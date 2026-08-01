@@ -1,1 +1,965 @@
-file:///C:/Users/reuni/Downloads/gerencial_v2_2.html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerencial Comercial</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--wine:#8B1C2A;--wine-dark:#6B0010;--wine-light:#F5EAE8;--cream:#F5F0EB;--card:#FFF8F5;--border:#E8D5CC;--text:#1A0508;--muted:#8A6A6E;--green:#085041;--green-bg:#E1F5EE;--amber:#854F0B;--amber-bg:#FAEEDA}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--cream);color:var(--text);font-size:14px;min-height:100vh}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:380px;width:100%;box-shadow:0 8px 40px rgba(139,28,42,.1);text-align:center}
+.login-logo{width:64px;height:64px;border-radius:50%;margin:0 auto 16px;object-fit:cover}
+.login-box h1{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px}
+.login-box p{font-size:13px;color:var(--muted);margin-bottom:28px}
+.pin-display{display:flex;gap:10px;justify-content:center;margin-bottom:24px}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .2s}
+.pin-dot.filled{background:var(--wine);border-color:var(--wine)}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:220px;margin:0 auto 16px}
+.pin-btn{padding:14px;border-radius:10px;border:1px solid var(--border);background:var(--card);font-size:18px;font-weight:600;cursor:pointer;color:var(--text);transition:all .15s}
+.pin-btn:hover{background:var(--wine-light);border-color:var(--wine)}
+.pin-btn:active{transform:scale(.95)}
+.pin-btn.del{color:var(--muted);font-size:14px}
+#login-error{color:#C03030;font-size:12px;margin-top:8px;min-height:18px}
+
+/* APP */
+#app-screen{display:none}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--card);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.topbar-left h1{font-size:17px;font-weight:700;color:var(--text)}
+.topbar-sub{font-size:11px;color:var(--muted)}
+.user-badge{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.user-badge .name{font-weight:600;color:var(--text)}
+.top-actions{display:flex;gap:8px;align-items:center}
+.btn{padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text);display:inline-flex;align-items:center;gap:6px;font-weight:500;transition:all .15s;white-space:nowrap}
+.btn:hover{background:#F0E8E3}
+.btn.primary{background:var(--wine);color:#FFF8F5;border-color:var(--wine)}
+.btn.primary:hover{background:var(--wine-dark)}
+.btn.sm{padding:4px 10px;font-size:11px}
+.btn.danger{background:#FCEBEB;color:#791F1F;border-color:#E8B0B0}
+
+/* NAVIGATION */
+.nav{display:flex;border-bottom:1px solid var(--border);background:var(--card);padding:0 24px}
+.nav-tab{padding:10px 16px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500;transition:all .15s}
+.nav-tab.active{color:var(--wine);border-bottom-color:var(--wine)}
+.nav-tab:hover{color:var(--text)}
+
+/* CONTENT */
+.content{padding:20px 24px;max-width:1300px;margin:0 auto}
+.section-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.card h3{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid-areas{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+
+/* KPIs */
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.kpi.hl{background:var(--wine-light);border-color:#C8A0A8}
+.kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;font-weight:600}
+.kpi.hl .lbl{color:var(--wine)}
+.kpi .val{font-size:22px;font-weight:700;color:var(--text);line-height:1}
+.kpi.hl .val{color:var(--wine-dark)}
+.kpi .sub{font-size:11px;margin-top:4px;color:var(--muted)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#F5F0EB;color:#5A3A3E;font-weight:600;text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+td{padding:9px 12px;border-bottom:1px solid #F0E8E3;color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FFF3EE}
+tr.boletado td{background:var(--green-bg)}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
+.b-green{background:var(--green-bg);color:var(--green)}
+.b-amber{background:var(--amber-bg);color:var(--amber)}
+.b-red{background:#FCEBEB;color:#791F1F}
+.b-blue{background:#E6F1FB;color:#0C447C}
+.b-purple{background:#EEEDFE;color:#3C3489}
+.b-wine{background:var(--wine-light);color:var(--wine-dark)}
+.b-gray{background:#F1EFE8;color:#5A3A3E}
+.b-teal{background:#E1F5EE;color:#085041}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:10px;font-weight:700;color:#5A3A3E;text-transform:uppercase;letter-spacing:.04em}
+.fg input,.fg select,.fg textarea{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--wine)}
+.fg textarea{resize:vertical;min-height:60px}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--card);border-radius:16px;padding:24px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(139,28,42,.15)}
+.modal-sm{max-width:420px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-header h2{font-size:16px;font-weight:700}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* MISC */
+.mini-bar{height:4px;border-radius:99px;background:var(--border);margin-top:4px}
+.mini-fill{height:4px;border-radius:99px}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--wine);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:180px;gap:12px;color:var(--muted);text-align:center}
+.empty svg{opacity:.25}
+.area-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:4px solid var(--wine)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.daily-opp{border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;background:var(--card);transition:all .2s}
+.daily-opp.selected{border-color:var(--wine);background:var(--wine-light)}
+.history-item{font-size:11px;padding:5px 0;border-bottom:1px solid #F0E8E3;color:var(--muted)}
+.history-item:last-child{border-bottom:none}
+.history-item strong{color:var(--text)}
+select.inline{border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;background:var(--card);color:var(--text);cursor:pointer}
+select.inline:focus{outline:none;border-color:var(--wine)}
+@media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.content{padding:12px 14px}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div style="font-size:48px;margin-bottom:12px">🏦</div>
+    <h1>Gerencial Comercial</h1>
+    <p>Digite seu PIN de acesso</p>
+    <div class="pin-display" id="pin-display">
+      <div class="pin-dot" id="d0"></div>
+      <div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div>
+      <div class="pin-dot" id="d3"></div>
+    </div>
+    <div class="pin-grid">
+      <button class="pin-btn" onclick="pinPress('1')">1</button>
+      <button class="pin-btn" onclick="pinPress('2')">2</button>
+      <button class="pin-btn" onclick="pinPress('3')">3</button>
+      <button class="pin-btn" onclick="pinPress('4')">4</button>
+      <button class="pin-btn" onclick="pinPress('5')">5</button>
+      <button class="pin-btn" onclick="pinPress('6')">6</button>
+      <button class="pin-btn" onclick="pinPress('7')">7</button>
+      <button class="pin-btn" onclick="pinPress('8')">8</button>
+      <button class="pin-btn" onclick="pinPress('9')">9</button>
+      <button class="pin-btn del" onclick="pinClear()">Limpar</button>
+      <button class="pin-btn" onclick="pinPress('0')">0</button>
+      <button class="pin-btn del" onclick="pinDel()">⌫</button>
+    </div>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div>
+        <h1>Gerencial Comercial</h1>
+        <div class="topbar-sub" id="topbar-sub"></div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <div class="user-badge">
+        <span id="user-area-badge"></span>
+        <span class="name" id="user-name-badge"></span>
+      </div>
+      <button class="btn" onclick="logout()">Sair</button>
+    </div>
+  </div>
+  <div class="nav" id="main-nav"></div>
+  <div class="content" id="main-content"></div>
+</div>
+
+<!-- MODALS -->
+<div id="modal-opp" class="modal-bg" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-opp-title">Editar oportunidade</h2>
+      <button class="modal-close" onclick="closeModal('opp')">×</button>
+    </div>
+    <div class="form-grid">
+      <div class="fg"><label>Status comercial</label>
+        <select id="ed-sc">
+          <option value="">Selecionar...</option>
+          <option>Ligar Cliente</option><option>Ligar Cliente c AI</option>
+          <option>Agendar Reunião</option><option>Reunião Agendada</option>
+          <option>Cliente Confirmar</option><option>Cliente Topou</option>
+          <option>Cliente Negou</option><option>Não se Aplica</option>
+        </select>
+      </div>
+      <div class="fg"><label>Pendência boleta</label>
+        <select id="ed-pb">
+          <option value="">Selecionar...</option>
+          <option>To Do Comercial</option><option>To Do Operacional</option>
+          <option>Email/Push + Saldo</option><option>Email + Suit + Saldo</option>
+          <option>Email + Suita</option><option>Email/Push</option><option>Email</option>
+          <option>A Boletar</option><option>Aguardando Comercial</option>
+          <option>Boletado</option><option>Não se Aplica</option>
+        </select>
+      </div>
+      <div class="fg"><label>Volume atual (R$)</label>
+        <input type="number" id="ed-atual" placeholder="0">
+      </div>
+      <div class="fg"><label>Data da boleta</label>
+        <input type="date" id="ed-data">
+      </div>
+      <div class="fg"><label>Fonte do $</label>
+        <select id="ed-fonte">
+          <option value="">Selecionar...</option>
+          <option>Aporte</option><option>STVM</option><option>Troca de ativo</option>
+          <option>Liquidez</option><option>Saldo</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:12px"><label>Próximo TODO</label>
+      <input type="text" id="ed-todo" placeholder="O que precisa ser feito...">
+    </div>
+    <div class="fg" style="margin-bottom:12px"><label>Observação</label>
+      <textarea id="ed-obs" placeholder="Observações sobre esta oportunidade..."></textarea>
+    </div>
+    <div id="ed-history" style="margin-bottom:12px"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('opp')">Cancelar</button>
+      <button class="btn primary" id="btn-save-opp" onclick="saveOpp()">Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-usuario" class="modal-bg modal-sm" style="display:none">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <h2 id="modal-user-title">Novo usuário</h2>
+      <button class="modal-close" onclick="closeModal('usuario')">×</button>
+    </div>
+    <div class="fg" style="margin-bottom:12px"><label>Nome</label>
+      <input type="text" id="u-nome" placeholder="Nome completo">
+    </div>
+    <div class="fg" style="margin-bottom:12px"><label>PIN (4 dígitos)</label>
+      <input type="text" id="u-pin" placeholder="1234" maxlength="4">
+    </div>
+    <div class="fg" style="margin-bottom:12px"><label>Perfil</label>
+      <select id="u-perfil" onchange="toggleAreaSelect()">
+        <option value="assessor">Assessor</option>
+        <option value="diretor">Diretor</option>
+      </select>
+    </div>
+    <div id="u-areas-wrap" class="fg" style="margin-bottom:16px"><label>Áreas com acesso</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;font-weight:normal;text-transform:none;letter-spacing:0"><input type="checkbox" value="inv" id="ua-inv"> Investimentos</label>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;font-weight:normal;text-transform:none;letter-spacing:0"><input type="checkbox" value="cons" id="ua-cons"> Consórcio</label>
+        <label style="font-size:12px;display:flex;align-items:center;gap:4px;font-weight:normal;text-transform:none;letter-spacing:0"><input type="checkbox" value="seg" id="ua-seg"> Seguro de vida</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('usuario')">Cancelar</button>
+      <button class="btn primary" onclick="saveUsuario()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-upload" class="modal-bg" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Upload de planilhas</h2>
+      <button class="modal-close" onclick="closeModal('upload')">×</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Suba as planilhas de pipe. O sistema importa automaticamente os campos Assessor, Cliente, Produto, Volume e Data.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
+      <div class="card" style="text-align:center;cursor:pointer" onclick="document.getElementById('f-inv').click()">
+        <div style="font-size:24px;margin-bottom:8px">📊</div>
+        <div style="font-size:12px;font-weight:600;color:var(--wine);margin-bottom:4px">Investimentos</div>
+        <div style="font-size:11px;color:var(--muted)">RV + RF</div>
+        <div id="st-inv" style="font-size:11px;margin-top:8px;color:var(--wine);font-weight:600"></div>
+        <input type="file" id="f-inv" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('inv',this)">
+      </div>
+      <div class="card" style="text-align:center;cursor:pointer" onclick="document.getElementById('f-cons').click()">
+        <div style="font-size:24px;margin-bottom:8px">📋</div>
+        <div style="font-size:12px;font-weight:600;color:#EF9F27;margin-bottom:4px">Consórcio</div>
+        <div style="font-size:11px;color:var(--muted)">Planilha de pipe</div>
+        <div id="st-cons" style="font-size:11px;margin-top:8px;color:#EF9F27;font-weight:600"></div>
+        <input type="file" id="f-cons" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('cons',this)">
+      </div>
+      <div class="card" style="text-align:center;cursor:pointer" onclick="document.getElementById('f-seg').click()">
+        <div style="font-size:24px;margin-bottom:8px">🛡️</div>
+        <div style="font-size:12px;font-weight:600;color:#7F77DD;margin-bottom:4px">Seguro de vida</div>
+        <div style="font-size:11px;color:var(--muted)">Planilha de pipe</div>
+        <div id="st-seg" style="font-size:11px;margin-top:8px;color:#7F77DD;font-weight:600"></div>
+        <input type="file" id="f-seg" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('seg',this)">
+      </div>
+    </div>
+    <div id="upload-log" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--wine);color:#FFF8F5;font-size:12px;font-weight:500;padding:10px 18px;border-radius:8px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;max-width:320px"></div>
+
+<script>
+const SUPA='https://xhkjxdnsuxybfxbvzgmf.supabase.co';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhoa2p4ZG5zdXh5YmZ4YnZ6Z21mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMjA0NTksImV4cCI6MjA5NjY5NjQ1OX0.xWT_dTjFa34B0Tl58I8_rFVkUcg0qSbHpwWrU1XDIwI';
+
+const AREA_NAMES={inv:'Investimentos',cons:'Consórcio',seg:'Seguro de vida'};
+const AREA_COLORS={inv:'#8B1C2A',cons:'#EF9F27',seg:'#7F77DD'};
+const SC_BADGE={'cliente topou':'b-green','cliente confirmar':'b-amber','agendar reunião':'b-purple','reunião agendada':'b-purple','ligar cliente':'b-gray','cliente negou':'b-red','não se aplica':'b-gray'};
+const PB_BADGE={'to do comercial':'b-amber','to do operacional':'b-blue','a boletar':'b-teal','boletado':'b-green','não se aplica':'b-gray','aguardando comercial':'b-amber','email':'b-purple'};
+
+let USER=null, OPPS=[], USUARIOS=[], DAILY={}, editingOppId=null;
+let pinVal='';
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
+function norm(s){return s?String(s).toLowerCase().trim().replace(/\s+/g,' '):''}
+function fmt(v){if(!v||isNaN(v)||v===0)return '—';if(v>=1000000)return 'R$'+(v/1000000).toFixed(1)+'M';if(v>=1000)return 'R$'+(v/1000).toFixed(0)+'k';return 'R$'+Math.round(v)}
+function isBoletado(r){const k=norm(r.pb||'');return k==='boletado'||k==='a boletar'}
+function isPending(r){const k=norm(r.pb||'');return k.includes('todo')||k.includes('email')||k.includes('aguardando')}
+function matchKey(val,map){const k=norm(val);for(const[kk,v]of Object.entries(map)){if(k.includes(norm(kk)))return v;}return null}
+function showToast(msg,col){const t=document.getElementById('toast');t.textContent=msg;t.style.background=col||'#8B1C2A';t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',3500)}
+function closeModal(id){document.getElementById('modal-'+id).style.display='none'}
+
+// ── SUPABASE ──────────────────────────────────────────────────────────────
+async function supa(method,table,data,filter){
+  let url=`${SUPA}/rest/v1/${table}`;
+  if(filter) url+=`?${filter}`;
+  const opts={method,headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':'return=minimal'}};
+  if(data) opts.body=JSON.stringify(data);
+  const res=await fetch(url,opts);
+  if(!res.ok){const e=await res.text();throw new Error(e)}
+  if(res.status===204)return null;
+  return res.json();
+}
+
+// ── PIN LOGIN ─────────────────────────────────────────────────────────────
+function pinPress(d){
+  if(pinVal.length>=4)return;
+  pinVal+=d;
+  updatePinDisplay();
+  if(pinVal.length===4) setTimeout(doLogin,200);
+}
+function pinDel(){pinVal=pinVal.slice(0,-1);updatePinDisplay();document.getElementById('login-error').textContent=''}
+function pinClear(){pinVal='';updatePinDisplay();document.getElementById('login-error').textContent=''}
+function updatePinDisplay(){
+  for(let i=0;i<4;i++){
+    document.getElementById('d'+i).classList.toggle('filled',i<pinVal.length);
+  }
+}
+async function doLogin(){
+  const errEl=document.getElementById('login-error');
+  errEl.textContent='Verificando...';
+  try{
+    const res=await fetch(`${SUPA}/rest/v1/usuarios?pin=eq.${pinVal}&ativo=eq.true&select=*`,{
+      headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json'}
+    });
+    if(!res.ok){
+      const body=await res.text();
+      errEl.textContent='Erro de conexão ('+res.status+'). Tente novamente.';
+      console.error('Supabase error:',body);
+      pinVal='';updatePinDisplay();return;
+    }
+    const data=await res.json();
+    if(!data||!data.length){
+      errEl.textContent='PIN incorreto. Tente novamente.';
+      pinVal='';updatePinDisplay();return;
+    }
+    USER=data[0];
+    errEl.textContent='';
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-screen').style.display='block';
+    await initApp();
+  }catch(e){
+    errEl.textContent='Sem conexão com internet. Verifique e tente novamente.';
+    console.error('Login error:',e);
+    pinVal='';updatePinDisplay();
+  }
+}
+function logout(){USER=null;pinVal='';updatePinDisplay();document.getElementById('login-error').textContent='';document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';}
+
+// ── APP INIT ──────────────────────────────────────────────────────────────
+async function initApp(){
+  document.getElementById('user-name-badge').textContent=USER.nome;
+  const areas=USER.perfil==='diretor'?Object.keys(AREA_NAMES):(USER.areas||[]);
+  document.getElementById('user-area-badge').innerHTML=areas.map(a=>`<span class="badge b-wine" style="margin-right:3px">${AREA_NAMES[a]||a}</span>`).join('');
+  document.getElementById('topbar-sub').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  await loadData();
+  buildNav();
+  renderView('dashboard');
+}
+
+async function loadData(){
+  const areas=USER.perfil==='diretor'?['inv','cons','seg']:(USER.areas||[]);
+  const areaFilter=areas.map(a=>`area.eq.${a}`).join(',');
+  const [opps, users]=await Promise.all([
+    supa('GET','oportunidades','',`or=(${areaFilter})&order=created_at.desc`),
+    USER.perfil==='diretor'?supa('GET','usuarios','','order=nome.asc'):Promise.resolve([])
+  ]);
+  OPPS=opps||[];
+  USUARIOS=users||[];
+  // Load today's daily
+  const today=new Date().toISOString().split('T')[0];
+  const dailyRes=await supa('GET','daily_selecoes','',`data=eq.${today}&assessor=eq.${encodeURIComponent(USER.nome)}`);
+  DAILY={};
+  (dailyRes||[]).forEach(d=>{DAILY[d.oportunidade_id]={tipo:d.tipo,acao:d.acao,id:d.id};});
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+let curView='dashboard';
+function buildNav(){
+  const tabs=USER.perfil==='diretor'
+    ?[['dashboard','Dashboard'],['pipeline','Pipeline'],['daily','Daily'],['upload','Upload'],['usuarios','Usuários']]
+    :[['dashboard','Meu painel'],['pipeline','Oportunidades'],['daily','Daily']];
+  document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>`<button class="nav-tab${v===curView?' active':''}" onclick="renderView('${v}',this)">${l}</button>`).join('');
+}
+function renderView(v,btn){
+  curView=v;
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  else{const t=document.querySelector(`.nav-tab[onclick*="'${v}'"]`);if(t)t.classList.add('active');}
+  const c=document.getElementById('main-content');
+  if(v==='dashboard')renderDashboard(c);
+  else if(v==='pipeline')renderPipeline(c);
+  else if(v==='daily')renderDaily(c);
+  else if(v==='upload')renderUpload(c);
+  else if(v==='usuarios')renderUsuarios(c);
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────
+function renderDashboard(c){
+  const areas=USER.perfil==='diretor'?['inv','cons','seg']:(USER.areas||[]);
+  const myOpps=USER.perfil==='diretor'?OPPS:OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+
+  const totalPipe=myOpps.reduce((s,r)=>s+(r.pipe||0),0);
+  const totalBol=myOpps.filter(isBoletado).reduce((s,r)=>s+(r.atual||0),0);
+  const totalPend=myOpps.filter(isPending).length;
+  const bolN=myOpps.filter(isBoletado).length;
+
+  let html=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px">
+    <div class="kpi hl"><div class="lbl">✓ Boletado</div><div class="val">${fmt(totalBol)||'R$0'}</div><div class="sub">${bolN} oportunidades</div></div>
+    <div class="kpi"><div class="lbl">Volume pipe</div><div class="val">${fmt(totalPipe)}</div><div class="sub">${myOpps.length} oport.</div></div>
+    <div class="kpi"><div class="lbl">Pendências</div><div class="val">${totalPend}</div><div class="sub">requerem ação</div></div>
+  </div>`;
+
+  // Area cards
+  html+=`<div class="section-title">Por área</div><div class="grid-areas" style="margin-bottom:20px">`;
+  areas.forEach(ak=>{
+    const rows=myOpps.filter(r=>r.area===ak);
+    const pipe=rows.reduce((s,r)=>s+(r.pipe||0),0);
+    const bol=rows.filter(isBoletado).reduce((s,r)=>s+(r.atual||0),0);
+    const bolN2=rows.filter(isBoletado).length;
+    const pend=rows.filter(isPending).length;
+    const cor=AREA_COLORS[ak];
+    html+=`<div class="area-card" style="border-left-color:${cor}">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:6px">
+        <span style="width:8px;height:8px;border-radius:50%;background:${cor}"></span>${AREA_NAMES[ak]}
+      </div>
+      <div style="background:var(--wine-light);border:1px solid #C8A0A8;border-radius:8px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:10px;color:var(--wine);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">✓ Boletado</div>
+        <div style="font-size:20px;font-weight:700;color:var(--wine-dark)">${fmt(bol)||'R$0'}</div>
+        <div style="font-size:11px;color:var(--wine);margin-top:2px">${bolN2} opor.</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid #F0E8E3"><span style="color:var(--muted)">Total opor.</span><span style="font-weight:600">${rows.length}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid #F0E8E3"><span style="color:var(--muted)">Volume pipe</span><span style="font-weight:600">${fmt(pipe)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0"><span style="color:var(--muted)">Pendências</span><span style="font-weight:600;color:${pend>0?'#854F0B':'#085041'}">${pend||'—'}</span></div>
+    </div>`;
+  });
+  html+='</div>';
+
+  // Pipeline table by area+product
+  const prodMap={};
+  myOpps.forEach(r=>{
+    const gk=AREA_NAMES[r.area]||r.area;
+    const pk=r.produto||'Outros';
+    if(!prodMap[gk]){prodMap[gk]={pipe:0,bol:0,n:0,cor:AREA_COLORS[r.area],subs:{}};}
+    prodMap[gk].pipe+=(r.pipe||0);prodMap[gk].n++;
+    if(isBoletado(r))prodMap[gk].bol+=(r.atual||0);
+    if(!prodMap[gk].subs[pk]){prodMap[gk].subs[pk]={pipe:0,bol:0,n:0};}
+    prodMap[gk].subs[pk].pipe+=(r.pipe||0);prodMap[gk].subs[pk].n++;
+    if(isBoletado(r))prodMap[gk].subs[pk].bol+=(r.atual||0);
+  });
+
+  if(Object.keys(prodMap).length){
+    html+=`<div class="section-title">Pipeline por área e produto</div><div class="tbl-wrap">
+    <table><thead><tr><th>Área / Produto</th><th style="text-align:right">Opor.</th><th style="text-align:right">Volume pipe</th><th style="text-align:right">Boletado</th></tr></thead><tbody>`;
+    Object.entries(prodMap).sort((a,b)=>b[1].pipe-a[1].pipe).forEach(([gk,v])=>{
+      html+=`<tr style="background:#F5F0EB"><td style="font-weight:700"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${v.cor};display:inline-block"></span>${gk}</span></td><td style="text-align:right;font-weight:700">${v.n}</td><td style="text-align:right;font-weight:700;color:${v.cor}">${fmt(v.pipe)}</td><td style="text-align:right;font-weight:700;color:var(--wine-dark)">${fmt(v.bol)||'—'}</td></tr>`;
+      Object.entries(v.subs).sort((a,b)=>b[1].pipe-a[1].pipe).forEach(([pk,sv])=>{
+        html+=`<tr><td style="padding-left:22px;color:#5A3A3E;font-size:12px">${pk}</td><td style="text-align:right;color:var(--muted)">${sv.n}</td><td style="text-align:right;color:var(--muted)">${fmt(sv.pipe)}</td><td style="text-align:right;color:var(--green)">${fmt(sv.bol)||'—'}</td></tr>`;
+      });
+    });
+    html+=`</tbody></table></div>`;
+  }
+
+  // Assessor ranking (director only)
+  if(USER.perfil==='diretor'){
+    const assMap={};
+    OPPS.forEach(r=>{
+      if(!r.assessor)return;
+      if(!assMap[r.assessor]){assMap[r.assessor]={pipe:0,bol:0,n:0,area:r.area};}
+      assMap[r.assessor].pipe+=(r.pipe||0);assMap[r.assessor].n++;
+      if(isBoletado(r))assMap[r.assessor].bol+=(r.atual||0);
+    });
+    const maxBol=Math.max(...Object.values(assMap).map(v=>v.bol),1);
+    html+=`<div class="section-title">Ranking de assessores</div><div class="tbl-wrap"><table>
+    <thead><tr><th>Assessor</th><th>Área</th><th style="text-align:right">Opor.</th><th style="text-align:right">Pipe</th><th style="text-align:right">Boletado</th></tr></thead><tbody>`;
+    Object.entries(assMap).sort((a,b)=>b[1].bol-a[1].bol).forEach(([name,v])=>{
+      const pct=Math.min(Math.round(v.bol/maxBol*100),100);
+      const cor=AREA_COLORS[v.area]||'#8B1C2A';
+      html+=`<tr><td><div style="font-weight:600">${name}</div><div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${cor}"></div></div></td>
+      <td><span class="badge" style="background:${cor}18;color:${cor}">${AREA_NAMES[v.area]||v.area}</span></td>
+      <td style="text-align:right">${v.n}</td><td style="text-align:right;color:var(--muted)">${fmt(v.pipe)}</td>
+      <td style="text-align:right;font-weight:700;color:var(--wine-dark)">${fmt(v.bol)||'—'}</td></tr>`;
+    });
+    html+=`</tbody></table></div>`;
+  }
+
+  c.innerHTML=html;
+}
+
+// ── PIPELINE ──────────────────────────────────────────────────────────────
+function renderPipeline(c){
+  const myOpps=USER.perfil==='diretor'?OPPS:OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+  const areas=USER.perfil==='diretor'?['inv','cons','seg']:(USER.areas||[]);
+
+  let filters=`<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">`;
+  if(USER.perfil==='diretor'){
+    filters+=`<select id="f-area" onchange="filterPipeline()" class="fg" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)"><option value="">Todas as áreas</option>${areas.map(a=>`<option value="${a}">${AREA_NAMES[a]}</option>`).join('')}</select>`;
+    filters+=`<select id="f-ass" onchange="filterPipeline()" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)"><option value="">Todos assessores</option>${[...new Set(OPPS.map(r=>r.assessor).filter(Boolean))].sort().map(a=>`<option>${a}</option>`).join('')}</select>`;
+  }
+  filters+=`<select id="f-sc" onchange="filterPipeline()" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)"><option value="">Todos status</option>${['Ligar Cliente','Ligar Cliente c AI','Agendar Reunião','Reunião Agendada','Cliente Confirmar','Cliente Topou','Cliente Negou','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}</select>`;
+  filters+=`<select id="f-pb" onchange="filterPipeline()" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)"><option value="">Todas pendências</option>${['To Do Comercial','To Do Operacional','A Boletar','Boletado','Aguardando Comercial','Email','Email/Push','Email + Suit + Saldo','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}</select>`;
+  filters+=`<input id="f-cli" type="text" placeholder="Buscar cliente..." oninput="filterPipeline()" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);flex:1;min-width:120px">`;
+  filters+=`</div><div id="pipe-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px"></div><div id="pipe-tbl"></div>`;
+
+  c.innerHTML=filters;
+  filterPipeline();
+}
+
+function filterPipeline(){
+  const myOpps=USER.perfil==='diretor'?OPPS:OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+  let rows=[...myOpps];
+  const fA=document.getElementById('f-area')?.value;
+  const fAss=document.getElementById('f-ass')?.value;
+  const fSC=document.getElementById('f-sc')?.value;
+  const fPB=document.getElementById('f-pb')?.value;
+  const fCli=(document.getElementById('f-cli')?.value||'').toLowerCase();
+  if(fA)rows=rows.filter(r=>r.area===fA);
+  if(fAss)rows=rows.filter(r=>r.assessor===fAss);
+  if(fSC)rows=rows.filter(r=>r.sc===fSC);
+  if(fPB)rows=rows.filter(r=>r.pb===fPB);
+  if(fCli)rows=rows.filter(r=>(r.cliente||'').toLowerCase().includes(fCli));
+
+  const kpi=document.getElementById('pipe-kpis');
+  if(kpi){
+    const totP=rows.reduce((s,r)=>s+(r.pipe||0),0);
+    const totB=rows.filter(isBoletado).reduce((s,r)=>s+(r.atual||0),0);
+    kpi.innerHTML=`<div class="kpi hl"><div class="lbl">Boletado</div><div class="val">${fmt(totB)||'R$0'}</div></div>
+    <div class="kpi"><div class="lbl">Pipe</div><div class="val">${fmt(totP)}</div><div class="sub">${rows.length} opor.</div></div>
+    <div class="kpi"><div class="lbl">Pendências</div><div class="val">${rows.filter(isPending).length}</div></div>`;
+  }
+
+  const wrap=document.getElementById('pipe-tbl');
+  if(!wrap)return;
+  if(!rows.length){wrap.innerHTML='<div class="empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg><p>Nenhuma oportunidade encontrada</p></div>';return;}
+
+  let html='<div class="tbl-wrap"><table><thead><tr>';
+  if(USER.perfil==='diretor')html+='<th>Assessor</th>';
+  html+=`<th>Cliente</th><th>Área</th><th>Produto</th><th style="text-align:right">Pipe</th><th style="text-align:right">Atual</th><th>Status</th><th>Pendência</th><th>TODO</th><th>Ação</th></tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const bsc=matchKey(r.sc||'',SC_BADGE)||'b-gray';
+    const bpb=matchKey(r.pb||'',PB_BADGE)||'b-gray';
+    const cor=AREA_COLORS[r.area]||'#888';
+    html+=`<tr class="${isBoletado(r)?'boletado':''}">`;
+    if(USER.perfil==='diretor')html+=`<td style="font-weight:500">${r.assessor||'—'}</td>`;
+    html+=`<td style="font-weight:500">${r.cliente||'—'}</td>
+    <td><span class="badge" style="background:${cor}18;color:${cor}">${AREA_NAMES[r.area]||r.area||'—'}</span></td>
+    <td>${r.produto||'—'}</td>
+    <td style="text-align:right;color:var(--muted)">${fmt(r.pipe)}</td>
+    <td style="text-align:right;font-weight:600;color:${isBoletado(r)?'var(--wine-dark)':'var(--text)'}">${fmt(r.atual)}</td>
+    <td>${r.sc?`<span class="badge ${bsc}">${r.sc}</span>`:'—'}</td>
+    <td>${r.pb?`<span class="badge ${bpb}">${r.pb}</span>`:'—'}</td>
+    <td style="font-size:11px;color:var(--muted);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${r.todo||''}">${r.todo||'—'}</td>
+    <td><button class="btn sm" onclick="openEditOpp('${r.id}')">Editar</button></td></tr>`;
+  });
+  html+='</tbody></table></div>';
+  wrap.innerHTML=html;
+}
+
+// ── EDIT OPP ──────────────────────────────────────────────────────────────
+function openEditOpp(id){
+  const r=OPPS.find(o=>o.id===id);
+  if(!r)return;
+  editingOppId=id;
+  document.getElementById('modal-opp-title').textContent=`${r.cliente} — ${r.produto||r.area}`;
+  document.getElementById('ed-sc').value=r.sc||'';
+  document.getElementById('ed-pb').value=r.pb||'';
+  document.getElementById('ed-atual').value=r.atual||'';
+  document.getElementById('ed-data').value=r.data_boleta||'';
+  document.getElementById('ed-fonte').value=r.fonte||'';
+  document.getElementById('ed-todo').value=r.todo||'';
+  document.getElementById('ed-obs').value=r.obs||'';
+
+  // History
+  const hist=r.historico||[];
+  const histEl=document.getElementById('ed-history');
+  if(hist.length){
+    histEl.innerHTML=`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Histórico de alterações</div>
+    <div style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;max-height:140px;overflow-y:auto">
+    ${hist.slice(-10).reverse().map(h=>`<div class="history-item"><strong>${h.usuario}</strong> · ${h.data} — ${h.campo}: <em>${h.de||'—'}</em> → <strong>${h.para}</strong></div>`).join('')}
+    </div>`;
+  } else histEl.innerHTML='';
+
+  document.getElementById('modal-opp').style.display='flex';
+}
+
+async function saveOpp(){
+  const r=OPPS.find(o=>o.id===editingOppId);
+  if(!r)return;
+  const btn=document.getElementById('btn-save-opp');
+  btn.innerHTML='<span class="spinner"></span>';btn.disabled=true;
+
+  const newSc=document.getElementById('ed-sc').value;
+  const newPb=document.getElementById('ed-pb').value;
+  const newAtual=parseFloat(document.getElementById('ed-atual').value)||0;
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('pt-BR')+ ' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+
+  // Build history entries
+  const hist=[...(r.historico||[])];
+  const changes=[
+    ['Status comercial',r.sc,newSc],
+    ['Pendência boleta',r.pb,newPb],
+    ['Volume atual',String(r.atual||0),String(newAtual)],
+  ];
+  changes.forEach(([campo,de,para])=>{
+    if(de!==para&&para) hist.push({campo,de,para,usuario:USER.nome,data:dateStr});
+  });
+
+  const data={
+    sc:newSc,pb:newPb,atual:newAtual,
+    data_boleta:document.getElementById('ed-data').value||null,
+    fonte:document.getElementById('ed-fonte').value,
+    todo:document.getElementById('ed-todo').value,
+    obs:document.getElementById('ed-obs').value,
+    historico:hist,
+    updated_at:now.toISOString()
+  };
+
+  try{
+    await supa('PATCH','oportunidades',data,`id=eq.${editingOppId}`);
+    showToast('Salvo!','#085041');
+    closeModal('opp');
+    await loadData();
+    filterPipeline();
+  }catch(e){showToast('Erro: '+e.message,'#C03030');}
+  btn.innerHTML='Salvar alterações';btn.disabled=false;
+}
+
+// ── DAILY ─────────────────────────────────────────────────────────────────
+function renderDaily(c){
+  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+  const today=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
+
+  // Group opps
+  const reunioes=myOpps.filter(r=>norm(r.sc||'').includes('reunião')||norm(r.sc||'').includes('agendar'));
+  const pendentes=myOpps.filter(r=>isPending(r)&&!isBoletado(r)&&!reunioes.includes(r));
+  const outros=myOpps.filter(r=>!isPending(r)&&!isBoletado(r)&&!reunioes.includes(r));
+
+  function oppCard(r){
+    const isSel=!!DAILY[r.id];
+    const cor=AREA_COLORS[r.area]||'#8B1C2A';
+    const bpb=matchKey(r.pb||'',PB_BADGE)||'b-gray';
+    const tipo=DAILY[r.id]?.tipo||'';
+    const acao=DAILY[r.id]?.acao||'';
+    return `<div class="daily-opp${isSel?' selected':''}" id="dopp-${r.id}">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <input type="checkbox" ${isSel?'checked':''} onchange="toggleDaily('${r.id}',this.checked)"
+          style="width:17px;height:17px;accent-color:${cor};cursor:pointer;margin-top:2px;flex-shrink:0">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+            <span style="font-size:13px;font-weight:600">${r.cliente}</span>
+            <span class="badge" style="background:${cor}18;color:${cor}">${r.produto||AREA_NAMES[r.area]}</span>
+            <span class="badge ${bpb}" style="font-size:10px">${r.pb||'—'}</span>
+            <span style="margin-left:auto;font-weight:600;color:${cor}">${fmt(r.atual||r.pipe)}</span>
+          </div>
+          ${r.todo?`<div style="font-size:11px;color:var(--muted);margin-bottom:6px">📋 ${r.todo}</div>`:''}
+          ${isSel?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+            <div class="fg"><label>Tipo de ação</label>
+              <select class="inline" onchange="updateDaily('${r.id}','tipo',this.value)">
+                <option value=""${!tipo?' selected':''}>Selecionar...</option>
+                <option value="reuniao"${tipo==='reuniao'?' selected':''}>📅 Reunião</option>
+                <option value="boleta"${tipo==='boleta'?' selected':''}>✅ Boleta</option>
+                <option value="todo"${tipo==='todo'?' selected':''}>📋 TODO / Ligação</option>
+              </select>
+            </div>
+            <div class="fg"><label>Ação planejada</label>
+              <input type="text" value="${acao}" placeholder="O que vai fazer..." onchange="updateDaily('${r.id}','acao',this.value)" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card)">
+            </div>
+          </div>`:''}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function group(title,rows,cor){
+    if(!rows.length)return'';
+    return `<div style="font-size:11px;font-weight:700;color:${cor};text-transform:uppercase;letter-spacing:.05em;margin:16px 0 8px;display:flex;align-items:center;gap:6px">
+      ${title}<span style="background:${cor}18;color:${cor};padding:1px 8px;border-radius:999px;font-size:10px">${rows.length}</span></div>
+    ${rows.map(oppCard).join('')}`;
+  }
+
+  const selCount=Object.keys(DAILY).length;
+  const selBol=Object.entries(DAILY).filter(([,v])=>v.tipo==='boleta').length;
+  const selReun=Object.entries(DAILY).filter(([,v])=>v.tipo==='reuniao').length;
+  const selTodo=Object.entries(DAILY).filter(([,v])=>v.tipo==='todo').length;
+
+  c.innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div><div style="font-size:16px;font-weight:700">Daily — ${today}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Selecione as oportunidades que vai trabalhar hoje</div></div>
+      <button class="btn primary" onclick="exportDailyPDF()">Exportar PDF do dia</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+      <div class="kpi hl"><div class="lbl">Selecionadas</div><div class="val">${selCount}</div></div>
+      <div class="kpi"><div class="lbl">📅 Reuniões</div><div class="val">${selReun}</div></div>
+      <div class="kpi"><div class="lbl">✅ Boletas</div><div class="val">${selBol}</div></div>
+      <div class="kpi"><div class="lbl">📋 TODOs</div><div class="val">${selTodo}</div></div>
+    </div>
+    ${group('📅 Reuniões pendentes',reunioes,'#8B1C2A')}
+    ${group('⚡ Com pendência',pendentes,'#854F0B')}
+    ${group('📂 Outras',outros,'#5A3A3E')}
+    ${!myOpps.length?'<div class="empty"><p>Nenhuma oportunidade atribuída a você ainda.</p></div>':''}
+  `;
+}
+
+async function toggleDaily(oppId, checked){
+  const today=new Date().toISOString().split('T')[0];
+  try{
+    if(checked){
+      if(!DAILY[oppId]){
+        const res=await supa('POST','daily_selecoes',{data:today,assessor:USER.nome,oportunidade_id:oppId,tipo:'',acao:''});
+        DAILY[oppId]={tipo:'',acao:'',id:res?.[0]?.id};
+      }
+    } else {
+      if(DAILY[oppId]?.id){
+        await supa('DELETE','daily_selecoes','',`id=eq.${DAILY[oppId].id}`);
+      }
+      delete DAILY[oppId];
+    }
+    renderView('daily');
+  }catch(e){showToast('Erro: '+e.message,'#C03030');}
+}
+
+async function updateDaily(oppId, field, value){
+  if(!DAILY[oppId]?.id)return;
+  DAILY[oppId][field]=value;
+  try{
+    await supa('PATCH','daily_selecoes',{[field]:value},`id=eq.${DAILY[oppId].id}`);
+  }catch(e){console.warn('daily update:',e);}
+}
+
+function exportDailyPDF(){
+  const today=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  const selected=Object.entries(DAILY).filter(([,v])=>v.tipo);
+  if(!selected.length){showToast('Selecione e defina o tipo das oportunidades antes de exportar!','#854F0B');return;}
+
+  const grupos={reuniao:{emoji:'📅',label:'Reuniões',items:[]},boleta:{emoji:'✅',label:'Boletas a fechar',items:[]},todo:{emoji:'📋',label:'TODOs e ligações',items:[]}};
+  selected.forEach(([id,v])=>{
+    const r=OPPS.find(o=>o.id===id);
+    if(!r)return;
+    if(!grupos[v.tipo])return;
+    grupos[v.tipo].items.push({r,acao:v.acao||''});
+  });
+
+  const secoes=Object.values(grupos).filter(g=>g.items.length).map(g=>`
+    <h2>${g.emoji} ${g.label} (${g.items.length})</h2>
+    <table><thead><tr><th>Cliente</th><th>Produto</th><th>Status</th><th>Pendência</th><th>Volume</th><th>Ação planejada</th></tr></thead>
+    <tbody>${g.items.map(({r,acao})=>`<tr><td><strong>${r.cliente}</strong></td><td>${r.produto||'—'}</td><td>${r.sc||'—'}</td><td>${r.pb||'—'}</td><td style="color:#6B0010;font-weight:700">${fmt(r.atual||r.pipe)}</td><td style="color:#444;font-style:italic">${acao||'—'}</td></tr>`).join('')}</tbody></table>`).join('<hr style="border:1px solid #E8D5CC;margin:20px 0">');
+
+  const totalVol=selected.reduce((s,[id])=>{const r=OPPS.find(o=>o.id===id);return s+(r?.atual||r?.pipe||0);},0);
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily ${USER.nome}</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;color:#1A0508;font-size:13px;padding:40px}
+  .header{border-bottom:3px solid #8B1C2A;padding-bottom:20px;margin-bottom:24px;display:flex;justify-content:space-between}
+  h1{font-size:22px;font-weight:700;color:#8B1C2A}h2{font-size:13px;font-weight:700;margin:16px 0 10px;text-transform:uppercase;letter-spacing:.05em}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+  .kpi{border:1px solid #E8D5CC;border-radius:8px;padding:12px;text-align:center}
+  .kpi.hl{background:#8B1C2A;color:#fff}
+  .kv{font-size:20px;font-weight:800}.kl{font-size:10px;text-transform:uppercase;opacity:.7;margin-bottom:4px}
+  table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px}
+  th{background:#F5F0EB;padding:7px 10px;text-align:left;font-size:11px;text-transform:uppercase;border-bottom:2px solid #E8D5CC}
+  td{padding:6px 10px;border-bottom:1px solid #F0E8E3}
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head>
+  <body><div class="header"><div><h1>Daily — ${USER.nome}</h1><div style="color:#8A6A6E;margin-top:4px">${today}</div></div>
+  <div style="text-align:right;font-size:12px;color:#8A6A6E">${selected.length} oportunidades<br>${fmt(totalVol)}</div></div>
+  <div class="kpi-row">
+    <div class="kpi hl"><div class="kl">Total</div><div class="kv">${selected.length}</div></div>
+    <div class="kpi"><div class="kl">📅 Reuniões</div><div class="kv">${grupos.reuniao.items.length}</div></div>
+    <div class="kpi"><div class="kl">✅ Boletas</div><div class="kv">${grupos.boleta.items.length}</div></div>
+    <div class="kpi"><div class="kl">📋 TODOs</div><div class="kv">${grupos.todo.items.length}</div></div>
+  </div>
+  ${secoes}
+  <div style="margin-top:40px;padding-top:12px;border-top:1px solid #E8D5CC;font-size:11px;color:#B4A0A8;display:flex;justify-content:space-between"><span>Gerencial Comercial — Daily</span><span>${new Date().toLocaleString('pt-BR')}</span></div>
+  </body></html>`;
+  const w=window.open('','_blank');w.document.write(html);w.document.close();setTimeout(()=>w.print(),600);
+}
+
+// ── UPLOAD ────────────────────────────────────────────────────────────────
+function renderUpload(c){
+  c.innerHTML=`<div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+    Suba as planilhas de pipe. O sistema importa Assessor, Cliente, Produto, Volume e Data — e mantém os status/pendências já preenchidos pelo time.</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+    <div class="card" style="text-align:center;cursor:pointer;border-top:3px solid #8B1C2A" onclick="document.getElementById('f-inv').click()">
+      <div style="font-size:28px;margin-bottom:8px">📊</div>
+      <div style="font-size:13px;font-weight:600;color:#8B1C2A;margin-bottom:4px">Investimentos</div>
+      <div style="font-size:11px;color:var(--muted)">Abas: rv + RF</div>
+      <div id="st-inv" style="font-size:12px;margin-top:10px;font-weight:600;min-height:20px"></div>
+      <button class="btn primary sm" style="margin-top:10px;width:100%;justify-content:center">Selecionar arquivo</button>
+      <input type="file" id="f-inv" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('inv',this)">
+    </div>
+    <div class="card" style="text-align:center;cursor:pointer;border-top:3px solid #EF9F27" onclick="document.getElementById('f-cons').click()">
+      <div style="font-size:28px;margin-bottom:8px">📋</div>
+      <div style="font-size:13px;font-weight:600;color:#EF9F27;margin-bottom:4px">Consórcio</div>
+      <div style="font-size:11px;color:var(--muted)">Planilha de pipe</div>
+      <div id="st-cons" style="font-size:12px;margin-top:10px;font-weight:600;min-height:20px"></div>
+      <button class="btn sm" style="margin-top:10px;width:100%;justify-content:center;border-color:#EF9F27;color:#EF9F27">Selecionar arquivo</button>
+      <input type="file" id="f-cons" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('cons',this)">
+    </div>
+    <div class="card" style="text-align:center;cursor:pointer;border-top:3px solid #7F77DD" onclick="document.getElementById('f-seg').click()">
+      <div style="font-size:28px;margin-bottom:8px">🛡️</div>
+      <div style="font-size:13px;font-weight:600;color:#7F77DD;margin-bottom:4px">Seguro de vida</div>
+      <div style="font-size:11px;color:var(--muted)">Planilha de pipe</div>
+      <div id="st-seg" style="font-size:12px;margin-top:10px;font-weight:600;min-height:20px"></div>
+      <button class="btn sm" style="margin-top:10px;width:100%;justify-content:center;border-color:#7F77DD;color:#7F77DD">Selecionar arquivo</button>
+      <input type="file" id="f-seg" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('seg',this)">
+    </div>
+  </div>
+  <div id="upload-log" style="margin-top:16px"></div>`;
+}
+
+async function handleUpload(area, input){
+  const file=input.files[0];if(!file)return;
+  input.value='';
+  const st=document.getElementById('st-'+area);
+  if(st)st.textContent='Lendo...';
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      let newRows=[];
+      if(area==='inv'){
+        for(const sn of wb.SheetNames){
+          const raw=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:''});
+          newRows=[...newRows,...parsePipe(raw,area)];
+        }
+      } else {
+        const raw=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
+        newRows=parsePipe(raw,area);
+      }
+      if(!newRows.length){if(st)st.textContent='⚠ Nenhuma linha encontrada';return;}
+      if(st)st.textContent=`Salvando ${newRows.length} oportunidades...`;
+
+      // Smart merge: keep existing opp data (sc, pb, todo, obs, historico) by assessor+cliente+produto
+      const existing=OPPS.filter(r=>r.area===area);
+      const toInsert=[], toUpdate=[];
+      newRows.forEach(nr=>{
+        const ex=existing.find(e=>norm(e.assessor)===norm(nr.assessor)&&norm(e.cliente)===norm(nr.cliente)&&norm(e.produto||'')===norm(nr.produto||''));
+        if(ex){toUpdate.push({id:ex.id,pipe:nr.pipe,updated_at:new Date().toISOString()});}
+        else{toInsert.push(nr);}
+      });
+
+      // Insert new
+      if(toInsert.length){
+        for(let i=0;i<toInsert.length;i+=50) await supa('POST','oportunidades',toInsert.slice(i,i+50));
+      }
+      // Update existing (only pipe/data)
+      for(const u of toUpdate) await supa('PATCH','oportunidades',{pipe:u.pipe,updated_at:u.updated_at},`id=eq.${u.id}`);
+
+      if(st)st.textContent=`✓ ${newRows.length} importadas (${toInsert.length} novas, ${toUpdate.length} atualizadas)`;
+      showToast(`${AREA_NAMES[area]}: ${newRows.length} oportunidades importadas!`,'#085041');
+      const log=document.getElementById('upload-log');
+      if(log){const d=document.createElement('div');d.style.cssText='background:var(--green-bg);border:1px solid #9FE1CB;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:12px;color:var(--green)';d.innerHTML=`<strong>${AREA_NAMES[area]}</strong> — ${newRows.length} oportunidades de <strong>${file.name}</strong> em ${new Date().toLocaleTimeString('pt-BR')}`;log.prepend(d);}
+      await loadData();
+    }catch(err){if(st)st.textContent='Erro: '+err.message;showToast('Erro: '+err.message,'#C03030');}
+  };
+  reader.readAsBinaryString(file);
+}
+
+function parsePipe(raw,area){
+  let hr=-1;
+  for(let i=0;i<Math.min(raw.length,5);i++){
+    const v=raw[i].map(x=>String(x).trim().toLowerCase());
+    if(v.some(x=>x.includes('assessor')||x==='ai'||x==='aai')){hr=i;break;}
+  }
+  if(hr<0)return[];
+  const h=raw[hr].map(x=>String(x).trim().toLowerCase());
+  const fi=(aliases)=>{for(const a of aliases){const i=h.findIndex(x=>x.includes(a));if(i>=0)return i;}return -1;};
+  const ci={ass:fi(['assessor','ai','aai']),cli:fi(['cliente']),prod:fi(['produto']),pipe:fi(['volume acordado','pipe atual','rf pipe','rv pipe','seg pipe','pipe','volume']),data:fi(['data pipe','data'])};
+  return raw.slice(hr+1).filter(r=>{const a=String(r[ci.ass]||'').trim();return a&&a.toLowerCase()!=='nan'&&a.toLowerCase()!=='assessor';}).map(r=>({
+    area,assessor:String(r[ci.ass]||'').trim(),cliente:String(r[ci.cli]||'').trim(),
+    produto:String(r[ci.prod]||'').trim(),
+    pipe:parseFloat(String(r[ci.pipe]||0).replace(/[^0-9.,]/g,'').replace(',','.'))||0,
+    data_boleta:ci.data>=0&&r[ci.data]?String(r[ci.data]).trim():null,
+    sc:'',pb:'',todo:'',obs:'',atual:0,historico:[]
+  })).filter(r=>r.assessor&&r.cliente);
+}
+
+// ── USUARIOS ──────────────────────────────────────────────────────────────
+function renderUsuarios(c){
+  let html=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="font-size:14px;font-weight:600">${USUARIOS.length} usuários cadastrados</div>
+    <button class="btn primary" onclick="openModal('usuario')">+ Novo usuário</button>
+  </div>
+  <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Áreas</th><th>PIN</th><th>Status</th><th>Ação</th></tr></thead><tbody>`;
+  USUARIOS.forEach(u=>{
+    const areas=(u.areas||[]).map(a=>`<span class="badge b-wine" style="margin-right:3px">${AREA_NAMES[a]||a}</span>`).join('');
+    html+=`<tr><td style="font-weight:600">${u.nome}</td>
+    <td><span class="badge ${u.perfil==='diretor'?'b-wine':'b-gray'}">${u.perfil}</span></td>
+    <td>${u.perfil==='diretor'?'<span class="badge b-wine">Todas</span>':areas||'—'}</td>
+    <td><code style="background:#F5F0EB;padding:2px 6px;border-radius:4px;font-size:12px">${u.pin}</code></td>
+    <td><span class="badge ${u.ativo?'b-green':'b-red'}">${u.ativo?'Ativo':'Inativo'}</span></td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn sm" onclick="toggleUsuario('${u.id}',${!u.ativo})">${u.ativo?'Desativar':'Ativar'}</button>
+      <button class="btn sm danger" onclick="deleteUsuario('${u.id}')">Remover</button>
+    </div></td></tr>`;
+  });
+  html+='</tbody></table></div>';
+  c.innerHTML=html;
+}
+
+function openModal(type){document.getElementById('modal-'+type).style.display='flex';}
+function toggleAreaSelect(){
+  const p=document.getElementById('u-perfil').value;
+  document.getElementById('u-areas-wrap').style.display=p==='diretor'?'none':'flex';
+}
+
+async function saveUsuario(){
+  const nome=document.getElementById('u-nome').value.trim();
+  const pin=document.getElementById('u-pin').value.trim();
+  const perfil=document.getElementById('u-perfil').value;
+  if(!nome||!pin){showToast('Preencha nome e PIN!','#C03030');return;}
+  if(pin.length!==4||isNaN(pin)){showToast('PIN deve ter 4 dígitos numéricos!','#C03030');return;}
+  const areas=perfil==='diretor'?['inv','cons','seg']:['inv','cons','seg'].filter(a=>document.getElementById('ua-'+a)?.checked);
+  try{
+    await supa('POST','usuarios',{nome,pin,perfil,areas,ativo:true});
+    showToast('Usuário criado!','#085041');
+    closeModal('usuario');
+    const users=await supa('GET','usuarios','','order=nome.asc');
+    USUARIOS=users||[];
+    renderView('usuarios');
+  }catch(e){showToast('Erro: '+e.message,'#C03030');}
+}
+
+async function toggleUsuario(id,ativo){
+  try{await supa('PATCH','usuarios',{ativo},`id=eq.${id}`);const u=await supa('GET','usuarios','','order=nome.asc');USUARIOS=u||[];renderView('usuarios');}
+  catch(e){showToast('Erro: '+e.message,'#C03030');}
+}
+
+async function deleteUsuario(id){
+  if(!confirm('Remover este usuário?'))return;
+  try{await supa('DELETE','usuarios','',`id=eq.${id}`);const u=await supa('GET','usuarios','','order=nome.asc');USUARIOS=u||[];renderView('usuarios');}
+  catch(e){showToast('Erro: '+e.message,'#C03030');}
+}
+</script>
+</body>
+</html>
