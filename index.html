@@ -536,12 +536,19 @@ function buildNav(){
   document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>`<button class="nav-tab${v===curView?' active':''}" onclick="setView('${v}',this)">${l}</button>`).join('');
 }
 
-function setView(v,btn){
+async function setView(v,btn){
   curView=v;
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   if(btn)btn.classList.add('active');
   Object.values(charts).forEach(c=>{try{c.destroy()}catch{}});charts={};
+  // Recarrega dados frescos ao trocar de aba (pega atualizações do time)
+  try{await loadData();}catch(e){}
+  renderCurView();
+}
+
+function renderCurView(){
   const c=document.getElementById('main-content');
+  const v=curView;
   if(v==='diretor')renderDiretor(c);
   else if(v==='d-pipeline')renderDPipeline(c);
   else if(v==='d-metas')renderMetas(c);
@@ -550,6 +557,18 @@ function setView(v,btn){
   else if(v==='a-opps')renderAssessorOpps(c);
   else if(v==='a-daily')renderAssessorDaily(c);
 }
+
+// ── AUTO-REFRESH: a cada 60s recarrega dados e re-renderiza (exceto em upload/modal aberto) ──
+setInterval(async()=>{
+  if(!USER)return;
+  if(curView==='d-upload')return; // não interromper upload
+  const modalOpen=[...document.querySelectorAll('.modal-bg')].some(m=>m.style.display==='flex');
+  if(modalOpen)return; // não interromper edição
+  try{
+    await loadData();
+    renderCurView();
+  }catch(e){}
+},60000);
 
 // ══════════════════════════════════════════════════════════
 // ── DIRETOR DASHBOARD ──
