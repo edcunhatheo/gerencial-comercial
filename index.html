@@ -354,7 +354,7 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
 <div id="modal-meta" class="modal-bg" style="display:none">
   <div class="modal" style="max-width:420px">
     <div class="modal-hdr"><h2>🎯 Nova meta do mês</h2><button class="modal-x" onclick="closeModal('meta')">×</button></div>
-    <div class="fg"><label>Responsável (assessor)</label>
+    <div class="fg"><label>Responsável do time de vendas</label>
       <select id="m-assessor"><option value="">Selecionar...</option></select>
     </div>
     <div class="form-row">
@@ -1219,8 +1219,8 @@ function renderMetas(c=document.getElementById('main-content')){
 
   // Compute progress for each meta
   const metasComProgresso=METAS.map(m=>{
+    // Progresso = boletado da área/produto que o responsável do time cuida
     const rows=OPPS.filter(r=>{
-      if(norm(r.assessor)!==norm(m.assessor))return false;
       if(m.area&&r.area!==m.area)return false;
       if(m.produto&&norm(r.produto||'')!==norm(m.produto))return false;
       return true;
@@ -1284,9 +1284,10 @@ function renderMetas(c=document.getElementById('main-content')){
 }
 
 function fillMetaSelects(){
-  const assessores=[...new Set(OPPS.map(r=>r.assessor).filter(Boolean))].sort();
+  // Responsável = membro do time de vendas (usuários cadastrados no sistema)
+  const time=USUARIOS.filter(u=>u.ativo).map(u=>u.nome).sort();
   const selA=document.getElementById('m-assessor');
-  selA.innerHTML='<option value="">Selecionar assessor...</option>'+assessores.map(a=>'<option>'+a+'</option>').join('');
+  selA.innerHTML='<option value="">Selecionar responsável...</option>'+time.map(a=>'<option>'+a+'</option>').join('');
   updateMetaProdutos();
 }
 
