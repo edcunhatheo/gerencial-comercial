@@ -350,6 +350,35 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
   </div>
 </div>
 
+<!-- ── MODAL NOVA META ── -->
+<div id="modal-meta" class="modal-bg" style="display:none">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-hdr"><h2>🎯 Nova meta do mês</h2><button class="modal-x" onclick="closeModal('meta')">×</button></div>
+    <div class="fg"><label>Responsável (assessor)</label>
+      <select id="m-assessor"><option value="">Selecionar...</option></select>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Área</label>
+        <select id="m-area" onchange="updateMetaProdutos()">
+          <option value="inv">Investimentos</option>
+          <option value="cons">Consórcio</option>
+          <option value="seg">Seguro de vida</option>
+        </select>
+      </div>
+      <div class="fg"><label>Produto (opcional)</label>
+        <select id="m-produto"><option value="">Todos os produtos</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Meta de volume boletado (R$)</label>
+      <input type="number" id="m-valor" placeholder="Ex: 500000">
+    </div>
+    <div class="modal-ftr">
+      <button class="btn" onclick="closeModal('meta')">Cancelar</button>
+      <button class="btn wine" onclick="saveMeta()">Salvar meta</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -360,7 +389,7 @@ const AREAS={inv:{name:'Investimentos',color:'#8B1C2A'},cons:{name:'Consórcio',
 const SC_BADGE={'cliente topou':'b-green','cliente confirmar':'b-amber','reunião agendada':'b-purple','agendar reunião':'b-purple','ligar cliente':'b-gray','cliente negou':'b-red','não se aplica':'b-gray'};
 const PB_BADGE={'boletado':'b-green','a boletar':'b-teal','to do comercial':'b-amber','to do operacional':'b-blue','aguardando comercial':'b-amber','email':'b-purple','não se aplica':'b-gray'};
 
-let USER=null,OPPS=[],USUARIOS=[],DAILY={},editId=null,charts={};
+let USER=null,OPPS=[],USUARIOS=[],DAILY={},editId=null,charts={},SELECTED=new Set(),METAS=[];
 let pin='';
 
 // ── UTILS ──
@@ -481,12 +510,14 @@ async function initApp(){
 async function loadData(){
   const areas=USER.perfil==='diretor'?['inv','cons','seg']:(USER.areas||[]);
   const af=areas.map(a=>`area.eq.${a}`).join(',');
-  const[opps,users,daily]=await Promise.all([
+  const mesAtual=new Date().toISOString().slice(0,7);
+  const[opps,users,daily,metas]=await Promise.all([
     db('GET','oportunidades','',`or=(${af})&order=created_at.desc`),
     USER.perfil==='diretor'?db('GET','usuarios','','order=nome.asc'):Promise.resolve([]),
-    db('GET','daily_selecoes','',`data=eq.${today()}&assessor=eq.${encodeURIComponent(USER.nome)}`)
+    db('GET','daily_selecoes','',`data=eq.${today()}&assessor=eq.${encodeURIComponent(USER.nome)}`),
+    db('GET','metas','',`mes=eq.${mesAtual}&order=created_at.asc`).catch(()=>[])
   ]);
-  OPPS=opps||[];USUARIOS=users||[];
+  OPPS=opps||[];USUARIOS=users||[];METAS=metas||[];
   DAILY={};(daily||[]).forEach(d=>{DAILY[d.oportunidade_id]={tipo:d.tipo,acao:d.acao,id:d.id}});
 }
 
@@ -495,7 +526,7 @@ let curView='';
 function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
-    ?[['diretor','📊 Dashboard'],['d-pipeline','📋 Pipeline'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários']]
+    ?[['diretor','📊 Dashboard'],['d-pipeline','📋 Pipeline'],['d-metas','🎯 Definições do mês'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários']]
     :[['a-opps','📂 Minhas oportunidades'],['a-daily','☀️ Meu dia']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>`<button class="nav-tab${v===curView?' active':''}" onclick="setView('${v}',this)">${l}</button>`).join('');
 }
@@ -508,6 +539,7 @@ function setView(v,btn){
   const c=document.getElementById('main-content');
   if(v==='diretor')renderDiretor(c);
   else if(v==='d-pipeline')renderDPipeline(c);
+  else if(v==='d-metas')renderMetas(c);
   else if(v==='d-upload')renderUpload(c);
   else if(v==='d-usuarios')renderUsuarios(c);
   else if(v==='a-opps')renderAssessorOpps(c);
@@ -827,7 +859,15 @@ function applyFilter(){
     return db2-da;
   });
 
-  tEl.innerHTML=`<div class="tbl-wrap"><table><thead><tr>
+  const selCount=SELECTED.size;
+  const bulkBar=selCount>0?'<div style="display:flex;align-items:center;gap:12px;background:var(--wine-l);border:1.5px solid #C8A0A8;border-radius:10px;padding:10px 16px;margin-bottom:12px">'
+    +'<span style="font-size:13px;font-weight:700;color:var(--wine-d)">'+selCount+' selecionada'+(selCount>1?'s':'')+'</span>'
+    +'<button class="btn sm" style="border-color:var(--red-b);background:var(--red-bg);color:var(--red)" onclick="deleteSelected()">🗑️ Excluir selecionadas</button>'
+    +'<button class="btn sm" onclick="clearSelection()">Limpar seleção</button>'
+    +'</div>':'';
+
+  tEl.innerHTML=bulkBar+`<div class="tbl-wrap"><table><thead><tr>
+    <th style="width:36px"><input type="checkbox" id="sel-all" onchange="toggleSelectAll(this.checked)" style="width:16px;height:16px;cursor:pointer;accent-color:var(--wine)"></th>
     <th></th><th>Assessor</th><th>Cliente</th><th>Área</th><th>Produto</th>
     <th style="text-align:right">Pipe</th><th style="text-align:right">Atual</th>
     <th>Status</th><th>Pendência</th><th style="text-align:center">Dias</th><th>TODO</th><th></th>
@@ -839,6 +879,7 @@ function applyFilter(){
     const days=daysSince(lastMove);
     const risk=riskColor(isB(r)?0:days);
     return`<tr class="${isB(r)?'bol':''}">
+      <td><input type="checkbox" ${SELECTED.has(r.id)?'checked':''} onchange="toggleSelect('${r.id}',this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--wine)"></td>
       <td title="${risk.label} — ${isB(r)?'Boletado':days+' dias sem mover'}" style="text-align:center;font-size:14px;cursor:default">${isB(r)?'✅':risk.icon}</td>
       <td style="font-weight:600">${r.assessor||'—'}</td>
       <td style="font-weight:600">${r.cliente||'—'}</td>
@@ -853,6 +894,51 @@ function applyFilter(){
       <td><button class="btn sm" onclick="openEdit('${r.id}')">Ver</button></td>
     </tr>`;
   }).join('')}</tbody></table></div>`;
+}
+
+// ── SELEÇÃO / EXCLUSÃO EM MASSA ──
+function toggleSelect(id,checked){
+  if(checked)SELECTED.add(id);else SELECTED.delete(id);
+  applyFilter();
+}
+function toggleSelectAll(checked){
+  if(checked){
+    // Select all currently visible rows
+    let rows=[...OPPS];
+    const fA=document.getElementById('f-area')?.value;
+    const fAss=document.getElementById('f-ass')?.value;
+    const fSC=document.getElementById('f-sc')?.value;
+    const fPB=document.getElementById('f-pb')?.value;
+    const fCli=(document.getElementById('f-cli')?.value||'').toLowerCase();
+    if(fA)rows=rows.filter(r=>r.area===fA);
+    if(fAss)rows=rows.filter(r=>r.assessor===fAss);
+    if(fSC)rows=rows.filter(r=>r.sc===fSC);
+    if(fPB)rows=rows.filter(r=>r.pb===fPB);
+    if(fCli)rows=rows.filter(r=>(r.cliente||'').toLowerCase().includes(fCli));
+    rows.forEach(r=>SELECTED.add(r.id));
+  }else{
+    SELECTED.clear();
+  }
+  applyFilter();
+}
+function clearSelection(){SELECTED.clear();applyFilter();}
+
+async function deleteSelected(){
+  const n=SELECTED.size;
+  if(!n)return;
+  if(!confirm('Excluir '+n+' oportunidade'+(n>1?'s':'')+' permanentemente? Esta ação não pode ser desfeita.'))return;
+  showToast('Excluindo '+n+' oportunidades...');
+  try{
+    const ids=[...SELECTED];
+    for(let i=0;i<ids.length;i+=50){
+      const batch=ids.slice(i,i+50);
+      await db('DELETE','oportunidades','','id=in.('+batch.join(',')+')');
+    }
+    SELECTED.clear();
+    showToast('✅ '+n+' oportunidades excluídas!',true);
+    await loadData();
+    applyFilter();
+  }catch(e){showToast('Erro: '+e.message)}
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1122,6 +1208,120 @@ async function saveEdit(){
     else if(curView==='d-pipeline')renderDPipeline();
   }catch(e){showToast('Erro: '+e.message);}
   btn.innerHTML='💾 Salvar';btn.disabled=false;
+}
+
+// ── DEFINIÇÕES DO MÊS (METAS) ──
+function renderMetas(c=document.getElementById('main-content')){
+  const mesAtual=new Date().toISOString().slice(0,7);
+  const mesLabel=new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const assessores=[...new Set(OPPS.map(r=>r.assessor).filter(Boolean))].sort();
+  const produtos=[...new Set(OPPS.map(r=>r.produto).filter(Boolean))].sort();
+
+  // Compute progress for each meta
+  const metasComProgresso=METAS.map(m=>{
+    const rows=OPPS.filter(r=>{
+      if(norm(r.assessor)!==norm(m.assessor))return false;
+      if(m.area&&r.area!==m.area)return false;
+      if(m.produto&&norm(r.produto||'')!==norm(m.produto))return false;
+      return true;
+    });
+    const boletado=rows.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+    const pipe=rows.reduce((s,r)=>s+(r.pipe||0),0);
+    const pct=m.meta_valor>0?Math.min(Math.round(boletado/m.meta_valor*100),999):0;
+    return{...m,boletado,pipe,pct,nOpps:rows.length};
+  });
+
+  const totalMeta=metasComProgresso.reduce((s,m)=>s+(m.meta_valor||0),0);
+  const totalBol=metasComProgresso.reduce((s,m)=>s+m.boletado,0);
+  const totalPct=totalMeta>0?Math.round(totalBol/totalMeta*100):0;
+
+  c.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">'
+    +'<div><div style="font-size:18px;font-weight:800">🎯 Definições do mês</div>'
+    +'<div style="font-size:12px;color:var(--muted);text-transform:capitalize">'+mesLabel+'</div></div>'
+    +'<button class="btn wine" onclick="document.getElementById(\'modal-meta\').style.display=\'flex\';fillMetaSelects()">+ Nova meta</button>'
+    +'</div>'
+
+    // Summary
+    +(METAS.length?'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px">'
+      +'<div class="kpi wine"><div class="kpi-lbl">Meta total do mês</div><div class="kpi-val">'+fmt(totalMeta)+'</div></div>'
+      +'<div class="kpi green"><div class="kpi-lbl">Realizado</div><div class="kpi-val">'+(fmt(totalBol)||'R$0')+'</div></div>'
+      +'<div class="kpi '+(totalPct>=100?'green':totalPct>=60?'amber':'')+'"><div class="kpi-lbl">Atingimento</div><div class="kpi-val">'+totalPct+'%</div></div>'
+      +'</div>':'')
+
+    // Metas cards
+    +(metasComProgresso.length
+      ?'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px">'
+        +metasComProgresso.map(m=>{
+          const cor=AREAS[m.area]?.color||'#8B1C2A';
+          const pctColor=m.pct>=100?'#085041':m.pct>=60?'#854F0B':'#8B1C2A';
+          const barW=Math.min(m.pct,100);
+          return '<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:18px;border-top:4px solid '+cor+'">'
+            +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">'
+            +'<div><div style="font-size:15px;font-weight:800">'+m.assessor+'</div>'
+            +'<div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">'
+            +'<span class="badge" style="background:'+cor+'15;color:'+cor+';border:1px solid '+cor+'33;font-size:10px">'+(AREAS[m.area]?.name||m.area)+'</span>'
+            +(m.produto?'<span class="badge b-gray" style="font-size:10px">'+m.produto+'</span>':'<span class="badge b-gray" style="font-size:10px">Todos produtos</span>')
+            +'</div></div>'
+            +'<button class="btn sm" style="border-color:var(--red-b);background:var(--red-bg);color:var(--red)" onclick="delMeta(\''+m.id+'\')">×</button>'
+            +'</div>'
+            +'<div style="display:flex;align-items:baseline;gap:8px;margin:14px 0 4px">'
+            +'<span style="font-size:24px;font-weight:800;color:'+pctColor+'">'+(fmt(m.boletado)||'R$0')+'</span>'
+            +'<span style="font-size:13px;color:var(--muted)">/ '+fmt(m.meta_valor)+'</span>'
+            +'<span style="margin-left:auto;font-size:16px;font-weight:800;color:'+pctColor+'">'+m.pct+'%</span>'
+            +'</div>'
+            +'<div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden">'
+            +'<div style="width:'+barW+'%;height:8px;border-radius:99px;background:'+pctColor+';transition:width .6s"></div>'
+            +'</div>'
+            +'<div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--muted)">'
+            +'<span>'+m.nOpps+' oportunidades</span>'
+            +'<span>pipe: '+fmt(m.pipe)+'</span>'
+            +'<span>falta: '+(m.meta_valor>m.boletado?fmt(m.meta_valor-m.boletado):'✅ atingida!')+'</span>'
+            +'</div>'
+            +'</div>';
+        }).join('')
+      +'</div>'
+      :'<div class="empty"><div class="empty-icon">🎯</div><p>Nenhuma meta definida para este mês ainda.<br>Clique em <strong>+ Nova meta</strong> para começar.</p></div>');
+}
+
+function fillMetaSelects(){
+  const assessores=[...new Set(OPPS.map(r=>r.assessor).filter(Boolean))].sort();
+  const selA=document.getElementById('m-assessor');
+  selA.innerHTML='<option value="">Selecionar assessor...</option>'+assessores.map(a=>'<option>'+a+'</option>').join('');
+  updateMetaProdutos();
+}
+
+function updateMetaProdutos(){
+  const area=document.getElementById('m-area').value;
+  const produtos=[...new Set(OPPS.filter(r=>!area||r.area===area).map(r=>r.produto).filter(Boolean))].sort();
+  const selP=document.getElementById('m-produto');
+  selP.innerHTML='<option value="">Todos os produtos</option>'+produtos.map(p=>'<option>'+p+'</option>').join('');
+}
+
+async function saveMeta(){
+  const assessor=document.getElementById('m-assessor').value;
+  const area=document.getElementById('m-area').value;
+  const produto=document.getElementById('m-produto').value;
+  const valor=parseFloat(document.getElementById('m-valor').value)||0;
+  if(!assessor||!area||valor<=0){showToast('Preencha assessor, área e valor da meta!');return}
+  const mes=new Date().toISOString().slice(0,7);
+  try{
+    await db('POST','metas',{mes,assessor,area,produto,meta_valor:valor});
+    showToast('✅ Meta criada!',true);
+    closeModal('meta');
+    document.getElementById('m-valor').value='';
+    await loadData();
+    renderMetas();
+  }catch(e){showToast('Erro: '+e.message)}
+}
+
+async function delMeta(id){
+  if(!confirm('Remover esta meta?'))return;
+  try{
+    await db('DELETE','metas','','id=eq.'+id);
+    showToast('Meta removida',true);
+    await loadData();
+    renderMetas();
+  }catch(e){showToast('Erro: '+e.message)}
 }
 
 // ── UPLOAD ──
