@@ -735,25 +735,19 @@ function applyFilter(){
         </div>`;
       }).join('');
 
-      summaryEl.innerHTML=`
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
-          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px">
-            ${fAss?'📊 Resumo — '+fAss:fSC?'📊 Resumo — '+fSC:fPB?'📊 Resumo — '+fPB:'📊 Resumo filtrado'}
-            <span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:8px">${rows.length} oportunidades</span>
-          </div>
-          ${riskHtml}
-          ${areaBreak?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px">${areaBreak}</div>`:''}
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-            <div>
-              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Status comercial</div>
-              ${scBars||'<div style="font-size:12px;color:var(--muted)">—</div>'}
-            </div>
-            <div>
-              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Pendência boleta</div>
-              ${pbBars||'<div style="font-size:12px;color:var(--muted)">—</div>'}
-            </div>
-          </div>
-        </div>`;
+      summaryEl.innerHTML=
+        '<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">'
+        +'<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px">'
+        +(fAss?'📊 Resumo — '+fAss:fSC?'📊 Resumo — '+fSC:fPB?'📊 Resumo — '+fPB:'📊 Resumo filtrado')
+        +'<span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:8px">'+rows.length+' oportunidades</span></div>'
+        +riskHtml
+        +(areaBreak?'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px">'+areaBreak+'</div>':'')
+        +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">'
+        +'<div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Status comercial</div>'
+        +(scBars||'<div style="font-size:12px;color:var(--muted)">—</div>')+'</div>'
+        +'<div><div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Pendência boleta</div>'
+        +(pbBars||'<div style="font-size:12px;color:var(--muted)">—</div>')+'</div>'
+        +'</div></div>';
       summaryEl.style.display='block';
     } else {
       summaryEl.innerHTML='';
