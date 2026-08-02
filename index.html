@@ -690,6 +690,50 @@ function renderDiretor(c=document.getElementById('main-content')){
         <td style="text-align:right;color:${v.pend>0?'var(--amber)':'var(--green)'}">${v.pend||'—'}</td>
       </tr>`;
     }).join('')}</tbody></table>
+  </div>
+
+  <div class="section-label" style="margin-top:8px">Quadros por assessor</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
+    ${assRank.map(([name,v])=>{
+      const cor=AREAS[v.area]?.color||'#8B1C2A';
+      const myOpps=OPPS.filter(r=>r.assessor===name);
+      const bolRows=myOpps.filter(isB);
+      const bolN=bolRows.length;
+      const bolVol=bolRows.reduce((s,r)=>s+(r.atual||0),0);
+      const outras=myOpps.filter(r=>!isB(r));
+      const scMap={};
+      outras.forEach(r=>{const k=r.sc||'Sem status';if(!scMap[k])scMap[k]=0;scMap[k]++;});
+      const scList=Object.entries(scMap).sort((a,b)=>b[1]-a[1]);
+      const inits=name.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+      return '<div style="background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:16px;border-left:4px solid '+cor+'">'
+        +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+        +'<div style="width:36px;height:36px;border-radius:50%;background:'+cor+';color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+inits+'</div>'
+        +'<div style="min-width:0;flex:1">'
+        +'<div style="font-size:13px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+name+'</div>'
+        +'<div style="font-size:10px;color:'+cor+';font-weight:700;text-transform:uppercase">'+(AREAS[v.area]?.name||v.area)+'</div>'
+        +'</div>'
+        +'<div style="text-align:right;flex-shrink:0">'
+        +'<div style="font-size:16px;font-weight:800">'+myOpps.length+'</div>'
+        +'<div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">oport.</div>'
+        +'</div></div>'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;background:var(--green-bg);border:1px solid var(--green-b);border-radius:10px;padding:10px 14px;margin-bottom:12px">'
+        +'<div><div style="font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em">✓ Boletado</div>'
+        +'<div style="font-size:18px;font-weight:800;color:var(--green)">'+(fmt(bolVol)||'R$0')+'</div></div>'
+        +'<div style="text-align:right"><div style="font-size:15px;font-weight:800;color:var(--green)">'+bolN+'</div>'
+        +'<div style="font-size:9px;color:var(--green);font-weight:600">de '+myOpps.length+'</div></div>'
+        +'</div>'
+        +'<div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Status das demais ('+outras.length+')</div>'
+        +(scList.length?scList.map(([sc,n])=>{
+          const b=matchBadge(sc,SC_BADGE)||'b-gray';
+          const pct=outras.length?Math.round(n/outras.length*100):0;
+          return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">'
+            +'<span class="badge '+b+'" style="font-size:10px;min-width:120px;text-align:center;padding:2px 6px">'+sc+'</span>'
+            +'<div style="flex:1;height:4px;background:var(--border);border-radius:99px;overflow:hidden"><div style="width:'+pct+'%;height:4px;background:'+cor+';border-radius:99px"></div></div>'
+            +'<span style="font-size:11px;font-weight:700;min-width:18px;text-align:right">'+n+'</span>'
+            +'</div>';
+        }).join(''):'<div style="font-size:11px;color:var(--muted)">Todas boletadas! 🎉</div>')
+        +'</div>';
+    }).join('')}
   </div>`;
 
   // Charts
