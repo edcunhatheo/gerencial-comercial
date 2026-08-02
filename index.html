@@ -5,187 +5,283 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gerencial Comercial</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--wine:#8B1C2A;--wine-dark:#6B0010;--wine-light:#F5EAE8;--cream:#F5F0EB;--card:#FFF8F5;--border:#E8D5CC;--text:#1A0508;--muted:#8A6A6E;--green:#085041;--green-bg:#E1F5EE;--amber:#854F0B;--amber-bg:#FAEEDA}
+:root{
+  --wine:#8B1C2A;--wine-d:#6B0010;--wine-l:#F5EAE8;--wine-ll:#FDF5F4;
+  --cream:#F5F0EB;--card:#FFFFFF;--border:#E8D5CC;--border-l:#F0E8E3;
+  --text:#1A0508;--muted:#8A6A6E;--muted-l:#C4A8AC;
+  --green:#085041;--green-bg:#E1F5EE;--green-b:#9FD5B0;
+  --amber:#854F0B;--amber-bg:#FEF3E2;--amber-b:#FAC775;
+  --red:#791F1F;--red-bg:#FCEBEB;--red-b:#E8B0B0;
+  --blue:#0C447C;--blue-bg:#E6F1FB;--blue-b:#B5CEF0;
+  --purple:#3C3489;--purple-bg:#EEEDFE;--purple-b:#C5C2F8;
+}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--cream);color:var(--text);font-size:14px;min-height:100vh}
 
-/* LOGIN */
-#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.login-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;max-width:380px;width:100%;box-shadow:0 8px 40px rgba(139,28,42,.1);text-align:center}
-.login-logo{width:64px;height:64px;border-radius:50%;margin:0 auto 16px;object-fit:cover}
-.login-box h1{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px}
+/* ── LOGIN ── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,var(--cream) 0%,#EDE0D8 100%)}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:44px 36px;max-width:360px;width:100%;box-shadow:0 12px 48px rgba(139,28,42,.12);text-align:center}
+.login-icon{font-size:52px;margin-bottom:14px;display:block}
+.login-box h1{font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px}
 .login-box p{font-size:13px;color:var(--muted);margin-bottom:28px}
-.pin-display{display:flex;gap:10px;justify-content:center;margin-bottom:24px}
-.pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .2s}
-.pin-dot.filled{background:var(--wine);border-color:var(--wine)}
-.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:220px;margin:0 auto 16px}
-.pin-btn{padding:14px;border-radius:10px;border:1px solid var(--border);background:var(--card);font-size:18px;font-weight:600;cursor:pointer;color:var(--text);transition:all .15s}
-.pin-btn:hover{background:var(--wine-light);border-color:var(--wine)}
-.pin-btn:active{transform:scale(.95)}
-.pin-btn.del{color:var(--muted);font-size:14px}
-#login-error{color:#C03030;font-size:12px;margin-top:8px;min-height:18px}
+.pin-dots{display:flex;gap:12px;justify-content:center;margin-bottom:28px}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:all .2s}
+.pin-dot.on{background:var(--wine);border-color:var(--wine);transform:scale(1.1)}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:230px;margin:0 auto 14px}
+.pin-btn{padding:15px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);font-size:20px;font-weight:600;cursor:pointer;color:var(--text);transition:all .15s;user-select:none}
+.pin-btn:hover{background:var(--wine-l);border-color:var(--wine);color:var(--wine)}
+.pin-btn:active{transform:scale(.93)}
+.pin-btn.del{color:var(--muted);font-size:16px}
+#login-err{color:var(--red);font-size:12px;min-height:18px;margin-top:4px}
+.login-checking{color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
 
-/* APP */
-#app-screen{display:none}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:var(--card);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
-.topbar-left{display:flex;align-items:center;gap:10px}
-.topbar-left h1{font-size:17px;font-weight:700;color:var(--text)}
-.topbar-sub{font-size:11px;color:var(--muted)}
-.user-badge{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
-.user-badge .name{font-weight:600;color:var(--text)}
-.top-actions{display:flex;gap:8px;align-items:center}
-.btn{padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text);display:inline-flex;align-items:center;gap:6px;font-weight:500;transition:all .15s;white-space:nowrap}
-.btn:hover{background:#F0E8E3}
-.btn.primary{background:var(--wine);color:#FFF8F5;border-color:var(--wine)}
-.btn.primary:hover{background:var(--wine-dark)}
-.btn.sm{padding:4px 10px;font-size:11px}
-.btn.danger{background:#FCEBEB;color:#791F1F;border-color:#E8B0B0}
+/* ── APP ── */
+#app{display:none}
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:50}
+.topbar-brand{display:flex;align-items:center;gap:10px}
+.topbar-brand h1{font-size:16px;font-weight:700;color:var(--text)}
+.topbar-date{font-size:11px;color:var(--muted)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.user-pill{display:flex;align-items:center;gap:6px;background:var(--wine-l);border:1px solid #C8A0A8;border-radius:999px;padding:4px 12px 4px 6px}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:var(--wine);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.user-name{font-size:12px;font-weight:600;color:var(--wine-d)}
+.btn-logout{font-size:11px;color:var(--muted);cursor:pointer;background:none;border:none;padding:4px 8px;border-radius:6px}
+.btn-logout:hover{background:var(--border-l);color:var(--text)}
 
-/* NAVIGATION */
-.nav{display:flex;border-bottom:1px solid var(--border);background:var(--card);padding:0 24px}
-.nav-tab{padding:10px 16px;font-size:13px;cursor:pointer;border:none;background:transparent;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500;transition:all .15s}
-.nav-tab.active{color:var(--wine);border-bottom-color:var(--wine)}
+/* ── NAV ── */
+.nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:2px}
+.nav-tab{padding:12px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:all .15s;display:flex;align-items:center;gap:6px}
 .nav-tab:hover{color:var(--text)}
+.nav-tab.active{color:var(--wine);border-bottom-color:var(--wine);font-weight:600}
+.nav-tab .badge{background:var(--wine);color:#fff;border-radius:999px;font-size:10px;padding:1px 6px;font-weight:700}
 
-/* CONTENT */
-.content{padding:20px 24px;max-width:1300px;margin:0 auto}
-.section-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
-.card h3{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.grid-areas{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+/* ── CONTENT ── */
+.content{padding:24px;max-width:1400px;margin:0 auto}
 
-/* KPIs */
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
-.kpi.hl{background:var(--wine-light);border-color:#C8A0A8}
-.kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;font-weight:600}
-.kpi.hl .lbl{color:var(--wine)}
-.kpi .val{font-size:22px;font-weight:700;color:var(--text);line-height:1}
-.kpi.hl .val{color:var(--wine-dark)}
-.kpi .sub{font-size:11px;margin-top:4px;color:var(--muted)}
+/* ── DIRECTOR DASHBOARD ── */
+.kpi-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border)}
+.kpi.wine::before{background:var(--wine)}
+.kpi.green::before{background:var(--green)}
+.kpi.amber::before{background:#EF9F27}
+.kpi.blue::before{background:#378ADD}
+.kpi.purple::before{background:#7F77DD}
+.kpi-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:8px}
+.kpi-val{font-size:24px;font-weight:800;color:var(--text);line-height:1}
+.kpi.wine .kpi-val{color:var(--wine-d)}
+.kpi-sub{font-size:11px;color:var(--muted);margin-top:4px}
 
-/* TABLE */
-.tbl-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:10px}
+.area-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+.area-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;border-top:4px solid var(--wine)}
+.area-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.area-tag{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.area-dot{width:10px;height:10px;border-radius:50%}
+.area-bol{font-size:28px;font-weight:800;margin-bottom:4px}
+.area-bol-sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+.area-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.area-stat{background:var(--cream);border-radius:8px;padding:8px;text-align:center}
+.area-stat-l{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:3px}
+.area-stat-v{font-size:15px;font-weight:700;color:var(--text)}
+.prog-wrap{margin-top:12px}
+.prog-bg{height:6px;background:var(--border);border-radius:99px;overflow:hidden}
+.prog-fill{height:6px;border-radius:99px;transition:width .6s ease}
+.prog-lbl{font-size:10px;color:var(--muted);text-align:right;margin-top:3px}
+
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px}
+.chart-card h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:16px}
+.chart-wrap{position:relative;height:220px}
+
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+
+/* ── TABLE ── */
+.tbl-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
 table{width:100%;border-collapse:collapse;font-size:12px}
-th{background:#F5F0EB;color:#5A3A3E;font-weight:600;text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);white-space:nowrap;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
-td{padding:9px 12px;border-bottom:1px solid #F0E8E3;color:var(--text);vertical-align:middle}
+th{background:#FAF5F3;color:var(--muted);font-weight:700;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--border-l);color:var(--text);vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#FFF3EE}
-tr.boletado td{background:var(--green-bg)}
+tr:hover td{background:#FDF8F6}
+tr.bol td{background:var(--green-bg)}
 
-/* BADGES */
-.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
-.b-green{background:var(--green-bg);color:var(--green)}
-.b-amber{background:var(--amber-bg);color:var(--amber)}
-.b-red{background:#FCEBEB;color:#791F1F}
-.b-blue{background:#E6F1FB;color:#0C447C}
-.b-purple{background:#EEEDFE;color:#3C3489}
-.b-wine{background:var(--wine-light);color:var(--wine-dark)}
-.b-gray{background:#F1EFE8;color:#5A3A3E}
-.b-teal{background:#E1F5EE;color:#085041}
+/* ── BADGES ── */
+.badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}
+.b-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)}
+.b-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-b)}
+.b-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b)}
+.b-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-b)}
+.b-purple{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-b)}
+.b-wine{background:var(--wine-l);color:var(--wine-d);border:1px solid #C8A0A8}
+.b-gray{background:#F5F0EB;color:var(--muted);border:1px solid var(--border)}
+.b-teal{background:#E1F5EE;color:#085041;border:1px solid #9FD5B0}
 
-/* FORM */
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px}
-.fg{display:flex;flex-direction:column;gap:4px}
-.fg label{font-size:10px;font-weight:700;color:#5A3A3E;text-transform:uppercase;letter-spacing:.04em}
-.fg input,.fg select,.fg textarea{padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s}
+/* ── ASSESSOR CARDS ── */
+.opp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:20px}
+.opp-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:all .2s}
+.opp-card:hover{box-shadow:0 4px 20px rgba(139,28,42,.1);border-color:#C8A0A8}
+.opp-card.bol{border-left:4px solid var(--green);background:linear-gradient(to right,#F0FBF6,var(--card))}
+.opp-card-header{padding:14px 16px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.opp-client{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.opp-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.opp-card-body{padding:0 16px 12px;display:flex;flex-direction:column;gap:6px}
+.opp-row{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.opp-row-l{color:var(--muted);font-weight:500}
+.opp-row-v{font-weight:600;color:var(--text)}
+.opp-vol{font-size:18px;font-weight:800;color:var(--wine-d)}
+.opp-obs{font-size:11px;color:var(--muted);font-style:italic;padding:8px 12px;background:var(--cream);border-radius:8px;margin:0 16px 10px;border-left:3px solid var(--border)}
+.opp-actions{padding:10px 16px;background:#FAF5F3;border-top:1px solid var(--border-l);display:flex;gap:6px;flex-wrap:wrap}
+.opp-btn{padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.opp-btn.sc{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-b)}
+.opp-btn.sc:hover{background:var(--blue);color:#fff}
+.opp-btn.bol{background:var(--green-bg);color:var(--green);border-color:var(--green-b)}
+.opp-btn.bol:hover{background:var(--green);color:#fff}
+.opp-btn.obs{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-b)}
+.opp-btn.obs:hover{background:var(--amber);color:#fff}
+.opp-btn.todo{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-b)}
+.opp-btn.todo:hover{background:var(--purple);color:#fff}
+
+/* ── DAILY ── */
+.daily-header{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px}
+.daily-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.daily-subtitle{font-size:12px;color:var(--muted)}
+.daily-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.daily-kpi{text-align:center;padding:12px;background:var(--cream);border-radius:10px}
+.daily-kpi-v{font-size:22px;font-weight:800;color:var(--wine-d)}
+.daily-kpi-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-top:2px}
+
+.day-group-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:16px 0 10px;display:flex;align-items:center;gap:8px}
+.day-group-count{background:currentColor;border-radius:999px;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#fff;opacity:.9}
+
+.daily-opp{background:var(--card);border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+.daily-opp.sel{border-color:var(--wine);background:var(--wine-ll)}
+.daily-opp-top{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.daily-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;background:var(--card)}
+.daily-check.on{background:var(--wine);border-color:var(--wine)}
+.daily-check.on::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
+.daily-info{flex:1}
+.daily-cli{font-size:13px;font-weight:700}
+.daily-meta{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
+.daily-vol{font-size:13px;font-weight:700;color:var(--wine-d)}
+.daily-actions{padding:10px 14px;background:#FAF5F3;border-top:1px solid var(--border-l);display:grid;grid-template-columns:1fr 1fr;gap:8px}
+select.sel-tipo{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:12px;font-family:inherit;cursor:pointer}
+select.sel-tipo:focus{outline:none;border-color:var(--wine)}
+input.inp-acao{width:100%;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:12px;font-family:inherit}
+input.inp-acao:focus{outline:none;border-color:var(--wine)}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(26,5,8,.35);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.modal{background:var(--card);border-radius:18px;padding:28px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(139,28,42,.2)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-hdr h2{font-size:16px;font-weight:700}
+.modal-x{background:none;border:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1;padding:0 4px}
+.modal-x:hover{color:var(--text)}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fg label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.fg input,.fg select,.fg textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--card);color:var(--text);font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;width:100%}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--wine)}
-.fg textarea{resize:vertical;min-height:60px}
+.fg textarea{min-height:72px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-ftr{display:flex;gap:8px;justify-content:flex-end;padding-top:16px;border-top:1px solid var(--border)}
+.btn{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--card);color:var(--text);transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--cream)}
+.btn.wine{background:var(--wine);color:#fff;border-color:var(--wine)}
+.btn.wine:hover{background:var(--wine-d)}
+.btn.sm{padding:5px 12px;font-size:11px}
 
-/* MODAL */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
-.modal{background:var(--card);border-radius:16px;padding:24px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(139,28,42,.15)}
-.modal-sm{max-width:420px}
-.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-.modal-header h2{font-size:16px;font-weight:700}
-.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1}
-.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
-
-/* MISC */
-.mini-bar{height:4px;border-radius:99px;background:var(--border);margin-top:4px}
+/* ── MISC ── */
+.mini-bar{height:4px;background:var(--border);border-radius:99px;margin-top:5px;overflow:hidden}
 .mini-fill{height:4px;border-radius:99px}
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--wine);border-radius:50%;animation:spin .7s linear infinite}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:12px;color:var(--muted);text-align:center;padding:40px}
+.empty-icon{font-size:40px;opacity:.4}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--wine);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:180px;gap:12px;color:var(--muted);text-align:center}
-.empty svg{opacity:.25}
-.area-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:4px solid var(--wine)}
-.tag{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:600}
-.daily-opp{border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;background:var(--card);transition:all .2s}
-.daily-opp.selected{border-color:var(--wine);background:var(--wine-light)}
-.history-item{font-size:11px;padding:5px 0;border-bottom:1px solid #F0E8E3;color:var(--muted)}
-.history-item:last-child{border-bottom:none}
-.history-item strong{color:var(--text)}
-select.inline{border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;background:var(--card);color:var(--text);cursor:pointer}
-select.inline:focus{outline:none;border-color:var(--wine)}
-@media(max-width:700px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.content{padding:12px 14px}}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--wine);color:#fff;font-size:12px;font-weight:600;padding:10px 20px;border-radius:10px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;max-width:300px;box-shadow:0 4px 20px rgba(139,28,42,.3)}
+.hist-item{font-size:11px;padding:6px 0;border-bottom:1px solid var(--border-l);color:var(--muted);line-height:1.5}
+.hist-item:last-child{border:none}
+.hist-item strong{color:var(--text)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.filter-sel{padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:12px;font-family:inherit;cursor:pointer;outline:none}
+.filter-sel:focus{border-color:var(--wine)}
+.filter-inp{padding:6px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--card);color:var(--text);font-size:12px;font-family:inherit;outline:none;flex:1;min-width:140px}
+.filter-inp:focus{border-color:var(--wine)}
+.upload-card{background:var(--card);border:2px dashed var(--border);border-radius:14px;padding:28px;text-align:center;cursor:pointer;transition:all .2s}
+.upload-card:hover{border-color:var(--wine);background:var(--wine-ll)}
+.upload-card.done{border-style:solid;border-color:var(--green-b);background:var(--green-bg)}
+.upload-icon{font-size:32px;margin-bottom:10px}
+.upload-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.upload-sub{font-size:12px;color:var(--muted)}
+.upload-status{font-size:12px;font-weight:600;margin-top:10px;min-height:18px}
+@media(max-width:768px){
+  .charts-row,.area-cards{grid-template-columns:1fr}
+  .opp-grid{grid-template-columns:1fr}
+  .daily-kpis{grid-template-columns:repeat(2,1fr)}
+  .content{padding:14px}
+}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ── LOGIN ── -->
 <div id="login-screen">
   <div class="login-box">
-    <div style="font-size:48px;margin-bottom:12px">🏦</div>
+    <span class="login-icon">🏦</span>
     <h1>Gerencial Comercial</h1>
     <p>Digite seu PIN de acesso</p>
-    <div class="pin-display" id="pin-display">
-      <div class="pin-dot" id="d0"></div>
-      <div class="pin-dot" id="d1"></div>
-      <div class="pin-dot" id="d2"></div>
-      <div class="pin-dot" id="d3"></div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="d0"></div><div class="pin-dot" id="d1"></div>
+      <div class="pin-dot" id="d2"></div><div class="pin-dot" id="d3"></div>
     </div>
     <div class="pin-grid">
-      <button class="pin-btn" onclick="pinPress('1')">1</button>
-      <button class="pin-btn" onclick="pinPress('2')">2</button>
-      <button class="pin-btn" onclick="pinPress('3')">3</button>
-      <button class="pin-btn" onclick="pinPress('4')">4</button>
-      <button class="pin-btn" onclick="pinPress('5')">5</button>
-      <button class="pin-btn" onclick="pinPress('6')">6</button>
-      <button class="pin-btn" onclick="pinPress('7')">7</button>
-      <button class="pin-btn" onclick="pinPress('8')">8</button>
-      <button class="pin-btn" onclick="pinPress('9')">9</button>
-      <button class="pin-btn del" onclick="pinClear()">Limpar</button>
-      <button class="pin-btn" onclick="pinPress('0')">0</button>
-      <button class="pin-btn del" onclick="pinDel()">⌫</button>
+      <button class="pin-btn" onclick="pp('1')">1</button>
+      <button class="pin-btn" onclick="pp('2')">2</button>
+      <button class="pin-btn" onclick="pp('3')">3</button>
+      <button class="pin-btn" onclick="pp('4')">4</button>
+      <button class="pin-btn" onclick="pp('5')">5</button>
+      <button class="pin-btn" onclick="pp('6')">6</button>
+      <button class="pin-btn" onclick="pp('7')">7</button>
+      <button class="pin-btn" onclick="pp('8')">8</button>
+      <button class="pin-btn" onclick="pp('9')">9</button>
+      <button class="pin-btn del" onclick="pClear()">Limpar</button>
+      <button class="pin-btn" onclick="pp('0')">0</button>
+      <button class="pin-btn del" onclick="pDel()">⌫</button>
     </div>
-    <div id="login-error"></div>
+    <div id="login-err"></div>
   </div>
 </div>
 
-<!-- APP -->
-<div id="app-screen">
+<!-- ── APP ── -->
+<div id="app">
   <div class="topbar">
-    <div class="topbar-left">
+    <div class="topbar-brand">
       <div>
         <h1>Gerencial Comercial</h1>
-        <div class="topbar-sub" id="topbar-sub"></div>
+        <div class="topbar-date" id="topbar-date"></div>
       </div>
     </div>
-    <div class="top-actions">
-      <div class="user-badge">
-        <span id="user-area-badge"></span>
-        <span class="name" id="user-name-badge"></span>
+    <div class="topbar-right">
+      <div class="user-pill">
+        <div class="user-avatar" id="user-av"></div>
+        <span class="user-name" id="user-nm"></span>
       </div>
-      <button class="btn" onclick="logout()">Sair</button>
+      <button class="btn-logout" onclick="logout()">Sair</button>
     </div>
   </div>
   <div class="nav" id="main-nav"></div>
   <div class="content" id="main-content"></div>
 </div>
 
-<!-- MODALS -->
-<div id="modal-opp" class="modal-bg" style="display:none">
+<!-- ── MODAL EDITAR OPP ── -->
+<div id="modal-edit" class="modal-bg" style="display:none">
   <div class="modal">
-    <div class="modal-header">
-      <h2 id="modal-opp-title">Editar oportunidade</h2>
-      <button class="modal-close" onclick="closeModal('opp')">×</button>
+    <div class="modal-hdr">
+      <h2 id="modal-edit-title">Atualizar oportunidade</h2>
+      <button class="modal-x" onclick="closeModal('edit')">×</button>
     </div>
-    <div class="form-grid">
+    <div class="form-row">
       <div class="fg"><label>Status comercial</label>
-        <select id="ed-sc">
+        <select id="e-sc">
           <option value="">Selecionar...</option>
           <option>Ligar Cliente</option><option>Ligar Cliente c AI</option>
           <option>Agendar Reunião</option><option>Reunião Agendada</option>
@@ -194,7 +290,7 @@ select.inline:focus{outline:none;border-color:var(--wine)}
         </select>
       </div>
       <div class="fg"><label>Pendência boleta</label>
-        <select id="ed-pb">
+        <select id="e-pb">
           <option value="">Selecionar...</option>
           <option>To Do Comercial</option><option>To Do Operacional</option>
           <option>Email/Push + Saldo</option><option>Email + Suit + Saldo</option>
@@ -203,343 +299,353 @@ select.inline:focus{outline:none;border-color:var(--wine)}
           <option>Boletado</option><option>Não se Aplica</option>
         </select>
       </div>
+    </div>
+    <div class="form-row">
       <div class="fg"><label>Volume atual (R$)</label>
-        <input type="number" id="ed-atual" placeholder="0">
+        <input type="number" id="e-atual" placeholder="0">
       </div>
       <div class="fg"><label>Data da boleta</label>
-        <input type="date" id="ed-data">
+        <input type="date" id="e-data">
       </div>
-      <div class="fg"><label>Fonte do $</label>
-        <select id="ed-fonte">
-          <option value="">Selecionar...</option>
-          <option>Aporte</option><option>STVM</option><option>Troca de ativo</option>
-          <option>Liquidez</option><option>Saldo</option>
+    </div>
+    <div class="fg"><label>Próximo TODO</label>
+      <input type="text" id="e-todo" placeholder="O que precisa ser feito...">
+    </div>
+    <div class="fg"><label>Observação</label>
+      <textarea id="e-obs" placeholder="Observações sobre esta oportunidade..."></textarea>
+    </div>
+    <div id="e-hist" style="margin-bottom:8px"></div>
+    <div class="modal-ftr">
+      <button class="btn" onclick="closeModal('edit')">Cancelar</button>
+      <button class="btn wine" id="btn-save-edit" onclick="saveEdit()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL NOVO USUARIO ── -->
+<div id="modal-user" class="modal-bg" style="display:none">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-hdr"><h2>Novo usuário</h2><button class="modal-x" onclick="closeModal('user')">×</button></div>
+    <div class="fg"><label>Nome completo</label><input type="text" id="u-nome" placeholder="Nome do assessor"></div>
+    <div class="form-row">
+      <div class="fg"><label>PIN (4 dígitos)</label><input type="text" id="u-pin" maxlength="4" placeholder="0000"></div>
+      <div class="fg"><label>Perfil</label>
+        <select id="u-perfil" onchange="toggleAreas()">
+          <option value="assessor">Assessor</option>
+          <option value="diretor">Diretor</option>
         </select>
       </div>
     </div>
-    <div class="fg" style="margin-bottom:12px"><label>Próximo TODO</label>
-      <input type="text" id="ed-todo" placeholder="O que precisa ser feito...">
+    <div id="u-areas-wrap" class="fg"><label>Áreas com acesso</label>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;font-weight:normal;cursor:pointer"><input type="checkbox" id="ua-inv" value="inv"> Investimentos</label>
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;font-weight:normal;cursor:pointer"><input type="checkbox" id="ua-cons" value="cons"> Consórcio</label>
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;font-weight:normal;cursor:pointer"><input type="checkbox" id="ua-seg" value="seg"> Seguro de vida</label>
+      </div>
     </div>
-    <div class="fg" style="margin-bottom:12px"><label>Observação</label>
-      <textarea id="ed-obs" placeholder="Observações sobre esta oportunidade..."></textarea>
-    </div>
-    <div id="ed-history" style="margin-bottom:12px"></div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal('opp')">Cancelar</button>
-      <button class="btn primary" id="btn-save-opp" onclick="saveOpp()">Salvar alterações</button>
+    <div class="modal-ftr">
+      <button class="btn" onclick="closeModal('user')">Cancelar</button>
+      <button class="btn wine" onclick="saveUser()">Salvar</button>
     </div>
   </div>
 </div>
 
-<div id="modal-usuario" class="modal-bg modal-sm" style="display:none">
-  <div class="modal modal-sm">
-    <div class="modal-header">
-      <h2 id="modal-user-title">Novo usuário</h2>
-      <button class="modal-close" onclick="closeModal('usuario')">×</button>
-    </div>
-    <div class="fg" style="margin-bottom:12px"><label>Nome</label>
-      <input type="text" id="u-nome" placeholder="Nome completo">
-    </div>
-    <div class="fg" style="margin-bottom:12px"><label>PIN (4 dígitos)</label>
-      <input type="text" id="u-pin" placeholder="1234" maxlength="4">
-    </div>
-    <div class="fg" style="margin-bottom:12px"><label>Perfil</label>
-      <select id="u-perfil" onchange="toggleAreaSelect()">
-        <option value="assessor">Assessor</option>
-        <option value="diretor">Diretor</option>
-      </select>
-    </div>
-    <div id="u-areas-wrap" class="fg" style="margin-bottom:16px"><label>Áreas com acesso</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
-        <label style="font-size:12px;display:flex;align-items:center;gap:4px;font-weight:normal;text-transform:none;letter-spacing:0"><input type="checkbox" value="inv" id="ua-inv"> Investimentos</label>
-        <label style="font-size:12px;display:flex;align-items:center;gap:4px;font-weight:normal;text-transform:none;letter-spacing:0"><input type="checkbox" value="cons" id="ua-cons"> Consórcio</label>
-        <label style="font-size:12px;display:flex;align-items:center;gap:4px;font-weight:normal;text-transform:none;letter-spacing:0"><input type="checkbox" value="seg" id="ua-seg"> Seguro de vida</label>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal('usuario')">Cancelar</button>
-      <button class="btn primary" onclick="saveUsuario()">Salvar</button>
-    </div>
-  </div>
-</div>
-
-<div id="modal-upload" class="modal-bg" style="display:none">
-  <div class="modal">
-    <div class="modal-header">
-      <h2>Upload de planilhas</h2>
-      <button class="modal-close" onclick="closeModal('upload')">×</button>
-    </div>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:16px">Suba as planilhas de pipe. O sistema importa automaticamente os campos Assessor, Cliente, Produto, Volume e Data.</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
-      <div class="card" style="text-align:center;cursor:pointer" onclick="document.getElementById('f-inv').click()">
-        <div style="font-size:24px;margin-bottom:8px">📊</div>
-        <div style="font-size:12px;font-weight:600;color:var(--wine);margin-bottom:4px">Investimentos</div>
-        <div style="font-size:11px;color:var(--muted)">RV + RF</div>
-        <div id="st-inv" style="font-size:11px;margin-top:8px;color:var(--wine);font-weight:600"></div>
-        <input type="file" id="f-inv" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('inv',this)">
-      </div>
-      <div class="card" style="text-align:center;cursor:pointer" onclick="document.getElementById('f-cons').click()">
-        <div style="font-size:24px;margin-bottom:8px">📋</div>
-        <div style="font-size:12px;font-weight:600;color:#EF9F27;margin-bottom:4px">Consórcio</div>
-        <div style="font-size:11px;color:var(--muted)">Planilha de pipe</div>
-        <div id="st-cons" style="font-size:11px;margin-top:8px;color:#EF9F27;font-weight:600"></div>
-        <input type="file" id="f-cons" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('cons',this)">
-      </div>
-      <div class="card" style="text-align:center;cursor:pointer" onclick="document.getElementById('f-seg').click()">
-        <div style="font-size:24px;margin-bottom:8px">🛡️</div>
-        <div style="font-size:12px;font-weight:600;color:#7F77DD;margin-bottom:4px">Seguro de vida</div>
-        <div style="font-size:11px;color:var(--muted)">Planilha de pipe</div>
-        <div id="st-seg" style="font-size:11px;margin-top:8px;color:#7F77DD;font-weight:600"></div>
-        <input type="file" id="f-seg" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('seg',this)">
-      </div>
-    </div>
-    <div id="upload-log" style="margin-top:12px"></div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div id="toast" style="position:fixed;bottom:24px;right:24px;background:var(--wine);color:#FFF8F5;font-size:12px;font-weight:500;padding:10px 18px;border-radius:8px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;max-width:320px"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-const SUPA='https://xhkjxdnsuxybfxbvzgmf.supabase.co';
-const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhoa2p4ZG5zdXh5YmZ4YnZ6Z21mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMjA0NTksImV4cCI6MjA5NjY5NjQ1OX0.xWT_dTjFa34B0Tl58I8_rFVkUcg0qSbHpwWrU1XDIwI';
+const SUPA='https://thskeilfgipienfcctwa.supabase.co';
+const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoc2tlaWxmZ2lwaWVuZmNjdHdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2MDczMzQsImV4cCI6MjEwMTE4MzMzNH0.woP-zwaVCGO0hF4vY0yaCeIjhrd9XoAPB1KVhVvRiDY';
 
-const AREA_NAMES={inv:'Investimentos',cons:'Consórcio',seg:'Seguro de vida'};
-const AREA_COLORS={inv:'#8B1C2A',cons:'#EF9F27',seg:'#7F77DD'};
-const SC_BADGE={'cliente topou':'b-green','cliente confirmar':'b-amber','agendar reunião':'b-purple','reunião agendada':'b-purple','ligar cliente':'b-gray','cliente negou':'b-red','não se aplica':'b-gray'};
-const PB_BADGE={'to do comercial':'b-amber','to do operacional':'b-blue','a boletar':'b-teal','boletado':'b-green','não se aplica':'b-gray','aguardando comercial':'b-amber','email':'b-purple'};
+const AREAS={inv:{name:'Investimentos',color:'#8B1C2A'},cons:{name:'Consórcio',color:'#EF9F27'},seg:{name:'Seguro de vida',color:'#7F77DD'}};
+const SC_BADGE={'cliente topou':'b-green','cliente confirmar':'b-amber','reunião agendada':'b-purple','agendar reunião':'b-purple','ligar cliente':'b-gray','cliente negou':'b-red','não se aplica':'b-gray'};
+const PB_BADGE={'boletado':'b-green','a boletar':'b-teal','to do comercial':'b-amber','to do operacional':'b-blue','aguardando comercial':'b-amber','email':'b-purple','não se aplica':'b-gray'};
 
-let USER=null, OPPS=[], USUARIOS=[], DAILY={}, editingOppId=null;
-let pinVal='';
+let USER=null,OPPS=[],USUARIOS=[],DAILY={},editId=null,charts={};
+let pin='';
 
-// ── UTILS ─────────────────────────────────────────────────────────────────
-function norm(s){return s?String(s).toLowerCase().trim().replace(/\s+/g,' '):''}
-function fmt(v){if(!v||isNaN(v)||v===0)return '—';if(v>=1000000)return 'R$'+(v/1000000).toFixed(1)+'M';if(v>=1000)return 'R$'+(v/1000).toFixed(0)+'k';return 'R$'+Math.round(v)}
-function isBoletado(r){const k=norm(r.pb||'');return k==='boletado'||k==='a boletar'}
-function isPending(r){const k=norm(r.pb||'');return k.includes('todo')||k.includes('email')||k.includes('aguardando')}
-function matchKey(val,map){const k=norm(val);for(const[kk,v]of Object.entries(map)){if(k.includes(norm(kk)))return v;}return null}
-function showToast(msg,col){const t=document.getElementById('toast');t.textContent=msg;t.style.background=col||'#8B1C2A';t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',3500)}
+// ── UTILS ──
+const norm=s=>s?String(s).toLowerCase().trim().replace(/\s+/g,' '):'';
+const fmt=v=>{if(!v||isNaN(v)||v==0)return'—';if(v>=1e6)return'R$'+(v/1e6).toFixed(1)+'M';if(v>=1e3)return'R$'+(v/1e3).toFixed(0)+'k';return'R$'+Math.round(v)};
+const isB=r=>{const k=norm(r.pb||'');return k==='boletado'||k==='a boletar'};
+const isPend=r=>{const k=norm(r.pb||'');return k.includes('todo')||k.includes('email')||k.includes('aguardando')};
+const matchBadge=(v,map)=>{const k=norm(v);for(const[kk,b]of Object.entries(map)){if(k.includes(norm(kk)))return b;}return null};
+const today=()=>new Date().toISOString().split('T')[0];
+const initials=n=>n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+function showToast(msg,ok=false){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'#085041':'#8B1C2A';t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',3500)}
 function closeModal(id){document.getElementById('modal-'+id).style.display='none'}
 
-// ── SUPABASE ──────────────────────────────────────────────────────────────
-async function supa(method,table,data,filter){
+// ── SUPABASE ──
+async function db(method,table,data,filter){
   let url=`${SUPA}/rest/v1/${table}`;
-  if(filter) url+=`?${filter}`;
-  const opts={method,headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':'return=minimal'}};
-  if(data) opts.body=JSON.stringify(data);
-  const res=await fetch(url,opts);
-  if(!res.ok){const e=await res.text();throw new Error(e)}
-  if(res.status===204)return null;
-  return res.json();
+  if(filter)url+=`?${filter}`;
+  const r=await fetch(url,{method,headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':'return=minimal'},body:data?JSON.stringify(data):undefined});
+  if(!r.ok){const e=await r.text();throw new Error(e)}
+  if(r.status===204)return null;
+  return r.json();
 }
 
-// ── PIN LOGIN ─────────────────────────────────────────────────────────────
-function pinPress(d){
-  if(pinVal.length>=4)return;
-  pinVal+=d;
-  updatePinDisplay();
-  if(pinVal.length===4) setTimeout(doLogin,200);
-}
-function pinDel(){pinVal=pinVal.slice(0,-1);updatePinDisplay();document.getElementById('login-error').textContent=''}
-function pinClear(){pinVal='';updatePinDisplay();document.getElementById('login-error').textContent=''}
-function updatePinDisplay(){
-  for(let i=0;i<4;i++){
-    document.getElementById('d'+i).classList.toggle('filled',i<pinVal.length);
-  }
-}
+// ── PIN ──
+function pp(d){if(pin.length>=4)return;pin+=d;updateDots();if(pin.length===4)setTimeout(doLogin,200)}
+function pDel(){pin=pin.slice(0,-1);updateDots();document.getElementById('login-err').textContent=''}
+function pClear(){pin='';updateDots();document.getElementById('login-err').textContent=''}
+function updateDots(){for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('on',i<pin.length)}
+
 async function doLogin(){
-  const errEl=document.getElementById('login-error');
-  errEl.textContent='Verificando...';
+  const err=document.getElementById('login-err');
+  err.textContent='';
   try{
-    const res=await fetch(`${SUPA}/rest/v1/usuarios?pin=eq.${pinVal}&ativo=eq.true&select=*`,{
-      headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json'}
-    });
-    if(!res.ok){
-      const body=await res.text();
-      errEl.textContent='Erro de conexão ('+res.status+'). Tente novamente.';
-      console.error('Supabase error:',body);
-      pinVal='';updatePinDisplay();return;
-    }
+    const res=await fetch(`${SUPA}/rest/v1/usuarios?pin=eq.${pin}&ativo=eq.true&select=*`,{headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`}});
+    if(!res.ok)throw new Error('Erro '+res.status);
     const data=await res.json();
-    if(!data||!data.length){
-      errEl.textContent='PIN incorreto. Tente novamente.';
-      pinVal='';updatePinDisplay();return;
-    }
+    if(!data?.length){err.textContent='PIN incorreto.';pin='';updateDots();return}
     USER=data[0];
-    errEl.textContent='';
     document.getElementById('login-screen').style.display='none';
-    document.getElementById('app-screen').style.display='block';
-    await initApp();
-  }catch(e){
-    errEl.textContent='Sem conexão com internet. Verifique e tente novamente.';
-    console.error('Login error:',e);
-    pinVal='';updatePinDisplay();
-  }
+    document.getElementById('app').style.display='block';
+    initApp();
+  }catch(e){err.textContent='Erro de conexão. Tente novamente.';pin='';updateDots()}
 }
-function logout(){USER=null;pinVal='';updatePinDisplay();document.getElementById('login-error').textContent='';document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';}
 
-// ── APP INIT ──────────────────────────────────────────────────────────────
+function logout(){USER=null;pin='';updateDots();document.getElementById('login-err').textContent='';document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';Object.values(charts).forEach(c=>{try{c.destroy()}catch{}});charts={}}
+
+// ── INIT ──
 async function initApp(){
-  document.getElementById('user-name-badge').textContent=USER.nome;
-  const areas=USER.perfil==='diretor'?Object.keys(AREA_NAMES):(USER.areas||[]);
-  document.getElementById('user-area-badge').innerHTML=areas.map(a=>`<span class="badge b-wine" style="margin-right:3px">${AREA_NAMES[a]||a}</span>`).join('');
-  document.getElementById('topbar-sub').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('user-av').textContent=initials(USER.nome);
+  document.getElementById('user-nm').textContent=USER.nome;
   await loadData();
   buildNav();
-  renderView('dashboard');
+  if(USER.perfil==='diretor')renderDiretor();
+  else renderAssessorOpps();
 }
 
 async function loadData(){
   const areas=USER.perfil==='diretor'?['inv','cons','seg']:(USER.areas||[]);
-  const areaFilter=areas.map(a=>`area.eq.${a}`).join(',');
-  const [opps, users]=await Promise.all([
-    supa('GET','oportunidades','',`or=(${areaFilter})&order=created_at.desc`),
-    USER.perfil==='diretor'?supa('GET','usuarios','','order=nome.asc'):Promise.resolve([])
+  const af=areas.map(a=>`area.eq.${a}`).join(',');
+  const[opps,users,daily]=await Promise.all([
+    db('GET','oportunidades','',`or=(${af})&order=created_at.desc`),
+    USER.perfil==='diretor'?db('GET','usuarios','','order=nome.asc'):Promise.resolve([]),
+    db('GET','daily_selecoes','',`data=eq.${today()}&assessor=eq.${encodeURIComponent(USER.nome)}`)
   ]);
-  OPPS=opps||[];
-  USUARIOS=users||[];
-  // Load today's daily
-  const today=new Date().toISOString().split('T')[0];
-  const dailyRes=await supa('GET','daily_selecoes','',`data=eq.${today}&assessor=eq.${encodeURIComponent(USER.nome)}`);
-  DAILY={};
-  (dailyRes||[]).forEach(d=>{DAILY[d.oportunidade_id]={tipo:d.tipo,acao:d.acao,id:d.id};});
+  OPPS=opps||[];USUARIOS=users||[];
+  DAILY={};(daily||[]).forEach(d=>{DAILY[d.oportunidade_id]={tipo:d.tipo,acao:d.acao,id:d.id}});
 }
 
-// ── NAV ───────────────────────────────────────────────────────────────────
-let curView='dashboard';
+// ── NAV ──
+let curView='';
 function buildNav(){
-  const tabs=USER.perfil==='diretor'
-    ?[['dashboard','Dashboard'],['pipeline','Pipeline'],['daily','Daily'],['upload','Upload'],['usuarios','Usuários']]
-    :[['dashboard','Meu painel'],['pipeline','Oportunidades'],['daily','Daily']];
-  document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>`<button class="nav-tab${v===curView?' active':''}" onclick="renderView('${v}',this)">${l}</button>`).join('');
+  const isDiretor=USER.perfil==='diretor';
+  const tabs=isDiretor
+    ?[['diretor','📊 Dashboard'],['d-pipeline','📋 Pipeline'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários']]
+    :[['a-opps','📂 Minhas oportunidades'],['a-daily','☀️ Meu dia']];
+  document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>`<button class="nav-tab${v===curView?' active':''}" onclick="setView('${v}',this)">${l}</button>`).join('');
 }
-function renderView(v,btn){
+
+function setView(v,btn){
   curView=v;
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   if(btn)btn.classList.add('active');
-  else{const t=document.querySelector(`.nav-tab[onclick*="'${v}'"]`);if(t)t.classList.add('active');}
+  Object.values(charts).forEach(c=>{try{c.destroy()}catch{}});charts={};
   const c=document.getElementById('main-content');
-  if(v==='dashboard')renderDashboard(c);
-  else if(v==='pipeline')renderPipeline(c);
-  else if(v==='daily')renderDaily(c);
-  else if(v==='upload')renderUpload(c);
-  else if(v==='usuarios')renderUsuarios(c);
+  if(v==='diretor')renderDiretor(c);
+  else if(v==='d-pipeline')renderDPipeline(c);
+  else if(v==='d-upload')renderUpload(c);
+  else if(v==='d-usuarios')renderUsuarios(c);
+  else if(v==='a-opps')renderAssessorOpps(c);
+  else if(v==='a-daily')renderAssessorDaily(c);
 }
 
-// ── DASHBOARD ─────────────────────────────────────────────────────────────
-function renderDashboard(c){
-  const areas=USER.perfil==='diretor'?['inv','cons','seg']:(USER.areas||[]);
-  const myOpps=USER.perfil==='diretor'?OPPS:OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+// ══════════════════════════════════════════════════════════
+// ── DIRETOR DASHBOARD ──
+// ══════════════════════════════════════════════════════════
+function renderDiretor(c=document.getElementById('main-content')){
+  const bolVol=OPPS.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+  const bolN=OPPS.filter(isB).length;
+  const pipe=OPPS.reduce((s,r)=>s+(r.pipe||0),0);
+  const pend=OPPS.filter(isPend).length;
+  const efet=OPPS.length?Math.round(bolN/OPPS.length*100):0;
 
-  const totalPipe=myOpps.reduce((s,r)=>s+(r.pipe||0),0);
-  const totalBol=myOpps.filter(isBoletado).reduce((s,r)=>s+(r.atual||0),0);
-  const totalPend=myOpps.filter(isPending).length;
-  const bolN=myOpps.filter(isBoletado).length;
+  // Area data
+  const aData=Object.entries(AREAS).map(([ak,a])=>{
+    const rows=OPPS.filter(r=>r.area===ak);
+    const bol=rows.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+    const bolN2=rows.filter(isB).length;
+    const p=rows.reduce((s,r)=>s+(r.pipe||0),0);
+    const pend2=rows.filter(isPend).length;
+    const ef=rows.length?Math.round(bolN2/rows.length*100):0;
+    const pct=p>0?Math.min(Math.round(bol/p*100),100):0;
+    return{ak,a,rows,bol,bolN:bolN2,pipe:p,pend:pend2,ef,pct};
+  });
 
-  let html=`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:20px">
-    <div class="kpi hl"><div class="lbl">✓ Boletado</div><div class="val">${fmt(totalBol)||'R$0'}</div><div class="sub">${bolN} oportunidades</div></div>
-    <div class="kpi"><div class="lbl">Volume pipe</div><div class="val">${fmt(totalPipe)}</div><div class="sub">${myOpps.length} oport.</div></div>
-    <div class="kpi"><div class="lbl">Pendências</div><div class="val">${totalPend}</div><div class="sub">requerem ação</div></div>
+  // Assessor ranking
+  const assMap={};
+  OPPS.forEach(r=>{
+    if(!r.assessor)return;
+    if(!assMap[r.assessor])assMap[r.assessor]={bol:0,bolN:0,pipe:0,n:0,pend:0,area:r.area};
+    assMap[r.assessor].n++;assMap[r.assessor].pipe+=(r.pipe||0);
+    if(isB(r)){assMap[r.assessor].bol+=(r.atual||0);assMap[r.assessor].bolN++}
+    if(isPend(r))assMap[r.assessor].pend++;
+  });
+  const assRank=Object.entries(assMap).sort((a,b)=>b[1].bol-a[1].bol);
+  const maxBol=Math.max(...assRank.map(([,v])=>v.bol),1);
+
+  c.innerHTML=`
+  <!-- KPIs -->
+  <div class="kpi-strip">
+    <div class="kpi wine"><div class="kpi-lbl">✓ Volume boletado</div><div class="kpi-val">${fmt(bolVol)||'R$0'}</div><div class="kpi-sub">${bolN} oportunidades · ${efet}% efetiv.</div></div>
+    <div class="kpi green"><div class="kpi-lbl">Volume pipe total</div><div class="kpi-val">${fmt(pipe)}</div><div class="kpi-sub">${OPPS.length} oportunidades</div></div>
+    <div class="kpi amber"><div class="kpi-lbl">Pendências ativas</div><div class="kpi-val">${pend}</div><div class="kpi-sub">requerem ação</div></div>
+    <div class="kpi blue"><div class="kpi-lbl">Assessores ativos</div><div class="kpi-val">${assRank.length}</div><div class="kpi-sub">com oportunidades</div></div>
+  </div>
+
+  <!-- Area cards -->
+  <div class="section-label">Desempenho por área</div>
+  <div class="area-cards">
+    ${aData.map(({ak,a,rows,bol,bolN:bN,pipe:p,pend:pend2,ef,pct})=>`
+    <div class="area-card" style="border-top-color:${a.color}">
+      <div class="area-card-header">
+        <div class="area-tag"><span class="area-dot" style="background:${a.color}"></span><span style="color:${a.color}">${a.name}</span></div>
+        <span class="badge b-wine">${rows.length} opor.</span>
+      </div>
+      <div class="area-bol" style="color:${a.color}">${fmt(bol)||'R$0'}</div>
+      <div class="area-bol-sub">${bN} boletadas · ${ef}% efetivação</div>
+      <div class="area-stats">
+        <div class="area-stat"><div class="area-stat-l">Pipe</div><div class="area-stat-v" style="color:${a.color}">${fmt(p)}</div></div>
+        <div class="area-stat"><div class="area-stat-l">Pendências</div><div class="area-stat-v" style="color:${pend2>0?'#854F0B':'#085041'}">${pend2||'0'}</div></div>
+        <div class="area-stat"><div class="area-stat-l">Efetiv.</div><div class="area-stat-v" style="color:${ef>=70?'#085041':ef>=40?'#854F0B':'#993C1D'}">${ef}%</div></div>
+      </div>
+      ${ak==='inv'?(()=>{
+        const RV_PRODS=['Hawk','Collar','Collar Kin','Equity Strategy','Asset Allocation'];
+        const RF_PRODS=['NTN-B 50','NTN-B Principal','COE','CP','Liquidez'];
+        const rvRows=rows.filter(r=>RV_PRODS.some(p2=>norm(r.produto||'').includes(norm(p2))));
+        const rfRows=rows.filter(r=>RF_PRODS.some(p2=>norm(r.produto||'').includes(norm(p2))));
+        const rvBol=rvRows.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+        const rfBol=rfRows.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+        const rvPipe=rvRows.reduce((s,r)=>s+(r.pipe||0),0);
+        const rfPipe=rfRows.reduce((s,r)=>s+(r.pipe||0),0);
+
+        // Products per sub-area
+        const rvProdMap={},rfProdMap={};
+        rvRows.forEach(r=>{const pk=r.produto||'Outros';if(!rvProdMap[pk])rvProdMap[pk]={pipe:0,bol:0};rvProdMap[pk].pipe+=(r.pipe||0);if(isB(r))rvProdMap[pk].bol+=(r.atual||0);});
+        rfRows.forEach(r=>{const pk=r.produto||'Outros';if(!rfProdMap[pk])rfProdMap[pk]={pipe:0,bol:0};rfProdMap[pk].pipe+=(r.pipe||0);if(isB(r))rfProdMap[pk].bol+=(r.atual||0);});
+
+        const maxRV=Math.max(...Object.values(rvProdMap).map(v=>v.pipe),1);
+        const maxRF=Math.max(...Object.values(rfProdMap).map(v=>v.pipe),1);
+
+        function prodRows(map,maxP,cor){
+          return Object.entries(map).sort((a,b)=>b[1].pipe-a[1].pipe).map(([name,v])=>{
+            const pct2=Math.min(Math.round(v.pipe/maxP*100),100)||2;
+            return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+              +'<div style="font-size:12px;color:var(--text);min-width:100px;font-weight:500">'+name+'</div>'
+              +'<div style="flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden"><div style="width:'+pct2+'%;height:5px;background:'+cor+';border-radius:99px"></div></div>'
+              +'<div style="font-size:12px;font-weight:700;color:'+cor+';min-width:52px;text-align:right">'+fmt(v.pipe)+'</div>'
+              +'</div>';
+          }).join('');
+        }
+
+        return '<div style="margin-top:16px;border-top:1px solid var(--border-l);padding-top:16px">'
+
+          // RV section
+          +'<div style="margin-bottom:16px">'
+          +'<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">'
+          +'<div style="font-size:16px;font-weight:800;color:#8B1C2A">Renda variável</div>'
+          +'<div style="text-align:right"><span style="font-size:18px;font-weight:800;color:#6B0010">'+(fmt(rvBol)||'—')+'</span><span style="font-size:11px;color:var(--muted);margin-left:6px">/ pipe '+(fmt(rvPipe))+'</span></div>'
+          +'</div>'
+          +(Object.keys(rvProdMap).length?prodRows(rvProdMap,maxRV,'#8B1C2A'):'<div style="font-size:12px;color:var(--muted)">Nenhuma oportunidade</div>')
+          +'</div>'
+
+          // RF section
+          +'<div style="padding-top:14px;border-top:1px solid var(--border-l)">'
+          +'<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">'
+          +'<div style="font-size:16px;font-weight:800;color:#378ADD">Renda fixa</div>'
+          +'<div style="text-align:right"><span style="font-size:18px;font-weight:800;color:#185FA5">'+(fmt(rfBol)||'—')+'</span><span style="font-size:11px;color:var(--muted);margin-left:6px">/ pipe '+(fmt(rfPipe))+'</span></div>'
+          +'</div>'
+          +(Object.keys(rfProdMap).length?prodRows(rfProdMap,maxRF,'#378ADD'):'<div style="font-size:12px;color:var(--muted)">Nenhuma oportunidade</div>')
+          +'</div>'
+
+          +'</div>';
+      })():''}
+      <div class="prog-wrap"><div class="prog-bg"><div class="prog-fill" style="width:${pct}%;background:${a.color}"></div></div><div class="prog-lbl">${pct}% realizado</div></div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Charts -->
+  <div class="charts-row">
+    <div class="chart-card"><h3>Boletado por área</h3><div class="chart-wrap"><canvas id="ch-area"></canvas></div></div>
+    <div class="chart-card"><h3>Pipe vs. boletado por assessor (top 8)</h3><div class="chart-wrap"><canvas id="ch-ass"></canvas></div></div>
+  </div>
+
+  <!-- Assessor ranking -->
+  <div class="section-label">Ranking de assessores</div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Assessor</th><th>Área</th><th style="text-align:right">Opor.</th><th style="text-align:right">Pipe</th><th style="text-align:right">Boletado</th><th style="text-align:right">Efetiv.</th><th style="text-align:right">Pendências</th></tr></thead>
+    <tbody>${assRank.map(([name,v])=>{
+      const ef2=v.n?Math.round(v.bolN/v.n*100):0;
+      const efC=ef2>=70?'var(--green)':ef2>=40?'var(--amber)':'#993C1D';
+      const pct2=Math.min(Math.round(v.bol/maxBol*100),100);
+      const cor=AREAS[v.area]?.color||'#8B1C2A';
+      return`<tr>
+        <td><div style="font-weight:700">${name}</div><div class="mini-bar"><div class="mini-fill" style="width:${pct2}%;background:${cor}"></div></div></td>
+        <td><span class="badge b-wine" style="background:${cor}18;color:${cor};border-color:${cor}44">${AREAS[v.area]?.name||v.area}</span></td>
+        <td style="text-align:right">${v.n}</td>
+        <td style="text-align:right;color:var(--muted)">${fmt(v.pipe)}</td>
+        <td style="text-align:right;font-weight:700;color:var(--wine-d)">${fmt(v.bol)||'—'}</td>
+        <td style="text-align:right;font-weight:700;color:${efC}">${ef2}%</td>
+        <td style="text-align:right;color:${v.pend>0?'var(--amber)':'var(--green)'}">${v.pend||'—'}</td>
+      </tr>`;
+    }).join('')}</tbody></table>
   </div>`;
 
-  // Area cards
-  html+=`<div class="section-title">Por área</div><div class="grid-areas" style="margin-bottom:20px">`;
-  areas.forEach(ak=>{
-    const rows=myOpps.filter(r=>r.area===ak);
-    const pipe=rows.reduce((s,r)=>s+(r.pipe||0),0);
-    const bol=rows.filter(isBoletado).reduce((s,r)=>s+(r.atual||0),0);
-    const bolN2=rows.filter(isBoletado).length;
-    const pend=rows.filter(isPending).length;
-    const cor=AREA_COLORS[ak];
-    html+=`<div class="area-card" style="border-left-color:${cor}">
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;display:flex;align-items:center;gap:6px">
-        <span style="width:8px;height:8px;border-radius:50%;background:${cor}"></span>${AREA_NAMES[ak]}
-      </div>
-      <div style="background:var(--wine-light);border:1px solid #C8A0A8;border-radius:8px;padding:10px 12px;margin-bottom:10px">
-        <div style="font-size:10px;color:var(--wine);font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">✓ Boletado</div>
-        <div style="font-size:20px;font-weight:700;color:var(--wine-dark)">${fmt(bol)||'R$0'}</div>
-        <div style="font-size:11px;color:var(--wine);margin-top:2px">${bolN2} opor.</div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid #F0E8E3"><span style="color:var(--muted)">Total opor.</span><span style="font-weight:600">${rows.length}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid #F0E8E3"><span style="color:var(--muted)">Volume pipe</span><span style="font-weight:600">${fmt(pipe)}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;padding:3px 0"><span style="color:var(--muted)">Pendências</span><span style="font-weight:600;color:${pend>0?'#854F0B':'#085041'}">${pend||'—'}</span></div>
-    </div>`;
+  // Charts
+  requestAnimationFrame(()=>{
+    // Area chart
+    const actx=document.getElementById('ch-area');
+    if(actx){charts.area=new Chart(actx,{type:'doughnut',data:{labels:aData.map(d=>d.a.name),datasets:[{data:aData.map(d=>d.bol),backgroundColor:aData.map(d=>d.a.color),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}}}})}
+
+    // Assessor chart top 8
+    const top8=assRank.slice(0,8);
+    const bctx=document.getElementById('ch-ass');
+    if(bctx){charts.ass=new Chart(bctx,{type:'bar',data:{
+      labels:top8.map(([n])=>n.split(' ')[0]),
+      datasets:[
+        {label:'Pipe',data:top8.map(([,v])=>v.pipe),backgroundColor:'#E8D5CC',borderRadius:4},
+        {label:'Boletado',data:top8.map(([,v])=>v.bol),backgroundColor:'#8B1C2A',borderRadius:4}
+      ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{y:{ticks:{callback:v=>fmt(v),font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{size:10}}}}}})
+    }
   });
-  html+='</div>';
-
-  // Pipeline table by area+product
-  const prodMap={};
-  myOpps.forEach(r=>{
-    const gk=AREA_NAMES[r.area]||r.area;
-    const pk=r.produto||'Outros';
-    if(!prodMap[gk]){prodMap[gk]={pipe:0,bol:0,n:0,cor:AREA_COLORS[r.area],subs:{}};}
-    prodMap[gk].pipe+=(r.pipe||0);prodMap[gk].n++;
-    if(isBoletado(r))prodMap[gk].bol+=(r.atual||0);
-    if(!prodMap[gk].subs[pk]){prodMap[gk].subs[pk]={pipe:0,bol:0,n:0};}
-    prodMap[gk].subs[pk].pipe+=(r.pipe||0);prodMap[gk].subs[pk].n++;
-    if(isBoletado(r))prodMap[gk].subs[pk].bol+=(r.atual||0);
-  });
-
-  if(Object.keys(prodMap).length){
-    html+=`<div class="section-title">Pipeline por área e produto</div><div class="tbl-wrap">
-    <table><thead><tr><th>Área / Produto</th><th style="text-align:right">Opor.</th><th style="text-align:right">Volume pipe</th><th style="text-align:right">Boletado</th></tr></thead><tbody>`;
-    Object.entries(prodMap).sort((a,b)=>b[1].pipe-a[1].pipe).forEach(([gk,v])=>{
-      html+=`<tr style="background:#F5F0EB"><td style="font-weight:700"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${v.cor};display:inline-block"></span>${gk}</span></td><td style="text-align:right;font-weight:700">${v.n}</td><td style="text-align:right;font-weight:700;color:${v.cor}">${fmt(v.pipe)}</td><td style="text-align:right;font-weight:700;color:var(--wine-dark)">${fmt(v.bol)||'—'}</td></tr>`;
-      Object.entries(v.subs).sort((a,b)=>b[1].pipe-a[1].pipe).forEach(([pk,sv])=>{
-        html+=`<tr><td style="padding-left:22px;color:#5A3A3E;font-size:12px">${pk}</td><td style="text-align:right;color:var(--muted)">${sv.n}</td><td style="text-align:right;color:var(--muted)">${fmt(sv.pipe)}</td><td style="text-align:right;color:var(--green)">${fmt(sv.bol)||'—'}</td></tr>`;
-      });
-    });
-    html+=`</tbody></table></div>`;
-  }
-
-  // Assessor ranking (director only)
-  if(USER.perfil==='diretor'){
-    const assMap={};
-    OPPS.forEach(r=>{
-      if(!r.assessor)return;
-      if(!assMap[r.assessor]){assMap[r.assessor]={pipe:0,bol:0,n:0,area:r.area};}
-      assMap[r.assessor].pipe+=(r.pipe||0);assMap[r.assessor].n++;
-      if(isBoletado(r))assMap[r.assessor].bol+=(r.atual||0);
-    });
-    const maxBol=Math.max(...Object.values(assMap).map(v=>v.bol),1);
-    html+=`<div class="section-title">Ranking de assessores</div><div class="tbl-wrap"><table>
-    <thead><tr><th>Assessor</th><th>Área</th><th style="text-align:right">Opor.</th><th style="text-align:right">Pipe</th><th style="text-align:right">Boletado</th></tr></thead><tbody>`;
-    Object.entries(assMap).sort((a,b)=>b[1].bol-a[1].bol).forEach(([name,v])=>{
-      const pct=Math.min(Math.round(v.bol/maxBol*100),100);
-      const cor=AREA_COLORS[v.area]||'#8B1C2A';
-      html+=`<tr><td><div style="font-weight:600">${name}</div><div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${cor}"></div></div></td>
-      <td><span class="badge" style="background:${cor}18;color:${cor}">${AREA_NAMES[v.area]||v.area}</span></td>
-      <td style="text-align:right">${v.n}</td><td style="text-align:right;color:var(--muted)">${fmt(v.pipe)}</td>
-      <td style="text-align:right;font-weight:700;color:var(--wine-dark)">${fmt(v.bol)||'—'}</td></tr>`;
-    });
-    html+=`</tbody></table></div>`;
-  }
-
-  c.innerHTML=html;
 }
 
-// ── PIPELINE ──────────────────────────────────────────────────────────────
-function renderPipeline(c){
-  const myOpps=USER.perfil==='diretor'?OPPS:OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
-  const areas=USER.perfil==='diretor'?['inv','cons','seg']:(USER.areas||[]);
-
-  let filters=`<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">`;
-  if(USER.perfil==='diretor'){
-    filters+=`<select id="f-area" onchange="filterPipeline()" class="fg" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)"><option value="">Todas as áreas</option>${areas.map(a=>`<option value="${a}">${AREA_NAMES[a]}</option>`).join('')}</select>`;
-    filters+=`<select id="f-ass" onchange="filterPipeline()" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)"><option value="">Todos assessores</option>${[...new Set(OPPS.map(r=>r.assessor).filter(Boolean))].sort().map(a=>`<option>${a}</option>`).join('')}</select>`;
-  }
-  filters+=`<select id="f-sc" onchange="filterPipeline()" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)"><option value="">Todos status</option>${['Ligar Cliente','Ligar Cliente c AI','Agendar Reunião','Reunião Agendada','Cliente Confirmar','Cliente Topou','Cliente Negou','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}</select>`;
-  filters+=`<select id="f-pb" onchange="filterPipeline()" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text)"><option value="">Todas pendências</option>${['To Do Comercial','To Do Operacional','A Boletar','Boletado','Aguardando Comercial','Email','Email/Push','Email + Suit + Saldo','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}</select>`;
-  filters+=`<input id="f-cli" type="text" placeholder="Buscar cliente..." oninput="filterPipeline()" style="font-size:12px;padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--text);flex:1;min-width:120px">`;
-  filters+=`</div><div id="pipe-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px"></div><div id="pipe-tbl"></div>`;
-
-  c.innerHTML=filters;
-  filterPipeline();
+// ── DIRETOR PIPELINE ──
+function renderDPipeline(c=document.getElementById('main-content')){
+  let rows=[...OPPS];
+  c.innerHTML=`
+    <div class="filters">
+      <select class="filter-sel" id="f-area" onchange="applyFilter()">
+        <option value="">Todas as áreas</option>
+        ${Object.entries(AREAS).map(([k,a])=>`<option value="${k}">${a.name}</option>`).join('')}
+      </select>
+      <select class="filter-sel" id="f-ass" onchange="applyFilter()">
+        <option value="">Todos assessores</option>
+        ${[...new Set(OPPS.map(r=>r.assessor).filter(Boolean))].sort().map(a=>`<option>${a}</option>`).join('')}
+      </select>
+      <select class="filter-sel" id="f-sc" onchange="applyFilter()">
+        <option value="">Todos status</option>
+        ${['Ligar Cliente','Ligar Cliente c AI','Agendar Reunião','Reunião Agendada','Cliente Confirmar','Cliente Topou','Cliente Negou','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}
+      </select>
+      <select class="filter-sel" id="f-pb" onchange="applyFilter()">
+        <option value="">Todas pendências</option>
+        ${['To Do Comercial','To Do Operacional','A Boletar','Boletado','Aguardando Comercial','Email','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}
+      </select>
+      <input class="filter-inp" id="f-cli" type="text" placeholder="🔍 Buscar cliente..." oninput="applyFilter()">
+    </div>
+    <div id="pipeline-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px"></div>
+    <div id="pipeline-summary" style="display:none"></div>
+    <div id="pipeline-tbl"></div>`;
+  applyFilter();
 }
 
-function filterPipeline(){
-  const myOpps=USER.perfil==='diretor'?OPPS:OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
-  let rows=[...myOpps];
+function applyFilter(){
+  let rows=[...OPPS];
   const fA=document.getElementById('f-area')?.value;
   const fAss=document.getElementById('f-ass')?.value;
   const fSC=document.getElementById('f-sc')?.value;
@@ -551,414 +657,614 @@ function filterPipeline(){
   if(fPB)rows=rows.filter(r=>r.pb===fPB);
   if(fCli)rows=rows.filter(r=>(r.cliente||'').toLowerCase().includes(fCli));
 
-  const kpi=document.getElementById('pipe-kpis');
-  if(kpi){
-    const totP=rows.reduce((s,r)=>s+(r.pipe||0),0);
-    const totB=rows.filter(isBoletado).reduce((s,r)=>s+(r.atual||0),0);
-    kpi.innerHTML=`<div class="kpi hl"><div class="lbl">Boletado</div><div class="val">${fmt(totB)||'R$0'}</div></div>
-    <div class="kpi"><div class="lbl">Pipe</div><div class="val">${fmt(totP)}</div><div class="sub">${rows.length} opor.</div></div>
-    <div class="kpi"><div class="lbl">Pendências</div><div class="val">${rows.filter(isPending).length}</div></div>`;
+  const kEl=document.getElementById('pipeline-kpis');
+  if(kEl){
+    const tP=rows.reduce((s,r)=>s+(r.pipe||0),0);
+    const tB=rows.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+    kEl.innerHTML=`<div class="kpi wine"><div class="kpi-lbl">Boletado</div><div class="kpi-val">${fmt(tB)||'R$0'}</div></div>
+    <div class="kpi"><div class="kpi-lbl">Pipe</div><div class="kpi-val">${fmt(tP)}</div><div class="kpi-sub">${rows.length} opor.</div></div>
+    <div class="kpi"><div class="kpi-lbl">Pendências</div><div class="kpi-val">${rows.filter(isPend).length}</div></div>`;
   }
 
-  const wrap=document.getElementById('pipe-tbl');
-  if(!wrap)return;
-  if(!rows.length){wrap.innerHTML='<div class="empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg><p>Nenhuma oportunidade encontrada</p></div>';return;}
-
-  let html='<div class="tbl-wrap"><table><thead><tr>';
-  if(USER.perfil==='diretor')html+='<th>Assessor</th>';
-  html+=`<th>Cliente</th><th>Área</th><th>Produto</th><th style="text-align:right">Pipe</th><th style="text-align:right">Atual</th><th>Status</th><th>Pendência</th><th>TODO</th><th>Ação</th></tr></thead><tbody>`;
-  rows.forEach(r=>{
-    const bsc=matchKey(r.sc||'',SC_BADGE)||'b-gray';
-    const bpb=matchKey(r.pb||'',PB_BADGE)||'b-gray';
-    const cor=AREA_COLORS[r.area]||'#888';
-    html+=`<tr class="${isBoletado(r)?'boletado':''}">`;
-    if(USER.perfil==='diretor')html+=`<td style="font-weight:500">${r.assessor||'—'}</td>`;
-    html+=`<td style="font-weight:500">${r.cliente||'—'}</td>
-    <td><span class="badge" style="background:${cor}18;color:${cor}">${AREA_NAMES[r.area]||r.area||'—'}</span></td>
-    <td>${r.produto||'—'}</td>
-    <td style="text-align:right;color:var(--muted)">${fmt(r.pipe)}</td>
-    <td style="text-align:right;font-weight:600;color:${isBoletado(r)?'var(--wine-dark)':'var(--text)'}">${fmt(r.atual)}</td>
-    <td>${r.sc?`<span class="badge ${bsc}">${r.sc}</span>`:'—'}</td>
-    <td>${r.pb?`<span class="badge ${bpb}">${r.pb}</span>`:'—'}</td>
-    <td style="font-size:11px;color:var(--muted);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${r.todo||''}">${r.todo||'—'}</td>
-    <td><button class="btn sm" onclick="openEditOpp('${r.id}')">Editar</button></td></tr>`;
-  });
-  html+='</tbody></table></div>';
-  wrap.innerHTML=html;
-}
-
-// ── EDIT OPP ──────────────────────────────────────────────────────────────
-function openEditOpp(id){
-  const r=OPPS.find(o=>o.id===id);
-  if(!r)return;
-  editingOppId=id;
-  document.getElementById('modal-opp-title').textContent=`${r.cliente} — ${r.produto||r.area}`;
-  document.getElementById('ed-sc').value=r.sc||'';
-  document.getElementById('ed-pb').value=r.pb||'';
-  document.getElementById('ed-atual').value=r.atual||'';
-  document.getElementById('ed-data').value=r.data_boleta||'';
-  document.getElementById('ed-fonte').value=r.fonte||'';
-  document.getElementById('ed-todo').value=r.todo||'';
-  document.getElementById('ed-obs').value=r.obs||'';
-
-  // History
-  const hist=r.historico||[];
-  const histEl=document.getElementById('ed-history');
-  if(hist.length){
-    histEl.innerHTML=`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Histórico de alterações</div>
-    <div style="border:1px solid var(--border);border-radius:8px;padding:8px 12px;max-height:140px;overflow-y:auto">
-    ${hist.slice(-10).reverse().map(h=>`<div class="history-item"><strong>${h.usuario}</strong> · ${h.data} — ${h.campo}: <em>${h.de||'—'}</em> → <strong>${h.para}</strong></div>`).join('')}
-    </div>`;
-  } else histEl.innerHTML='';
-
-  document.getElementById('modal-opp').style.display='flex';
-}
-
-async function saveOpp(){
-  const r=OPPS.find(o=>o.id===editingOppId);
-  if(!r)return;
-  const btn=document.getElementById('btn-save-opp');
-  btn.innerHTML='<span class="spinner"></span>';btn.disabled=true;
-
-  const newSc=document.getElementById('ed-sc').value;
-  const newPb=document.getElementById('ed-pb').value;
-  const newAtual=parseFloat(document.getElementById('ed-atual').value)||0;
-  const now=new Date();
-  const dateStr=now.toLocaleDateString('pt-BR')+ ' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-
-  // Build history entries
-  const hist=[...(r.historico||[])];
-  const changes=[
-    ['Status comercial',r.sc,newSc],
-    ['Pendência boleta',r.pb,newPb],
-    ['Volume atual',String(r.atual||0),String(newAtual)],
-  ];
-  changes.forEach(([campo,de,para])=>{
-    if(de!==para&&para) hist.push({campo,de,para,usuario:USER.nome,data:dateStr});
-  });
-
-  const data={
-    sc:newSc,pb:newPb,atual:newAtual,
-    data_boleta:document.getElementById('ed-data').value||null,
-    fonte:document.getElementById('ed-fonte').value,
-    todo:document.getElementById('ed-todo').value,
-    obs:document.getElementById('ed-obs').value,
-    historico:hist,
-    updated_at:now.toISOString()
-  };
-
-  try{
-    await supa('PATCH','oportunidades',data,`id=eq.${editingOppId}`);
-    showToast('Salvo!','#085041');
-    closeModal('opp');
-    await loadData();
-    filterPipeline();
-  }catch(e){showToast('Erro: '+e.message,'#C03030');}
-  btn.innerHTML='Salvar alterações';btn.disabled=false;
-}
-
-// ── DAILY ─────────────────────────────────────────────────────────────────
-function renderDaily(c){
-  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
-  const today=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'});
-
-  // Group opps
-  const reunioes=myOpps.filter(r=>norm(r.sc||'').includes('reunião')||norm(r.sc||'').includes('agendar'));
-  const pendentes=myOpps.filter(r=>isPending(r)&&!isBoletado(r)&&!reunioes.includes(r));
-  const outros=myOpps.filter(r=>!isPending(r)&&!isBoletado(r)&&!reunioes.includes(r));
-
-  function oppCard(r){
-    const isSel=!!DAILY[r.id];
-    const cor=AREA_COLORS[r.area]||'#8B1C2A';
-    const bpb=matchKey(r.pb||'',PB_BADGE)||'b-gray';
-    const tipo=DAILY[r.id]?.tipo||'';
-    const acao=DAILY[r.id]?.acao||'';
-    return `<div class="daily-opp${isSel?' selected':''}" id="dopp-${r.id}">
-      <div style="display:flex;align-items:flex-start;gap:10px">
-        <input type="checkbox" ${isSel?'checked':''} onchange="toggleDaily('${r.id}',this.checked)"
-          style="width:17px;height:17px;accent-color:${cor};cursor:pointer;margin-top:2px;flex-shrink:0">
-        <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px">
-            <span style="font-size:13px;font-weight:600">${r.cliente}</span>
-            <span class="badge" style="background:${cor}18;color:${cor}">${r.produto||AREA_NAMES[r.area]}</span>
-            <span class="badge ${bpb}" style="font-size:10px">${r.pb||'—'}</span>
-            <span style="margin-left:auto;font-weight:600;color:${cor}">${fmt(r.atual||r.pipe)}</span>
+  // Summary cards when assessor or status filtered
+  const summaryEl=document.getElementById('pipeline-summary');
+  if(summaryEl){
+    const hasFilter=fA||fAss||fSC||fPB;
+    if(hasFilter&&rows.length){
+      // Per area breakdown
+      const areaBreak=Object.entries(AREAS).map(([ak,a])=>{
+        const ar=rows.filter(r=>r.area===ak);
+        if(!ar.length)return'';
+        const bol=ar.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+        const bolN=ar.filter(isB).length;
+        const pipe=ar.reduce((s,r)=>s+(r.pipe||0),0);
+        const ef=ar.length?Math.round(bolN/ar.length*100):0;
+        return`<div style="background:var(--card);border:1.5px solid ${a.color}33;border-radius:12px;padding:14px 16px;border-top:3px solid ${a.color}">
+          <div style="font-size:10px;font-weight:700;color:${a.color};text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:5px">
+            <span style="width:7px;height:7px;border-radius:50%;background:${a.color}"></span>${a.name}
           </div>
-          ${r.todo?`<div style="font-size:11px;color:var(--muted);margin-bottom:6px">📋 ${r.todo}</div>`:''}
-          ${isSel?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-            <div class="fg"><label>Tipo de ação</label>
-              <select class="inline" onchange="updateDaily('${r.id}','tipo',this.value)">
-                <option value=""${!tipo?' selected':''}>Selecionar...</option>
-                <option value="reuniao"${tipo==='reuniao'?' selected':''}>📅 Reunião</option>
-                <option value="boleta"${tipo==='boleta'?' selected':''}>✅ Boleta</option>
-                <option value="todo"${tipo==='todo'?' selected':''}>📋 TODO / Ligação</option>
-              </select>
+          <div style="font-size:20px;font-weight:800;color:${a.color};margin-bottom:2px">${fmt(bol)||'R$0'}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px">${bolN}/${ar.length} boletar · ${ef}% efetiv.</div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid var(--border-l)">
+            <span style="color:var(--muted)">Pipe</span><span style="font-weight:600">${fmt(pipe)}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid var(--border-l)">
+            <span style="color:var(--muted)">Pendências</span><span style="font-weight:600;color:${rows.filter(r=>r.area===ak&&isPend(r)).length>0?'var(--amber)':'var(--green)'}">${rows.filter(r=>r.area===ak&&isPend(r)).length||'—'}</span>
+          </div>
+        </div>`;
+      }).filter(Boolean).join('');
+
+      // Risk summary
+      const atRisk=rows.filter(r=>!isB(r)&&daysSince(getLastMoveDate(r))>7);
+      const attn=rows.filter(r=>!isB(r)&&daysSince(getLastMoveDate(r))>3&&daysSince(getLastMoveDate(r))<=7);
+      const ok=rows.filter(r=>!isB(r)&&daysSince(getLastMoveDate(r))<=3);
+      const riskHtml='<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">'
+        +'<div style="background:#FCEBEB;border:1px solid #E8B0B0;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px">'
+        +'<span style="font-size:20px">🔴</span><div><div style="font-size:18px;font-weight:800;color:#791F1F">'+atRisk.length+'</div><div style="font-size:10px;color:#791F1F;font-weight:600">Paradas +7 dias</div><div style="font-size:11px;color:var(--muted)">'+fmt(atRisk.reduce((s,r)=>s+(r.pipe||0),0))+'</div></div></div>'
+        +'<div style="background:#FEF3E2;border:1px solid #FAC775;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px">'
+        +'<span style="font-size:20px">🟡</span><div><div style="font-size:18px;font-weight:800;color:#854F0B">'+attn.length+'</div><div style="font-size:10px;color:#854F0B;font-weight:600">Atenção 4-7 dias</div><div style="font-size:11px;color:var(--muted)">'+fmt(attn.reduce((s,r)=>s+(r.pipe||0),0))+'</div></div></div>'
+        +'<div style="background:#E1F5EE;border:1px solid #9FD5B0;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:8px">'
+        +'<span style="font-size:20px">🟢</span><div><div style="font-size:18px;font-weight:800;color:#085041">'+ok.length+'</div><div style="font-size:10px;color:#085041;font-weight:600">Em dia ≤3 dias</div><div style="font-size:11px;color:var(--muted)">'+fmt(ok.reduce((s,r)=>s+(r.pipe||0),0))+'</div></div></div>'
+        +'</div>';
+
+      // Status breakdown
+      const scMap={};
+      rows.forEach(r=>{if(r.sc){if(!scMap[r.sc])scMap[r.sc]=0;scMap[r.sc]++;}});
+      const scBars=Object.entries(scMap).sort((a,b)=>b[1]-a[1]).map(([sc,n])=>{
+        const b=matchBadge(sc,SC_BADGE)||'b-gray';
+        return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span class="badge ${b}" style="min-width:140px;text-align:center">${sc}</span>
+          <div style="flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden">
+            <div style="width:${Math.round(n/rows.length*100)}%;height:5px;background:var(--wine);border-radius:99px"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;min-width:24px;text-align:right">${n}</span>
+        </div>`;
+      }).join('');
+
+      // Pendencia breakdown
+      const pbMap={};
+      rows.forEach(r=>{if(r.pb){if(!pbMap[r.pb])pbMap[r.pb]=0;pbMap[r.pb]++;}});
+      const pbBars=Object.entries(pbMap).sort((a,b)=>b[1]-a[1]).map(([pb,n])=>{
+        const b=matchBadge(pb,PB_BADGE)||'b-gray';
+        return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <span class="badge ${b}" style="min-width:140px;text-align:center">${pb}</span>
+          <div style="flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden">
+            <div style="width:${Math.round(n/rows.length*100)}%;height:5px;background:var(--wine);border-radius:99px"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;min-width:24px;text-align:right">${n}</span>
+        </div>`;
+      }).join('');
+
+      summaryEl.innerHTML=`
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px">
+            ${fAss?'📊 Resumo — '+fAss:fSC?'📊 Resumo — '+fSC:fPB?'📊 Resumo — '+fPB:'📊 Resumo filtrado'}
+            <span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:8px">${rows.length} oportunidades</span>
+          </div>
+          ${riskHtml}
+          ${areaBreak?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px">${areaBreak}</div>`:''}
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Status comercial</div>
+              ${scBars||'<div style="font-size:12px;color:var(--muted)">—</div>'}
             </div>
-            <div class="fg"><label>Ação planejada</label>
-              <input type="text" value="${acao}" placeholder="O que vai fazer..." onchange="updateDaily('${r.id}','acao',this.value)" style="padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card)">
+            <div>
+              <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Pendência boleta</div>
+              ${pbBars||'<div style="font-size:12px;color:var(--muted)">—</div>'}
             </div>
-          </div>`:''}
-        </div>
-      </div>
-    </div>`;
+          </div>
+        </div>`;
+      summaryEl.style.display='block';
+    } else {
+      summaryEl.innerHTML='';
+      summaryEl.style.display='none';
+    }
   }
 
-  function group(title,rows,cor){
-    if(!rows.length)return'';
-    return `<div style="font-size:11px;font-weight:700;color:${cor};text-transform:uppercase;letter-spacing:.05em;margin:16px 0 8px;display:flex;align-items:center;gap:6px">
-      ${title}<span style="background:${cor}18;color:${cor};padding:1px 8px;border-radius:999px;font-size:10px">${rows.length}</span></div>
-    ${rows.map(oppCard).join('')}`;
-  }
+  const tEl=document.getElementById('pipeline-tbl');
+  if(!tEl)return;
+  if(!rows.length){tEl.innerHTML='<div class="empty"><div class="empty-icon">📭</div><p>Nenhuma oportunidade encontrada</p></div>';return}
 
-  const selCount=Object.keys(DAILY).length;
-  const selBol=Object.entries(DAILY).filter(([,v])=>v.tipo==='boleta').length;
-  const selReun=Object.entries(DAILY).filter(([,v])=>v.tipo==='reuniao').length;
-  const selTodo=Object.entries(DAILY).filter(([,v])=>v.tipo==='todo').length;
+  // Sort: red first, then yellow, then green
+  rows.sort((a,b)=>{
+    const da=daysSince(getLastMoveDate(a));
+    const db2=daysSince(getLastMoveDate(b));
+    if(isB(a)&&!isB(b))return 1;
+    if(!isB(a)&&isB(b))return -1;
+    return db2-da;
+  });
+
+  tEl.innerHTML=`<div class="tbl-wrap"><table><thead><tr>
+    <th></th><th>Assessor</th><th>Cliente</th><th>Área</th><th>Produto</th>
+    <th style="text-align:right">Pipe</th><th style="text-align:right">Atual</th>
+    <th>Status</th><th>Pendência</th><th style="text-align:center">Dias</th><th>TODO</th><th></th>
+  </tr></thead><tbody>${rows.map(r=>{
+    const bsc=matchBadge(r.sc||'',SC_BADGE)||'b-gray';
+    const bpb=matchBadge(r.pb||'',PB_BADGE)||'b-gray';
+    const cor=AREAS[r.area]?.color||'#8B1C2A';
+    const lastMove=getLastMoveDate(r);
+    const days=daysSince(lastMove);
+    const risk=riskColor(isB(r)?0:days);
+    return`<tr class="${isB(r)?'bol':''}">
+      <td title="${risk.label} — ${isB(r)?'Boletado':days+' dias sem mover'}" style="text-align:center;font-size:14px;cursor:default">${isB(r)?'✅':risk.icon}</td>
+      <td style="font-weight:600">${r.assessor||'—'}</td>
+      <td style="font-weight:600">${r.cliente||'—'}</td>
+      <td><span class="badge" style="background:${cor}15;color:${cor};border:1px solid ${cor}33">${AREAS[r.area]?.name||r.area||'—'}</span></td>
+      <td>${r.produto||'—'}</td>
+      <td style="text-align:right;color:var(--muted)">${fmt(r.pipe)}</td>
+      <td style="text-align:right;font-weight:700;color:${isB(r)?'var(--green)':'var(--text)'}">${fmt(r.atual)}</td>
+      <td>${r.sc?`<span class="badge ${bsc}">${r.sc}</span>`:'—'}</td>
+      <td>${r.pb?`<span class="badge ${bpb}">${r.pb}</span>`:'—'}</td>
+      <td style="text-align:center"><span style="font-size:11px;font-weight:700;color:${risk.color};background:${risk.bg};padding:2px 7px;border-radius:999px">${isB(r)?'✓':days+'d'}</span></td>
+      <td style="font-size:11px;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.todo||''}">${r.todo||'—'}</td>
+      <td><button class="btn sm" onclick="openEdit('${r.id}')">Ver</button></td>
+    </tr>`;
+  }).join('')}</tbody></table></div>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// ── ASSESSOR: MINHAS OPORTUNIDADES ──
+// ══════════════════════════════════════════════════════════
+function renderAssessorOpps(c=document.getElementById('main-content')){
+  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+
+  const bolVol=myOpps.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+  const bolN=myOpps.filter(isB).length;
+  const pipe=myOpps.reduce((s,r)=>s+(r.pipe||0),0);
+  const pend=myOpps.filter(isPend).length;
+
+  // Sort: pendentes primeiro, depois por status
+  const SC_ORDER={'Ligar Cliente':1,'Ligar Cliente c AI':2,'Agendar Reunião':3,'Reunião Agendada':4,'Cliente Confirmar':5,'Cliente Topou':6,'Cliente Negou':7,'Não se Aplica':8};
+  const sorted=[...myOpps].sort((a,b)=>{
+    if(isB(a)&&!isB(b))return 1;
+    if(!isB(a)&&isB(b))return -1;
+    return(SC_ORDER[a.sc]||9)-(SC_ORDER[b.sc]||9);
+  });
 
   c.innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-      <div><div style="font-size:16px;font-weight:700">Daily — ${today}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">Selecione as oportunidades que vai trabalhar hoje</div></div>
-      <button class="btn primary" onclick="exportDailyPDF()">Exportar PDF do dia</button>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
-      <div class="kpi hl"><div class="lbl">Selecionadas</div><div class="val">${selCount}</div></div>
-      <div class="kpi"><div class="lbl">📅 Reuniões</div><div class="val">${selReun}</div></div>
-      <div class="kpi"><div class="lbl">✅ Boletas</div><div class="val">${selBol}</div></div>
-      <div class="kpi"><div class="lbl">📋 TODOs</div><div class="val">${selTodo}</div></div>
-    </div>
-    ${group('📅 Reuniões pendentes',reunioes,'#8B1C2A')}
-    ${group('⚡ Com pendência',pendentes,'#854F0B')}
-    ${group('📂 Outras',outros,'#5A3A3E')}
-    ${!myOpps.length?'<div class="empty"><p>Nenhuma oportunidade atribuída a você ainda.</p></div>':''}
-  `;
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px">
+    <div class="kpi wine"><div class="kpi-lbl">✓ Boletado</div><div class="kpi-val">${fmt(bolVol)||'R$0'}</div><div class="kpi-sub">${bolN} opor.</div></div>
+    <div class="kpi"><div class="kpi-lbl">Pipe total</div><div class="kpi-val">${fmt(pipe)}</div><div class="kpi-sub">${myOpps.length} opor.</div></div>
+    <div class="kpi amber"><div class="kpi-lbl">Pendências</div><div class="kpi-val">${pend}</div><div class="kpi-sub">aguardando ação</div></div>
+  </div>
+  <div class="filters">
+    <select class="filter-sel" id="af-area" onchange="filterAssOpps()">
+      <option value="">Todas as áreas</option>
+      ${Object.entries(AREAS).map(([k,a])=>`<option value="${k}">${a.name}</option>`).join('')}
+    </select>
+    <select class="filter-sel" id="af-sc" onchange="filterAssOpps()">
+      <option value="">Todos status</option>
+      ${['Ligar Cliente','Ligar Cliente c AI','Agendar Reunião','Reunião Agendada','Cliente Confirmar','Cliente Topou','Cliente Negou','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}
+    </select>
+    <select class="filter-sel" id="af-pb" onchange="filterAssOpps()">
+      <option value="">Todas pendências</option>
+      ${['To Do Comercial','To Do Operacional','A Boletar','Boletado','Aguardando Comercial','Email','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}
+    </select>
+    <input class="filter-inp" id="af-cli" type="text" placeholder="🔍 Buscar cliente..." oninput="filterAssOpps()">
+  </div>
+  <div id="ass-opp-grid" class="opp-grid">${sorted.map(r=>oppCard(r)).join('')}</div>`;
 }
 
-async function toggleDaily(oppId, checked){
-  const today=new Date().toISOString().split('T')[0];
+function filterAssOpps(){
+  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+  const fA=document.getElementById('af-area')?.value;
+  const fSC=document.getElementById('af-sc')?.value;
+  const fPB=document.getElementById('af-pb')?.value;
+  const fCli=(document.getElementById('af-cli')?.value||'').toLowerCase();
+  let rows=[...myOpps];
+  if(fA)rows=rows.filter(r=>r.area===fA);
+  if(fSC)rows=rows.filter(r=>r.sc===fSC);
+  if(fPB)rows=rows.filter(r=>r.pb===fPB);
+  if(fCli)rows=rows.filter(r=>(r.cliente||'').toLowerCase().includes(fCli));
+  const grid=document.getElementById('ass-opp-grid');
+  if(grid)grid.innerHTML=rows.map(r=>oppCard(r)).join('');
+}
+
+function oppCard(r){
+  const cor=AREAS[r.area]?.color||'#8B1C2A';
+  const bsc=matchBadge(r.sc||'',SC_BADGE)||'b-gray';
+  const bpb=matchBadge(r.pb||'',PB_BADGE)||'b-gray';
+  const boletado=isB(r);
+  const pending=isPend(r);
+  return`<div class="opp-card${boletado?' bol':''}" id="card-${r.id}">
+    <div class="opp-card-header">
+      <div>
+        <div class="opp-client">${r.cliente}</div>
+        <div class="opp-meta">
+          <span class="badge" style="background:${cor}15;color:${cor};border:1px solid ${cor}33;font-size:10px">${AREAS[r.area]?.name||r.area}</span>
+          ${r.produto?`<span class="badge b-gray" style="font-size:10px">${r.produto}</span>`:''}
+        </div>
+      </div>
+      <div class="opp-vol">${fmt(r.atual||r.pipe)}</div>
+    </div>
+    <div class="opp-card-body">
+      <div class="opp-row">
+        <span class="opp-row-l">Status</span>
+        <span>${r.sc?`<span class="badge ${bsc}">${r.sc}</span>`:'<span style="color:var(--muted);font-size:12px">—</span>'}</span>
+      </div>
+      <div class="opp-row">
+        <span class="opp-row-l">Pendência</span>
+        <span>${r.pb?`<span class="badge ${bpb}">${r.pb}</span>`:'<span style="color:var(--muted);font-size:12px">—</span>'}</span>
+      </div>
+      ${r.todo?`<div class="opp-row"><span class="opp-row-l">📋 TODO</span><span class="opp-row-v" style="font-size:11px;max-width:160px;text-align:right">${r.todo}</span></div>`:''}
+    </div>
+    ${r.obs?`<div class="opp-obs">💬 ${r.obs}</div>`:''}
+    <div class="opp-actions">
+      <button class="opp-btn sc" onclick="openEdit('${r.id}')">✏️ Atualizar</button>
+      ${!boletado?`<button class="opp-btn bol" onclick="quickBoletar('${r.id}')">✅ Boletado</button>`:''}
+      ${pending?`<button class="opp-btn obs" onclick="openEdit('${r.id}')">⚡ Pendência</button>`:''}
+    </div>
+  </div>`;
+}
+
+// ── QUICK ACTIONS ──
+async function quickBoletar(id){
+  const r=OPPS.find(o=>o.id===id);
+  if(!r||!confirm(`Marcar "${r.cliente}" como Boletado?`))return;
+  const now=new Date();
+  const hist=[...(r.historico||[]),{campo:'Pendência boleta',de:r.pb,para:'Boletado',usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}];
+  try{
+    await db('PATCH','oportunidades',{pb:'Boletado',historico:hist,updated_at:now.toISOString()},`id=eq.${id}`);
+    showToast('✅ Marcado como Boletado!',true);
+    await loadData();
+    renderAssessorOpps();
+  }catch(e){showToast('Erro: '+e.message)}
+}
+
+// ══════════════════════════════════════════════════════════
+// ── ASSESSOR: MEU DIA ──
+// ══════════════════════════════════════════════════════════
+function renderAssessorDaily(c=document.getElementById('main-content')){
+  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+  const selN=Object.keys(DAILY).length;
+  const reunN=Object.values(DAILY).filter(v=>v.tipo==='reuniao').length;
+  const bolN2=Object.values(DAILY).filter(v=>v.tipo==='boleta').length;
+  const todoN=Object.values(DAILY).filter(v=>v.tipo==='todo').length;
+
+  const pendentes=myOpps.filter(r=>isPend(r)&&!isB(r));
+  const reunioes=myOpps.filter(r=>norm(r.sc||'').includes('reunião')||norm(r.sc||'').includes('agendar'));
+  const outros=myOpps.filter(r=>!isPend(r)&&!isB(r)&&!reunioes.find(x=>x.id===r.id));
+
+  function grp(emoji,title,rows,color){
+    if(!rows.length)return'';
+    return`<div class="day-group-title" style="color:${color}">${emoji} ${title}
+      <span class="badge" style="background:${color};color:#fff;font-size:10px;padding:1px 7px">${rows.length}</span>
+    </div>
+    ${rows.map(r=>{
+      const sel=!!DAILY[r.id];
+      const tipo=DAILY[r.id]?.tipo||'';
+      const acao=DAILY[r.id]?.acao||'';
+      const bpb=matchBadge(r.pb||'',PB_BADGE)||'b-gray';
+      return`<div class="daily-opp${sel?' sel':''}" id="dopp-${r.id}">
+        <div class="daily-opp-top">
+          <div class="daily-check${sel?' on':''}" onclick="toggleDaily('${r.id}',${!sel})"></div>
+          <div class="daily-info">
+            <div class="daily-cli">${r.cliente}</div>
+            <div class="daily-meta">
+              <span class="badge b-wine" style="font-size:10px">${AREAS[r.area]?.name||r.area}</span>
+              ${r.sc?`<span class="badge b-gray" style="font-size:10px">${r.sc}</span>`:''}
+              ${r.pb?`<span class="badge ${bpb}" style="font-size:10px">${r.pb}</span>`:''}
+            </div>
+            ${r.todo?`<div style="font-size:11px;color:var(--muted);margin-top:4px">📋 ${r.todo}</div>`:''}
+          </div>
+          <div class="daily-vol">${fmt(r.atual||r.pipe)}</div>
+        </div>
+        ${sel?`<div class="daily-actions">
+          <select class="sel-tipo" onchange="updateDaily('${r.id}','tipo',this.value)">
+            <option value="">Tipo de ação...</option>
+            <option value="reuniao"${tipo==='reuniao'?' selected':''}>📅 Reunião</option>
+            <option value="boleta"${tipo==='boleta'?' selected':''}>✅ Boleta</option>
+            <option value="todo"${tipo==='todo'?' selected':''}>📋 TODO/Ligação</option>
+          </select>
+          <input class="inp-acao" type="text" placeholder="O que vai fazer..." value="${acao}" onchange="updateDaily('${r.id}','acao',this.value)">
+        </div>`:''}
+      </div>`;
+    }).join('')}`;
+  }
+
+  c.innerHTML=`
+  <div class="daily-header">
+    <div class="daily-title">☀️ Meu dia — ${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})}</div>
+    <div class="daily-subtitle">Selecione as oportunidades que vai trabalhar hoje e defina a ação planejada</div>
+    <div class="daily-kpis">
+      <div class="daily-kpi"><div class="daily-kpi-v">${selN}</div><div class="daily-kpi-l">Selecionadas</div></div>
+      <div class="daily-kpi"><div class="daily-kpi-v" style="color:#185FA5">${reunN}</div><div class="daily-kpi-l">📅 Reuniões</div></div>
+      <div class="daily-kpi"><div class="daily-kpi-v" style="color:var(--green)">${bolN2}</div><div class="daily-kpi-l">✅ Boletas</div></div>
+      <div class="daily-kpi"><div class="daily-kpi-v" style="color:var(--amber)">${todoN}</div><div class="daily-kpi-l">📋 TODOs</div></div>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+    <button class="btn wine" onclick="exportDailyPDF()">📄 Exportar PDF do dia</button>
+  </div>
+  ${grp('📅','Reuniões agendadas',reunioes,'#8B1C2A')}
+  ${grp('⚡','Com pendência ativa',pendentes.filter(r=>!reunioes.find(x=>x.id===r.id)),'#854F0B')}
+  ${grp('📂','Outras oportunidades',outros,'#5A3A3E')}
+  ${!myOpps.length?'<div class="empty"><div class="empty-icon">📭</div><p>Nenhuma oportunidade atribuída a você ainda.</p></div>':''}`;
+}
+
+async function toggleDaily(oppId,checked){
+  const t=today();
   try{
     if(checked){
-      if(!DAILY[oppId]){
-        const res=await supa('POST','daily_selecoes',{data:today,assessor:USER.nome,oportunidade_id:oppId,tipo:'',acao:''});
-        DAILY[oppId]={tipo:'',acao:'',id:res?.[0]?.id};
-      }
-    } else {
-      if(DAILY[oppId]?.id){
-        await supa('DELETE','daily_selecoes','',`id=eq.${DAILY[oppId].id}`);
-      }
+      const res=await db('POST','daily_selecoes',{data:t,assessor:USER.nome,oportunidade_id:oppId,tipo:'',acao:''});
+      DAILY[oppId]={tipo:'',acao:'',id:res?.[0]?.id};
+    }else{
+      if(DAILY[oppId]?.id)await db('DELETE','daily_selecoes','',`id=eq.${DAILY[oppId].id}`);
       delete DAILY[oppId];
     }
-    renderView('daily');
-  }catch(e){showToast('Erro: '+e.message,'#C03030');}
+    renderAssessorDaily();
+  }catch(e){showToast('Erro: '+e.message)}
 }
 
-async function updateDaily(oppId, field, value){
+async function updateDaily(oppId,field,value){
   if(!DAILY[oppId]?.id)return;
   DAILY[oppId][field]=value;
-  try{
-    await supa('PATCH','daily_selecoes',{[field]:value},`id=eq.${DAILY[oppId].id}`);
-  }catch(e){console.warn('daily update:',e);}
+  try{await db('PATCH','daily_selecoes',{[field]:value},`id=eq.${DAILY[oppId].id}`);}catch{}
 }
 
 function exportDailyPDF(){
-  const today=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-  const selected=Object.entries(DAILY).filter(([,v])=>v.tipo);
-  if(!selected.length){showToast('Selecione e defina o tipo das oportunidades antes de exportar!','#854F0B');return;}
-
-  const grupos={reuniao:{emoji:'📅',label:'Reuniões',items:[]},boleta:{emoji:'✅',label:'Boletas a fechar',items:[]},todo:{emoji:'📋',label:'TODOs e ligações',items:[]}};
-  selected.forEach(([id,v])=>{
-    const r=OPPS.find(o=>o.id===id);
-    if(!r)return;
-    if(!grupos[v.tipo])return;
-    grupos[v.tipo].items.push({r,acao:v.acao||''});
-  });
-
-  const secoes=Object.values(grupos).filter(g=>g.items.length).map(g=>`
-    <h2>${g.emoji} ${g.label} (${g.items.length})</h2>
-    <table><thead><tr><th>Cliente</th><th>Produto</th><th>Status</th><th>Pendência</th><th>Volume</th><th>Ação planejada</th></tr></thead>
-    <tbody>${g.items.map(({r,acao})=>`<tr><td><strong>${r.cliente}</strong></td><td>${r.produto||'—'}</td><td>${r.sc||'—'}</td><td>${r.pb||'—'}</td><td style="color:#6B0010;font-weight:700">${fmt(r.atual||r.pipe)}</td><td style="color:#444;font-style:italic">${acao||'—'}</td></tr>`).join('')}</tbody></table>`).join('<hr style="border:1px solid #E8D5CC;margin:20px 0">');
-
-  const totalVol=selected.reduce((s,[id])=>{const r=OPPS.find(o=>o.id===id);return s+(r?.atual||r?.pipe||0);},0);
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily ${USER.nome}</title>
-  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;color:#1A0508;font-size:13px;padding:40px}
-  .header{border-bottom:3px solid #8B1C2A;padding-bottom:20px;margin-bottom:24px;display:flex;justify-content:space-between}
-  h1{font-size:22px;font-weight:700;color:#8B1C2A}h2{font-size:13px;font-weight:700;margin:16px 0 10px;text-transform:uppercase;letter-spacing:.05em}
-  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
-  .kpi{border:1px solid #E8D5CC;border-radius:8px;padding:12px;text-align:center}
-  .kpi.hl{background:#8B1C2A;color:#fff}
-  .kv{font-size:20px;font-weight:800}.kl{font-size:10px;text-transform:uppercase;opacity:.7;margin-bottom:4px}
-  table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px}
-  th{background:#F5F0EB;padding:7px 10px;text-align:left;font-size:11px;text-transform:uppercase;border-bottom:2px solid #E8D5CC}
-  td{padding:6px 10px;border-bottom:1px solid #F0E8E3}
-  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head>
-  <body><div class="header"><div><h1>Daily — ${USER.nome}</h1><div style="color:#8A6A6E;margin-top:4px">${today}</div></div>
-  <div style="text-align:right;font-size:12px;color:#8A6A6E">${selected.length} oportunidades<br>${fmt(totalVol)}</div></div>
-  <div class="kpi-row">
-    <div class="kpi hl"><div class="kl">Total</div><div class="kv">${selected.length}</div></div>
-    <div class="kpi"><div class="kl">📅 Reuniões</div><div class="kv">${grupos.reuniao.items.length}</div></div>
-    <div class="kpi"><div class="kl">✅ Boletas</div><div class="kv">${grupos.boleta.items.length}</div></div>
-    <div class="kpi"><div class="kl">📋 TODOs</div><div class="kv">${grupos.todo.items.length}</div></div>
-  </div>
-  ${secoes}
-  <div style="margin-top:40px;padding-top:12px;border-top:1px solid #E8D5CC;font-size:11px;color:#B4A0A8;display:flex;justify-content:space-between"><span>Gerencial Comercial — Daily</span><span>${new Date().toLocaleString('pt-BR')}</span></div>
-  </body></html>`;
+  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+  const sel=Object.entries(DAILY).filter(([,v])=>v.tipo);
+  if(!sel.length){showToast('Defina o tipo das oportunidades antes de exportar!');return}
+  const now=new Date();
+  const grupos={reuniao:{emoji:'📅',label:'Reuniões',items:[]},boleta:{emoji:'✅',label:'Boletas',items:[]},todo:{emoji:'📋',label:'TODOs e ligações',items:[]}};
+  sel.forEach(([id,v])=>{const r=myOpps.find(o=>o.id===id);if(r&&grupos[v.tipo])grupos[v.tipo].items.push({r,acao:v.acao||''})});
+  const totalVol=sel.reduce((s,[id])=>{const r=myOpps.find(o=>o.id===id);return s+(r?.atual||r?.pipe||0)},0);
+  const secoes=Object.values(grupos).filter(g=>g.items.length).map(g=>`<h2>${g.emoji} ${g.label} (${g.items.length})</h2><table><thead><tr><th>Cliente</th><th>Área</th><th>Produto</th><th>Status</th><th>Pendência</th><th>Volume</th><th>Ação</th></tr></thead><tbody>${g.items.map(({r,acao})=>`<tr><td><strong>${r.cliente}</strong></td><td>${AREAS[r.area]?.name||r.area}</td><td>${r.produto||'—'}</td><td>${r.sc||'—'}</td><td>${r.pb||'—'}</td><td style="color:#6B0010;font-weight:700">${fmt(r.atual||r.pipe)}</td><td style="color:#444;font-style:italic">${acao||'—'}</td></tr>`).join('')}</tbody></table>`).join('<hr>');
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Daily ${USER.nome}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,sans-serif;color:#1A0508;font-size:13px;padding:40px}.hdr{border-bottom:3px solid #8B1C2A;padding-bottom:20px;margin-bottom:24px;display:flex;justify-content:space-between}h1{font-size:22px;font-weight:700;color:#8B1C2A}h2{font-size:13px;font-weight:700;margin:16px 0 10px;text-transform:uppercase;letter-spacing:.05em}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}.kpi{border:1px solid #E8D5CC;border-radius:8px;padding:12px;text-align:center}.kpi.hl{background:#8B1C2A;color:#fff}.kv{font-size:20px;font-weight:800}.kl{font-size:10px;text-transform:uppercase;opacity:.7;margin-bottom:4px}table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px}th{background:#F5F0EB;padding:7px 10px;text-align:left;font-size:11px;text-transform:uppercase;border-bottom:2px solid #E8D5CC}td{padding:6px 10px;border-bottom:1px solid #F0E8E3}hr{border:1px solid #E8D5CC;margin:20px 0}.ftr{margin-top:40px;padding-top:12px;border-top:1px solid #E8D5CC;font-size:11px;color:#B4A0A8;display:flex;justify-content:space-between}@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}</style></head><body><div class="hdr"><div><h1>Daily — ${USER.nome}</h1><div style="color:#8A6A6E;margin-top:4px">${now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})}</div></div><div style="text-align:right;font-size:12px;color:#8A6A6E">${sel.length} oportunidades<br>${fmt(totalVol)}</div></div><div class="kpis"><div class="kpi hl"><div class="kl">Total</div><div class="kv">${sel.length}</div></div><div class="kpi"><div class="kl">📅 Reuniões</div><div class="kv">${grupos.reuniao.items.length}</div></div><div class="kpi"><div class="kl">✅ Boletas</div><div class="kv">${grupos.boleta.items.length}</div></div><div class="kpi"><div class="kl">📋 TODOs</div><div class="kv">${grupos.todo.items.length}</div></div></div>${secoes}<div class="ftr"><span>Gerencial Comercial — Daily</span><span>${now.toLocaleString('pt-BR')}</span></div></body></html>`;
   const w=window.open('','_blank');w.document.write(html);w.document.close();setTimeout(()=>w.print(),600);
 }
 
-// ── UPLOAD ────────────────────────────────────────────────────────────────
-function renderUpload(c){
-  c.innerHTML=`<div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-    Suba as planilhas de pipe. O sistema importa Assessor, Cliente, Produto, Volume e Data — e mantém os status/pendências já preenchidos pelo time.</div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
-    <div class="card" style="text-align:center;cursor:pointer;border-top:3px solid #8B1C2A" onclick="document.getElementById('f-inv').click()">
-      <div style="font-size:28px;margin-bottom:8px">📊</div>
-      <div style="font-size:13px;font-weight:600;color:#8B1C2A;margin-bottom:4px">Investimentos</div>
-      <div style="font-size:11px;color:var(--muted)">Abas: rv + RF</div>
-      <div id="st-inv" style="font-size:12px;margin-top:10px;font-weight:600;min-height:20px"></div>
-      <button class="btn primary sm" style="margin-top:10px;width:100%;justify-content:center">Selecionar arquivo</button>
-      <input type="file" id="f-inv" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('inv',this)">
+// ══════════════════════════════════════════════════════════
+// ── EDIT MODAL ──
+// ══════════════════════════════════════════════════════════
+function openEdit(id){
+  const r=OPPS.find(o=>o.id===id);if(!r)return;
+  editId=id;
+  document.getElementById('modal-edit-title').textContent=r.cliente+' — '+(r.produto||AREAS[r.area]?.name||r.area);
+  document.getElementById('e-sc').value=r.sc||'';
+  document.getElementById('e-pb').value=r.pb||'';
+  document.getElementById('e-atual').value=r.atual||'';
+  document.getElementById('e-data').value=r.data_boleta||'';
+  document.getElementById('e-todo').value=r.todo||'';
+  document.getElementById('e-obs').value=r.obs||'';
+  const days=daysSince(getLastMoveDate(r));
+  const risk=riskColor(isB(r)?0:days);
+  const hEl=document.getElementById('e-hist');
+  const hist=r.historico||[];
+  hEl.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;background:${risk.bg};border:1px solid ${risk.color}33;border-radius:10px;padding:10px 14px;margin-bottom:14px">
+      <span style="font-size:22px">${isB(r)?'✅':risk.icon}</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:${risk.color}">${isB(r)?'Boletado':risk.label+' — '+days+' dias sem movimentação'}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Última atualização: ${r.updated_at?new Date(r.updated_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—'}</div>
+      </div>
     </div>
-    <div class="card" style="text-align:center;cursor:pointer;border-top:3px solid #EF9F27" onclick="document.getElementById('f-cons').click()">
-      <div style="font-size:28px;margin-bottom:8px">📋</div>
-      <div style="font-size:13px;font-weight:600;color:#EF9F27;margin-bottom:4px">Consórcio</div>
-      <div style="font-size:11px;color:var(--muted)">Planilha de pipe</div>
-      <div id="st-cons" style="font-size:12px;margin-top:10px;font-weight:600;min-height:20px"></div>
-      <button class="btn sm" style="margin-top:10px;width:100%;justify-content:center;border-color:#EF9F27;color:#EF9F27">Selecionar arquivo</button>
-      <input type="file" id="f-cons" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('cons',this)">
-    </div>
-    <div class="card" style="text-align:center;cursor:pointer;border-top:3px solid #7F77DD" onclick="document.getElementById('f-seg').click()">
-      <div style="font-size:28px;margin-bottom:8px">🛡️</div>
-      <div style="font-size:13px;font-weight:600;color:#7F77DD;margin-bottom:4px">Seguro de vida</div>
-      <div style="font-size:11px;color:var(--muted)">Planilha de pipe</div>
-      <div id="st-seg" style="font-size:12px;margin-top:10px;font-weight:600;min-height:20px"></div>
-      <button class="btn sm" style="margin-top:10px;width:100%;justify-content:center;border-color:#7F77DD;color:#7F77DD">Selecionar arquivo</button>
-      <input type="file" id="f-seg" accept=".xlsx,.xls" style="display:none" onchange="handleUpload('seg',this)">
-    </div>
-  </div>
-  <div id="upload-log" style="margin-top:16px"></div>`;
+    ${hist.length?`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px">📍 Linha do tempo</div>
+    <div style="border:1px solid var(--border);border-radius:10px;padding:14px 16px;max-height:200px;overflow-y:auto">
+      ${renderTimeline(r)}
+    </div>`:'<div style="font-size:12px;color:var(--muted);padding:8px 0">Nenhuma movimentação registrada ainda.</div>'}
+  `
+  document.getElementById('modal-edit').style.display='flex';
 }
 
-async function handleUpload(area, input){
-  const file=input.files[0];if(!file)return;
-  input.value='';
-  const st=document.getElementById('st-'+area);
-  if(st)st.textContent='Lendo...';
+async function saveEdit(){
+  const r=OPPS.find(o=>o.id===editId);if(!r)return;
+  const btn=document.getElementById('btn-save-edit');
+  btn.innerHTML='<span class="spinner"></span>';btn.disabled=true;
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const newSc=document.getElementById('e-sc').value;
+  const newPb=document.getElementById('e-pb').value;
+  const newAtual=parseFloat(document.getElementById('e-atual').value)||0;
+  const hist=[...(r.historico||[])];
+  [['Status comercial',r.sc,newSc],['Pendência boleta',r.pb,newPb],['Volume atual',String(r.atual||0),String(newAtual)]].forEach(([campo,de,para])=>{if(de!==para&&para)hist.push({campo,de,para,usuario:USER.nome,data:ds})});
+  try{
+    await db('PATCH','oportunidades',{sc:newSc,pb:newPb,atual:newAtual,data_boleta:document.getElementById('e-data').value||null,todo:document.getElementById('e-todo').value,obs:document.getElementById('e-obs').value,historico:hist,updated_at:now.toISOString()},`id=eq.${editId}`);
+    showToast('✅ Salvo com sucesso!',true);
+    closeModal('edit');
+    await loadData();
+    if(curView==='a-opps')renderAssessorOpps();
+    else if(curView==='a-daily')renderAssessorDaily();
+    else if(curView==='d-pipeline')renderDPipeline();
+  }catch(e){showToast('Erro: '+e.message);}
+  btn.innerHTML='💾 Salvar';btn.disabled=false;
+}
+
+// ── UPLOAD ──
+function renderUpload(c=document.getElementById('main-content')){
+  c.innerHTML=`<p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
+    Suba <strong>uma única planilha</strong> de campanha. O sistema lê automaticamente as abas <strong>RV, RF, Consórcio e Seguro de Vida</strong> e separa por área. Faz merge inteligente — preserva histórico de status já preenchido pelo time.
+  </p>
+  <div class="upload-card" id="uc-main" onclick="document.getElementById('fi-main').click()" style="max-width:480px;margin:0 auto">
+    <div class="upload-icon">📊</div>
+    <div class="upload-title" style="color:var(--wine)">Campanha_vX_Mês.xlsx</div>
+    <div class="upload-sub">Abas: RV · RF · Consórcio · Seguro de Vida</div>
+    <div class="upload-status" id="us-main" style="margin-top:10px;min-height:20px"></div>
+    <input type="file" id="fi-main" accept=".xlsx,.xls" style="display:none" onchange="doUploadMain(this)">
+  </div>
+  <div id="upload-results" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:20px;display:none"></div>
+  <div id="upload-log" style="margin-top:20px"></div>`;
+}
+
+async function doUploadMain(input){
+  const file=input.files[0];if(!file)return;input.value='';
+  const st=document.getElementById('us-main');
+  const uc=document.getElementById('uc-main');
+  st.textContent='⏳ Lendo planilha...';st.style.color='var(--muted)';
+
+  const SHEET_MAP={
+    'rv':'inv','RV':'inv','Rv':'inv',
+    'rf':'inv','RF':'inv','Rf':'inv',
+    'Consórcio':'cons','Consorcio':'cons','CONSÓRCIO':'cons','CONSORCIO':'cons',
+    'Seguro de Vida':'seg','SEGURO DE VIDA':'seg','Seguro':'seg','SEG':'seg'
+  };
+
+  const SHEET_CFG={
+    rv:{area:'inv',aai:['AAI','AI'],pipe:['RV Pipe'],atual:['RV Atual'],sc:['Status Comercial','Status Comercial RV'],pb:['Pendencia Boleta','Pendencia Boleta RV'],todo:['ToDo','TO DO'],obs:['Obs']},
+    rf:{area:'inv',aai:['AI','AAI'],pipe:['RF Pipe'],atual:['RF Atual'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['Obs']},
+    cons:{area:'cons',aai:['AI','AAI'],pipe:['Pipe Atual','Carta'],atual:['Pipe Atual'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo','OBS'],obs:['OBS']},
+    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe'],atual:['Seg atual','Seg Atual'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['OBS','Obs']}
+  };
+
   const reader=new FileReader();
   reader.onload=async function(e){
     try{
       const wb=XLSX.read(e.target.result,{type:'binary'});
-      let newRows=[];
-      if(area==='inv'){
-        for(const sn of wb.SheetNames){
-          const raw=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:''});
-          newRows=[...newRows,...parsePipe(raw,area)];
-        }
-      } else {
-        const raw=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
-        newRows=parsePipe(raw,area);
+      const results={inv:{rows:[],new:0,upd:0},cons:{rows:[],new:0,upd:0},seg:{rows:[],new:0,upd:0}};
+
+      // Process each relevant sheet
+      for(const sname of wb.SheetNames){
+        let cfgKey=null;
+        const sl=sname.toLowerCase().trim();
+        if(sl==='rv')cfgKey='rv';
+        else if(sl==='rf')cfgKey='rf';
+        else if(sl.includes('cons'))cfgKey='cons';
+        else if(sl.includes('seguro')||sl.includes('seg vida')||sl==='seg')cfgKey='seg';
+        if(!cfgKey)continue;
+
+        const cfg=SHEET_CFG[cfgKey];
+        const raw=XLSX.utils.sheet_to_json(wb.Sheets[sname],{header:1,defval:''});
+        const rows=parsePipeCfg(raw,cfg.area,cfg);
+        results[cfg.area].rows=[...results[cfg.area].rows,...rows];
       }
-      if(!newRows.length){if(st)st.textContent='⚠ Nenhuma linha encontrada';return;}
-      if(st)st.textContent=`Salvando ${newRows.length} oportunidades...`;
 
-      // Smart merge: keep existing opp data (sc, pb, todo, obs, historico) by assessor+cliente+produto
-      const existing=OPPS.filter(r=>r.area===area);
-      const toInsert=[], toUpdate=[];
-      newRows.forEach(nr=>{
-        const ex=existing.find(e=>norm(e.assessor)===norm(nr.assessor)&&norm(e.cliente)===norm(nr.cliente)&&norm(e.produto||'')===norm(nr.produto||''));
-        if(ex){toUpdate.push({id:ex.id,pipe:nr.pipe,updated_at:new Date().toISOString()});}
-        else{toInsert.push(nr);}
-      });
-
-      // Insert new
-      if(toInsert.length){
-        for(let i=0;i<toInsert.length;i+=50) await supa('POST','oportunidades',toInsert.slice(i,i+50));
+      let totalNew=0,totalUpd=0,totalRows=0;
+      for(const[area,res]of Object.entries(results)){
+        if(!res.rows.length)continue;
+        const existing=OPPS.filter(r=>r.area===area);
+        const toInsert=[],toUpdate=[];
+        res.rows.forEach(nr=>{
+          const ex=existing.find(e=>norm(e.assessor)===norm(nr.assessor)&&norm(e.cliente)===norm(nr.cliente)&&norm(e.produto||'')===norm(nr.produto||''));
+          if(ex){toUpdate.push({id:ex.id,pipe:nr.pipe,atual:nr.atual,sc:nr.sc,pb:nr.pb,todo:nr.todo,obs:nr.obs,updated_at:new Date().toISOString()});}
+          else toInsert.push(nr);
+        });
+        if(toInsert.length){for(let i=0;i<toInsert.length;i+=50)await db('POST','oportunidades',toInsert.slice(i,i+50));}
+        for(const u of toUpdate)await db('PATCH','oportunidades',{pipe:u.pipe,atual:u.atual,sc:u.sc,pb:u.pb,todo:u.todo,obs:u.obs,updated_at:u.updated_at},`id=eq.${u.id}`);
+        res.new=toInsert.length;res.upd=toUpdate.length;
+        totalNew+=toInsert.length;totalUpd+=toUpdate.length;totalRows+=res.rows.length;
       }
-      // Update existing (only pipe/data)
-      for(const u of toUpdate) await supa('PATCH','oportunidades',{pipe:u.pipe,updated_at:u.updated_at},`id=eq.${u.id}`);
 
-      if(st)st.textContent=`✓ ${newRows.length} importadas (${toInsert.length} novas, ${toUpdate.length} atualizadas)`;
-      showToast(`${AREA_NAMES[area]}: ${newRows.length} oportunidades importadas!`,'#085041');
+      uc.classList.add('done');
+      st.textContent=`✅ ${totalRows} oportunidades importadas (${totalNew} novas · ${totalUpd} atualizadas)`;
+      st.style.color='var(--green)';
+
+      // Show per-area results
+      const resEl=document.getElementById('upload-results');
+      if(resEl){
+        resEl.style.display='grid';
+        resEl.innerHTML=Object.entries(results).map(([ak,res])=>res.rows.length?`
+          <div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:10px;padding:12px 14px">
+            <div style="font-weight:700;color:${AREAS[ak].color};margin-bottom:4px">${AREAS[ak].name}</div>
+            <div style="font-size:13px;font-weight:800;color:var(--green)">${res.rows.length} oportunidades</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px">${res.new} novas · ${res.upd} atualizadas</div>
+          </div>`:'').join('');
+      }
+
+      showToast(`✅ ${totalRows} oportunidades importadas!`,true);
       const log=document.getElementById('upload-log');
-      if(log){const d=document.createElement('div');d.style.cssText='background:var(--green-bg);border:1px solid #9FE1CB;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:12px;color:var(--green)';d.innerHTML=`<strong>${AREA_NAMES[area]}</strong> — ${newRows.length} oportunidades de <strong>${file.name}</strong> em ${new Date().toLocaleTimeString('pt-BR')}`;log.prepend(d);}
+      if(log){const d=document.createElement('div');d.style.cssText='background:var(--green-bg);border:1px solid var(--green-b);border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:12px;color:var(--green)';d.innerHTML=`<strong>${file.name}</strong> — ${totalRows} oportunidades importadas em ${new Date().toLocaleTimeString('pt-BR')}`;log.prepend(d)}
       await loadData();
-    }catch(err){if(st)st.textContent='Erro: '+err.message;showToast('Erro: '+err.message,'#C03030');}
+    }catch(err){
+      st.textContent='❌ Erro: '+err.message;st.style.color='var(--red)';
+      showToast('Erro: '+err.message);
+      console.error(err);
+    }
   };
   reader.readAsBinaryString(file);
 }
 
-function parsePipe(raw,area){
+// Keep old doUpload for compatibility
+async function doUpload(area,input){doUploadMain(input)}
+
+function parsePipeCfg(raw,area,cfg){
+  // Find header row
   let hr=-1;
-  for(let i=0;i<Math.min(raw.length,5);i++){
+  for(let i=0;i<Math.min(raw.length,6);i++){
     const v=raw[i].map(x=>String(x).trim().toLowerCase());
-    if(v.some(x=>x.includes('assessor')||x==='ai'||x==='aai')){hr=i;break;}
+    if(v.some(x=>x==='ai'||x==='aai'||x.includes('assessor'))){hr=i;break;}
   }
   if(hr<0)return[];
-  const h=raw[hr].map(x=>String(x).trim().toLowerCase());
-  const fi=(aliases)=>{for(const a of aliases){const i=h.findIndex(x=>x.includes(a));if(i>=0)return i;}return -1;};
-  const ci={ass:fi(['assessor','ai','aai']),cli:fi(['cliente']),prod:fi(['produto']),pipe:fi(['volume acordado','pipe atual','rf pipe','rv pipe','seg pipe','pipe','volume']),data:fi(['data pipe','data'])};
-  return raw.slice(hr+1).filter(r=>{const a=String(r[ci.ass]||'').trim();return a&&a.toLowerCase()!=='nan'&&a.toLowerCase()!=='assessor';}).map(r=>({
-    area,assessor:String(r[ci.ass]||'').trim(),cliente:String(r[ci.cli]||'').trim(),
+  const h=raw[hr].map(x=>String(x).trim());
+  const fi=als=>{for(const a of als){const i=h.findIndex(x=>x.toLowerCase().includes(a.toLowerCase()));if(i>=0)return i;}return -1};
+  const ci={
+    aai:fi(cfg.aai),cli:fi(['Cliente']),prod:fi(['Produto']),
+    pipe:fi(cfg.pipe),atual:fi(cfg.atual||cfg.pipe),
+    fonte:fi(['Fonte do $','Fonte']),sc:fi(cfg.sc),pb:fi(cfg.pb),
+    data:fi(['DATA DA BOLETA','Data Boleta','data_boleta']),
+    todo:fi(cfg.todo),obs:fi(cfg.obs||['Obs'])
+  };
+  const pn=v=>{const s=String(v||0).replace(/[^0-9.,]/g,'').replace(',','.');return parseFloat(s)||0};
+  return raw.slice(hr+1).filter(r=>{
+    const a=String(r[ci.aai]||'').trim();
+    return a&&!['nan','assessor','ai','aai','total',''].includes(a.toLowerCase());
+  }).map(r=>({
+    area,
+    assessor:String(r[ci.aai]||'').trim(),
+    cliente:String(r[ci.cli]||'').trim(),
     produto:String(r[ci.prod]||'').trim(),
-    pipe:parseFloat(String(r[ci.pipe]||0).replace(/[^0-9.,]/g,'').replace(',','.'))||0,
-    data_boleta:ci.data>=0&&r[ci.data]?String(r[ci.data]).trim():null,
-    sc:'',pb:'',todo:'',obs:'',atual:0,historico:[]
+    pipe:pn(r[ci.pipe]),
+    atual:pn(r[ci.atual]),
+    fonte:String(r[ci.fonte]||'').trim(),
+    sc:String(r[ci.sc]||'').trim(),
+    pb:String(r[ci.pb]||'').trim(),
+    data_boleta:ci.data>=0&&r[ci.data]&&String(r[ci.data]).trim()!=='nan'?String(r[ci.data]).trim():null,
+    todo:String(r[ci.todo]||'').trim(),
+    obs:String(r[ci.obs]||'').trim(),
+    historico:[]
   })).filter(r=>r.assessor&&r.cliente);
 }
 
-// ── USUARIOS ──────────────────────────────────────────────────────────────
-function renderUsuarios(c){
-  let html=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-    <div style="font-size:14px;font-weight:600">${USUARIOS.length} usuários cadastrados</div>
-    <button class="btn primary" onclick="openModal('usuario')">+ Novo usuário</button>
+function parsePipe(raw,area){
+  const cfg={aai:['assessor','ai','aai'],pipe:['volume acordado','pipe atual','rf pipe','rv pipe','seg pipe','pipe','volume'],atual:['atual'],sc:['status comercial'],pb:['pendencia boleta'],todo:['todo'],obs:['obs']};
+  return parsePipeCfg(raw,area,cfg);
+}
+
+// ── USUARIOS ──
+function renderUsuarios(c=document.getElementById('main-content')){
+  c.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="font-size:14px;font-weight:700">${USUARIOS.length} usuários cadastrados</div>
+    <button class="btn wine" onclick="document.getElementById('modal-user').style.display='flex'">+ Novo usuário</button>
   </div>
-  <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Áreas</th><th>PIN</th><th>Status</th><th>Ação</th></tr></thead><tbody>`;
-  USUARIOS.forEach(u=>{
-    const areas=(u.areas||[]).map(a=>`<span class="badge b-wine" style="margin-right:3px">${AREA_NAMES[a]||a}</span>`).join('');
-    html+=`<tr><td style="font-weight:600">${u.nome}</td>
+  <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Áreas</th><th>PIN</th><th>Status</th><th></th></tr></thead>
+  <tbody>${USUARIOS.map(u=>`<tr>
+    <td style="font-weight:700">${u.nome}</td>
     <td><span class="badge ${u.perfil==='diretor'?'b-wine':'b-gray'}">${u.perfil}</span></td>
-    <td>${u.perfil==='diretor'?'<span class="badge b-wine">Todas</span>':areas||'—'}</td>
-    <td><code style="background:#F5F0EB;padding:2px 6px;border-radius:4px;font-size:12px">${u.pin}</code></td>
+    <td>${u.perfil==='diretor'?'<span class="badge b-wine">Todas</span>':(u.areas||[]).map(a=>`<span class="badge b-gray" style="margin-right:3px">${AREAS[a]?.name||a}</span>`).join('')||'—'}</td>
+    <td><code style="background:var(--cream);padding:2px 8px;border-radius:5px;font-size:12px;border:1px solid var(--border)">${u.pin}</code></td>
     <td><span class="badge ${u.ativo?'b-green':'b-red'}">${u.ativo?'Ativo':'Inativo'}</span></td>
-    <td><div style="display:flex;gap:4px">
-      <button class="btn sm" onclick="toggleUsuario('${u.id}',${!u.ativo})">${u.ativo?'Desativar':'Ativar'}</button>
-      <button class="btn sm danger" onclick="deleteUsuario('${u.id}')">Remover</button>
-    </div></td></tr>`;
-  });
-  html+='</tbody></table></div>';
-  c.innerHTML=html;
+    <td><div style="display:flex;gap:6px">
+      <button class="btn sm" onclick="toggleUser('${u.id}',${!u.ativo})">${u.ativo?'Desativar':'Ativar'}</button>
+      <button class="btn sm" style="border-color:var(--red-b);background:var(--red-bg);color:var(--red)" onclick="delUser('${u.id}')">Remover</button>
+    </div></td>
+  </tr>`).join('')}</tbody></table></div>`;
 }
 
-function openModal(type){document.getElementById('modal-'+type).style.display='flex';}
-function toggleAreaSelect(){
-  const p=document.getElementById('u-perfil').value;
-  document.getElementById('u-areas-wrap').style.display=p==='diretor'?'none':'flex';
+function toggleAreas(){
+  document.getElementById('u-areas-wrap').style.display=document.getElementById('u-perfil').value==='diretor'?'none':'flex';
 }
 
-async function saveUsuario(){
+async function saveUser(){
   const nome=document.getElementById('u-nome').value.trim();
-  const pin=document.getElementById('u-pin').value.trim();
+  const pin2=document.getElementById('u-pin').value.trim();
   const perfil=document.getElementById('u-perfil').value;
-  if(!nome||!pin){showToast('Preencha nome e PIN!','#C03030');return;}
-  if(pin.length!==4||isNaN(pin)){showToast('PIN deve ter 4 dígitos numéricos!','#C03030');return;}
+  if(!nome||!pin2||pin2.length!==4||isNaN(pin2)){showToast('Nome e PIN de 4 dígitos obrigatórios!');return}
   const areas=perfil==='diretor'?['inv','cons','seg']:['inv','cons','seg'].filter(a=>document.getElementById('ua-'+a)?.checked);
   try{
-    await supa('POST','usuarios',{nome,pin,perfil,areas,ativo:true});
-    showToast('Usuário criado!','#085041');
-    closeModal('usuario');
-    const users=await supa('GET','usuarios','','order=nome.asc');
-    USUARIOS=users||[];
-    renderView('usuarios');
-  }catch(e){showToast('Erro: '+e.message,'#C03030');}
+    await db('POST','usuarios',{nome,pin:pin2,perfil,areas,ativo:true});
+    showToast('✅ Usuário criado!',true);
+    closeModal('user');
+    USUARIOS=await db('GET','usuarios','','order=nome.asc');
+    renderUsuarios();
+  }catch(e){showToast('Erro: '+e.message)}
 }
 
-async function toggleUsuario(id,ativo){
-  try{await supa('PATCH','usuarios',{ativo},`id=eq.${id}`);const u=await supa('GET','usuarios','','order=nome.asc');USUARIOS=u||[];renderView('usuarios');}
-  catch(e){showToast('Erro: '+e.message,'#C03030');}
+async function toggleUser(id,ativo){
+  try{await db('PATCH','usuarios',{ativo},`id=eq.${id}`);USUARIOS=await db('GET','usuarios','','order=nome.asc');renderUsuarios()}catch(e){showToast('Erro: '+e.message)}
 }
-
-async function deleteUsuario(id){
+async function delUser(id){
   if(!confirm('Remover este usuário?'))return;
-  try{await supa('DELETE','usuarios','',`id=eq.${id}`);const u=await supa('GET','usuarios','','order=nome.asc');USUARIOS=u||[];renderView('usuarios');}
-  catch(e){showToast('Erro: '+e.message,'#C03030');}
+  try{await db('DELETE','usuarios','',`id=eq.${id}`);USUARIOS=await db('GET','usuarios','','order=nome.asc');renderUsuarios()}catch(e){showToast('Erro: '+e.message)}
 }
 </script>
 </body>
