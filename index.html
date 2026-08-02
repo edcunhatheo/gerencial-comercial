@@ -393,17 +393,22 @@ function updateDots(){for(let i=0;i<4;i++)document.getElementById('d'+i).classLi
 
 async function doLogin(){
   const err=document.getElementById('login-err');
-  err.textContent='';
+  err.textContent='Verificando...';
+  const pinAtual=pin;
   try{
-    const res=await fetch(`${SUPA}/rest/v1/usuarios?pin=eq.${pin}&ativo=eq.true&select=*`,{headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`}});
+    const res=await fetch(SUPA+'/rest/v1/usuarios?pin=eq.'+pinAtual+'&ativo=eq.true&select=*',{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});
     if(!res.ok)throw new Error('Erro '+res.status);
     const data=await res.json();
-    if(!data?.length){err.textContent='PIN incorreto.';pin='';updateDots();return}
+    if(!data||!data.length){err.textContent='PIN incorreto.';pin='';updateDots();return;}
     USER=data[0];
+    err.textContent='';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='block';
-    initApp();
-  }catch(e){err.textContent='Erro de conexão. Tente novamente.';pin='';updateDots()}
+    await initApp();
+  }catch(e){
+    err.textContent='Erro de conexão: '+e.message;
+    pin='';updateDots();
+  }
 }
 
 function logout(){USER=null;pin='';updateDots();document.getElementById('login-err').textContent='';document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';Object.values(charts).forEach(c=>{try{c.destroy()}catch{}});charts={}}
