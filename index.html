@@ -415,8 +415,12 @@ async function initApp(){
   document.getElementById('user-nm').textContent=USER.nome;
   await loadData();
   buildNav();
-  if(USER.perfil==='diretor')renderDiretor();
-  else renderAssessorOpps();
+  const c=document.getElementById('main-content');
+  if(USER.perfil==='diretor'){curView='diretor';renderDiretor(c);}
+  else{curView='a-opps';renderAssessorOpps(c);}
+  // Mark active tab
+  const firstTab=document.querySelector('.nav-tab');
+  if(firstTab)firstTab.classList.add('active');
 }
 
 async function loadData(){
