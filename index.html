@@ -1127,7 +1127,8 @@ async function saveEdit(){
 // ── UPLOAD ──
 function renderUpload(c=document.getElementById('main-content')){
   c.innerHTML=`<p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
-    Suba <strong>uma única planilha</strong> de campanha. O sistema lê automaticamente as abas <strong>RV, RF, Consórcio e Seguro de Vida</strong> e separa por área. Faz merge inteligente — preserva histórico de status já preenchido pelo time.
+    Suba a planilha <strong>uma vez por dia</strong>. O sistema lê as abas <strong>RV, RF, Consórcio e Seguro de Vida</strong> e separa por área automaticamente.<br><br>
+<strong>✅ Sem duplicatas:</strong> oportunidades já existentes (mesmo assessor + cliente + produto) têm apenas o volume atualizado — o status, pendência, TODO e observações que o time preencheu <strong>no sistema são preservados</strong>. Só as oportunidades novas são adicionadas.
   </p>
   <div class="upload-card" id="uc-main" onclick="document.getElementById('fi-main').click()" style="max-width:480px;margin:0 auto">
     <div class="upload-icon">📊</div>
@@ -1189,11 +1190,21 @@ async function doUploadMain(input){
         const toInsert=[],toUpdate=[];
         res.rows.forEach(nr=>{
           const ex=existing.find(e=>norm(e.assessor)===norm(nr.assessor)&&norm(e.cliente)===norm(nr.cliente)&&norm(e.produto||'')===norm(nr.produto||''));
-          if(ex){toUpdate.push({id:ex.id,pipe:nr.pipe,atual:nr.atual,sc:nr.sc,pb:nr.pb,todo:nr.todo,obs:nr.obs,updated_at:new Date().toISOString()});}
+          if(ex){
+            // MERGE DIÁRIO: preserva o trabalho do time no sistema.
+            // Só atualiza pipe (volume). Campos vazios no sistema são preenchidos pela planilha.
+            const upd={id:ex.id,pipe:nr.pipe,updated_at:new Date().toISOString()};
+            if(!ex.sc&&nr.sc)upd.sc=nr.sc;
+            if(!ex.pb&&nr.pb)upd.pb=nr.pb;
+            if(!ex.todo&&nr.todo)upd.todo=nr.todo;
+            if(!ex.obs&&nr.obs)upd.obs=nr.obs;
+            if((!ex.atual||ex.atual===0)&&nr.atual)upd.atual=nr.atual;
+            toUpdate.push(upd);
+          }
           else toInsert.push(nr);
         });
         if(toInsert.length){for(let i=0;i<toInsert.length;i+=50)await db('POST','oportunidades',toInsert.slice(i,i+50));}
-        for(const u of toUpdate)await db('PATCH','oportunidades',{pipe:u.pipe,atual:u.atual,sc:u.sc,pb:u.pb,todo:u.todo,obs:u.obs,updated_at:u.updated_at},`id=eq.${u.id}`);
+        for(const u of toUpdate){const{id,...fields}=u;await db('PATCH','oportunidades',fields,`id=eq.${id}`);}
         res.new=toInsert.length;res.upd=toUpdate.length;
         totalNew+=toInsert.length;totalUpd+=toUpdate.length;totalRows+=res.rows.length;
       }
