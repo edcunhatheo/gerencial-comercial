@@ -375,6 +375,56 @@ const initials=n=>n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpper
 function showToast(msg,ok=false){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'#085041':'#8B1C2A';t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',3500)}
 function closeModal(id){document.getElementById('modal-'+id).style.display='none'}
 
+// ── RISCO / TEMPO ──
+function daysSince(dateStr){
+  if(!dateStr)return 999;
+  try{
+    const d=new Date(dateStr);
+    if(isNaN(d))return 999;
+    return Math.floor((Date.now()-d.getTime())/(1000*60*60*24));
+  }catch(e){return 999}
+}
+
+function riskColor(days){
+  if(days<=3)return{color:'#085041',bg:'#E1F5EE',label:'Em dia',icon:'🟢'};
+  if(days<=7)return{color:'#854F0B',bg:'#FEF3E2',label:'Atenção',icon:'🟡'};
+  return{color:'#791F1F',bg:'#FCEBEB',label:'Parado',icon:'🔴'};
+}
+
+function getLastMoveDate(r){
+  const hist=r.historico||[];
+  if(hist.length){
+    const last=hist[hist.length-1];
+    if(last.data){
+      const parts=last.data.split(' ')[0].split('/');
+      if(parts.length===3){
+        const d=new Date(parts[2],parts[1]-1,parts[0]);
+        if(!isNaN(d))return d.toISOString();
+      }
+    }
+  }
+  return r.updated_at||r.created_at||null;
+}
+
+function renderTimeline(r){
+  const hist=(r.historico||[]).filter(h=>h.campo==='Status comercial'||h.campo==='Pendência boleta');
+  if(!hist.length)return'<div style="font-size:12px;color:var(--muted);padding:8px 0">Nenhuma movimentação registrada ainda.</div>';
+  return '<div style="position:relative;padding-left:20px">'
+    +hist.map(function(h,i){
+      const isLast=i===hist.length-1;
+      const isStatus=h.campo==='Status comercial';
+      const cor=isStatus?'var(--wine)':'var(--green)';
+      return '<div style="position:relative;padding-bottom:14px">'
+        +'<div style="position:absolute;left:-16px;top:4px;width:10px;height:10px;border-radius:50%;background:'+cor+';border:2px solid #fff;box-shadow:0 0 0 2px '+cor+'33"></div>'
+        +(!isLast?'<div style="position:absolute;left:-12px;top:14px;bottom:0;width:2px;background:var(--border)"></div>':'')
+        +'<div style="font-size:12px;font-weight:600;color:var(--text)">'+h.para+'</div>'
+        +'<div style="font-size:11px;color:var(--muted);margin-top:1px">'+h.campo+' · '+h.data+' · por <strong>'+h.usuario+'</strong></div>'
+        +(h.de?'<div style="font-size:10px;color:var(--muted-l);margin-top:1px">anterior: '+h.de+'</div>':'')
+        +'</div>';
+    }).join('')
+    +'</div>';
+}
+
 // ── SUPABASE ──
 async function db(method,table,data,filter){
   let url=`${SUPA}/rest/v1/${table}`;
