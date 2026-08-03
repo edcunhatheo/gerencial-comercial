@@ -464,6 +464,14 @@ const SUPA='https://thskeilfgipienfcctwa.supabase.co';
 const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRoc2tlaWxmZ2lwaWVuZmNjdHdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2MDczMzQsImV4cCI6MjEwMTE4MzMzNH0.woP-zwaVCGO0hF4vY0yaCeIjhrd9XoAPB1KVhVvRiDY';
 
 const AREAS={inv:{name:'Investimentos',color:'#8B1C2A'},cons:{name:'Consórcio',color:'#EF9F27'},seg:{name:'Seguro de vida',color:'#7F77DD'}};
+const SUBAREAS={rv:{name:'Renda variável',color:'#8B1C2A'},rf:{name:'Renda fixa',color:'#378ADD'},cons:{name:'Consórcio',color:'#EF9F27'},seg:{name:'Seguro de vida',color:'#7F77DD'}};
+const RF_PRODS_G=['NTN-B','COE','CP','Liquidez','LCI','LCA','CDB','CRA','CRI','Debênture','Debenture','Tesouro'];
+function subAreaOf(r){
+  if(r.area!=='inv')return r.area;
+  const p=norm(r.produto||'');
+  if(RF_PRODS_G.some(x=>p.includes(norm(x))))return 'rf';
+  return 'rv';
+}
 const SC_BADGE={'cliente topou':'b-green','cliente confirmar':'b-amber','reunião agendada':'b-purple','agendar reunião':'b-purple','ligar cliente':'b-gray','cliente negou':'b-red','não se aplica':'b-gray'};
 const PB_BADGE={'boletado':'b-green','a boletar':'b-teal','to do comercial':'b-amber','to do operacional':'b-blue','aguardando comercial':'b-amber','email':'b-purple','não se aplica':'b-gray'};
 
@@ -688,12 +696,13 @@ function getActivity(){
       if(dp.length!==3)return;
       const iso=dp[2]+'-'+String(dp[1]).padStart(2,'0')+'-'+String(dp[0]).padStart(2,'0');
       const paraN=norm(h.para||'');
+      const sub=subAreaOf(r);
       if(h.campo==='Pendência boleta'&&paraN==='boletado'){
-        acts.push({date:iso,area:r.area,tipo:'boleta',valor:r.atual||r.pipe||0,usuario:h.usuario,cliente:r.cliente});
+        acts.push({date:iso,area:r.area,sub,tipo:'boleta',valor:r.atual||r.pipe||0,usuario:h.usuario,cliente:r.cliente});
       }else if(h.campo==='Status comercial'&&paraN.includes('reuni')){
-        acts.push({date:iso,area:r.area,tipo:'reuniao',valor:0,usuario:h.usuario,cliente:r.cliente});
+        acts.push({date:iso,area:r.area,sub,tipo:'reuniao',valor:0,usuario:h.usuario,cliente:r.cliente});
       }else if((h.campo==='Status comercial'||h.campo==='Pendência boleta')&&h.para){
-        acts.push({date:iso,area:r.area,tipo:'avanco',valor:0,usuario:h.usuario,cliente:r.cliente});
+        acts.push({date:iso,area:r.area,sub,tipo:'avanco',valor:0,usuario:h.usuario,cliente:r.cliente});
       }
     });
   });
@@ -765,10 +774,10 @@ function renderDiretor(c=document.getElementById('main-content')){
       +'<div style="font-size:13px;opacity:.85;margin-top:2px">'+actsHoje.length+' boleta'+(actsHoje.length!==1?'s':'')+' fechada'+(actsHoje.length!==1?'s':'')+' hoje</div>'
       +'</div>'
       +'<div style="display:flex;gap:14px;flex-wrap:wrap">'
-      +Object.entries(AREAS).map(([ak,a])=>{
-        const arr=actsHoje.filter(x=>x.area===ak);
+      +Object.entries(SUBAREAS).map(([sk,a])=>{
+        const arr=actsHoje.filter(x=>(x.sub||x.area)===sk);
         const v=arr.reduce((s,x)=>s+x.valor,0);
-        return '<div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 18px;text-align:center;min-width:110px">'
+        return '<div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 16px;text-align:center;min-width:100px">'
           +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;opacity:.9">'+a.name+'</div>'
           +'<div style="font-size:20px;font-weight:900;margin-top:3px">'+(fmt(v)||'—')+'</div>'
           +'<div style="font-size:11px;opacity:.8">'+arr.length+' boleta'+(arr.length!==1?'s':'')+'</div>'
@@ -874,8 +883,8 @@ function renderDiretor(c=document.getElementById('main-content')){
 
     const areaBreakdown=(items,showVol)=>{
       return '<div style="display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border-l);flex-wrap:wrap">'
-        +Object.entries(AREAS).map(([ak,a])=>{
-          const arr=items.filter(x=>x.area===ak);
+        +Object.entries(SUBAREAS).map(([sk,a])=>{
+          const arr=items.filter(x=>(x.sub||x.area)===sk);
           const v=arr.reduce((s,x)=>s+(x.valor||0),0);
           return '<div style="display:flex;align-items:center;gap:4px" title="'+a.name+'">'
             +'<span style="width:8px;height:8px;border-radius:50%;background:'+a.color+';flex-shrink:0"></span>'
@@ -900,8 +909,8 @@ function renderDiretor(c=document.getElementById('main-content')){
       +'<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:24px">'
       +'<h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:16px">🎯 Funil do pipeline — visão executiva por área</h3>'
       +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">'
-      +Object.entries(AREAS).map(([ak,a])=>{
-        const areaOpps=OPPS.filter(r=>r.area===ak);
+      +Object.entries(SUBAREAS).map(([ak,a])=>{
+        const areaOpps=OPPS.filter(r=>subAreaOf(r)===ak);
         const areaAtivos=areaOpps.filter(r=>!isB(r));
         const fd=FUNIL.map(([key,label])=>{
           if(key==='__BOL__'){
@@ -1013,9 +1022,9 @@ function renderDiretor(c=document.getElementById('main-content')){
 
     const bctx2=document.getElementById('ch-boletas-dia');
     if(bctx2){
-      const dsAreas=Object.entries(AREAS).map(([ak,a])=>({
+      const dsAreas=Object.entries(SUBAREAS).map(([sk,a])=>({
         label:a.name,
-        data:days14.map(d=>acts2.filter(x=>x.tipo==='boleta'&&x.date===d&&x.area===ak).length),
+        data:days14.map(d=>acts2.filter(x=>x.tipo==='boleta'&&x.date===d&&(x.sub||x.area)===sk).length),
         backgroundColor:a.color,borderRadius:3
       }));
       charts.boletasDia=new Chart(bctx2,{type:'bar',data:{labels:dayLabels,datasets:dsAreas},
