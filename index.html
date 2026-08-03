@@ -643,6 +643,37 @@ setInterval(async()=>{
   }catch(e){}
 },60000);
 
+// ── ATIVIDADE (extraída do histórico automático) ──
+function getActivity(){
+  const acts=[];
+  OPPS.forEach(r=>{
+    (r.historico||[]).forEach(h=>{
+      if(!h.data)return;
+      const dp=h.data.split(' ')[0].split('/');
+      if(dp.length!==3)return;
+      const iso=dp[2]+'-'+String(dp[1]).padStart(2,'0')+'-'+String(dp[0]).padStart(2,'0');
+      const paraN=norm(h.para||'');
+      if(h.campo==='Pendência boleta'&&paraN==='boletado'){
+        acts.push({date:iso,area:r.area,tipo:'boleta',valor:r.atual||r.pipe||0,usuario:h.usuario,cliente:r.cliente});
+      }else if(h.campo==='Status comercial'&&paraN.includes('reuni')){
+        acts.push({date:iso,area:r.area,tipo:'reuniao',valor:0,usuario:h.usuario,cliente:r.cliente});
+      }else if((h.campo==='Status comercial'||h.campo==='Pendência boleta')&&h.para){
+        acts.push({date:iso,area:r.area,tipo:'avanco',valor:0,usuario:h.usuario,cliente:r.cliente});
+      }
+    });
+  });
+  return acts;
+}
+
+function lastNDays(n){
+  const days=[];
+  for(let i=n-1;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  return days;
+}
+
 // ══════════════════════════════════════════════════════════
 // ── DIRETOR DASHBOARD ──
 // ══════════════════════════════════════════════════════════
@@ -757,6 +788,60 @@ function renderDiretor(c=document.getElementById('main-content')){
     </div>`).join('')}
   </div>
 
+  <!-- Avanço & Atividade -->
+  ${(()=>{
+    const acts=getActivity();
+    const days7=lastNDays(7);
+    const semana=acts.filter(a=>days7.includes(a.date));
+    const boletasSem=semana.filter(a=>a.tipo==='boleta');
+    const reunioesSem=semana.filter(a=>a.tipo==='reuniao');
+    const avancosSem=semana.filter(a=>a.tipo==='avanco');
+    const volSem=boletasSem.reduce((s,a)=>s+a.valor,0);
+
+    // Funil executivo
+    const FUNIL=[['Ligar Cliente','Ligar'],['Agendar Reunião','Agendar reunião'],['Reunião Agendada','Reunião agendada'],['Cliente Confirmar','Confirmar'],['Cliente Topou','Topou'],['__BOL__','✓ Boletado']];
+    const ativos=OPPS.filter(r=>!isB(r));
+    const funilData=FUNIL.map(([key,label])=>{
+      if(key==='__BOL__'){
+        const rows=OPPS.filter(isB);
+        return{label,n:rows.length,vol:rows.reduce((s,r)=>s+(r.atual||0),0),bol:true};
+      }
+      const rows=ativos.filter(r=>norm(r.sc||'')===norm(key));
+      return{label,n:rows.length,vol:rows.reduce((s,r)=>s+(r.pipe||0),0),bol:false};
+    });
+    const maxN=Math.max(...funilData.map(f=>f.n),1);
+
+    return '<div class="section-label" style="margin-top:8px">📈 Avanço & atividade do time</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px">'
+      +'<div class="kpi green"><div class="kpi-lbl">✓ Boletas na semana</div><div class="kpi-val">'+boletasSem.length+'</div><div class="kpi-sub">'+(fmt(volSem)||'R$0')+' em volume</div></div>'
+      +'<div class="kpi blue"><div class="kpi-lbl">📅 Reuniões movidas</div><div class="kpi-val">'+reunioesSem.length+'</div><div class="kpi-sub">últimos 7 dias</div></div>'
+      +'<div class="kpi amber"><div class="kpi-lbl">⚡ Avanços de status</div><div class="kpi-val">'+avancosSem.length+'</div><div class="kpi-sub">movimentações na semana</div></div>'
+      +'<div class="kpi wine"><div class="kpi-lbl">Atividade total</div><div class="kpi-val">'+semana.length+'</div><div class="kpi-sub">ações registradas</div></div>'
+      +'</div>'
+      +'<div class="charts-row">'
+      +'<div class="chart-card"><h3>✓ Boletas por dia · por área (14 dias)</h3><div class="chart-wrap"><canvas id="ch-boletas-dia"></canvas></div></div>'
+      +'<div class="chart-card"><h3>⚡ Movimentações por dia (14 dias)</h3><div class="chart-wrap"><canvas id="ch-avancos-dia"></canvas></div></div>'
+      +'</div>'
+      // Funil executivo
+      +'<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:24px">'
+      +'<h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:16px">🎯 Funil do pipeline — visão executiva</h3>'
+      +funilData.map(f=>{
+        const w=Math.max(Math.round(f.n/maxN*100),3);
+        const cor=f.bol?'#085041':'#8B1C2A';
+        const bg=f.bol?'#E1F5EE':'#F5EAE8';
+        return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">'
+          +'<div style="min-width:130px;font-size:12px;font-weight:'+(f.bol?'800':'600')+';color:'+cor+'">'+f.label+'</div>'
+          +'<div style="flex:1;background:'+bg+';border-radius:8px;height:32px;position:relative;overflow:hidden">'
+          +'<div style="width:'+w+'%;height:32px;background:'+cor+';border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;min-width:36px">'
+          +'<span style="color:#fff;font-size:12px;font-weight:800">'+f.n+'</span>'
+          +'</div></div>'
+          +'<div style="min-width:70px;text-align:right;font-size:12px;font-weight:700;color:'+cor+'">'+(fmt(f.vol)||'—')+'</div>'
+          +'</div>';
+      }).join('')
+      +'<div style="font-size:10px;color:var(--muted);margin-top:10px">Nº de oportunidades por etapa · volume à direita (pipe para etapas ativas, boletado para concluídas)</div>'
+      +'</div>';
+  })()}
+
   <!-- Charts -->
   <div class="charts-row">
     <div class="chart-card"><h3>Boletado por área</h3><div class="chart-wrap"><canvas id="ch-area"></canvas></div></div>
@@ -823,6 +908,35 @@ function renderDiretor(c=document.getElementById('main-content')){
         {label:'Pipe',data:top8.map(([,v])=>v.pipe),backgroundColor:'#E8D5CC',borderRadius:4},
         {label:'Boletado',data:top8.map(([,v])=>v.bol),backgroundColor:'#8B1C2A',borderRadius:4}
       ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{y:{ticks:{callback:v=>fmt(v),font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{size:10}}}}}})
+    }
+
+    // ── Activity charts (14 dias) ──
+    const acts2=getActivity();
+    const days14=lastNDays(14);
+    const dayLabels=days14.map(d=>{const p=d.split('-');return p[2]+'/'+p[1];});
+
+    const bctx2=document.getElementById('ch-boletas-dia');
+    if(bctx2){
+      const dsAreas=Object.entries(AREAS).map(([ak,a])=>({
+        label:a.name,
+        data:days14.map(d=>acts2.filter(x=>x.tipo==='boleta'&&x.date===d&&x.area===ak).length),
+        backgroundColor:a.color,borderRadius:3
+      }));
+      charts.boletasDia=new Chart(bctx2,{type:'bar',data:{labels:dayLabels,datasets:dsAreas},
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:12}}},
+          scales:{x:{stacked:true,ticks:{font:{size:9}}},y:{stacked:true,ticks:{stepSize:1,font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}}}}});
+    }
+
+    const actx2=document.getElementById('ch-avancos-dia');
+    if(actx2){
+      charts.avancosDia=new Chart(actx2,{type:'bar',data:{labels:dayLabels,datasets:[
+        {label:'Avanços de status',data:days14.map(d=>acts2.filter(x=>x.tipo==='avanco'&&x.date===d).length),backgroundColor:'#EF9F27',borderRadius:3},
+        {label:'Reuniões',data:days14.map(d=>acts2.filter(x=>x.tipo==='reuniao'&&x.date===d).length),backgroundColor:'#378ADD',borderRadius:3},
+        {label:'Boletas',data:days14.map(d=>acts2.filter(x=>x.tipo==='boleta'&&x.date===d).length),backgroundColor:'#085041',borderRadius:3}
+      ]},options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:12}}},
+        scales:{x:{stacked:true,ticks:{font:{size:9}}},y:{stacked:true,ticks:{stepSize:1,font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}}}}});
     }
   });
 }
