@@ -1758,7 +1758,7 @@ function renderAssessorDash(c=document.getElementById('main-content')){
 // ── ASSESSOR: MEU DIA ──
 // ══════════════════════════════════════════════════════════
 function renderAssessorDaily(c=document.getElementById('main-content')){
-  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome)||(USER.areas||[]).includes(r.area));
   const selN=Object.keys(DAILY).length;
   const reunN=Object.values(DAILY).filter(v=>v.tipo==='reuniao').length;
   const bolN2=Object.values(DAILY).filter(v=>v.tipo==='boleta').length;
@@ -1846,7 +1846,7 @@ async function updateDaily(oppId,field,value){
 }
 
 function exportDailyPDF(){
-  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome)||(USER.areas||[]).includes(r.area));
   const sel=Object.entries(DAILY).filter(([,v])=>v.tipo);
   if(!sel.length){showToast('Defina o tipo das oportunidades antes de exportar!');return}
   const now=new Date();
