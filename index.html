@@ -142,6 +142,35 @@ tr.bol td{background:var(--green-bg)}
 .opp-btn.todo{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-b)}
 .opp-btn.todo:hover{background:var(--purple);color:#fff}
 
+/* ── COCKPIT / KANBAN ── */
+.cockpit-hero{background:linear-gradient(135deg,#8B1C2A,#6B0010);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:20px;box-shadow:0 8px 24px rgba(139,28,42,.2)}
+.cockpit-hello{font-size:20px;font-weight:800}
+.cockpit-sub{font-size:12px;opacity:.85;margin-top:2px}
+.cockpit-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:16px}
+.cockpit-stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:11px;padding:10px 14px;text-align:center}
+.cockpit-stat-v{font-size:22px;font-weight:900}
+.cockpit-stat-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.85;margin-top:2px}
+.prio-item{display:flex;align-items:center;gap:12px;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;margin-bottom:8px;transition:all .15s}
+.prio-item:hover{border-color:#C8A0A8;box-shadow:0 2px 12px rgba(139,28,42,.08)}
+.prio-flag{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.prio-info{flex:1;min-width:0}
+.prio-cli{font-size:13px;font-weight:800}
+.prio-acao{font-size:12px;color:var(--muted);margin-top:2px}
+.prio-vol{font-size:14px;font-weight:800;color:var(--wine-d);white-space:nowrap}
+.kb-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;align-items:flex-start}
+.kb-col{min-width:235px;max-width:235px;background:#F1E9E4;border-radius:14px;padding:10px;flex-shrink:0}
+.kb-col-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 10px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.kb-count{background:var(--card);border-radius:999px;padding:1px 8px;font-size:10px;font-weight:800;color:var(--muted)}
+.kb-card{background:var(--card);border:1.5px solid var(--border);border-radius:11px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.kb-card:hover{border-color:#C8A0A8;box-shadow:0 3px 10px rgba(139,28,42,.1);transform:translateY(-1px)}
+.kb-cli{font-size:12px;font-weight:800;line-height:1.3}
+.kb-meta{font-size:10px;color:var(--muted);margin-top:3px}
+.kb-vol{font-size:13px;font-weight:800;color:var(--wine-d);margin-top:5px}
+.kb-adv{width:100%;margin-top:8px;padding:5px;border-radius:8px;border:1.5px solid var(--border);background:var(--cream);font-size:10px;font-weight:700;cursor:pointer;color:var(--text);transition:all .15s}
+.kb-adv:hover{background:var(--wine);color:#fff;border-color:var(--wine)}
+.kb-adv.bol{background:var(--green-bg);border-color:var(--green-b);color:var(--green)}
+.kb-adv.bol:hover{background:var(--green);color:#fff}
+
 /* ── DAILY ── */
 .daily-header{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px}
 .daily-title{font-size:18px;font-weight:700;margin-bottom:4px}
@@ -648,7 +677,7 @@ function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
     ?[['diretor','📊 Dashboard'],['d-pipeline','📋 Pipeline'],['d-metas','🎯 Definições do mês'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários']]
-    :[['a-opps','📂 Minhas oportunidades'],['a-daily','☀️ Meu dia']];
+    :[['a-opps','🎯 Guia do dia'],['a-daily','☀️ Daily']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>`<button class="nav-tab${v===curView?' active':''}" onclick="setView('${v}',this)">${l}</button>`).join('');
 }
 
@@ -1298,63 +1327,170 @@ async function deleteSelected(){
 // ══════════════════════════════════════════════════════════
 // ── ASSESSOR: MINHAS OPORTUNIDADES ──
 // ══════════════════════════════════════════════════════════
+function sugestaoAcao(r){
+  if(r.todo)return r.todo;
+  const sc=norm(r.sc||'');
+  const pb=norm(r.pb||'');
+  if(pb.includes('email'))return 'Enviar email/push para o cliente';
+  if(pb==='a boletar')return 'Gerar a boleta!';
+  if(pb.includes('to do'))return 'Resolver pendência da boleta';
+  if(sc==='ligar cliente'||sc==='ligar cliente c ai')return 'Ligar para o cliente';
+  if(sc==='agendar reunião')return 'Agendar a reunião';
+  if(sc==='reunião agendada')return 'Realizar a reunião';
+  if(sc==='cliente confirmar')return 'Cobrar confirmação do cliente';
+  if(sc==='cliente topou')return 'Cliente topou — fechar a boleta!';
+  return 'Definir próximo passo';
+}
+
+const SC_CHAIN=['Ligar Cliente','Agendar Reunião','Reunião Agendada','Cliente Confirmar','Cliente Topou'];
+
+async function advanceStatus(id,ev){
+  if(ev)ev.stopPropagation();
+  const r=OPPS.find(o=>o.id===id);if(!r)return;
+  const cur=SC_CHAIN.findIndex(s=>norm(s)===norm(r.sc||''));
+  const next=cur<0?SC_CHAIN[0]:SC_CHAIN[Math.min(cur+1,SC_CHAIN.length-1)];
+  if(cur>=SC_CHAIN.length-1){quickBoletar(id);return;}
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const hist=[...(r.historico||[]),{campo:'Status comercial',de:r.sc||'',para:next,usuario:USER.nome,data:ds}];
+  try{
+    await db('PATCH','oportunidades',{sc:next,historico:hist,updated_at:now.toISOString()},'id=eq.'+id);
+    showToast('✅ '+r.cliente+' → '+next,true);
+    await loadData();
+    renderCurView();
+  }catch(e){showToast('Erro: '+e.message)}
+}
+
 function renderAssessorOpps(c=document.getElementById('main-content')){
-  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
+  const isDir=USER.perfil==='diretor';
+  const myOpps=isDir?[...OPPS]:OPPS.filter(r=>norm(r.assessor)===norm(USER.nome)||(USER.areas||[]).includes(r.area));
+  const hoje=today();
+  const hora=new Date().getHours();
+  const saud=hora<12?'Bom dia':hora<18?'Boa tarde':'Boa noite';
 
   const bolVol=myOpps.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
-  const bolN=myOpps.filter(isB).length;
-  const pipe=myOpps.reduce((s,r)=>s+(r.pipe||0),0);
-  const pend=myOpps.filter(isPend).length;
+  const ativos=myOpps.filter(r=>!isB(r));
 
-  // Sort: pendentes primeiro, depois por status
-  const SC_ORDER={'Ligar Cliente':1,'Ligar Cliente c AI':2,'Agendar Reunião':3,'Reunião Agendada':4,'Cliente Confirmar':5,'Cliente Topou':6,'Cliente Negou':7,'Não se Aplica':8};
-  const sorted=[...myOpps].sort((a,b)=>{
-    if(isB(a)&&!isB(b))return 1;
-    if(!isB(a)&&isB(b))return -1;
-    return(SC_ORDER[a.sc]||9)-(SC_ORDER[b.sc]||9);
-  });
+  // Priority buckets
+  const atrasados=ativos.filter(r=>r.todo_data&&r.todo_data<hoje);
+  const hojeList=ativos.filter(r=>r.todo_data===hoje);
+  const quaseLa=ativos.filter(r=>!atrasados.includes(r)&&!hojeList.includes(r)&&(norm(r.sc||'')==='cliente topou'||norm(r.pb||'')==='a boletar'));
+  const parados=ativos.filter(r=>!atrasados.includes(r)&&!hojeList.includes(r)&&!quaseLa.includes(r)&&daysSince(getLastMoveDate(r))>7);
+  const reunioesHoje=ativos.filter(r=>norm(r.sc||'')==='reunião agendada');
 
-  c.innerHTML=`
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:20px">
-    <div class="kpi wine"><div class="kpi-lbl">✓ Boletado</div><div class="kpi-val">${fmt(bolVol)||'R$0'}</div><div class="kpi-sub">${bolN} opor.</div></div>
-    <div class="kpi"><div class="kpi-lbl">Pipe total</div><div class="kpi-val">${fmt(pipe)}</div><div class="kpi-sub">${myOpps.length} opor.</div></div>
-    <div class="kpi amber"><div class="kpi-lbl">Pendências</div><div class="kpi-val">${pend}</div><div class="kpi-sub">aguardando ação</div></div>
-  </div>
-  <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-    <button class="btn wine" onclick="openNewOpp()">+ Nova oportunidade</button>
-  </div>
-  <div class="filters">
-    <select class="filter-sel" id="af-area" onchange="filterAssOpps()">
-      <option value="">Todas as áreas</option>
-      ${Object.entries(AREAS).map(([k,a])=>`<option value="${k}">${a.name}</option>`).join('')}
-    </select>
-    <select class="filter-sel" id="af-sc" onchange="filterAssOpps()">
-      <option value="">Todos status</option>
-      ${['Ligar Cliente','Ligar Cliente c AI','Agendar Reunião','Reunião Agendada','Cliente Confirmar','Cliente Topou','Cliente Negou','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}
-    </select>
-    <select class="filter-sel" id="af-pb" onchange="filterAssOpps()">
-      <option value="">Todas pendências</option>
-      ${['To Do Comercial','To Do Operacional','A Boletar','Boletado','Aguardando Comercial','Email','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}
-    </select>
-    <input class="filter-inp" id="af-cli" type="text" placeholder="🔍 Buscar cliente..." oninput="filterAssOpps()">
-  </div>
-  <div id="ass-opp-grid" class="opp-grid">${sorted.map(r=>oppCard(r)).join('')}</div>`;
+  function prioLine(r,tipo){
+    const cfg={
+      atrasado:{icon:'🔴',bg:'#FCEBEB',label:'há '+(Math.floor((new Date(hoje)-new Date(r.todo_data))/(1000*60*60*24)))+'d atrasado'},
+      hoje:{icon:'📅',bg:'#FEF3E2',label:'para hoje'},
+      quase:{icon:'🔥',bg:'#E1F5EE',label:'quase lá!'},
+      parado:{icon:'💤',bg:'#F5F0EB',label:daysSince(getLastMoveDate(r))+'d parado'}
+    }[tipo];
+    return '<div class="prio-item">'
+      +'<div class="prio-flag" style="background:'+cfg.bg+'">'+cfg.icon+'</div>'
+      +'<div class="prio-info">'
+      +'<div class="prio-cli">'+r.cliente+' <span style="font-size:10px;font-weight:600;color:var(--muted)">· '+(SUBAREAS[subAreaOf(r)]?.name||'')+(r.produto?' · '+r.produto:'')+'</span></div>'
+      +'<div class="prio-acao">👉 '+sugestaoAcao(r)+' <span style="font-weight:700">('+cfg.label+')</span></div>'
+      +'</div>'
+      +'<div class="prio-vol">'+fmt(r.atual||r.pipe)+'</div>'
+      +'<button class="btn sm wine" onclick="openEdit(\''+r.id+'\')">Atualizar</button>'
+      +'</div>';
+  }
+
+  const prioHtml=[
+    ...atrasados.map(r=>prioLine(r,'atrasado')),
+    ...hojeList.map(r=>prioLine(r,'hoje')),
+    ...quaseLa.map(r=>prioLine(r,'quase')),
+    ...parados.slice(0,5).map(r=>prioLine(r,'parado'))
+  ].join('');
+
+  // Kanban columns
+  const KB_COLS=[
+    ['Ligar Cliente','📞','#5A3A3E'],
+    ['Agendar Reunião','🗓️','#854F0B'],
+    ['Reunião Agendada','📅','#3C3489'],
+    ['Cliente Confirmar','⏳','#0C447C'],
+    ['Cliente Topou','🤝','#085041'],
+    ['__BOL__','✅','#085041']
+  ];
+
+  function kbCard(r){
+    const dias=daysSince(getLastMoveDate(r));
+    const risk=isB(r)?null:riskColor(dias);
+    const isTopou=norm(r.sc||'')==='cliente topou';
+    return '<div class="kb-card" onclick="openEdit(\''+r.id+'\')">'
+      +'<div class="kb-cli">'+r.cliente+'</div>'
+      +'<div class="kb-meta">'+(SUBAREAS[subAreaOf(r)]?.name||'')+(r.produto?' · '+r.produto:'')+'</div>'
+      +(r.todo?'<div class="kb-meta" style="color:var(--amber)">📋 '+r.todo.substring(0,40)+(r.todo_data?' ('+r.todo_data.split('-')[2]+'/'+r.todo_data.split('-')[1]+')':'')+'</div>':'')
+      +'<div style="display:flex;align-items:center;justify-content:space-between">'
+      +'<div class="kb-vol">'+fmt(r.atual||r.pipe)+'</div>'
+      +(risk?'<span style="font-size:10px;font-weight:700;color:'+risk.color+'">'+risk.icon+' '+dias+'d</span>':'<span style="font-size:12px">✅</span>')
+      +'</div>'
+      +(!isB(r)?'<button class="kb-adv'+(isTopou?' bol':'')+'" onclick="advanceStatus(\''+r.id+'\',event)">'+(isTopou?'✅ Boletar agora':'Avançar etapa →')+'</button>':'')
+      +'</div>';
+  }
+
+  const fArea=window._kbArea||'';
+  const fCliKb=window._kbCli||'';
+  let kbOpps=myOpps;
+  if(fArea)kbOpps=kbOpps.filter(r=>subAreaOf(r)===fArea);
+  if(fCliKb)kbOpps=kbOpps.filter(r=>(r.cliente||'').toLowerCase().includes(fCliKb));
+
+  const kbHtml=KB_COLS.map(([key,emoji,cor])=>{
+    let rows;
+    if(key==='__BOL__')rows=kbOpps.filter(isB);
+    else rows=kbOpps.filter(r=>!isB(r)&&norm(r.sc||'')===norm(key));
+    const vol=rows.reduce((s,r)=>s+(key==='__BOL__'?(r.atual||0):(r.pipe||0)),0);
+    return '<div class="kb-col">'
+      +'<div class="kb-col-hdr" style="color:'+cor+'">'
+      +'<span>'+emoji+' '+(key==='__BOL__'?'Boletado':key)+'</span>'
+      +'<span class="kb-count">'+rows.length+'</span>'
+      +'</div>'
+      +'<div style="font-size:10px;font-weight:700;color:'+cor+';padding:0 8px 8px">'+(fmt(vol)||'—')+'</div>'
+      +rows.slice(0,30).map(kbCard).join('')
+      +(rows.length>30?'<div style="text-align:center;font-size:10px;color:var(--muted);padding:6px">+'+(rows.length-30)+' mais...</div>':'')
+      +'</div>';
+  }).join('');
+
+  // Sem status column
+  const semStatus=kbOpps.filter(r=>!isB(r)&&!SC_CHAIN.some(s=>norm(s)===norm(r.sc||''))&&norm(r.sc||'')!=='cliente negou');
+
+  c.innerHTML=''
+    // Hero
+    +'<div class="cockpit-hero">'
+    +'<div class="cockpit-hello">'+saud+', '+USER.nome.split(' ')[0]+'! 👋</div>'
+    +'<div class="cockpit-sub">'+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+' — aqui está o seu guia de hoje</div>'
+    +'<div class="cockpit-stats">'
+    +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+(atrasados.length+hojeList.length)+'</div><div class="cockpit-stat-l">🎯 Ações p/ hoje</div></div>'
+    +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+reunioesHoje.length+'</div><div class="cockpit-stat-l">📅 Reuniões marcadas</div></div>'
+    +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+quaseLa.length+'</div><div class="cockpit-stat-l">🔥 Prontas p/ fechar</div></div>'
+    +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+(fmt(bolVol)||'R$0')+'</div><div class="cockpit-stat-l">✓ Já boletado</div></div>'
+    +'</div></div>'
+
+    // Nova oportunidade
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">'
+    +'<div class="section-label" style="margin:0;border:none;padding:0">🎯 Suas prioridades agora</div>'
+    +'<button class="btn wine" onclick="openNewOpp()">+ Nova oportunidade</button>'
+    +'</div>'
+
+    // Priorities
+    +(prioHtml||'<div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:12px;padding:16px;text-align:center;color:var(--green);font-weight:700;margin-bottom:8px">🎉 Tudo em dia! Nenhuma ação urgente pendente.</div>')
+
+    // Kanban
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin:24px 0 12px;flex-wrap:wrap;gap:8px">'
+    +'<div class="section-label" style="margin:0;border:none;padding:0">📋 Seu funil — arraste as oportunidades pelas etapas</div>'
+    +'<div style="display:flex;gap:8px">'
+    +'<select class="filter-sel" onchange="window._kbArea=this.value;renderAssessorOpps()">'
+    +'<option value="">Todas as áreas</option>'
+    +Object.entries(SUBAREAS).map(([k,a])=>'<option value="'+k+'"'+(fArea===k?' selected':'')+'>'+a.name+'</option>').join('')
+    +'</select>'
+    +'<input class="filter-inp" type="text" placeholder="🔍 Cliente..." value="'+fCliKb+'" oninput="window._kbCli=this.value.toLowerCase();renderAssessorOpps()" style="min-width:120px">'
+    +'</div></div>'
+    +'<div class="kb-board">'+kbHtml
+    +(semStatus.length?'<div class="kb-col"><div class="kb-col-hdr" style="color:var(--muted)"><span>❔ Sem status</span><span class="kb-count">'+semStatus.length+'</span></div>'+semStatus.slice(0,30).map(kbCard).join('')+'</div>':'')
+    +'</div>';
 }
 
-function filterAssOpps(){
-  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome));
-  const fA=document.getElementById('af-area')?.value;
-  const fSC=document.getElementById('af-sc')?.value;
-  const fPB=document.getElementById('af-pb')?.value;
-  const fCli=(document.getElementById('af-cli')?.value||'').toLowerCase();
-  let rows=[...myOpps];
-  if(fA)rows=rows.filter(r=>r.area===fA);
-  if(fSC)rows=rows.filter(r=>r.sc===fSC);
-  if(fPB)rows=rows.filter(r=>r.pb===fPB);
-  if(fCli)rows=rows.filter(r=>(r.cliente||'').toLowerCase().includes(fCli));
-  const grid=document.getElementById('ass-opp-grid');
-  if(grid)grid.innerHTML=rows.map(r=>oppCard(r)).join('');
-}
+function filterAssOpps(){renderAssessorOpps();}
 
 function oppCard(r){
   const cor=AREAS[r.area]?.color||'#8B1C2A';
