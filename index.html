@@ -345,6 +345,9 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
         <input type="date" id="e-todo-data">
       </div>
     </div>
+    <div class="fg"><label>📅 Reunião marcada (data e hora)</label>
+      <input type="datetime-local" id="e-reuniao">
+    </div>
     <div class="fg"><label>Observação</label>
       <textarea id="e-obs" placeholder="Observações sobre esta oportunidade..."></textarea>
     </div>
@@ -446,6 +449,9 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
       <div class="fg"><label>📅 Data do TODO</label>
         <input type="date" id="n-todo-data">
       </div>
+    </div>
+    <div class="fg"><label>📅 Reunião marcada (data e hora)</label>
+      <input type="datetime-local" id="n-reuniao">
     </div>
     <div class="fg"><label>Observação</label>
       <textarea id="n-obs" placeholder="Observações..."></textarea>
@@ -1329,6 +1335,13 @@ async function deleteSelected(){
 // ══════════════════════════════════════════════════════════
 // ── ASSESSOR: MINHAS OPORTUNIDADES ──
 // ══════════════════════════════════════════════════════════
+function fmtReuniao(s){
+  if(!s)return'';
+  const [d,h]=s.split('T');
+  const p=d.split('-');
+  return p[2]+'/'+p[1]+(h?' às '+h.substring(0,5):'');
+}
+
 function sugestaoAcao(r){
   if(r.todo)return r.todo;
   const sc=norm(r.sc||'');
@@ -1374,14 +1387,15 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   const ativos=myOpps.filter(r=>!isB(r));
 
   // Priority buckets
-  const atrasados=ativos.filter(r=>r.todo_data&&r.todo_data<hoje);
-  const hojeList=ativos.filter(r=>r.todo_data===hoje);
-  const quaseLa=ativos.filter(r=>!atrasados.includes(r)&&!hojeList.includes(r)&&(norm(r.sc||'')==='cliente topou'||norm(r.pb||'')==='a boletar'));
-  const parados=ativos.filter(r=>!atrasados.includes(r)&&!hojeList.includes(r)&&!quaseLa.includes(r)&&daysSince(getLastMoveDate(r))>7);
-  const reunioesHoje=ativos.filter(r=>norm(r.sc||'')==='reunião agendada');
+  const reunioesHoje=ativos.filter(r=>r.reuniao_data&&r.reuniao_data.startsWith(hoje)).sort((a,b)=>(a.reuniao_data||'').localeCompare(b.reuniao_data||''));
+  const atrasados=ativos.filter(r=>!reunioesHoje.includes(r)&&r.todo_data&&r.todo_data<hoje);
+  const hojeList=ativos.filter(r=>!reunioesHoje.includes(r)&&r.todo_data===hoje);
+  const quaseLa=ativos.filter(r=>!reunioesHoje.includes(r)&&!atrasados.includes(r)&&!hojeList.includes(r)&&(norm(r.sc||'')==='cliente topou'||norm(r.pb||'')==='a boletar'));
+  const parados=ativos.filter(r=>!reunioesHoje.includes(r)&&!atrasados.includes(r)&&!hojeList.includes(r)&&!quaseLa.includes(r)&&daysSince(getLastMoveDate(r))>7);
 
   function prioLine(r,tipo){
     const cfg={
+      reuniao:{icon:'📅',bg:'#E6F1FB',label:'reunião hoje '+(r.reuniao_data&&r.reuniao_data.includes('T')?'às '+r.reuniao_data.split('T')[1].substring(0,5):'')},
       atrasado:{icon:'🔴',bg:'#FCEBEB',label:'há '+(Math.floor((new Date(hoje)-new Date(r.todo_data))/(1000*60*60*24)))+'d atrasado'},
       hoje:{icon:'📅',bg:'#FEF3E2',label:'para hoje'},
       quase:{icon:'🔥',bg:'#E1F5EE',label:'quase lá!'},
@@ -1399,6 +1413,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   }
 
   const prioHtml=[
+    ...reunioesHoje.map(r=>prioLine(r,'reuniao')),
     ...atrasados.map(r=>prioLine(r,'atrasado')),
     ...hojeList.map(r=>prioLine(r,'hoje')),
     ...quaseLa.map(r=>prioLine(r,'quase')),
@@ -1422,6 +1437,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     return '<div class="kb-card" onclick="openEdit(\''+r.id+'\')">'
       +'<div class="kb-cli">'+r.cliente+'</div>'
       +'<div class="kb-meta">'+(SUBAREAS[subAreaOf(r)]?.name||'')+(r.produto?' · '+r.produto:'')+'</div>'
+      +(r.reuniao_data?'<div class="kb-meta" style="color:#0C447C;font-weight:700">📅 Reunião '+fmtReuniao(r.reuniao_data)+'</div>':'')
       +(r.todo?'<div class="kb-meta" style="color:var(--amber)">📋 '+r.todo.substring(0,40)+(r.todo_data?' ('+r.todo_data.split('-')[2]+'/'+r.todo_data.split('-')[1]+')':'')+'</div>':'')
       +'<div style="display:flex;align-items:center;justify-content:space-between">'
       +'<div class="kb-vol">'+fmt(r.atual||r.pipe)+'</div>'
@@ -1521,7 +1537,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'<div class="cockpit-sub">'+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+' — '+(isDir?'guia do dia do time completo':'aqui está o seu guia de hoje')+'</div>'
     +'<div class="cockpit-stats">'
     +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+(atrasados.length+hojeList.length)+'</div><div class="cockpit-stat-l">🎯 Ações p/ hoje</div></div>'
-    +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+reunioesHoje.length+'</div><div class="cockpit-stat-l">📅 Reuniões marcadas</div></div>'
+    +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+reunioesHoje.length+'</div><div class="cockpit-stat-l">📅 Reuniões hoje</div></div>'
     +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+quaseLa.length+'</div><div class="cockpit-stat-l">🔥 Prontas p/ fechar</div></div>'
     +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+(fmt(bolVol)||'R$0')+'</div><div class="cockpit-stat-l">✓ Já boletado</div></div>'
     +'</div></div>'
@@ -1871,6 +1887,7 @@ function openEdit(id){
   document.getElementById('e-data').value=r.data_boleta||'';
   document.getElementById('e-todo').value=r.todo||'';
   document.getElementById('e-todo-data').value=r.todo_data||'';
+  document.getElementById('e-reuniao').value=r.reuniao_data||'';
   document.getElementById('e-obs').value=r.obs||'';
   const days=daysSince(getLastMoveDate(r));
   const risk=riskColor(isB(r)?0:days);
@@ -1904,7 +1921,7 @@ async function saveEdit(){
   const hist=[...(r.historico||[])];
   [['Status comercial',r.sc,newSc],['Pendência boleta',r.pb,newPb],['Volume atual',String(r.atual||0),String(newAtual)]].forEach(([campo,de,para])=>{if(de!==para&&para)hist.push({campo,de,para,usuario:USER.nome,data:ds})});
   try{
-    await db('PATCH','oportunidades',{sc:newSc,pb:newPb,atual:newAtual,data_boleta:document.getElementById('e-data').value||null,todo:document.getElementById('e-todo').value,todo_data:document.getElementById('e-todo-data').value||null,obs:document.getElementById('e-obs').value,historico:hist,updated_at:now.toISOString()},`id=eq.${editId}`);
+    await db('PATCH','oportunidades',{sc:newSc,pb:newPb,atual:newAtual,data_boleta:document.getElementById('e-data').value||null,todo:document.getElementById('e-todo').value,todo_data:document.getElementById('e-todo-data').value||null,reuniao_data:document.getElementById('e-reuniao').value||null,obs:document.getElementById('e-obs').value,historico:hist,updated_at:now.toISOString()},`id=eq.${editId}`);
     showToast('✅ Salvo com sucesso!',true);
     closeModal('edit');
     await loadData();
@@ -1947,6 +1964,7 @@ async function saveNewOpp(){
     pb:document.getElementById('n-pb').value,
     todo:document.getElementById('n-todo').value.trim(),
     todo_data:document.getElementById('n-todo-data').value||null,
+    reuniao_data:document.getElementById('n-reuniao').value||null,
     obs:document.getElementById('n-obs').value.trim(),
     fonte:'Manual',
     historico:[{campo:'Criação',de:'',para:'Oportunidade criada manualmente',usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}]
@@ -1955,7 +1973,7 @@ async function saveNewOpp(){
     await db('POST','oportunidades',[opp]);
     showToast('✅ Oportunidade criada!',true);
     closeModal('newopp');
-    ['n-assessor','n-cliente','n-produto','n-pipe','n-atual','n-sc','n-pb','n-todo','n-todo-data','n-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['n-assessor','n-cliente','n-produto','n-pipe','n-atual','n-sc','n-pb','n-todo','n-todo-data','n-reuniao','n-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     await loadData();
     renderCurView();
   }catch(e){showToast('Erro: '+e.message)}
