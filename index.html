@@ -1499,6 +1499,50 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     // Priorities
     +(prioHtml||'<div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:12px;padding:16px;text-align:center;color:var(--green);font-weight:700;margin-bottom:8px">🎉 Tudo em dia! Nenhuma ação urgente pendente.</div>')
 
+    // Resumo do funil
+    +(()=>{
+      const segs=Object.entries(SUBAREAS).map(([sk,a])=>{
+        const so=myOpps.filter(r=>subAreaOf(r)===sk);
+        if(!so.length)return null;
+        const etapas=SC_CHAIN.map(s=>so.filter(r=>!isB(r)&&norm(r.sc||'')===norm(s)).length);
+        const bolRows=so.filter(isB);
+        const pipeAtivo=so.filter(r=>!isB(r)).reduce((s2,r)=>s2+(r.pipe||0),0);
+        const bolV=bolRows.reduce((s2,r)=>s2+(r.atual||0),0);
+        return{sk,a,etapas,bolN:bolRows.length,pipeAtivo,bolV,total:so.length};
+      }).filter(Boolean);
+      if(!segs.length)return'';
+      const totE=SC_CHAIN.map((s,i)=>segs.reduce((s2,g)=>s2+g.etapas[i],0));
+      const totBolN=segs.reduce((s2,g)=>s2+g.bolN,0);
+      const totPipe=segs.reduce((s2,g)=>s2+g.pipeAtivo,0);
+      const totBolV=segs.reduce((s2,g)=>s2+g.bolV,0);
+      const hd=['📞 Ligar','🗓️ Agendar','📅 Reunião','⏳ Confirmar','🤝 Topou'];
+      return '<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-top:20px;overflow-x:auto">'
+        +'<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:12px">📊 Resumo do funil</div>'
+        +'<table style="width:100%;border-collapse:collapse;font-size:12px;min-width:640px">'
+        +'<thead><tr>'
+        +'<th style="text-align:left;padding:6px 10px;font-size:10px;color:var(--muted);text-transform:uppercase">Segmento</th>'
+        +hd.map(h=>'<th style="text-align:center;padding:6px 8px;font-size:10px;color:var(--muted)">'+h+'</th>').join('')
+        +'<th style="text-align:center;padding:6px 8px;font-size:10px;color:#085041">✅ Boletado</th>'
+        +'<th style="text-align:right;padding:6px 10px;font-size:10px;color:var(--muted)">Pipe ativo</th>'
+        +'<th style="text-align:right;padding:6px 10px;font-size:10px;color:#085041">Vol. boletado</th>'
+        +'</tr></thead><tbody>'
+        +segs.map(g=>'<tr style="border-top:1px solid var(--border-l)">'
+          +'<td style="padding:8px 10px;font-weight:800;color:'+g.a.color+'"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+g.a.color+';margin-right:6px"></span>'+g.a.name+'</td>'
+          +g.etapas.map(n=>'<td style="text-align:center;padding:8px;font-weight:'+(n>0?'700':'400')+';color:'+(n>0?'var(--text)':'var(--muted-l)')+'">'+(n||'—')+'</td>').join('')
+          +'<td style="text-align:center;padding:8px;font-weight:800;color:#085041">'+g.bolN+'</td>'
+          +'<td style="text-align:right;padding:8px 10px;color:var(--muted);font-weight:600">'+fmt(g.pipeAtivo)+'</td>'
+          +'<td style="text-align:right;padding:8px 10px;font-weight:800;color:#085041">'+(fmt(g.bolV)||'—')+'</td>'
+          +'</tr>').join('')
+        +'<tr style="border-top:2px solid var(--border);background:#FAF5F3">'
+        +'<td style="padding:8px 10px;font-weight:800">Total</td>'
+        +totE.map(n=>'<td style="text-align:center;padding:8px;font-weight:800">'+n+'</td>').join('')
+        +'<td style="text-align:center;padding:8px;font-weight:800;color:#085041">'+totBolN+'</td>'
+        +'<td style="text-align:right;padding:8px 10px;font-weight:800">'+fmt(totPipe)+'</td>'
+        +'<td style="text-align:right;padding:8px 10px;font-weight:800;color:#085041">'+(fmt(totBolV)||'—')+'</td>'
+        +'</tr>'
+        +'</tbody></table></div>';
+    })()
+
     // Kanban
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin:24px 0 12px;flex-wrap:wrap;gap:8px">'
     +'<div class="section-label" style="margin:0;border:none;padding:0">📋 '+(isDir?'Funil do time por segmento':'Seu funil')+' — clique no card para editar, use o botão para avançar</div>'
