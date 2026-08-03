@@ -676,7 +676,7 @@ let curView='';
 function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
-    ?[['diretor','📊 Dashboard'],['d-pipeline','📋 Pipeline'],['d-metas','🎯 Definições do mês'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários']]
+    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','📋 Pipeline'],['d-metas','🏆 Definições do mês'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários']]
     :[['a-opps','🎯 Guia do dia'],['a-daily','☀️ Daily']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>`<button class="nav-tab${v===curView?' active':''}" onclick="setView('${v}',this)">${l}</button>`).join('');
 }
@@ -696,6 +696,7 @@ function renderCurView(){
   const v=curView;
   if(v==='diretor')renderDiretor(c);
   else if(v==='d-pipeline')renderDPipeline(c);
+  else if(v==='d-guia')renderAssessorOpps(c);
   else if(v==='d-metas')renderMetas(c);
   else if(v==='d-upload')renderUpload(c);
   else if(v==='d-usuarios')renderUsuarios(c);
@@ -1435,30 +1436,53 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   if(fArea)kbOpps=kbOpps.filter(r=>subAreaOf(r)===fArea);
   if(fCliKb)kbOpps=kbOpps.filter(r=>(r.cliente||'').toLowerCase().includes(fCliKb));
 
-  const kbHtml=KB_COLS.map(([key,emoji,cor])=>{
-    let rows;
-    if(key==='__BOL__')rows=kbOpps.filter(isB);
-    else rows=kbOpps.filter(r=>!isB(r)&&norm(r.sc||'')===norm(key));
-    const vol=rows.reduce((s,r)=>s+(key==='__BOL__'?(r.atual||0):(r.pipe||0)),0);
-    return '<div class="kb-col">'
-      +'<div class="kb-col-hdr" style="color:'+cor+'">'
-      +'<span>'+emoji+' '+(key==='__BOL__'?'Boletado':key)+'</span>'
-      +'<span class="kb-count">'+rows.length+'</span>'
-      +'</div>'
-      +'<div style="font-size:10px;font-weight:700;color:'+cor+';padding:0 8px 8px">'+(fmt(vol)||'—')+'</div>'
-      +rows.slice(0,30).map(kbCard).join('')
-      +(rows.length>30?'<div style="text-align:center;font-size:10px;color:var(--muted);padding:6px">+'+(rows.length-30)+' mais...</div>':'')
-      +'</div>';
-  }).join('');
+  function buildKanban(opps){
+    return KB_COLS.map(([key,emoji,cor])=>{
+      let rows;
+      if(key==='__BOL__')rows=opps.filter(isB);
+      else rows=opps.filter(r=>!isB(r)&&norm(r.sc||'')===norm(key));
+      const vol=rows.reduce((s,r)=>s+(key==='__BOL__'?(r.atual||0):(r.pipe||0)),0);
+      return '<div class="kb-col">'
+        +'<div class="kb-col-hdr" style="color:'+cor+'">'
+        +'<span>'+emoji+' '+(key==='__BOL__'?'Boletado':key)+'</span>'
+        +'<span class="kb-count">'+rows.length+'</span>'
+        +'</div>'
+        +'<div style="font-size:10px;font-weight:700;color:'+cor+';padding:0 8px 8px">'+(fmt(vol)||'—')+'</div>'
+        +rows.slice(0,30).map(kbCard).join('')
+        +(rows.length>30?'<div style="text-align:center;font-size:10px;color:var(--muted);padding:6px">+'+(rows.length-30)+' mais...</div>':'')
+        +'</div>';
+    }).join('');
+  }
 
-  // Sem status column
+  let kbHtml;
+  if(isDir&&!fArea){
+    // DIRETOR: kanban agrupado por segmento
+    kbHtml=Object.entries(SUBAREAS).map(([sk,a])=>{
+      const segOpps=kbOpps.filter(r=>subAreaOf(r)===sk);
+      if(!segOpps.length)return'';
+      const segBol=segOpps.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+      return '<div style="margin-bottom:28px">'
+        +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:10px 16px;background:'+a.color+'12;border-left:4px solid '+a.color+';border-radius:10px">'
+        +'<span style="width:11px;height:11px;border-radius:50%;background:'+a.color+'"></span>'
+        +'<span style="font-size:15px;font-weight:800;color:'+a.color+';text-transform:uppercase;letter-spacing:.03em">'+a.name+'</span>'
+        +'<span style="font-size:12px;color:var(--muted)">'+segOpps.length+' oportunidades</span>'
+        +'<span style="margin-left:auto;font-size:13px;font-weight:800;color:#085041">✓ '+(fmt(segBol)||'R$0')+'</span>'
+        +'</div>'
+        +'<div class="kb-board">'+buildKanban(segOpps)+'</div>'
+        +'</div>';
+    }).join('');
+  }else{
+    kbHtml='<div class="kb-board">'+buildKanban(kbOpps)+'</div>';
+  }
+
+  // Sem status column (só na visão não segmentada)
   const semStatus=kbOpps.filter(r=>!isB(r)&&!SC_CHAIN.some(s=>norm(s)===norm(r.sc||''))&&norm(r.sc||'')!=='cliente negou');
 
   c.innerHTML=''
     // Hero
     +'<div class="cockpit-hero">'
     +'<div class="cockpit-hello">'+saud+', '+USER.nome.split(' ')[0]+'! 👋</div>'
-    +'<div class="cockpit-sub">'+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+' — aqui está o seu guia de hoje</div>'
+    +'<div class="cockpit-sub">'+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+' — '+(isDir?'guia do dia do time completo':'aqui está o seu guia de hoje')+'</div>'
     +'<div class="cockpit-stats">'
     +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+(atrasados.length+hojeList.length)+'</div><div class="cockpit-stat-l">🎯 Ações p/ hoje</div></div>'
     +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+reunioesHoje.length+'</div><div class="cockpit-stat-l">📅 Reuniões marcadas</div></div>'
@@ -1477,7 +1501,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
 
     // Kanban
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin:24px 0 12px;flex-wrap:wrap;gap:8px">'
-    +'<div class="section-label" style="margin:0;border:none;padding:0">📋 Seu funil — arraste as oportunidades pelas etapas</div>'
+    +'<div class="section-label" style="margin:0;border:none;padding:0">📋 '+(isDir?'Funil do time por segmento':'Seu funil')+' — clique no card para editar, use o botão para avançar</div>'
     +'<div style="display:flex;gap:8px">'
     +'<select class="filter-sel" onchange="window._kbArea=this.value;renderAssessorOpps()">'
     +'<option value="">Todas as áreas</option>'
@@ -1485,9 +1509,8 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'</select>'
     +'<input class="filter-inp" type="text" placeholder="🔍 Cliente..." value="'+fCliKb+'" oninput="window._kbCli=this.value.toLowerCase();renderAssessorOpps()" style="min-width:120px">'
     +'</div></div>'
-    +'<div class="kb-board">'+kbHtml
-    +(semStatus.length?'<div class="kb-col"><div class="kb-col-hdr" style="color:var(--muted)"><span>❔ Sem status</span><span class="kb-count">'+semStatus.length+'</span></div>'+semStatus.slice(0,30).map(kbCard).join('')+'</div>':'')
-    +'</div>';
+    +kbHtml
+    +((!isDir||fArea)&&semStatus.length?'<div class="kb-board" style="margin-top:-8px"><div class="kb-col"><div class="kb-col-hdr" style="color:var(--muted)"><span>❔ Sem status</span><span class="kb-count">'+semStatus.length+'</span></div>'+semStatus.slice(0,30).map(kbCard).join('')+'</div></div>':'');
 }
 
 function filterAssOpps(){renderAssessorOpps();}
