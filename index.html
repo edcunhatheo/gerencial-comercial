@@ -847,12 +847,25 @@ function renderDiretor(c=document.getElementById('main-content')){
     });
     const maxN=Math.max(...funilData.map(f=>f.n),1);
 
+    const areaBreakdown=(items,showVol)=>{
+      return '<div style="display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border-l);flex-wrap:wrap">'
+        +Object.entries(AREAS).map(([ak,a])=>{
+          const arr=items.filter(x=>x.area===ak);
+          const v=arr.reduce((s,x)=>s+(x.valor||0),0);
+          return '<div style="display:flex;align-items:center;gap:4px" title="'+a.name+'">'
+            +'<span style="width:8px;height:8px;border-radius:50%;background:'+a.color+';flex-shrink:0"></span>'
+            +'<span style="font-size:12px;font-weight:800;color:'+a.color+'">'+arr.length+'</span>'
+            +(showVol&&v>0?'<span style="font-size:9px;color:var(--muted)">'+fmt(v)+'</span>':'')
+            +'</div>';
+        }).join('')
+        +'</div>';
+    };
     return '<div class="section-label" style="margin-top:8px">📈 Avanço & atividade do time</div>'
-      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px">'
-      +'<div class="kpi green"><div class="kpi-lbl">✓ Boletas na semana</div><div class="kpi-val">'+boletasSem.length+'</div><div class="kpi-sub">'+(fmt(volSem)||'R$0')+' em volume</div></div>'
-      +'<div class="kpi blue"><div class="kpi-lbl">📅 Reuniões movidas</div><div class="kpi-val">'+reunioesSem.length+'</div><div class="kpi-sub">últimos 7 dias</div></div>'
-      +'<div class="kpi amber"><div class="kpi-lbl">⚡ Avanços de status</div><div class="kpi-val">'+avancosSem.length+'</div><div class="kpi-sub">movimentações na semana</div></div>'
-      +'<div class="kpi wine"><div class="kpi-lbl">Atividade total</div><div class="kpi-val">'+semana.length+'</div><div class="kpi-sub">ações registradas</div></div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px">'
+      +'<div class="kpi green"><div class="kpi-lbl">✓ Boletas na semana</div><div class="kpi-val">'+boletasSem.length+'</div><div class="kpi-sub">'+(fmt(volSem)||'R$0')+' em volume</div>'+areaBreakdown(boletasSem,true)+'</div>'
+      +'<div class="kpi blue"><div class="kpi-lbl">📅 Reuniões movidas</div><div class="kpi-val">'+reunioesSem.length+'</div><div class="kpi-sub">últimos 7 dias</div>'+areaBreakdown(reunioesSem,false)+'</div>'
+      +'<div class="kpi amber"><div class="kpi-lbl">⚡ Avanços de status</div><div class="kpi-val">'+avancosSem.length+'</div><div class="kpi-sub">movimentações na semana</div>'+areaBreakdown(avancosSem,false)+'</div>'
+      +'<div class="kpi wine"><div class="kpi-lbl">Atividade total</div><div class="kpi-val">'+semana.length+'</div><div class="kpi-sub">ações registradas</div>'+areaBreakdown(semana,false)+'</div>'
       +'</div>'
       +'<div class="charts-row">'
       +'<div class="chart-card"><h3>✓ Boletas por dia · por área (14 dias)</h3><div class="chart-wrap"><canvas id="ch-boletas-dia"></canvas></div></div>'
