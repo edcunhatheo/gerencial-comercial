@@ -472,6 +472,23 @@ let pin='';
 
 // ── UTILS ──
 const norm=s=>s?String(s).toLowerCase().trim().replace(/\s+/g,' '):'';
+const ASSESSORES_OFICIAIS=["ALEXANDRA NASCIMENTO","CINTIA BRAGA","DAVI GAZZANI","MATEUS CASTRO","ANDRE ALVES","FELIPE SOUZA","LUIS SILVA","ROBSON SANTANA","ADRIANE POSSATTO","ALINE BACHI","BRED KUTZ","CARLOS CASTRO","CRISTIANE ARAMIZO","EDVALDO SERROTE","FABIO CARVALHO","JOAO GABRIEL","JORGE CARREIRO","LETICIA","LIZANDRA MOREIRA","LORENZO CAPELASSO","LUCCA MELO","LUIS BAPTISTELLA","OSWALD","PAOLA SOARES","PAULO MINEHIRA","RENAN SOUZA","RICARDO SILVA","RODRIGO LAURENZANO","ROGER MEDINA","ROSANIA SCHIAVO","SHEILA BELARMINO","THAIS MARTINS","THAISE MOURA","TIAGO COPIT","ARTUR SHIGUEFUZI","AUGUSTO MORAN","DIOGO ISHIBASHI","KEVIN ALVES","LIDIANE ZANOTTO"];
+const stripAcc=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const _canonCache={};
+function canonAssessor(nome){
+  if(!nome)return null;
+  if(_canonCache[nome]!==undefined)return _canonCache[nome];
+  const n=stripAcc(norm(nome));
+  const nWords=n.split(' ');
+  let result=null;
+  for(const of2 of ASSESSORES_OFICIAIS){
+    const o=stripAcc(norm(of2));
+    const oWords=o.split(' ');
+    if(oWords.every(w=>nWords.includes(w))||nWords.every(w=>oWords.includes(w))){result=of2;break;}
+  }
+  _canonCache[nome]=result;
+  return result;
+}
 const fmt=v=>{if(!v||isNaN(v)||v==0)return'—';if(v>=1e6)return'R$'+(v/1e6).toFixed(1)+'M';if(v>=1e3)return'R$'+(v/1e3).toFixed(0)+'k';return'R$'+Math.round(v)};
 const isB=r=>{const k=norm(r.pb||'');return k==='boletado'||k==='a boletar'};
 const isPend=r=>{const k=norm(r.pb||'');return k.includes('todo')||k.includes('email')||k.includes('aguardando')};
@@ -699,11 +716,12 @@ function renderDiretor(c=document.getElementById('main-content')){
   // Assessor ranking
   const assMap={};
   OPPS.forEach(r=>{
-    if(!r.assessor)return;
-    if(!assMap[r.assessor])assMap[r.assessor]={bol:0,bolN:0,pipe:0,n:0,pend:0,area:r.area};
-    assMap[r.assessor].n++;assMap[r.assessor].pipe+=(r.pipe||0);
-    if(isB(r)){assMap[r.assessor].bol+=(r.atual||0);assMap[r.assessor].bolN++}
-    if(isPend(r))assMap[r.assessor].pend++;
+    const cn=canonAssessor(r.assessor);
+    if(!cn)return;
+    if(!assMap[cn])assMap[cn]={bol:0,bolN:0,pipe:0,n:0,pend:0,area:r.area};
+    assMap[cn].n++;assMap[cn].pipe+=(r.pipe||0);
+    if(isB(r)){assMap[cn].bol+=(r.atual||0);assMap[cn].bolN++}
+    if(isPend(r))assMap[cn].pend++;
   });
   const assRank=Object.entries(assMap).sort((a,b)=>b[1].bol-a[1].bol);
   const maxBol=Math.max(...assRank.map(([,v])=>v.bol),1);
@@ -875,7 +893,7 @@ function renderDiretor(c=document.getElementById('main-content')){
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
     ${assRank.map(([name,v])=>{
       const cor=AREAS[v.area]?.color||'#8B1C2A';
-      const myOpps=OPPS.filter(r=>r.assessor===name);
+      const myOpps=OPPS.filter(r=>canonAssessor(r.assessor)===name);
       const bolRows=myOpps.filter(isB);
       const bolN=bolRows.length;
       const bolVol=bolRows.reduce((s,r)=>s+(r.atual||0),0);
@@ -977,7 +995,7 @@ function renderDPipeline(c=document.getElementById('main-content')){
       </select>
       <select class="filter-sel" id="f-ass" onchange="applyFilter()">
         <option value="">Todos assessores</option>
-        ${[...new Set(OPPS.map(r=>r.assessor).filter(Boolean))].sort().map(a=>`<option>${a}</option>`).join('')}
+        ${ASSESSORES_OFICIAIS.filter(a=>OPPS.some(r=>canonAssessor(r.assessor)===a)).map(a=>`<option>${a}</option>`).join('')}
       </select>
       <select class="filter-sel" id="f-sc" onchange="applyFilter()">
         <option value="">Todos status</option>
@@ -1011,7 +1029,7 @@ function applyFilter(){
   const fPB=document.getElementById('f-pb')?.value;
   const fCli=(document.getElementById('f-cli')?.value||'').toLowerCase();
   if(fA)rows=rows.filter(r=>r.area===fA);
-  if(fAss)rows=rows.filter(r=>r.assessor===fAss);
+  if(fAss)rows=rows.filter(r=>canonAssessor(r.assessor)===fAss);
   if(fSC)rows=rows.filter(r=>r.sc===fSC);
   if(fPB)rows=rows.filter(r=>r.pb===fPB);
   if(fCli)rows=rows.filter(r=>(r.cliente||'').toLowerCase().includes(fCli));
@@ -1149,7 +1167,7 @@ function applyFilter(){
     return`<tr class="${isB(r)?'bol':''}">
       <td><input type="checkbox" ${SELECTED.has(r.id)?'checked':''} onchange="toggleSelect('${r.id}',this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--wine)"></td>
       <td title="${risk.label} — ${isB(r)?'Boletado':days+' dias sem mover'}" style="text-align:center;font-size:14px;cursor:default">${isB(r)?'✅':risk.icon}</td>
-      <td style="font-weight:600">${r.assessor||'—'}</td>
+      <td style="font-weight:600">${canonAssessor(r.assessor)||r.assessor||'—'}</td>
       <td style="font-weight:600">${r.cliente||'—'}</td>
       <td><span class="badge" style="background:${cor}15;color:${cor};border:1px solid ${cor}33">${AREAS[r.area]?.name||r.area||'—'}</span></td>
       <td>${r.produto||'—'}</td>
@@ -1182,7 +1200,7 @@ function toggleSelectAll(checked){
     const fPB=document.getElementById('f-pb')?.value;
     const fCli=(document.getElementById('f-cli')?.value||'').toLowerCase();
     if(fA)rows=rows.filter(r=>r.area===fA);
-    if(fAss)rows=rows.filter(r=>r.assessor===fAss);
+    if(fAss)rows=rows.filter(r=>canonAssessor(r.assessor)===fAss);
     if(fSC)rows=rows.filter(r=>r.sc===fSC);
     if(fPB)rows=rows.filter(r=>r.pb===fPB);
     if(fCli)rows=rows.filter(r=>(r.cliente||'').toLowerCase().includes(fCli));
@@ -1488,9 +1506,8 @@ async function saveEdit(){
 // ── NOVA OPORTUNIDADE MANUAL ──
 function openNewOpp(){
   // Fill datalists
-  const assessores=[...new Set(OPPS.map(r=>r.assessor).filter(Boolean))].sort();
   const produtos=[...new Set(OPPS.map(r=>r.produto).filter(Boolean))].sort();
-  document.getElementById('dl-assessores').innerHTML=assessores.map(a=>'<option value="'+a.replace(/"/g,'&quot;')+'">').join('');
+  document.getElementById('dl-assessores').innerHTML=ASSESSORES_OFICIAIS.map(a=>'<option value="'+a+'">').join('');
   document.getElementById('dl-produtos').innerHTML=produtos.map(p=>'<option value="'+p.replace(/"/g,'&quot;')+'">').join('');
   // Se for assessor, preenche o próprio nome e trava área nas dele
   if(USER.perfil!=='diretor'){
