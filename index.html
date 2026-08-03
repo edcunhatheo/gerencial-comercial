@@ -355,6 +355,79 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
   </div>
 </div>
 
+<!-- ── MODAL NOVA OPORTUNIDADE ── -->
+<div id="modal-newopp" class="modal-bg" style="display:none">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-hdr"><h2>+ Nova oportunidade</h2><button class="modal-x" onclick="closeModal('newopp')">×</button></div>
+    <div class="form-row">
+      <div class="fg"><label>Área *</label>
+        <select id="n-area">
+          <option value="inv">Investimentos</option>
+          <option value="cons">Consórcio</option>
+          <option value="seg">Seguro de vida</option>
+        </select>
+      </div>
+      <div class="fg"><label>Assessor *</label>
+        <input type="text" id="n-assessor" list="dl-assessores" placeholder="Nome do assessor">
+        <datalist id="dl-assessores"></datalist>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Cliente *</label>
+        <input type="text" id="n-cliente" placeholder="Nome do cliente">
+      </div>
+      <div class="fg"><label>Produto</label>
+        <input type="text" id="n-produto" list="dl-produtos" placeholder="Ex: Hawk, COE...">
+        <datalist id="dl-produtos"></datalist>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Volume pipe (R$)</label>
+        <input type="number" id="n-pipe" placeholder="0">
+      </div>
+      <div class="fg"><label>Volume atual (R$)</label>
+        <input type="number" id="n-atual" placeholder="0">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>Status comercial</label>
+        <select id="n-sc">
+          <option value="">Selecionar...</option>
+          <option>Ligar Cliente</option><option>Ligar Cliente c AI</option>
+          <option>Agendar Reunião</option><option>Reunião Agendada</option>
+          <option>Cliente Confirmar</option><option>Cliente Topou</option>
+          <option>Cliente Negou</option><option>Não se Aplica</option>
+        </select>
+      </div>
+      <div class="fg"><label>Pendência boleta</label>
+        <select id="n-pb">
+          <option value="">Selecionar...</option>
+          <option>To Do Comercial</option><option>To Do Operacional</option>
+          <option>Email/Push + Saldo</option><option>Email + Suit + Saldo</option>
+          <option>Email + Suita</option><option>Email/Push</option><option>Email</option>
+          <option>A Boletar</option><option>Aguardando Comercial</option>
+          <option>Boletado</option><option>Não se Aplica</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="fg"><label>TODO</label>
+        <input type="text" id="n-todo" placeholder="Próxima ação...">
+      </div>
+      <div class="fg"><label>📅 Data do TODO</label>
+        <input type="date" id="n-todo-data">
+      </div>
+    </div>
+    <div class="fg"><label>Observação</label>
+      <textarea id="n-obs" placeholder="Observações..."></textarea>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn" onclick="closeModal('newopp')">Cancelar</button>
+      <button class="btn wine" onclick="saveNewOpp()">Criar oportunidade</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── MODAL NOVA META ── -->
 <div id="modal-meta" class="modal-bg" style="display:none">
   <div class="modal" style="max-width:420px">
@@ -690,28 +763,8 @@ function renderDiretor(c=document.getElementById('main-content')){
     <div class="chart-card"><h3>Pipe vs. boletado por assessor (top 8)</h3><div class="chart-wrap"><canvas id="ch-ass"></canvas></div></div>
   </div>
 
-  <!-- Assessor ranking -->
-  <div class="section-label">Ranking de assessores</div>
-  <div class="tbl-wrap">
-    <table><thead><tr><th>Assessor</th><th>Área</th><th style="text-align:right">Opor.</th><th style="text-align:right">Pipe</th><th style="text-align:right">Boletado</th><th style="text-align:right">Efetiv.</th><th style="text-align:right">Pendências</th></tr></thead>
-    <tbody>${assRank.map(([name,v])=>{
-      const ef2=v.n?Math.round(v.bolN/v.n*100):0;
-      const efC=ef2>=70?'var(--green)':ef2>=40?'var(--amber)':'#993C1D';
-      const pct2=Math.min(Math.round(v.bol/maxBol*100),100);
-      const cor=AREAS[v.area]?.color||'#8B1C2A';
-      return`<tr>
-        <td><div style="font-weight:700">${name}</div><div class="mini-bar"><div class="mini-fill" style="width:${pct2}%;background:${cor}"></div></div></td>
-        <td><span class="badge b-wine" style="background:${cor}18;color:${cor};border-color:${cor}44">${AREAS[v.area]?.name||v.area}</span></td>
-        <td style="text-align:right">${v.n}</td>
-        <td style="text-align:right;color:var(--muted)">${fmt(v.pipe)}</td>
-        <td style="text-align:right;font-weight:700;color:var(--wine-d)">${fmt(v.bol)||'—'}</td>
-        <td style="text-align:right;font-weight:700;color:${efC}">${ef2}%</td>
-        <td style="text-align:right;color:${v.pend>0?'var(--amber)':'var(--green)'}">${v.pend||'—'}</td>
-      </tr>`;
-    }).join('')}</tbody></table>
-  </div>
 
-  <div class="section-label" style="margin-top:8px">Quadros por assessor</div>
+    <div class="section-label" style="margin-top:8px">Quadros por assessor</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
     ${assRank.map(([name,v])=>{
       const cor=AREAS[v.area]?.color||'#8B1C2A';
@@ -778,6 +831,9 @@ function renderDiretor(c=document.getElementById('main-content')){
 function renderDPipeline(c=document.getElementById('main-content')){
   let rows=[...OPPS];
   c.innerHTML=`
+    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+      <button class="btn wine" onclick="openNewOpp()">+ Nova oportunidade</button>
+    </div>
     <div class="filters">
       <select class="filter-sel" id="f-area" onchange="applyFilter()">
         <option value="">Todas as áreas</option>
@@ -1045,6 +1101,9 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     <div class="kpi"><div class="kpi-lbl">Pipe total</div><div class="kpi-val">${fmt(pipe)}</div><div class="kpi-sub">${myOpps.length} opor.</div></div>
     <div class="kpi amber"><div class="kpi-lbl">Pendências</div><div class="kpi-val">${pend}</div><div class="kpi-sub">aguardando ação</div></div>
   </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
+    <button class="btn wine" onclick="openNewOpp()">+ Nova oportunidade</button>
+  </div>
   <div class="filters">
     <select class="filter-sel" id="af-area" onchange="filterAssOpps()">
       <option value="">Todas as áreas</option>
@@ -1288,6 +1347,53 @@ async function saveEdit(){
     else if(curView==='d-pipeline')renderDPipeline();
   }catch(e){showToast('Erro: '+e.message);}
   btn.innerHTML='💾 Salvar';btn.disabled=false;
+}
+
+// ── NOVA OPORTUNIDADE MANUAL ──
+function openNewOpp(){
+  // Fill datalists
+  const assessores=[...new Set(OPPS.map(r=>r.assessor).filter(Boolean))].sort();
+  const produtos=[...new Set(OPPS.map(r=>r.produto).filter(Boolean))].sort();
+  document.getElementById('dl-assessores').innerHTML=assessores.map(a=>'<option value="'+a.replace(/"/g,'&quot;')+'">').join('');
+  document.getElementById('dl-produtos').innerHTML=produtos.map(p=>'<option value="'+p.replace(/"/g,'&quot;')+'">').join('');
+  // Se for assessor, preenche o próprio nome e trava área nas dele
+  if(USER.perfil!=='diretor'){
+    document.getElementById('n-assessor').value=USER.nome;
+    const areaSel=document.getElementById('n-area');
+    [...areaSel.options].forEach(o=>{o.disabled=USER.areas&&USER.areas.length&&!USER.areas.includes(o.value);});
+    const firstOk=[...areaSel.options].find(o=>!o.disabled);
+    if(firstOk)areaSel.value=firstOk.value;
+  }
+  document.getElementById('modal-newopp').style.display='flex';
+}
+
+async function saveNewOpp(){
+  const area=document.getElementById('n-area').value;
+  const assessor=document.getElementById('n-assessor').value.trim();
+  const cliente=document.getElementById('n-cliente').value.trim();
+  if(!area||!assessor||!cliente){showToast('Área, assessor e cliente são obrigatórios!');return}
+  const now=new Date();
+  const opp={
+    area,assessor,cliente,
+    produto:document.getElementById('n-produto').value.trim(),
+    pipe:parseFloat(document.getElementById('n-pipe').value)||0,
+    atual:parseFloat(document.getElementById('n-atual').value)||0,
+    sc:document.getElementById('n-sc').value,
+    pb:document.getElementById('n-pb').value,
+    todo:document.getElementById('n-todo').value.trim(),
+    todo_data:document.getElementById('n-todo-data').value||null,
+    obs:document.getElementById('n-obs').value.trim(),
+    fonte:'Manual',
+    historico:[{campo:'Criação',de:'',para:'Oportunidade criada manualmente',usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}]
+  };
+  try{
+    await db('POST','oportunidades',[opp]);
+    showToast('✅ Oportunidade criada!',true);
+    closeModal('newopp');
+    ['n-assessor','n-cliente','n-produto','n-pipe','n-atual','n-sc','n-pb','n-todo','n-todo-data','n-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    await loadData();
+    renderCurView();
+  }catch(e){showToast('Erro: '+e.message)}
 }
 
 // ── DEFINIÇÕES DO MÊS (METAS) ──
