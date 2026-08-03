@@ -474,17 +474,35 @@ let pin='';
 const norm=s=>s?String(s).toLowerCase().trim().replace(/\s+/g,' '):'';
 const ASSESSORES_OFICIAIS=["ALEXANDRA NASCIMENTO","CINTIA BRAGA","DAVI GAZZANI","MATEUS CASTRO","ANDRE ALVES","FELIPE SOUZA","LUIS SILVA","ROBSON SANTANA","ADRIANE POSSATTO","ALINE BACHI","BRED KUTZ","CARLOS CASTRO","CRISTIANE ARAMIZO","EDVALDO SERROTE","FABIO CARVALHO","JOAO GABRIEL","JORGE CARREIRO","LETICIA","LIZANDRA MOREIRA","LORENZO CAPELASSO","LUCCA MELO","LUIS BAPTISTELLA","OSWALD","PAOLA SOARES","PAULO MINEHIRA","RENAN SOUZA","RICARDO SILVA","RODRIGO LAURENZANO","ROGER MEDINA","ROSANIA SCHIAVO","SHEILA BELARMINO","THAIS MARTINS","THAISE MOURA","TIAGO COPIT","ARTUR SHIGUEFUZI","AUGUSTO MORAN","DIOGO ISHIBASHI","KEVIN ALVES","LIDIANE ZANOTTO"];
 const stripAcc=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const fixMojibake=s=>s.replace(/Ã£/g,'ã').replace(/Ã©/g,'é').replace(/Ã§/g,'ç').replace(/Ã­/g,'í').replace(/Ãº/g,'ú').replace(/Ã³/g,'ó').replace(/Ã¡/g,'á').replace(/Ãª/g,'ê').replace(/Ã¢/g,'â').replace(/Ãµ/g,'õ').replace(/Ã´/g,'ô').replace(/Ã /g,'à');
+function lev1(a,b){
+  // true se distância de edição <= 1
+  if(a===b)return true;
+  const la=a.length,lb=b.length;
+  if(Math.abs(la-lb)>1)return false;
+  let i=0,j=0,diff=0;
+  while(i<la&&j<lb){
+    if(a[i]===b[j]){i++;j++;continue}
+    diff++;if(diff>1)return false;
+    if(la>lb)i++;else if(lb>la)j++;else{i++;j++}
+  }
+  diff+=(la-i)+(lb-j);
+  return diff<=1;
+}
+const wordMatch=(w1,w2)=>w1===w2||(w1.length>4&&w2.length>4&&lev1(w1,w2));
 const _canonCache={};
 function canonAssessor(nome){
   if(!nome)return null;
   if(_canonCache[nome]!==undefined)return _canonCache[nome];
-  const n=stripAcc(norm(nome));
+  const n=stripAcc(norm(fixMojibake(String(nome))));
   const nWords=n.split(' ');
   let result=null;
   for(const of2 of ASSESSORES_OFICIAIS){
     const o=stripAcc(norm(of2));
     const oWords=o.split(' ');
-    if(oWords.every(w=>nWords.includes(w))||nWords.every(w=>oWords.includes(w))){result=of2;break;}
+    const allOfficialInName=oWords.every(w=>nWords.some(nw=>wordMatch(w,nw)));
+    const allNameInOfficial=nWords.every(w=>oWords.some(ow=>wordMatch(w,ow)));
+    if(allOfficialInName||allNameInOfficial){result=of2;break;}
   }
   _canonCache[nome]=result;
   return result;
