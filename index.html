@@ -677,7 +677,7 @@ function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
     ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','📋 Pipeline'],['d-metas','🏆 Definições do mês'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários']]
-    :[['a-opps','🎯 Guia do dia'],['a-daily','☀️ Daily']];
+    :[['a-opps','🎯 Guia do dia'],['a-dash','📊 Meu painel'],['a-daily','☀️ Daily']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>`<button class="nav-tab${v===curView?' active':''}" onclick="setView('${v}',this)">${l}</button>`).join('');
 }
 
@@ -701,6 +701,7 @@ function renderCurView(){
   else if(v==='d-upload')renderUpload(c);
   else if(v==='d-usuarios')renderUsuarios(c);
   else if(v==='a-opps')renderAssessorOpps(c);
+  else if(v==='a-dash')renderAssessorDash(c);
   else if(v==='a-daily')renderAssessorDaily(c);
 }
 
@@ -1608,6 +1609,110 @@ async function quickBoletar(id){
     await loadData();
     renderAssessorOpps();
   }catch(e){showToast('Erro: '+e.message)}
+}
+
+// ── ASSESSOR: MEU PAINEL ──
+function renderAssessorDash(c=document.getElementById('main-content')){
+  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome)||(USER.areas||[]).includes(r.area));
+  const bolRows=myOpps.filter(isB);
+  const bolV=bolRows.reduce((s,r)=>s+(r.atual||0),0);
+  const ativos=myOpps.filter(r=>!isB(r));
+  const pipeV=ativos.reduce((s,r)=>s+(r.pipe||0),0);
+  const pend=ativos.filter(isPend).length;
+  const efet=myOpps.length?Math.round(bolRows.length/myOpps.length*100):0;
+
+  // Minhas metas (responsável = eu)
+  const minhasMetas=METAS.filter(m=>norm(m.assessor)===norm(USER.nome)).map(m=>{
+    const rows=OPPS.filter(r=>{
+      if(m.area&&r.area!==m.area)return false;
+      if(m.produto&&norm(r.produto||'')!==norm(m.produto))return false;
+      return true;
+    });
+    const boletado=rows.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+    const pct=m.meta_valor>0?Math.min(Math.round(boletado/m.meta_valor*100),999):0;
+    return{...m,boletado,pct};
+  });
+
+  // Por segmento
+  const segCards=Object.entries(SUBAREAS).map(([sk,a])=>{
+    const so=myOpps.filter(r=>subAreaOf(r)===sk);
+    if(!so.length)return'';
+    const sb=so.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+    const sbN=so.filter(isB).length;
+    const sp=so.filter(r=>!isB(r)).reduce((s,r)=>s+(r.pipe||0),0);
+    const spN=so.filter(r=>!isB(r)).length;
+    return '<div style="background:var(--card);border:1.5px solid var(--border);border-radius:13px;padding:16px;border-top:4px solid '+a.color+'">'
+      +'<div style="font-size:12px;font-weight:800;color:'+a.color+';text-transform:uppercase;letter-spacing:.03em;margin-bottom:12px">'+a.name+'</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+      +'<div style="background:var(--green-bg);border-radius:9px;padding:10px">'
+      +'<div style="font-size:9px;font-weight:700;color:var(--green);text-transform:uppercase">✓ Boletado</div>'
+      +'<div style="font-size:16px;font-weight:800;color:var(--green)">'+(fmt(sb)||'R$0')+'</div>'
+      +'<div style="font-size:10px;color:var(--green)">'+sbN+' opor.</div>'
+      +'</div>'
+      +'<div style="background:var(--cream);border-radius:9px;padding:10px">'
+      +'<div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase">🔄 Em esteira</div>'
+      +'<div style="font-size:16px;font-weight:800;color:'+a.color+'">'+(fmt(sp)||'—')+'</div>'
+      +'<div style="font-size:10px;color:var(--muted)">'+spN+' opor.</div>'
+      +'</div>'
+      +'</div></div>';
+  }).join('');
+
+  // Esteira por etapa (mini funil)
+  const funilRows=SC_CHAIN.map(s=>{
+    const rows=ativos.filter(r=>norm(r.sc||'')===norm(s));
+    return{s,n:rows.length,v:rows.reduce((s2,r)=>s2+(r.pipe||0),0)};
+  });
+  const maxF=Math.max(...funilRows.map(f=>f.n),1);
+
+  c.innerHTML=''
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px">'
+    +'<div class="kpi green"><div class="kpi-lbl">✓ Boletado</div><div class="kpi-val">'+(fmt(bolV)||'R$0')+'</div><div class="kpi-sub">'+bolRows.length+' oportunidades</div></div>'
+    +'<div class="kpi wine"><div class="kpi-lbl">🔄 Em esteira</div><div class="kpi-val">'+(fmt(pipeV)||'R$0')+'</div><div class="kpi-sub">'+ativos.length+' em andamento</div></div>'
+    +'<div class="kpi amber"><div class="kpi-lbl">⚡ Pendências</div><div class="kpi-val">'+pend+'</div><div class="kpi-sub">aguardando ação</div></div>'
+    +'<div class="kpi blue"><div class="kpi-lbl">Efetivação</div><div class="kpi-val">'+efet+'%</div><div class="kpi-sub">boletadas / total</div></div>'
+    +'</div>'
+
+    // Minhas metas
+    +(minhasMetas.length?'<div class="section-label">🏆 Minhas metas do mês</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:22px">'
+      +minhasMetas.map(m=>{
+        const a=AREAS[m.area]||{color:'#8B1C2A',name:m.area};
+        const pctColor=m.pct>=100?'#085041':m.pct>=60?'#854F0B':a.color;
+        return '<div style="background:var(--card);border:1.5px solid var(--border);border-radius:13px;padding:16px;border-left:4px solid '+a.color+'">'
+          +'<div style="display:flex;justify-content:space-between;margin-bottom:6px">'
+          +'<span style="font-size:12px;font-weight:700;color:'+a.color+'">'+a.name+(m.produto?' · '+m.produto:'')+'</span>'
+          +'<span style="font-size:16px;font-weight:800;color:'+pctColor+'">'+m.pct+'%</span>'
+          +'</div>'
+          +'<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:8px">'
+          +'<span style="font-size:20px;font-weight:800;color:'+pctColor+'">'+(fmt(m.boletado)||'R$0')+'</span>'
+          +'<span style="font-size:12px;color:var(--muted)">/ '+fmt(m.meta_valor)+'</span>'
+          +'</div>'
+          +'<div style="height:8px;background:var(--border);border-radius:99px;overflow:hidden">'
+          +'<div style="width:'+Math.min(m.pct,100)+'%;height:8px;background:'+pctColor+';border-radius:99px"></div>'
+          +'</div>'
+          +'<div style="font-size:10px;color:var(--muted);margin-top:6px;text-align:right">'+(m.meta_valor>m.boletado?'falta '+fmt(m.meta_valor-m.boletado):'✅ meta atingida!')+'</div>'
+          +'</div>';
+      }).join('')+'</div>':'')
+
+    // Por segmento
+    +'<div class="section-label">Por segmento</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:22px">'+segCards+'</div>'
+
+    // Esteira por etapa
+    +'<div class="section-label">🔄 O que está na esteira</div>'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:20px">'
+    +funilRows.map(f=>{
+      const w=Math.max(Math.round(f.n/maxF*100),3);
+      return '<div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">'
+        +'<div style="min-width:130px;font-size:12px;font-weight:600">'+f.s+'</div>'
+        +'<div style="flex:1;background:var(--wine-l);border-radius:8px;height:28px;overflow:hidden">'
+        +'<div style="width:'+w+'%;height:28px;background:var(--wine);border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;min-width:30px">'
+        +'<span style="color:#fff;font-size:11px;font-weight:800">'+f.n+'</span>'
+        +'</div></div>'
+        +'<div style="min-width:64px;text-align:right;font-size:12px;font-weight:700;color:var(--wine-d)">'+(fmt(f.v)||'—')+'</div>'
+        +'</div>';
+    }).join('')
+    +'</div>';
 }
 
 // ══════════════════════════════════════════════════════════
