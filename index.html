@@ -1328,7 +1328,7 @@ async function deleteSelected(){
     SELECTED.clear();
     showToast('✅ '+n+' oportunidades excluídas!',true);
     await loadData();
-    applyFilter();
+    renderCurView();
   }catch(e){showToast('Erro: '+e.message)}
 }
 
