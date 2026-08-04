@@ -1450,9 +1450,11 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   }
 
   const fArea=window._kbArea||'';
+  const fAssKb=window._kbAss||'';
   const fCliKb=window._kbCli||'';
   let kbOpps=myOpps;
   if(fArea)kbOpps=kbOpps.filter(r=>subAreaOf(r)===fArea);
+  if(fAssKb)kbOpps=kbOpps.filter(r=>canonAssessor(r.assessor)===fAssKb);
   if(fCliKb)kbOpps=kbOpps.filter(r=>(r.cliente||'').toLowerCase().includes(fCliKb));
 
   function buildKanban(opps){
@@ -1608,6 +1610,10 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'<select class="filter-sel" onchange="window._kbArea=this.value;renderAssessorOpps()">'
     +'<option value="">Todas as áreas</option>'
     +Object.entries(SUBAREAS).map(([k,a])=>'<option value="'+k+'"'+(fArea===k?' selected':'')+'>'+a.name+'</option>').join('')
+    +'</select>'
+    +'<select class="filter-sel" onchange="window._kbAss=this.value;renderAssessorOpps()">'
+    +'<option value="">Todos assessores</option>'
+    +ASSESSORES_OFICIAIS.filter(a=>myOpps.some(r=>canonAssessor(r.assessor)===a)).map(a=>'<option'+((window._kbAss||'')===a?' selected':'')+'>'+a+'</option>').join('')
     +'</select>'
     +'<input class="filter-inp" type="text" placeholder="🔍 Cliente..." value="'+fCliKb+'" oninput="window._kbCli=this.value.toLowerCase();renderAssessorOpps()" style="min-width:120px">'
     +'</div></div>'
@@ -1940,14 +1946,9 @@ function openNewOpp(){
   const produtos=[...new Set(OPPS.map(r=>r.produto).filter(Boolean))].sort();
   document.getElementById('dl-assessores').innerHTML=ASSESSORES_OFICIAIS.map(a=>'<option value="'+a+'">').join('');
   document.getElementById('dl-produtos').innerHTML=produtos.map(p=>'<option value="'+p.replace(/"/g,'&quot;')+'">').join('');
-  // Se for assessor, preenche o próprio nome e trava área nas dele
-  if(USER.perfil!=='diretor'){
-    document.getElementById('n-assessor').value=USER.nome;
-    const areaSel=document.getElementById('n-area');
-    [...areaSel.options].forEach(o=>{o.disabled=USER.areas&&USER.areas.length&&!USER.areas.includes(o.value);});
-    const firstOk=[...areaSel.options].find(o=>!o.disabled);
-    if(firstOk)areaSel.value=firstOk.value;
-  }
+  // Todos podem escolher qualquer assessor e qualquer área
+  const areaSel=document.getElementById('n-area');
+  [...areaSel.options].forEach(o=>{o.disabled=false;});
   document.getElementById('modal-newopp').style.display='flex';
 }
 
