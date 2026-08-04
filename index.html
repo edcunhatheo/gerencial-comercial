@@ -353,8 +353,8 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
         <select id="e-resp"><option value="">Sem responsável</option></select>
       </div>
     </div>
-    <div class="fg"><label>Observação</label>
-      <textarea id="e-obs" placeholder="Observações sobre esta oportunidade..."></textarea>
+    <div class="fg"><label>💬 Nova observação (entra na linha do tempo)</label>
+      <textarea id="e-obs" placeholder="Escreva o que aconteceu nesse contato... Ex: 'Cliente pediu proposta revisada com prazo maior'"></textarea>
     </div>
     <div id="e-hist" style="margin-bottom:8px"></div>
     <div class="modal-ftr">
@@ -602,19 +602,23 @@ function getLastMoveDate(r){
 }
 
 function renderTimeline(r){
-  const hist=(r.historico||[]).filter(h=>h.campo==='Status comercial'||h.campo==='Pendência boleta');
-  if(!hist.length)return'<div style="font-size:12px;color:var(--muted);padding:8px 0">Nenhuma movimentação registrada ainda.</div>';
+  const hist=(r.historico||[]).filter(h=>h.campo==='Status comercial'||h.campo==='Pendência boleta'||h.campo==='Observação'||h.campo==='Criação');
+  if(!hist.length)return'<div style="font-size:12px;color:var(--muted);padding:8px 0">Nenhuma movimentação registrada ainda. As mudanças de status e observações vão contar a história desta oportunidade aqui.</div>';
   return '<div style="position:relative;padding-left:20px">'
     +hist.map(function(h,i){
       const isLast=i===hist.length-1;
+      const isObs=h.campo==='Observação';
       const isStatus=h.campo==='Status comercial';
-      const cor=isStatus?'var(--wine)':'var(--green)';
+      const cor=isObs?'#854F0B':isStatus?'var(--wine)':'var(--green)';
+      const icone=isObs?'💬':'';
       return '<div style="position:relative;padding-bottom:14px">'
         +'<div style="position:absolute;left:-16px;top:4px;width:10px;height:10px;border-radius:50%;background:'+cor+';border:2px solid #fff;box-shadow:0 0 0 2px '+cor+'33"></div>'
         +(!isLast?'<div style="position:absolute;left:-12px;top:14px;bottom:0;width:2px;background:var(--border)"></div>':'')
-        +'<div style="font-size:12px;font-weight:600;color:var(--text)">'+h.para+'</div>'
-        +'<div style="font-size:11px;color:var(--muted);margin-top:1px">'+h.campo+' · '+h.data+' · por <strong>'+h.usuario+'</strong></div>'
-        +(h.de?'<div style="font-size:10px;color:var(--muted-l);margin-top:1px">anterior: '+h.de+'</div>':'')
+        +(isObs
+          ?'<div style="font-size:12px;color:var(--text);background:#FEF9F0;border:1px solid #FAC77555;border-radius:8px;padding:7px 10px;font-style:italic">💬 "'+h.para+'"</div>'
+          :'<div style="font-size:12px;font-weight:600;color:var(--text)">'+h.para+'</div>')
+        +'<div style="font-size:11px;color:var(--muted);margin-top:2px">'+(isObs?'Observação':h.campo)+' · '+h.data+' · por <strong>'+h.usuario+'</strong></div>'
+        +(h.de&&!isObs?'<div style="font-size:10px;color:var(--muted-l);margin-top:1px">anterior: '+h.de+'</div>':'')
         +'</div>';
     }).join('')
     +'</div>';
@@ -1371,6 +1375,42 @@ function sugestaoAcao(r){
 
 const SC_CHAIN=['Ligar Cliente','Agendar Reunião','Reunião Agendada','Cliente Confirmar','Cliente Topou'];
 
+// ── 🤖 INTELIGÊNCIA: análise da próxima ação ──
+function analisarProximaAcao(r){
+  const dias=daysSince(getLastMoveDate(r));
+  const sc=norm(r.sc||''),pb=norm(r.pb||'');
+  const vol=r.atual||r.pipe||0;
+  const hist=r.historico||[];
+  const nMoves=hist.filter(h=>h.campo==='Status comercial').length;
+  const temReuniao=!!r.reuniao_data;
+  const agora=new Date().toISOString().slice(0,16);
+  const reuniaoPassada=temReuniao&&r.reuniao_data<agora;
+  let acao='',motivo='',urg='media';
+
+  if(isB(r)){acao='Oportunidade concluída';motivo='Boletada com sucesso. Nenhuma ação necessária.';urg='baixa';}
+  else if(pb==='a boletar'){acao='Gerar a boleta AGORA';motivo='Cliente pronto para boletar. '+(dias>2?'Já se passaram '+dias+' dias — risco de esfriar!':'Aproveite o momento quente.');urg='alta';}
+  else if(sc==='cliente topou'){acao='Resolver pendência e boletar';motivo='Cliente topou'+(r.pb?' mas há pendência: '+r.pb:'')+'.'+(dias>3?' '+dias+' dias parado — priorize hoje!':'');urg='alta';}
+  else if(reuniaoPassada){acao='Registrar o resultado da reunião';motivo='A reunião de '+fmtReuniao(r.reuniao_data)+' já aconteceu. Atualize o status com o desfecho e a próxima etapa.';urg='alta';}
+  else if(temReuniao){acao='Preparar a reunião de '+fmtReuniao(r.reuniao_data);motivo='Revise a proposta, o perfil do cliente e o material antes do encontro.';urg='media';}
+  else if(sc==='cliente confirmar'){
+    if(dias>3){acao='Cobrar resposta do cliente';motivo='Sem resposta há '+dias+' dias. Um follow-up educado recupera boa parte dos silêncios.';urg='alta';}
+    else{acao='Aguardar confirmação (follow-up em '+(4-dias)+' dia'+(4-dias>1?'s':'')+')';motivo='Cliente está decidindo. Não pressione ainda.';urg='baixa';}
+  }
+  else if(sc==='reunião agendada'&&!temReuniao){acao='Registrar data e hora da reunião';motivo='Status indica reunião marcada mas sem data no sistema — registre para aparecer na agenda do dia.';urg='media';}
+  else if(sc==='agendar reunião'){acao='Propor 2 horários ao cliente';motivo='Oferecer opções concretas acelera o agendamento.'+(dias>5?' Parado há '+dias+' dias.':'');urg=dias>5?'alta':'media';}
+  else if(sc.includes('ligar')){
+    if(dias>7){acao='Retomar contato (ligação + WhatsApp)';motivo='Sem avanço há '+dias+' dias'+(nMoves===0?' e nenhum contato registrado':'')+'. Tente um canal alternativo.';urg='alta';}
+    else{acao='Ligar para o cliente';motivo='O primeiro contato define o ritmo da negociação.';urg='media';}
+  }
+  else if(pb.includes('email')){acao='Enviar: '+r.pb;motivo='Pendência operacional travando a boleta há '+dias+' dia'+(dias>1?'s':'')+'.';urg='alta';}
+  else if(pb.includes('to do')||pb.includes('aguardando')){acao='Resolver: '+r.pb;motivo='Pendência aberta há '+dias+' dias.';urg=dias>3?'alta':'media';}
+  else if(!r.sc){acao='Classificar a oportunidade';motivo='Sem status definido. Defina a etapa para ela entrar no funil e nas prioridades.';urg='media';}
+  else{acao=sugestaoAcao(r);motivo=dias>7?'Parada há '+dias+' dias sem movimentação.':'Mantenha o ritmo de acompanhamento.';urg=dias>7?'alta':'baixa';}
+
+  if(!isB(r)&&vol>=500000&&urg!=='alta')motivo+=' 💰 Ticket alto ('+fmt(vol)+') — merece atenção extra.';
+  return{acao,motivo,urg};
+}
+
 async function advanceStatus(id,ev){
   if(ev)ev.stopPropagation();
   const r=OPPS.find(o=>o.id===id);if(!r)return;
@@ -1422,7 +1462,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       +'<div class="prio-flag" style="background:'+cfg.bg+'">'+cfg.icon+'</div>'
       +'<div class="prio-info">'
       +'<div class="prio-cli">'+r.cliente+' <span style="font-size:10px;font-weight:600;color:var(--muted)">· '+(SUBAREAS[subAreaOf(r)]?.name||'')+(r.produto?' · '+r.produto:'')+(r.responsavel?' · 👤'+r.responsavel:'')+'</span></div>'
-      +'<div class="prio-acao">👉 '+sugestaoAcao(r)+' <span style="font-weight:700">('+cfg.label+')</span></div>'
+      +'<div class="prio-acao">👉 '+analisarProximaAcao(r).acao+' <span style="font-weight:700">('+cfg.label+')</span></div>'
       +'</div>'
       +'<div class="prio-vol">'+fmt(r.atual||r.pipe)+'</div>'
       +'<button class="btn sm wine" onclick="openEdit(\''+r.id+'\')">Atualizar</button>'
@@ -1930,12 +1970,20 @@ function openEdit(id){
   const timeUsers=USUARIOS.filter(u=>u.ativo&&u.perfil!=='diretor').map(u=>u.nome);
   respSel.innerHTML='<option value="">Sem responsável</option>'+timeUsers.map(n=>'<option'+(norm(n)===norm(r.responsavel||'')?' selected':'')+'>'+n+'</option>').join('');
   if(r.responsavel&&!timeUsers.some(n=>norm(n)===norm(r.responsavel)))respSel.innerHTML+='<option selected>'+r.responsavel+'</option>';
-  document.getElementById('e-obs').value=r.obs||'';
+  document.getElementById('e-obs').value='';
   const days=daysSince(getLastMoveDate(r));
   const risk=riskColor(isB(r)?0:days);
   const hEl=document.getElementById('e-hist');
   const hist=r.historico||[];
+  const ia=analisarProximaAcao(r);
+  const iaCor=ia.urg==='alta'?'#791F1F':ia.urg==='media'?'#854F0B':'#085041';
+  const iaBg=ia.urg==='alta'?'#FCEBEB':ia.urg==='media'?'#FEF3E2':'#E1F5EE';
   hEl.innerHTML=`
+    <div style="background:${iaBg};border:1.5px solid ${iaCor}44;border-radius:12px;padding:12px 16px;margin-bottom:12px">
+      <div style="font-size:10px;font-weight:800;color:${iaCor};text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">🤖 Próxima ação sugerida ${ia.urg==='alta'?'· URGENTE':''}</div>
+      <div style="font-size:14px;font-weight:800;color:${iaCor}">${ia.acao}</div>
+      <div style="font-size:11px;color:var(--text);margin-top:4px;opacity:.85">${ia.motivo}</div>
+    </div>
     <div style="display:flex;align-items:center;gap:10px;background:${risk.bg};border:1px solid ${risk.color}33;border-radius:10px;padding:10px 14px;margin-bottom:14px">
       <span style="font-size:22px">${isB(r)?'✅':risk.icon}</span>
       <div>
@@ -1962,8 +2010,10 @@ async function saveEdit(){
   const newAtual=parseFloat(document.getElementById('e-atual').value)||0;
   const hist=[...(r.historico||[])];
   [['Status comercial',r.sc,newSc],['Pendência boleta',r.pb,newPb],['Volume atual',String(r.atual||0),String(newAtual)]].forEach(([campo,de,para])=>{if(de!==para&&para)hist.push({campo,de,para,usuario:USER.nome,data:ds})});
+  const newObs=document.getElementById('e-obs').value.trim();
+  if(newObs)hist.push({campo:'Observação',de:'',para:newObs,usuario:USER.nome,data:ds});
   try{
-    await db('PATCH','oportunidades',{sc:newSc,pb:newPb,atual:newAtual,data_boleta:document.getElementById('e-data').value||null,todo:document.getElementById('e-todo').value,todo_data:document.getElementById('e-todo-data').value||null,reuniao_data:document.getElementById('e-reuniao').value||null,responsavel:document.getElementById('e-resp').value||'',obs:document.getElementById('e-obs').value,historico:hist,updated_at:now.toISOString()},`id=eq.${editId}`);
+    await db('PATCH','oportunidades',{sc:newSc,pb:newPb,atual:newAtual,data_boleta:document.getElementById('e-data').value||null,todo:document.getElementById('e-todo').value,todo_data:document.getElementById('e-todo-data').value||null,reuniao_data:document.getElementById('e-reuniao').value||null,responsavel:document.getElementById('e-resp').value||'',obs:newObs||r.obs||'',historico:hist,updated_at:now.toISOString()},`id=eq.${editId}`);
     showToast('✅ Salvo com sucesso!',true);
     closeModal('edit');
     await loadData();
