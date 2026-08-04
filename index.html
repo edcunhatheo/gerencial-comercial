@@ -2318,8 +2318,12 @@ async function doUploadMain(input){
         if(!res.rows.length)continue;
         const existing=OPPS.filter(r=>r.area===area);
         const toInsert=[],toUpdate=[];
+        let skipped=0;
         res.rows.forEach(nr=>{
           const ex=existing.find(e=>norm(e.assessor)===norm(nr.assessor)&&norm(e.cliente)===norm(nr.cliente)&&norm(e.produto||'')===norm(nr.produto||''));
+          // Boletas antigas da planilha NÃO entram como novas (histórico de meses anteriores).
+          // Boletas do mês devem ser marcadas dentro do sistema.
+          if(!ex&&norm(nr.pb||'')==='boletado'){skipped++;return;}
           if(ex){
             // MERGE DIÁRIO: preserva o trabalho do time no sistema.
             // Só atualiza pipe (volume). Campos vazios no sistema são preenchidos pela planilha.
@@ -2341,7 +2345,7 @@ async function doUploadMain(input){
       }
 
       uc.classList.add('done');
-      st.textContent=`✅ ${totalRows} oportunidades importadas (${totalNew} novas · ${totalUpd} atualizadas)`;
+      st.textContent=`✅ ${totalNew+totalUpd} processadas (${totalNew} novas · ${totalUpd} atualizadas)${totalRows-totalNew-totalUpd>0?' · '+(totalRows-totalNew-totalUpd)+' boletas antigas ignoradas':''}`;
       st.style.color='var(--green)';
 
       // Show per-area results
