@@ -311,24 +311,11 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
       <button class="modal-x" onclick="closeModal('edit')">×</button>
     </div>
     <div class="form-row">
-      <div class="fg"><label>Status comercial</label>
-        <select id="e-sc">
-          <option value="">Selecionar...</option>
-          <option>Ligar Cliente</option><option>Ligar Cliente c AI</option>
-          <option>Agendar Reunião</option><option>Reunião Agendada</option>
-          <option>Cliente Confirmar</option><option>Cliente Topou</option>
-          <option>Cliente Negou</option><option>Não se Aplica</option>
-        </select>
+      <div class="fg"><label>Status comercial <span style="font-weight:400;text-transform:none;font-size:9px">(escolha ou digite um novo)</span></label>
+        <input type="text" id="e-sc" list="dl-sc-opts" placeholder="Selecionar ou digitar...">
       </div>
-      <div class="fg"><label>Pendência boleta</label>
-        <select id="e-pb">
-          <option value="">Selecionar...</option>
-          <option>To Do Comercial</option><option>To Do Operacional</option>
-          <option>Email/Push + Saldo</option><option>Email + Suit + Saldo</option>
-          <option>Email + Suita</option><option>Email/Push</option><option>Email</option>
-          <option>A Boletar</option><option>Aguardando Comercial</option>
-          <option>Boletado</option><option>Não se Aplica</option>
-        </select>
+      <div class="fg"><label>Pendência boleta <span style="font-weight:400;text-transform:none;font-size:9px">(escolha ou digite)</span></label>
+        <input type="text" id="e-pb" list="dl-pb-opts" placeholder="Selecionar ou digitar...">
       </div>
     </div>
     <div class="form-row">
@@ -429,24 +416,11 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
       </div>
     </div>
     <div class="form-row">
-      <div class="fg"><label>Status comercial</label>
-        <select id="n-sc">
-          <option value="">Selecionar...</option>
-          <option>Ligar Cliente</option><option>Ligar Cliente c AI</option>
-          <option>Agendar Reunião</option><option>Reunião Agendada</option>
-          <option>Cliente Confirmar</option><option>Cliente Topou</option>
-          <option>Cliente Negou</option><option>Não se Aplica</option>
-        </select>
+      <div class="fg"><label>Status comercial <span style="font-weight:400;text-transform:none;font-size:9px">(escolha ou digite um novo)</span></label>
+        <input type="text" id="n-sc" list="dl-sc-opts" placeholder="Selecionar ou digitar...">
       </div>
-      <div class="fg"><label>Pendência boleta</label>
-        <select id="n-pb">
-          <option value="">Selecionar...</option>
-          <option>To Do Comercial</option><option>To Do Operacional</option>
-          <option>Email/Push + Saldo</option><option>Email + Suit + Saldo</option>
-          <option>Email + Suita</option><option>Email/Push</option><option>Email</option>
-          <option>A Boletar</option><option>Aguardando Comercial</option>
-          <option>Boletado</option><option>Não se Aplica</option>
-        </select>
+      <div class="fg"><label>Pendência boleta <span style="font-weight:400;text-transform:none;font-size:9px">(escolha ou digite)</span></label>
+        <input type="text" id="n-pb" list="dl-pb-opts" placeholder="Selecionar ou digitar...">
       </div>
     </div>
     <div class="form-row">
@@ -503,6 +477,9 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
     </div>
   </div>
 </div>
+
+<datalist id="dl-sc-opts"></datalist>
+<datalist id="dl-pb-opts"></datalist>
 
 <div class="toast" id="toast"></div>
 
@@ -1119,11 +1096,11 @@ function renderDPipeline(c=document.getElementById('main-content')){
       </select>
       <select class="filter-sel" id="f-sc" onchange="applyFilter()">
         <option value="">Todos status</option>
-        ${['Ligar Cliente','Ligar Cliente c AI','Agendar Reunião','Reunião Agendada','Cliente Confirmar','Cliente Topou','Cliente Negou','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}
+        ${[...new Set(OPPS.map(r=>r.sc).filter(Boolean))].sort().map(s=>`<option>${s}</option>`).join('')}
       </select>
       <select class="filter-sel" id="f-pb" onchange="applyFilter()">
         <option value="">Todas pendências</option>
-        ${['To Do Comercial','To Do Operacional','A Boletar','Boletado','Aguardando Comercial','Email','Não se Aplica'].map(s=>`<option>${s}</option>`).join('')}
+        ${[...new Set(OPPS.map(r=>r.pb).filter(Boolean))].sort().map(s=>`<option>${s}</option>`).join('')}
       </select>
       <select class="filter-sel" id="f-tododata" onchange="applyFilter()">
         <option value="">📅 Todos os TODOs</option>
@@ -2038,7 +2015,17 @@ function exportDailyPDF(){
 // ══════════════════════════════════════════════════════════
 // ── EDIT MODAL ──
 // ══════════════════════════════════════════════════════════
+const SC_PADRAO=['Ligar Cliente','Ligar Cliente c AI','Agendar Reunião','Reunião Agendada','Cliente Confirmar','Cliente Topou','Cliente Negou','Não se Aplica'];
+const PB_PADRAO=['To Do Comercial','To Do Operacional','Email/Push + Saldo','Email + Suit + Saldo','Email + Suita','Email/Push','Email','A Boletar','Aguardando Comercial','Boletado','Não se Aplica'];
+function fillStatusDatalists(){
+  const scAll=[...new Set([...SC_PADRAO,...OPPS.map(r=>r.sc).filter(Boolean)])].sort();
+  const pbAll=[...new Set([...PB_PADRAO,...OPPS.map(r=>r.pb).filter(Boolean)])].sort();
+  document.getElementById('dl-sc-opts').innerHTML=scAll.map(s=>'<option value="'+s.replace(/"/g,'&quot;')+'">').join('');
+  document.getElementById('dl-pb-opts').innerHTML=pbAll.map(s=>'<option value="'+s.replace(/"/g,'&quot;')+'">').join('');
+}
+
 function openEdit(id){
+  fillStatusDatalists();
   const r=OPPS.find(o=>o.id===id);if(!r)return;
   editId=id;
   document.getElementById('modal-edit-title').textContent=r.cliente+' — '+(r.produto||AREAS[r.area]?.name||r.area);
@@ -2110,6 +2097,7 @@ async function saveEdit(){
 // ── NOVA OPORTUNIDADE MANUAL ──
 function openNewOpp(){
   // Fill datalists
+  fillStatusDatalists();
   const produtos=[...new Set(OPPS.map(r=>r.produto).filter(Boolean))].sort();
   document.getElementById('dl-assessores').innerHTML=ASSESSORES_OFICIAIS.map(a=>'<option value="'+a+'">').join('');
   document.getElementById('dl-produtos').innerHTML=produtos.map(p=>'<option value="'+p.replace(/"/g,'&quot;')+'">').join('');
