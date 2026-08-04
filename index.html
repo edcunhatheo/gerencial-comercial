@@ -1329,6 +1329,14 @@ function toggleSelectAll(checked){
   applyFilter();
 }
 function clearSelection(){SELECTED.clear();applyFilter();}
+function toggleSelectG(id,checked,ev){if(ev)ev.stopPropagation();if(checked)SELECTED.add(id);else SELECTED.delete(id);renderAssessorOpps();}
+function toggleSelectAllG(checked){
+  const ids=window._listIds||[];
+  if(checked)ids.forEach(id=>SELECTED.add(id));
+  else ids.forEach(id=>SELECTED.delete(id));
+  renderAssessorOpps();
+}
+function clearSelectionG(){SELECTED.clear();renderAssessorOpps();}
 
 async function deleteSelected(){
   const n=SELECTED.size;
@@ -1536,7 +1544,9 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       if(!isB(a)&&isB(b))return -1;
       return daysSince(getLastMoveDate(b))-daysSince(getLastMoveDate(a));
     });
+    ordered.forEach(r=>window._listIds.push(r.id));
     return '<div class="tbl-wrap" style="margin-bottom:14px"><table><thead><tr>'
+      +'<th style="width:34px"><input type="checkbox" onchange="toggleSelectAllG(this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--wine)"></th>'
       +'<th></th><th>Cliente</th><th>Produto</th><th>Status</th><th>Pendência</th><th>TODO</th><th style="text-align:center">Dias</th><th style="text-align:right">Volume</th><th></th>'
       +'</tr></thead><tbody>'
       +ordered.map(r=>{
@@ -1547,6 +1557,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
         const isTopou=norm(r.sc||'')==='cliente topou';
         const tdData=r.todo_data?(()=>{const atras=r.todo_data<today()&&!isB(r);const dt=r.todo_data.split('-');return '<div style="font-size:10px;font-weight:700;color:'+(atras?'var(--red)':'var(--muted)')+'">📅 '+dt[2]+'/'+dt[1]+(atras?' ⚠️':'')+'</div>';})():'';
         return '<tr class="'+(isB(r)?'bol':'')+'">'
+          +'<td><input type="checkbox" '+(SELECTED.has(r.id)?'checked':'')+' onchange="toggleSelectG(\''+r.id+'\',this.checked,event)" style="width:14px;height:14px;cursor:pointer;accent-color:var(--wine)"></td>'
           +'<td style="text-align:center;font-size:13px">'+(isB(r)?'✅':risk.icon)+'</td>'
           +'<td style="font-weight:700">'+r.cliente+'</td>'
           +'<td style="font-size:11px;color:var(--muted)">'+(r.produto||'—')+(r.responsavel?'<div style="font-size:10px;font-weight:700;color:#7F77DD">👤 '+r.responsavel+'</div>':'')+'</td>'
@@ -1565,6 +1576,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   }
 
   const viewMode=window._kbView||'kanban';
+  window._listIds=[];
   let kbHtml;
   if(isDir&&!fArea){
     // DIRETOR: agrupado por segmento
@@ -1672,6 +1684,11 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'</select>'
     +'<input class="filter-inp" type="text" placeholder="🔍 Cliente..." value="'+fCliKb+'" oninput="window._kbCli=this.value.toLowerCase();renderAssessorOpps()" style="min-width:120px">'
     +'</div></div>'
+    +(SELECTED.size>0?'<div style="display:flex;align-items:center;gap:12px;background:var(--wine-l);border:1.5px solid #C8A0A8;border-radius:10px;padding:10px 16px;margin-bottom:12px">'
+      +'<span style="font-size:13px;font-weight:700;color:var(--wine-d)">'+SELECTED.size+' selecionada'+(SELECTED.size>1?'s':'')+'</span>'
+      +'<button class="btn sm" style="border-color:var(--red-b);background:var(--red-bg);color:var(--red)" onclick="deleteSelected()">🗑️ Excluir selecionadas</button>'
+      +'<button class="btn sm" onclick="clearSelectionG()">Limpar seleção</button>'
+      +'</div>':'')
     +kbHtml
     +((!isDir||fArea)&&semStatus.length?'<div class="kb-board" style="margin-top:-8px"><div class="kb-col"><div class="kb-col-hdr" style="color:var(--muted)"><span>❔ Sem status</span><span class="kb-count">'+semStatus.length+'</span></div>'+semStatus.slice(0,30).map(kbCard).join('')+'</div></div>':'');
 }
