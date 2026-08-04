@@ -614,7 +614,9 @@ function renderTimeline(r){
 async function db(method,table,data,filter){
   let url=`${SUPA}/rest/v1/${table}`;
   if(filter)url+=`?${filter}`;
-  const r=await fetch(url,{method,headers:{'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':'return=minimal'},body:data?JSON.stringify(data):undefined});
+  const headers={'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':'return=minimal'};
+  if(method==='GET')headers['Range']='0-9999';
+  const r=await fetch(url,{method,headers,body:data?JSON.stringify(data):undefined});
   if(!r.ok){const e=await r.text();throw new Error(e)}
   if(r.status===204)return null;
   return r.json();
