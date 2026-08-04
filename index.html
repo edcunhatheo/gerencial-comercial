@@ -2322,6 +2322,17 @@ function renderUpload(c=document.getElementById('main-content')){
     <input type="file" id="fi-main" accept=".xlsx,.xls" style="display:none" onchange="doUploadMain(this)">
   </div>
   <div id="upload-results" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:20px;display:none"></div>
+
+  <div class="section-label" style="margin-top:28px">Ou suba apenas uma área</div>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Planilha com uma aba só (qualquer nome de aba) — o sistema lê a primeira aba com o formato da área escolhida.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
+    ${[['rv','📈 Só Renda Variável','#8B1C2A'],['rf','💰 Só Renda Fixa','#378ADD'],['cons','📋 Só Consórcio','#EF9F27'],['seg','🛡️ Só Seguro de Vida','#7F77DD']].map(([k,label,cor])=>`
+    <div class="upload-card" id="uca-${k}" onclick="document.getElementById('fia-${k}').click()" style="padding:18px">
+      <div class="upload-title" style="color:${cor};font-size:13px">${label}</div>
+      <div class="upload-status" id="usa-${k}" style="margin-top:6px;min-height:16px;font-size:11px"></div>
+      <input type="file" id="fia-${k}" accept=".xlsx,.xls" style="display:none" onchange="doUploadArea('${k}',this)">
+    </div>`).join('')}
+  </div>
   <div id="upload-log" style="margin-top:20px"></div>`;
 }
 
@@ -2429,6 +2440,59 @@ async function doUploadMain(input){
 
 // Keep old doUpload for compatibility
 async function doUpload(area,input){doUploadMain(input)}
+
+// Upload de UMA área só — lê a primeira aba, qualquer nome
+async function doUploadArea(cfgKey,input){
+  const file=input.files[0];if(!file)return;input.value='';
+  const st=document.getElementById('usa-'+cfgKey);
+  const uc=document.getElementById('uca-'+cfgKey);
+  st.textContent='⏳ Lendo...';st.style.color='var(--muted)';
+
+  const SHEET_CFG={
+    rv:{area:'inv',aai:['AAI','AI'],pipe:['RV Pipe','Pipe'],atual:['RV Atual','Atual'],sc:['Status Comercial','Status'],pb:['Pendencia Boleta','Pendencia'],todo:['ToDo','TO DO'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
+    rf:{area:'inv',aai:['AI','AAI'],pipe:['RF Pipe','Pipe'],atual:['RF Atual','Atual'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
+    cons:{area:'cons',aai:['AI','AAI'],pipe:['Pipe Atual','Carta','Pipe'],atual:['Pipe Atual','Atual'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo','OBS'],obs:['OBS'],resp:['Responsável','Responsavel','Resp']},
+    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe','Pipe'],atual:['Seg atual','Seg Atual','Atual'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp']}
+  };
+  const cfg=SHEET_CFG[cfgKey];
+
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const raw=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
+      const rows=parsePipeCfg(raw,cfg.area,cfg);
+      if(!rows.length){st.textContent='⚠️ Nenhuma linha reconhecida';st.style.color='var(--red)';return;}
+      st.textContent='⏳ Processando '+rows.length+'...';
+
+      const existing=OPPS.filter(r=>r.area===cfg.area);
+      const toInsert=[],toUpdate=[];let skipped=0;
+      rows.forEach(nr=>{
+        const ex=existing.find(x=>norm(x.assessor)===norm(nr.assessor)&&norm(x.cliente)===norm(nr.cliente)&&norm(x.produto||'')===norm(nr.produto||''));
+        if(!ex&&norm(nr.pb||'')==='boletado'){skipped++;return;}
+        if(ex){
+          const upd={id:ex.id,pipe:nr.pipe,updated_at:new Date().toISOString()};
+          if(!ex.sc&&nr.sc)upd.sc=nr.sc;
+          if(!ex.pb&&nr.pb)upd.pb=nr.pb;
+          if(!ex.todo&&nr.todo)upd.todo=nr.todo;
+          if(!ex.obs&&nr.obs)upd.obs=nr.obs;
+          if((!ex.atual||ex.atual===0)&&nr.atual)upd.atual=nr.atual;
+          if(nr.responsavel)upd.responsavel=nr.responsavel;
+          toUpdate.push(upd);
+        }else toInsert.push(nr);
+      });
+      if(toInsert.length){for(let i=0;i<toInsert.length;i+=50)await db('POST','oportunidades',toInsert.slice(i,i+50));}
+      for(const u of toUpdate){const{id,...fields}=u;await db('PATCH','oportunidades',fields,'id=eq.'+id);}
+
+      uc.classList.add('done');
+      st.textContent='✅ '+toInsert.length+' novas · '+toUpdate.length+' atualizadas'+(skipped?' · '+skipped+' boletas antigas ignoradas':'');
+      st.style.color='var(--green)';
+      showToast('✅ Área importada!',true);
+      await loadData();
+    }catch(err){st.textContent='❌ '+err.message.substring(0,60);st.style.color='var(--red)';}
+  };
+  reader.readAsBinaryString(file);
+}
 
 function parsePipeCfg(raw,area,cfg){
   // Find header row
