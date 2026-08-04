@@ -345,8 +345,13 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
         <input type="date" id="e-todo-data">
       </div>
     </div>
-    <div class="fg"><label>📅 Reunião marcada (data e hora)</label>
-      <input type="datetime-local" id="e-reuniao">
+    <div class="form-row">
+      <div class="fg"><label>📅 Reunião marcada (data e hora)</label>
+        <input type="datetime-local" id="e-reuniao">
+      </div>
+      <div class="fg"><label>👤 Responsável (time)</label>
+        <select id="e-resp"><option value="">Sem responsável</option></select>
+      </div>
     </div>
     <div class="fg"><label>Observação</label>
       <textarea id="e-obs" placeholder="Observações sobre esta oportunidade..."></textarea>
@@ -450,8 +455,13 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
         <input type="date" id="n-todo-data">
       </div>
     </div>
-    <div class="fg"><label>📅 Reunião marcada (data e hora)</label>
-      <input type="datetime-local" id="n-reuniao">
+    <div class="form-row">
+      <div class="fg"><label>📅 Reunião marcada (data e hora)</label>
+        <input type="datetime-local" id="n-reuniao">
+      </div>
+      <div class="fg"><label>👤 Responsável (time)</label>
+        <select id="n-resp"><option value="">Sem responsável</option></select>
+      </div>
     </div>
     <div class="fg"><label>Observação</label>
       <textarea id="n-obs" placeholder="Observações..."></textarea>
@@ -671,7 +681,7 @@ async function loadData(){
   const mesAtual=new Date().toISOString().slice(0,7);
   const[opps,users,daily,metas]=await Promise.all([
     db('GET','oportunidades','',`or=(${af})&order=created_at.desc`),
-    USER.perfil==='diretor'?db('GET','usuarios','','order=nome.asc'):Promise.resolve([]),
+    db('GET','usuarios','','order=nome.asc'),
     db('GET','daily_selecoes','',`data=eq.${today()}&assessor=eq.${encodeURIComponent(USER.nome)}`),
     db('GET','metas','',`mes=eq.${mesAtual}&order=created_at.asc`).catch(()=>[])
   ]);
@@ -1274,7 +1284,7 @@ function applyFilter(){
       <td style="font-weight:600">${canonAssessor(r.assessor)||r.assessor||'—'}</td>
       <td style="font-weight:600">${r.cliente||'—'}</td>
       <td><span class="badge" style="background:${cor}15;color:${cor};border:1px solid ${cor}33">${AREAS[r.area]?.name||r.area||'—'}</span></td>
-      <td>${r.produto||'—'}</td>
+      <td>${r.produto||'—'}${r.responsavel?`<div style="font-size:10px;font-weight:700;color:#7F77DD">👤 ${r.responsavel}</div>`:''}</td>
       <td style="text-align:right;color:var(--muted)">${fmt(r.pipe)}</td>
       <td style="text-align:right;font-weight:700;color:${isB(r)?'var(--green)':'var(--text)'}">${fmt(r.atual)}</td>
       <td>${r.sc?`<span class="badge ${bsc}">${r.sc}</span>`:'—'}</td>
@@ -1380,7 +1390,12 @@ async function advanceStatus(id,ev){
 
 function renderAssessorOpps(c=document.getElementById('main-content')){
   const isDir=USER.perfil==='diretor';
-  const myOpps=isDir?[...OPPS]:OPPS.filter(r=>norm(r.assessor)===norm(USER.nome)||(USER.areas||[]).includes(r.area));
+  const myOpps=isDir?[...OPPS]:OPPS.filter(r=>{
+    if(norm(r.assessor)===norm(USER.nome))return true;
+    if(!(USER.areas||[]).includes(r.area))return false;
+    if(r.responsavel&&norm(r.responsavel)!==norm(USER.nome))return false;
+    return true;
+  });
   const hoje=today();
   const hora=new Date().getHours();
   const saud=hora<12?'Bom dia':hora<18?'Boa tarde':'Boa noite';
@@ -1406,7 +1421,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     return '<div class="prio-item">'
       +'<div class="prio-flag" style="background:'+cfg.bg+'">'+cfg.icon+'</div>'
       +'<div class="prio-info">'
-      +'<div class="prio-cli">'+r.cliente+' <span style="font-size:10px;font-weight:600;color:var(--muted)">· '+(SUBAREAS[subAreaOf(r)]?.name||'')+(r.produto?' · '+r.produto:'')+'</span></div>'
+      +'<div class="prio-cli">'+r.cliente+' <span style="font-size:10px;font-weight:600;color:var(--muted)">· '+(SUBAREAS[subAreaOf(r)]?.name||'')+(r.produto?' · '+r.produto:'')+(r.responsavel?' · 👤'+r.responsavel:'')+'</span></div>'
       +'<div class="prio-acao">👉 '+sugestaoAcao(r)+' <span style="font-weight:700">('+cfg.label+')</span></div>'
       +'</div>'
       +'<div class="prio-vol">'+fmt(r.atual||r.pipe)+'</div>'
@@ -1438,7 +1453,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     const isTopou=norm(r.sc||'')==='cliente topou';
     return '<div class="kb-card" onclick="openEdit(\''+r.id+'\')">'
       +'<div class="kb-cli">'+r.cliente+'</div>'
-      +'<div class="kb-meta">'+(SUBAREAS[subAreaOf(r)]?.name||'')+(r.produto?' · '+r.produto:'')+'</div>'
+      +'<div class="kb-meta">'+(SUBAREAS[subAreaOf(r)]?.name||'')+(r.produto?' · '+r.produto:'')+(r.responsavel?' · 👤'+r.responsavel:'')+'</div>'
       +(r.reuniao_data?'<div class="kb-meta" style="color:#0C447C;font-weight:700">📅 Reunião '+fmtReuniao(r.reuniao_data)+'</div>':'')
       +(r.todo?'<div class="kb-meta" style="color:var(--amber)">📋 '+r.todo.substring(0,40)+(r.todo_data?' ('+r.todo_data.split('-')[2]+'/'+r.todo_data.split('-')[1]+')':'')+'</div>':'')
       +'<div style="display:flex;align-items:center;justify-content:space-between">'
@@ -1494,7 +1509,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
         return '<tr class="'+(isB(r)?'bol':'')+'">'
           +'<td style="text-align:center;font-size:13px">'+(isB(r)?'✅':risk.icon)+'</td>'
           +'<td style="font-weight:700">'+r.cliente+'</td>'
-          +'<td style="font-size:11px;color:var(--muted)">'+(r.produto||'—')+'</td>'
+          +'<td style="font-size:11px;color:var(--muted)">'+(r.produto||'—')+(r.responsavel?'<div style="font-size:10px;font-weight:700;color:#7F77DD">👤 '+r.responsavel+'</div>':'')+'</td>'
           +'<td>'+(r.sc?'<span class="badge '+bsc+'" style="font-size:10px">'+r.sc+'</span>':'—')+'</td>'
           +'<td>'+(r.pb?'<span class="badge '+bpb+'" style="font-size:10px">'+r.pb+'</span>':'—')+'</td>'
           +'<td style="font-size:11px;max-width:130px"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+(r.todo||'')+'">'+(r.todo||'—')+'</div>'+tdData+'</td>'
@@ -1676,7 +1691,12 @@ async function quickBoletar(id){
 
 // ── ASSESSOR: MEU PAINEL ──
 function renderAssessorDash(c=document.getElementById('main-content')){
-  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome)||(USER.areas||[]).includes(r.area));
+  const myOpps=OPPS.filter(r=>{
+    if(norm(r.assessor)===norm(USER.nome))return true;
+    if(!(USER.areas||[]).includes(r.area))return false;
+    if(r.responsavel&&norm(r.responsavel)!==norm(USER.nome))return false;
+    return true;
+  });
   const bolRows=myOpps.filter(isB);
   const bolV=bolRows.reduce((s,r)=>s+(r.atual||0),0);
   const ativos=myOpps.filter(r=>!isB(r));
@@ -1782,7 +1802,12 @@ function renderAssessorDash(c=document.getElementById('main-content')){
 // ── ASSESSOR: MEU DIA ──
 // ══════════════════════════════════════════════════════════
 function renderAssessorDaily(c=document.getElementById('main-content')){
-  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome)||(USER.areas||[]).includes(r.area));
+  const myOpps=OPPS.filter(r=>{
+    if(norm(r.assessor)===norm(USER.nome))return true;
+    if(!(USER.areas||[]).includes(r.area))return false;
+    if(r.responsavel&&norm(r.responsavel)!==norm(USER.nome))return false;
+    return true;
+  });
   const selN=Object.keys(DAILY).length;
   const reunN=Object.values(DAILY).filter(v=>v.tipo==='reuniao').length;
   const bolN2=Object.values(DAILY).filter(v=>v.tipo==='boleta').length;
@@ -1870,7 +1895,12 @@ async function updateDaily(oppId,field,value){
 }
 
 function exportDailyPDF(){
-  const myOpps=OPPS.filter(r=>norm(r.assessor)===norm(USER.nome)||(USER.areas||[]).includes(r.area));
+  const myOpps=OPPS.filter(r=>{
+    if(norm(r.assessor)===norm(USER.nome))return true;
+    if(!(USER.areas||[]).includes(r.area))return false;
+    if(r.responsavel&&norm(r.responsavel)!==norm(USER.nome))return false;
+    return true;
+  });
   const sel=Object.entries(DAILY).filter(([,v])=>v.tipo);
   if(!sel.length){showToast('Defina o tipo das oportunidades antes de exportar!');return}
   const now=new Date();
@@ -1896,6 +1926,10 @@ function openEdit(id){
   document.getElementById('e-todo').value=r.todo||'';
   document.getElementById('e-todo-data').value=r.todo_data||'';
   document.getElementById('e-reuniao').value=r.reuniao_data||'';
+  const respSel=document.getElementById('e-resp');
+  const timeUsers=USUARIOS.filter(u=>u.ativo&&u.perfil!=='diretor').map(u=>u.nome);
+  respSel.innerHTML='<option value="">Sem responsável</option>'+timeUsers.map(n=>'<option'+(norm(n)===norm(r.responsavel||'')?' selected':'')+'>'+n+'</option>').join('');
+  if(r.responsavel&&!timeUsers.some(n=>norm(n)===norm(r.responsavel)))respSel.innerHTML+='<option selected>'+r.responsavel+'</option>';
   document.getElementById('e-obs').value=r.obs||'';
   const days=daysSince(getLastMoveDate(r));
   const risk=riskColor(isB(r)?0:days);
@@ -1929,7 +1963,7 @@ async function saveEdit(){
   const hist=[...(r.historico||[])];
   [['Status comercial',r.sc,newSc],['Pendência boleta',r.pb,newPb],['Volume atual',String(r.atual||0),String(newAtual)]].forEach(([campo,de,para])=>{if(de!==para&&para)hist.push({campo,de,para,usuario:USER.nome,data:ds})});
   try{
-    await db('PATCH','oportunidades',{sc:newSc,pb:newPb,atual:newAtual,data_boleta:document.getElementById('e-data').value||null,todo:document.getElementById('e-todo').value,todo_data:document.getElementById('e-todo-data').value||null,reuniao_data:document.getElementById('e-reuniao').value||null,obs:document.getElementById('e-obs').value,historico:hist,updated_at:now.toISOString()},`id=eq.${editId}`);
+    await db('PATCH','oportunidades',{sc:newSc,pb:newPb,atual:newAtual,data_boleta:document.getElementById('e-data').value||null,todo:document.getElementById('e-todo').value,todo_data:document.getElementById('e-todo-data').value||null,reuniao_data:document.getElementById('e-reuniao').value||null,responsavel:document.getElementById('e-resp').value||'',obs:document.getElementById('e-obs').value,historico:hist,updated_at:now.toISOString()},`id=eq.${editId}`);
     showToast('✅ Salvo com sucesso!',true);
     closeModal('edit');
     await loadData();
@@ -1949,6 +1983,9 @@ function openNewOpp(){
   // Todos podem escolher qualquer assessor e qualquer área
   const areaSel=document.getElementById('n-area');
   [...areaSel.options].forEach(o=>{o.disabled=false;});
+  const nResp=document.getElementById('n-resp');
+  const timeU=USUARIOS.filter(u=>u.ativo&&u.perfil!=='diretor').map(u=>u.nome);
+  nResp.innerHTML='<option value="">Sem responsável</option>'+timeU.map(n=>'<option'+(norm(n)===norm(USER.nome)?' selected':'')+'>'+n+'</option>').join('');
   document.getElementById('modal-newopp').style.display='flex';
 }
 
@@ -1968,6 +2005,7 @@ async function saveNewOpp(){
     todo:document.getElementById('n-todo').value.trim(),
     todo_data:document.getElementById('n-todo-data').value||null,
     reuniao_data:document.getElementById('n-reuniao').value||null,
+    responsavel:document.getElementById('n-resp').value||'',
     obs:document.getElementById('n-obs').value.trim(),
     fonte:'Manual',
     historico:[{campo:'Criação',de:'',para:'Oportunidade criada manualmente',usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}]
@@ -1976,7 +2014,7 @@ async function saveNewOpp(){
     await db('POST','oportunidades',[opp]);
     showToast('✅ Oportunidade criada!',true);
     closeModal('newopp');
-    ['n-assessor','n-cliente','n-produto','n-pipe','n-atual','n-sc','n-pb','n-todo','n-todo-data','n-reuniao','n-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['n-assessor','n-cliente','n-produto','n-pipe','n-atual','n-sc','n-pb','n-todo','n-todo-data','n-reuniao','n-resp','n-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     await loadData();
     renderCurView();
   }catch(e){showToast('Erro: '+e.message)}
@@ -2183,7 +2221,7 @@ async function doUploadMain(input){
     rv:{area:'inv',aai:['AAI','AI'],pipe:['RV Pipe'],atual:['RV Atual'],sc:['Status Comercial','Status Comercial RV'],pb:['Pendencia Boleta','Pendencia Boleta RV'],todo:['ToDo','TO DO'],obs:['Obs']},
     rf:{area:'inv',aai:['AI','AAI'],pipe:['RF Pipe'],atual:['RF Atual'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['Obs']},
     cons:{area:'cons',aai:['AI','AAI'],pipe:['Pipe Atual','Carta'],atual:['Pipe Atual'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo','OBS'],obs:['OBS']},
-    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe'],atual:['Seg atual','Seg Atual'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['OBS','Obs']}
+    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe'],atual:['Seg atual','Seg Atual'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp','Dono']}
   };
 
   const reader=new FileReader();
@@ -2224,6 +2262,7 @@ async function doUploadMain(input){
             if(!ex.todo&&nr.todo)upd.todo=nr.todo;
             if(!ex.obs&&nr.obs)upd.obs=nr.obs;
             if((!ex.atual||ex.atual===0)&&nr.atual)upd.atual=nr.atual;
+            if(nr.responsavel)upd.responsavel=nr.responsavel;
             toUpdate.push(upd);
           }
           else toInsert.push(nr);
@@ -2281,7 +2320,8 @@ function parsePipeCfg(raw,area,cfg){
     pipe:fi(cfg.pipe),atual:fi(cfg.atual||cfg.pipe),
     fonte:fi(['Fonte do $','Fonte']),sc:fi(cfg.sc),pb:fi(cfg.pb),
     data:fi(['DATA DA BOLETA','Data Boleta','data_boleta']),
-    todo:fi(cfg.todo),obs:fi(cfg.obs||['Obs'])
+    todo:fi(cfg.todo),obs:fi(cfg.obs||['Obs']),
+    resp:fi(cfg.resp||['Responsável','Responsavel','Resp'])
   };
   const pn=v=>{const s=String(v||0).replace(/[^0-9.,]/g,'').replace(',','.');return parseFloat(s)||0};
   return raw.slice(hr+1).filter(r=>{
@@ -2300,6 +2340,7 @@ function parsePipeCfg(raw,area,cfg){
     data_boleta:ci.data>=0&&r[ci.data]&&String(r[ci.data]).trim()!=='nan'?String(r[ci.data]).trim():null,
     todo:String(r[ci.todo]||'').trim(),
     obs:String(r[ci.obs]||'').trim(),
+    responsavel:ci.resp>=0?String(r[ci.resp]||'').trim():'',
     historico:[]
   })).filter(r=>r.assessor&&r.cliente);
 }
