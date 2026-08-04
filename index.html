@@ -2378,6 +2378,12 @@ async function doUploadMain(input){
         results[cfg.area].rows=[...results[cfg.area].rows,...rows];
       }
 
+      const nadaReconhecido=Object.values(results).every(res=>!res.rows.length);
+      if(nadaReconhecido){
+        st.textContent='⚠️ Nenhuma aba reconhecida (esperado: RV, RF, Consórcio, Seguro de Vida). A planilha tem: '+wb.SheetNames.join(', ')+'. 👉 Use os cards de área única abaixo!';
+        st.style.color='var(--red)';
+        return;
+      }
       let totalNew=0,totalUpd=0,totalRows=0;
       for(const[area,res]of Object.entries(results)){
         if(!res.rows.length)continue;
