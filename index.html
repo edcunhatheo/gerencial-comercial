@@ -1560,6 +1560,13 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   if(fAssKb)kbOpps=kbOpps.filter(r=>canonAssessor(r.assessor)===fAssKb);
   if(fSCKb)kbOpps=kbOpps.filter(r=>r.sc===fSCKb);
   if(fPBKb)kbOpps=kbOpps.filter(r=>r.pb===fPBKb);
+  const fAg=window._kbAg||'';
+  if(fAg==='todo-hoje')kbOpps=kbOpps.filter(r=>r.todo_data===hoje);
+  else if(fAg==='todo-atrasado')kbOpps=kbOpps.filter(r=>r.todo_data&&r.todo_data<hoje&&!isB(r));
+  else if(fAg==='reuniao-hoje')kbOpps=kbOpps.filter(r=>r.reuniao_data&&r.reuniao_data.startsWith(hoje));
+  else if(fAg==='parado')kbOpps=kbOpps.filter(r=>!isB(r)&&daysSince(getLastMoveDate(r))>7);
+  const fResp=window._kbResp||'';
+  if(fResp)kbOpps=kbOpps.filter(r=>norm(r.responsavel||'')===norm(fResp));
   if(fCliKb)kbOpps=kbOpps.filter(r=>(r.cliente||'').toLowerCase().includes(fCliKb));
 
   function buildKanban(opps){
@@ -1732,6 +1739,15 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'<option value="">Todas pendências</option>'
     +[...new Set(myOpps.map(r=>r.pb).filter(Boolean))].sort().map(s=>'<option'+((window._kbPB||'')===s?' selected':'')+'>'+s+'</option>').join('')
     +'</select>'
+    +'<select class="filter-sel" onchange="window._kbAg=this.value;renderAssessorOpps()">'
+    +'<option value="">📅 Agenda: tudo</option>'
+    +[['todo-hoje','TODOs de hoje'],['todo-atrasado','TODOs atrasados'],['reuniao-hoje','Reuniões de hoje'],['parado','Parados +7 dias']].map(([v,l])=>'<option value="'+v+'"'+((window._kbAg||'')===v?' selected':'')+'>'+l+'</option>').join('')
+    +'</select>'
+    +((()=>{const resps=[...new Set(myOpps.map(r=>r.responsavel).filter(Boolean))].sort();
+      return resps.length?'<select class="filter-sel" onchange="window._kbResp=this.value;renderAssessorOpps()">'
+        +'<option value="">👤 Todos responsáveis</option>'
+        +resps.map(s=>'<option'+((window._kbResp||'')===s?' selected':'')+'>'+s+'</option>').join('')
+        +'</select>':'';})())
     +'<input class="filter-inp" type="text" placeholder="🔍 Cliente..." value="'+fCliKb+'" oninput="window._kbCli=this.value.toLowerCase();renderAssessorOpps()" style="min-width:120px">'
     +'</div></div>'
     +(SELECTED.size>0?'<div style="display:flex;align-items:center;gap:12px;background:var(--wine-l);border:1.5px solid #C8A0A8;border-radius:10px;padding:10px 16px;margin-bottom:12px">'
