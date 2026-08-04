@@ -1514,10 +1514,14 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
 
   const fArea=window._kbArea||'';
   const fAssKb=window._kbAss||'';
+  const fSCKb=window._kbSC||'';
+  const fPBKb=window._kbPB||'';
   const fCliKb=window._kbCli||'';
   let kbOpps=myOpps;
   if(fArea)kbOpps=kbOpps.filter(r=>subAreaOf(r)===fArea);
   if(fAssKb)kbOpps=kbOpps.filter(r=>canonAssessor(r.assessor)===fAssKb);
+  if(fSCKb)kbOpps=kbOpps.filter(r=>r.sc===fSCKb);
+  if(fPBKb)kbOpps=kbOpps.filter(r=>r.pb===fPBKb);
   if(fCliKb)kbOpps=kbOpps.filter(r=>(r.cliente||'').toLowerCase().includes(fCliKb));
 
   function buildKanban(opps){
@@ -1681,6 +1685,14 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'<select class="filter-sel" onchange="window._kbAss=this.value;renderAssessorOpps()">'
     +'<option value="">Todos assessores</option>'
     +ASSESSORES_OFICIAIS.filter(a=>myOpps.some(r=>canonAssessor(r.assessor)===a)).map(a=>'<option'+((window._kbAss||'')===a?' selected':'')+'>'+a+'</option>').join('')
+    +'</select>'
+    +'<select class="filter-sel" onchange="window._kbSC=this.value;renderAssessorOpps()">'
+    +'<option value="">Todos status</option>'
+    +[...new Set(myOpps.map(r=>r.sc).filter(Boolean))].sort().map(s=>'<option'+((window._kbSC||'')===s?' selected':'')+'>'+s+'</option>').join('')
+    +'</select>'
+    +'<select class="filter-sel" onchange="window._kbPB=this.value;renderAssessorOpps()">'
+    +'<option value="">Todas pendências</option>'
+    +[...new Set(myOpps.map(r=>r.pb).filter(Boolean))].sort().map(s=>'<option'+((window._kbPB||'')===s?' selected':'')+'>'+s+'</option>').join('')
     +'</select>'
     +'<input class="filter-inp" type="text" placeholder="🔍 Cliente..." value="'+fCliKb+'" oninput="window._kbCli=this.value.toLowerCase();renderAssessorOpps()" style="min-width:120px">'
     +'</div></div>'
