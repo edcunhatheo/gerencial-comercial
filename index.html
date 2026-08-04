@@ -161,7 +161,9 @@ tr.bol td{background:var(--green-bg)}
 .kb-col{min-width:235px;max-width:235px;background:#F1E9E4;border-radius:14px;padding:10px;flex-shrink:0}
 .kb-col-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 10px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
 .kb-count{background:var(--card);border-radius:999px;padding:1px 8px;font-size:10px;font-weight:800;color:var(--muted)}
-.kb-card{background:var(--card);border:1.5px solid var(--border);border-radius:11px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.kb-card{background:var(--card);border:1.5px solid var(--border);border-radius:11px;padding:10px 12px;margin-bottom:8px;cursor:grab;transition:all .15s}
+.kb-card:active{cursor:grabbing}
+.kb-col{transition:background .15s,transform .15s}
 .kb-card:hover{border-color:#C8A0A8;box-shadow:0 3px 10px rgba(139,28,42,.1);transform:translateY(-1px)}
 .kb-cli{font-size:12px;font-weight:800;line-height:1.3}
 .kb-meta{font-size:10px;color:var(--muted);margin-top:3px}
@@ -1436,6 +1438,42 @@ async function advanceStatus(id,ev){
   }catch(e){showToast('Erro: '+e.message)}
 }
 
+let _dragId=null;
+function kbDragStart(ev,id){_dragId=id;ev.dataTransfer.effectAllowed='move';try{ev.dataTransfer.setData('text/plain',id)}catch(e){}}
+function kbDragOver(ev){ev.preventDefault();ev.dataTransfer.dropEffect='move';ev.currentTarget.style.background='#E4D2C6';ev.currentTarget.style.transform='scale(1.01)';}
+function kbDragLeave(ev){ev.currentTarget.style.background='';ev.currentTarget.style.transform='';}
+async function kbDrop(ev,statusKey){
+  ev.preventDefault();
+  ev.currentTarget.style.background='';ev.currentTarget.style.transform='';
+  const id=_dragId;_dragId=null;
+  if(!id)return;
+  const r=OPPS.find(o=>o.id===id);if(!r)return;
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const hist=[...(r.historico||[])];
+  const patch={updated_at:now.toISOString()};
+  if(statusKey==='__BOL__'){
+    if(isB(r))return;
+    hist.push({campo:'Pendência boleta',de:r.pb||'',para:'Boletado',usuario:USER.nome,data:ds});
+    patch.pb='Boletado';
+  }else{
+    if(norm(r.sc||'')===norm(statusKey)&&!isB(r))return;
+    if(isB(r)){
+      hist.push({campo:'Pendência boleta',de:r.pb||'',para:'(desfeita)',usuario:USER.nome,data:ds});
+      patch.pb='';
+    }
+    hist.push({campo:'Status comercial',de:r.sc||'',para:statusKey,usuario:USER.nome,data:ds});
+    patch.sc=statusKey;
+  }
+  patch.historico=hist;
+  try{
+    await db('PATCH','oportunidades',patch,'id=eq.'+id);
+    showToast('✅ '+r.cliente+' → '+(statusKey==='__BOL__'?'Boletado':statusKey),true);
+    await loadData();
+    renderCurView();
+  }catch(e){showToast('Erro: '+e.message)}
+}
+
 function renderAssessorOpps(c=document.getElementById('main-content')){
   const isDir=USER.perfil==='diretor';
   const myOpps=isDir?[...OPPS]:OPPS.filter(r=>{
@@ -1499,7 +1537,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     const dias=daysSince(getLastMoveDate(r));
     const risk=isB(r)?null:riskColor(dias);
     const isTopou=norm(r.sc||'')==='cliente topou';
-    return '<div class="kb-card" onclick="openEdit(\''+r.id+'\')">'
+    return '<div class="kb-card" draggable="true" ondragstart="kbDragStart(event,\''+r.id+'\')" onclick="openEdit(\''+r.id+'\')">'
       +'<div class="kb-cli">'+r.cliente+'</div>'
       +'<div class="kb-meta">'+(SUBAREAS[subAreaOf(r)]?.name||'')+(r.produto?' · '+r.produto:'')+(r.responsavel?' · 👤'+r.responsavel:'')+'</div>'
       +(r.reuniao_data?'<div class="kb-meta" style="color:#0C447C;font-weight:700">📅 Reunião '+fmtReuniao(r.reuniao_data)+'</div>':'')
@@ -1530,7 +1568,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       if(key==='__BOL__')rows=opps.filter(isB);
       else rows=opps.filter(r=>!isB(r)&&norm(r.sc||'')===norm(key));
       const vol=rows.reduce((s,r)=>s+(key==='__BOL__'?(r.atual||0):(r.pipe||0)),0);
-      return '<div class="kb-col">'
+      return '<div class="kb-col" ondragover="kbDragOver(event)" ondragleave="kbDragLeave(event)" ondrop="kbDrop(event,\''+key+'\')">'
         +'<div class="kb-col-hdr" style="color:'+cor+'">'
         +'<span>'+emoji+' '+(key==='__BOL__'?'Boletado':key)+'</span>'
         +'<span class="kb-count">'+rows.length+'</span>'
