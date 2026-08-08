@@ -820,7 +820,56 @@ async function doLogin(){
   }
 }
 
-function logout(){USER=null;pin='';updateDots();document.getElementById('login-err').textContent='';document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';Object.values(charts).forEach(c=>{try{c.destroy()}catch{}});charts={}}
+// ── PRESENÇA: último acesso + online agora ──
+function tempoAtras(iso){
+  if(!iso)return{txt:'nunca acessou',on:false};
+  const ms=Date.now()-new Date(iso).getTime();
+  if(isNaN(ms))return{txt:'—',on:false};
+  const min=Math.floor(ms/60000);
+  if(min<3)return{txt:'Online agora',on:true};
+  if(min<60)return{txt:'há '+min+' min',on:false};
+  const h=Math.floor(min/60);
+  if(h<24)return{txt:'há '+h+' h',on:false};
+  const d=Math.floor(h/24);
+  return{txt:'há '+d+' dia'+(d>1?'s':''),on:false};
+}
+// ── AUTO-ATUALIZAÇÃO: detecta versão nova publicada e avisa o usuário ──
+const APP_VERSION='20260808-1618';
+let _verTimer=null;
+async function checarVersao(){
+  try{
+    const res=await fetch(location.href.split('?')[0]+'?v='+Date.now(),{cache:'no-store'});
+    const txt=await res.text();
+    const m=txt.match(/APP_VERSION='([^']+)'/);
+    if(m&&m[1]!==APP_VERSION)mostrarAvisoVersao();
+  }catch(e){}
+}
+function mostrarAvisoVersao(){
+  if(document.getElementById('aviso-versao'))return;
+  clearInterval(_verTimer);
+  const d=document.createElement('div');
+  d.id='aviso-versao';
+  d.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#4A0E16;color:#fff;padding:12px 18px;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;gap:14px;font-size:13px';
+  d.innerHTML='✨ Nova versão do sistema disponível'
+    +'<button onclick="location.reload()" style="background:#fff;color:#4A0E16;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">Atualizar agora</button>';
+  document.body.appendChild(d);
+}
+function startVersaoCheck(){
+  clearInterval(_verTimer);
+  _verTimer=setInterval(checarVersao,5*60000);
+}
+let _hbTimer=null;
+async function pingPresenca(){
+  if(!USER||!USER.id)return;
+  try{await db('PATCH','usuarios',{ultimo_acesso:new Date().toISOString()},'id=eq.'+USER.id);}catch(e){/* coluna pode não existir ainda */}
+}
+function startHeartbeat(){
+  clearInterval(_hbTimer);
+  pingPresenca();
+  _hbTimer=setInterval(pingPresenca,60000);
+}
+
+function logout(){clearInterval(_hbTimer);USER=null;pin='';updateDots();document.getElementById('login-err').textContent='';document.getElementById('login-screen').style.display='flex';document.getElementById('app').style.display='none';Object.values(charts).forEach(c=>{try{c.destroy()}catch{}});charts={}}
 
 // ── INIT ──
 async function initApp(){
@@ -828,6 +877,8 @@ async function initApp(){
   document.getElementById('user-av').textContent=initials(USER.nome);
   document.getElementById('user-nm').textContent=USER.nome;
   await loadData();
+  startHeartbeat();
+  startVersaoCheck();
   buildNav();
   const c=document.getElementById('main-content');
   curView='diretor';renderDiretor(c);
@@ -857,8 +908,8 @@ function buildNav(){
   const tabs=isDiretor
     ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Definições do mês'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários']]
     :USER.perfil==='gestor'
-    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['a-dash','👤 Meu painel']]
-    :[['diretor','📊 Dashboard'],['a-opps','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['a-dash','👤 Meu painel']];
+    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']]
+    :[['diretor','📊 Dashboard'],['a-opps','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>{
     const ico=l.split(' ')[0];
     const lb=l.substring(ico.length+1);
@@ -891,6 +942,7 @@ function renderCurView(){
   else if(v==='d-upload')renderUpload(c);
   else if(v==='d-usuarios')renderUsuarios(c);
   else if(v==='a-opps')renderAssessorOpps(c);
+  else if(v==='a-upload')renderTeamUpload(c);
   else if(v==='a-dash')renderAssessorDash(c);
   else if(v==='a-daily')renderAssessorDaily(c);
 }
@@ -2881,7 +2933,7 @@ async function delMeta(id){
 
 // ── UPLOAD ──
 function renderUpload(c=document.getElementById('main-content')){
-  c.innerHTML=`<p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
+  c.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn" onclick="baixarModelo()">⬇️ Baixar planilha modelo</button></div><p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
     Suba a planilha <strong>uma vez por dia</strong>. O sistema lê as abas <strong>RV, RF, Consórcio e Seguro de Vida</strong> e separa por área automaticamente.<br><br>
 <strong>✅ Sem duplicatas:</strong> oportunidades já existentes (mesmo assessor + cliente + produto) têm apenas o volume atualizado — o status, pendência, TODO e observações que o time preencheu <strong>no sistema são preservados</strong>. Só as oportunidades novas são adicionadas.
   </p>
@@ -2921,10 +2973,10 @@ async function doUploadMain(input){
   };
 
   const SHEET_CFG={
-    rv:{area:'inv',aai:['AAI','AI'],pipe:['RV Pipe'],atual:['RV Atual'],sc:['Status Comercial','Status Comercial RV'],pb:['Pendencia Boleta','Pendencia Boleta RV'],todo:['ToDo','TO DO'],obs:['Obs']},
-    rf:{area:'inv',aai:['AI','AAI'],pipe:['RF Pipe'],atual:['RF Atual'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['Obs']},
-    cons:{area:'cons',aai:['AI','AAI'],pipe:['Pipe Atual','Carta'],atual:['Pipe Atual'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo','OBS'],obs:['OBS']},
-    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe'],atual:['Seg atual','Seg Atual'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp','Dono']}
+    rv:{area:'inv',aai:['AAI','AI'],pipe:['RV Pipe','Valor'],atual:['RV Atual','Valor'],sc:['Status Comercial','Status Comercial RV'],pb:['Pendencia Boleta','Pendencia Boleta RV'],todo:['ToDo','TO DO'],obs:['Obs']},
+    rf:{area:'inv',aai:['AI','AAI'],pipe:['RF Pipe','Valor'],atual:['RF Atual','Valor'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['Obs']},
+    cons:{area:'cons',aai:['AI','AAI'],pipe:['Pipe Atual','Carta','Valor'],atual:['Pipe Atual','Valor'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo','OBS'],obs:['OBS']},
+    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe','Valor'],atual:['Seg atual','Seg Atual','Valor'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp','Dono']}
   };
 
   const reader=new FileReader();
@@ -3015,6 +3067,48 @@ async function doUploadMain(input){
   reader.readAsBinaryString(file);
 }
 
+// ── PLANILHA MODELO para o time baixar ──
+function baixarModelo(){
+  const dados=[
+    ['Cliente','AI','Produto','Valor','STATUS COMERCIAL','PENDENCIA BOLETA','OBS'],
+    ['JOAO DA SILVA','MARIA ASSESSORA','CONSORCIO',5000,'AGENDAR REUNIAO','TO DO COMERCIAL','LIGAR ANTES DAS 14H'],
+    ['ANA SOUZA','PEDRO ASSESSOR','CONSORCIO',12000,'REUNIAO AGENDADA','TO DO COMERCIAL','-']
+  ];
+  const ws=XLSX.utils.aoa_to_sheet(dados);
+  ws['!cols']=[{wch:24},{wch:26},{wch:14},{wch:10},{wch:20},{wch:20},{wch:28}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Planilha1');
+  XLSX.writeFile(wb,'modelo-oportunidades.xlsx');
+  showToast('✅ Modelo baixado! Preencha e suba pela sua área.',true);
+}
+
+// ── ABA DO TIME: baixar modelo e subir basket da própria área ──
+function renderTeamUpload(c=document.getElementById('main-content')){
+  const subs=(USER.areas||[]).flatMap(a=>SUBS_DA_AREA[a]||[]);
+  const CARD_INFO={rv:['📈 Renda Variável','#8B1C2A'],rf:['💰 Renda Fixa','#378ADD'],cons:['📋 Consórcio','#EF9F27'],seg:['🛡️ Seguro de Vida','#7F77DD']};
+  c.innerHTML=''
+    +'<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--wine);border-radius:6px;padding:16px 18px;margin-bottom:16px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">'
+    +'<div style="flex:1;min-width:240px">'
+    +'<div style="font-size:13px;font-weight:600;margin-bottom:4px">📥 Planilha modelo</div>'
+    +'<div style="font-size:12px;color:var(--muted);line-height:1.5">Baixe o modelo, preencha uma linha por oportunidade e suba pela sua área abaixo. Colunas: <b>Cliente · AI · Produto · Valor · Status comercial · Pendência boleta · OBS</b>. As que você subir entram com você como responsável.</div>'
+    +'</div>'
+    +'<button class="btn wine" onclick="baixarModelo()">⬇️ Baixar modelo</button>'
+    +'</div></div>'
+    +'<div class="section-label">📤 Subir minha basket</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">'
+    +subs.map(k=>{
+      const [label,cor]=CARD_INFO[k]||[k,'#888'];
+      return '<div id="uca-'+k+'" style="background:var(--card);border:1px solid var(--border);border-left:3px solid '+cor+';border-radius:6px;padding:14px 16px">'
+        +'<div style="font-size:12px;font-weight:600;margin-bottom:8px">'+label+'</div>'
+        +'<input type="file" accept=".xlsx,.xls" style="font-size:11px;width:100%" onchange="doUploadArea(\''+k+'\',this)">'
+        +'<div id="usa-'+k+'" style="font-size:11px;margin-top:8px;color:var(--muted)">Escolha o arquivo preenchido no modelo</div>'
+        +'</div>';
+    }).join('')
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--muted);margin-top:14px">O sistema não duplica: cliente que já existe é atualizado, cliente novo é criado. Boletas antigas marcadas como boletadas são ignoradas.</div>';
+}
+
 // Keep old doUpload for compatibility
 async function doUpload(area,input){doUploadMain(input)}
 
@@ -3026,10 +3120,10 @@ async function doUploadArea(cfgKey,input){
   st.textContent='⏳ Lendo...';st.style.color='var(--muted)';
 
   const SHEET_CFG={
-    rv:{area:'inv',aai:['AAI','AI'],pipe:['RV Pipe','Pipe'],atual:['RV Atual','Atual'],sc:['Status Comercial','Status'],pb:['Pendencia Boleta','Pendencia'],todo:['ToDo','TO DO'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
-    rf:{area:'inv',aai:['AI','AAI'],pipe:['RF Pipe','Pipe'],atual:['RF Atual','Atual'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
-    cons:{area:'cons',aai:['AI','AAI'],pipe:['Pipe Atual','Carta','Pipe'],atual:['Pipe Atual','Atual'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo','OBS'],obs:['OBS'],resp:['Responsável','Responsavel','Resp']},
-    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe','Pipe'],atual:['Seg atual','Seg Atual','Atual'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp']}
+    rv:{area:'inv',aai:['AAI','AI'],pipe:['RV Pipe','Pipe','Valor'],atual:['RV Atual','Atual','Valor'],sc:['Status Comercial','Status'],pb:['Pendencia Boleta','Pendencia'],todo:['ToDo','TO DO'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
+    rf:{area:'inv',aai:['AI','AAI'],pipe:['RF Pipe','Pipe','Valor'],atual:['RF Atual','Atual','Valor'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
+    cons:{area:'cons',aai:['AI','AAI'],pipe:['Pipe Atual','Carta','Pipe','Valor'],atual:['Pipe Atual','Atual','Valor'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo','OBS'],obs:['OBS'],resp:['Responsável','Responsavel','Resp']},
+    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe','Pipe','Valor'],atual:['Seg atual','Seg Atual','Atual','Valor'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp']}
   };
   const cfg=SHEET_CFG[cfgKey];
 
@@ -3040,6 +3134,7 @@ async function doUploadArea(cfgKey,input){
       const raw=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
       const rows=parsePipeCfg(raw,cfg.area,cfg);
       if(!rows.length){st.textContent='⚠️ Nenhuma linha reconhecida';st.style.color='var(--red)';return;}
+      if(USER&&USER.perfil!=='diretor')rows.forEach(r=>{if(!r.responsavel)r.responsavel=USER.nome;});
       st.textContent='⏳ Processando '+rows.length+'...';
 
       const existing=OPPS.filter(r=>r.area===cfg.area);
@@ -3112,7 +3207,7 @@ function parsePipeCfg(raw,area,cfg){
 }
 
 function parsePipe(raw,area){
-  const cfg={aai:['assessor','ai','aai'],pipe:['volume acordado','pipe atual','rf pipe','rv pipe','seg pipe','pipe','volume'],atual:['atual'],sc:['status comercial'],pb:['pendencia boleta'],todo:['todo'],obs:['obs']};
+  const cfg={aai:['assessor','ai','aai'],pipe:['volume acordado','pipe atual','rf pipe','rv pipe','seg pipe','pipe','volume','valor'],atual:['atual'],sc:['status comercial'],pb:['pendencia boleta'],todo:['todo'],obs:['obs']};
   return parsePipeCfg(raw,area,cfg);
 }
 
@@ -3122,13 +3217,16 @@ function renderUsuarios(c=document.getElementById('main-content')){
     <div style="font-size:14px;font-weight:700">${USUARIOS.length} usuários cadastrados</div>
     <button class="btn wine" onclick="document.getElementById('modal-user').style.display='flex'">+ Novo usuário</button>
   </div>
-  <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Áreas</th><th>PIN</th><th>Status</th><th></th></tr></thead>
+  <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Áreas</th><th>PIN</th><th>Status</th><th>Último acesso</th><th></th></tr></thead>
   <tbody>${USUARIOS.map(u=>`<tr>
     <td style="font-weight:700">${u.nome}</td>
     <td><span class="badge ${u.perfil==='diretor'?'b-wine':u.perfil==='gestor'?'b-purple':'b-gray'}">${u.perfil}</span></td>
     <td>${u.perfil==='diretor'?'<span class="badge b-wine">Todas</span>':(u.areas||[]).map(a=>`<span class="badge b-gray" style="margin-right:3px">${AREAS[a]?.name||a}</span>`).join('')||'—'}</td>
     <td><code style="background:var(--cream);padding:2px 8px;border-radius:4px;font-size:12px;border:1px solid var(--border)">${u.pin}</code></td>
     <td><span class="badge ${u.ativo?'b-green':'b-red'}">${u.ativo?'Ativo':'Inativo'}</span></td>
+    <td>${(()=>{const t=tempoAtras(u.ultimo_acesso);return t.on
+      ?'<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#085041"><span style="width:8px;height:8px;border-radius:50%;background:#1D9E75;box-shadow:0 0 0 3px #E1F5EE"></span>Online agora</span>'
+      :'<span style="font-size:12px;color:var(--muted)">'+t.txt+'</span>';})()}</td>
     <td><div style="display:flex;gap:6px">
       ${u.perfil!=='diretor'?`<button class="btn sm" onclick="setPerfil('${u.id}','${u.perfil==='gestor'?'assessor':'gestor'}')">${u.perfil==='gestor'?'↓ Voltar a assessor':'★ Tornar gestor'}</button>`:''}
       <button class="btn sm" onclick="toggleUser('${u.id}',${!u.ativo})">${u.ativo?'Desativar':'Ativar'}</button>
