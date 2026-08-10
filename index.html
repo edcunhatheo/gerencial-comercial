@@ -470,7 +470,7 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
     <div class="modal-hdr"><h2>+ Nova oportunidade</h2><button class="modal-x" onclick="closeModal('newopp')">×</button></div>
     <div class="form-row">
       <div class="fg"><label>Área *</label>
-        <select id="n-area">
+        <select id="n-area" onchange="updateNovoProdutos()">
           <option value="inv">Investimentos</option>
           <option value="cons">Consórcio</option>
           <option value="seg">Seguro de vida</option>
@@ -908,7 +908,7 @@ function tempoAtras(iso){
   return{txt:'há '+d+' dia'+(d>1?'s':''),on:false};
 }
 // ── AUTO-ATUALIZAÇÃO: detecta versão nova publicada e avisa o usuário ──
-const APP_VERSION='20260810-2043';
+const APP_VERSION='20260810-2149';
 let _verTimer=null;
 async function checarVersao(){
   try{
@@ -2914,14 +2914,27 @@ async function saveEdit(){
 }
 
 // ── NOVA OPORTUNIDADE MANUAL ──
+// Produtos por área no modal: padrão da casa + o que já existe naquela área
+const PRODUTOS_PADRAO={inv:['Collar','Hawk','Equity','COE','NTN-B 50','CP','Liquidez'],cons:['ALAVANCAGEM FINANCEIRA/PAT'],seg:['SEGURO DE VIDA']};
+function updateNovoProdutos(){
+  const area=document.getElementById('n-area').value;
+  const m=new Map();
+  (PRODUTOS_PADRAO[area]||[]).forEach(p=>m.set(norm(p),p));
+  if(area!=='cons'){ // consórcio é produto único por regra do diretor
+    OPPS.filter(r=>r.area===area).map(r=>r.produto).filter(Boolean).forEach(p=>{if(!m.has(norm(p)))m.set(norm(p),p)});
+  }
+  document.getElementById('dl-produtos').innerHTML=[...m.values()].sort((a,b)=>a.localeCompare(b)).map(p=>'<option value="'+p.replace(/"/g,'&quot;')+'">').join('');
+  const np=document.getElementById('n-produto');
+  if(area==='cons')np.value='ALAVANCAGEM FINANCEIRA/PAT';
+  else if(area==='seg'&&!np.value)np.value='SEGURO DE VIDA';
+}
 function openNewOpp(){
   // Fill datalists
   fillStatusDatalists();
   fillSelect('n-sc',[...SC_PADRAO,...OPPS.map(x=>x.sc)],'');
   fillSelect('n-pb',[...PB_PADRAO,...OPPS.map(x=>x.pb)],'');
-  const produtos=[...new Set(OPPS.map(r=>r.produto).filter(Boolean))].sort();
   document.getElementById('dl-assessores').innerHTML=ASSESSORES_OFICIAIS.map(a=>'<option value="'+a+'">').join('');
-  document.getElementById('dl-produtos').innerHTML=produtos.map(p=>'<option value="'+p.replace(/"/g,'&quot;')+'">').join('');
+  updateNovoProdutos();
   // Todos podem escolher qualquer assessor e qualquer área
   const areaSel=document.getElementById('n-area');
   [...areaSel.options].forEach(o=>{o.disabled=false;});
@@ -2939,7 +2952,7 @@ async function saveNewOpp(){
   const now=new Date();
   const opp={
     area,assessor,cliente,
-    produto:document.getElementById('n-produto').value.trim(),
+    produto:area==='cons'?'ALAVANCAGEM FINANCEIRA/PAT':document.getElementById('n-produto').value.trim(),
     pipe:parseFloat(document.getElementById('n-pipe').value)||0,
     atual:parseFloat(document.getElementById('n-atual').value)||0,
     sc:lerSel('n-sc'),
@@ -3489,7 +3502,7 @@ function parsePipeCfg(raw,area,cfg){
     area,
     assessor:String(r[ci.aai]||'').trim(),
     cliente:String(r[ci.cli]||'').trim(),
-    produto:String(r[ci.prod]||'').trim(),
+    produto:area==='cons'?'ALAVANCAGEM FINANCEIRA/PAT':String(r[ci.prod]||'').trim(),
     pipe:pn(r[ci.pipe]),
     atual:pn(r[ci.atual]),
     fonte:String(r[ci.fonte]||'').trim(),
