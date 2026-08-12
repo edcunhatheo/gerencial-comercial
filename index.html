@@ -424,6 +424,7 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
         </div>
       </div>
     </div>
+    <div id="e-obs-atual" style="display:none;background:#FBF6EE;border:1px solid #E8D9C4;border-radius:6px;padding:10px 12px;margin-bottom:10px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#8A6A3B;margin-bottom:4px">💬 Observação salva no card</div><div id="e-obs-atual-txt" style="font-size:13px;color:var(--text);white-space:pre-wrap"></div></div>
     <div class="fg"><label>💬 Nova observação (entra na linha do tempo)</label>
       <textarea id="e-obs" placeholder="Escreva o que aconteceu nesse contato... Ex: 'Cliente pediu proposta revisada com prazo maior'"></textarea>
     </div>
@@ -909,7 +910,7 @@ function tempoAtras(iso){
   return{txt:'há '+d+' dia'+(d>1?'s':''),on:false};
 }
 // ── AUTO-ATUALIZAÇÃO: detecta versão nova publicada e avisa o usuário ──
-const APP_VERSION='20260812-1531';
+const APP_VERSION='20260812-1543';
 let _verTimer=null;
 async function checarVersao(){
   try{
@@ -2260,6 +2261,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       +(r.assessor?'<div class="kb-meta" style="font-weight:600">🧑‍💼 '+r.assessor+(r.responsavel?' · 👤'+r.responsavel:'')+'</div>':(r.responsavel?'<div class="kb-meta">👤 '+r.responsavel+'</div>':''))
       +(r.reuniao_data?'<div class="kb-meta" style="color:#0C447C;font-weight:700">📅 Reunião '+fmtReuniao(r.reuniao_data)+'</div>':'')
       +(r.todo?'<div class="kb-meta" style="color:var(--amber)">📋 '+r.todo.substring(0,40)+(r.todo_data?' ('+r.todo_data.split('-')[2]+'/'+r.todo_data.split('-')[1]+''+')':'')+'</div>':'')
+      +(r.obs&&limpaTraco(r.obs)?'<div class="kb-meta" title="'+String(r.obs).replace(/"/g,'&quot;')+'" style="color:#8A6A3B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 '+String(r.obs).substring(0,48)+(r.obs.length>48?'…':'')+'</div>':'')
       +'<div style="display:flex;align-items:center;justify-content:space-between">'
       +'<div class="kb-vol">'+fmt(r.atual||r.pipe)+'</div>'
       +(risk?'<span style="font-size:10px;font-weight:700;color:'+risk.color+'">'+risk.icon+' '+dias+'d</span>':'<span style="font-size:12px">✅</span>')
@@ -2879,6 +2881,9 @@ function openEdit(id){
   respSel.innerHTML='<option value="">Sem responsável</option>'+timeUsers.map(n=>'<option'+(norm(n)===norm(r.responsavel||'')?' selected':'')+'>'+n+'</option>').join('');
   if(r.responsavel&&!timeUsers.some(n=>norm(n)===norm(r.responsavel)))respSel.innerHTML+='<option selected>'+r.responsavel+'</option>';
   document.getElementById('e-obs').value='';
+  const obsBox=document.getElementById('e-obs-atual');
+  if(r.obs&&limpaTraco(r.obs)){obsBox.style.display='block';document.getElementById('e-obs-atual-txt').textContent=r.obs;}
+  else obsBox.style.display='none';
   const days=daysSince(getLastMoveDate(r));
   const risk=riskColor(isB(r)?0:days);
   const hEl=document.getElementById('e-hist');
@@ -3361,7 +3366,7 @@ async function doUploadMain(input){
             if(!ex.sc&&nr.sc)upd.sc=nr.sc;
             if(!ex.pb&&nr.pb){upd.pb=nr.pb;if(pbFechada(nr.pb)&&!pbFechada(ex.pb)){const iso2=parseDataBoleta(nr.data_boleta);const dbr2=iso2?iso2.split('-').reverse().join('/'):new Date().toLocaleDateString('pt-BR');upd.historico=[...(ex.historico||[]),{campo:'Pendência boleta',de:ex.pb||'',para:nr.pb,usuario:(USER?USER.nome:'')+' (planilha)',data:dbr2}];}}
             if(!ex.todo&&nr.todo)upd.todo=nr.todo;
-            if(nr.obs&&limpaTraco(nr.obs)&&nr.obs!==ex.obs)upd.obs=nr.obs;else if(!ex.obs&&nr.obs)upd.obs=nr.obs;
+            if(nr.obs&&limpaTraco(nr.obs)&&nr.obs!==ex.obs)upd.obs=nr.obs;else if(!ex.obs&&nr.obs)upd.obs=nr.obs;if('obs' in upd){const hhO=upd.historico||[...(ex.historico||[])];hhO.push({campo:'Observação',de:ex.obs||'',para:upd.obs,usuario:(typeof USER!=='undefined'&&USER?USER.nome:'')+' (planilha)',data:new Date().toLocaleDateString('pt-BR')+' '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});upd.historico=hhO;}
             if((!ex.atual||ex.atual===0)&&nr.atual)upd.atual=nr.atual;
             if(nr.responsavel)upd.responsavel=nr.responsavel;
             toUpdate.push(upd);
@@ -3483,7 +3488,7 @@ async function doUploadArea(cfgKey,input){
           if(!ex.sc&&nr.sc)upd.sc=nr.sc;
           if(!ex.pb&&nr.pb){upd.pb=nr.pb;if(pbFechada(nr.pb)&&!pbFechada(ex.pb)){const iso2=parseDataBoleta(nr.data_boleta);const dbr2=iso2?iso2.split('-').reverse().join('/'):new Date().toLocaleDateString('pt-BR');upd.historico=[...(ex.historico||[]),{campo:'Pendência boleta',de:ex.pb||'',para:nr.pb,usuario:(USER?USER.nome:'')+' (planilha)',data:dbr2}];}}
           if(!ex.todo&&nr.todo)upd.todo=nr.todo;
-          if(nr.obs&&limpaTraco(nr.obs)&&nr.obs!==ex.obs)upd.obs=nr.obs;else if(!ex.obs&&nr.obs)upd.obs=nr.obs;
+          if(nr.obs&&limpaTraco(nr.obs)&&nr.obs!==ex.obs)upd.obs=nr.obs;else if(!ex.obs&&nr.obs)upd.obs=nr.obs;if('obs' in upd){const hhO=upd.historico||[...(ex.historico||[])];hhO.push({campo:'Observação',de:ex.obs||'',para:upd.obs,usuario:(typeof USER!=='undefined'&&USER?USER.nome:'')+' (planilha)',data:new Date().toLocaleDateString('pt-BR')+' '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});upd.historico=hhO;}
           if((!ex.atual||ex.atual===0)&&nr.atual)upd.atual=nr.atual;
           if(nr.responsavel)upd.responsavel=nr.responsavel;
           toUpdate.push(upd);
