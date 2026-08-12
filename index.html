@@ -659,6 +659,7 @@ function canonAssessor(nome){
 }
 const fmt=v=>{if(!v||isNaN(v)||v==0)return'—';if(v>=1e6)return'R$'+(v/1e6).toFixed(1)+'M';if(v>=1e3)return'R$'+(v/1e3).toFixed(0)+'k';return'R$'+Math.round(v)};
 const isB=r=>{const k=norm(r.pb||'');return k==='boletado'||k==='a boletar'};
+const pbFechada=v=>{const k=norm(v||'');return k.startsWith('boletado')||k==='a boletar'};
 const isPerdida=r=>norm(r.sc||'')==='cliente negou';
 const isPend=r=>{const k=norm(r.pb||'');return k.includes('todo')||k.includes('email')||k.includes('aguardando')};
 const matchBadge=(v,map)=>{const k=norm(v);for(const[kk,b]of Object.entries(map)){if(k.includes(norm(kk)))return b;}return null};
@@ -908,7 +909,7 @@ function tempoAtras(iso){
   return{txt:'há '+d+' dia'+(d>1?'s':''),on:false};
 }
 // ── AUTO-ATUALIZAÇÃO: detecta versão nova publicada e avisa o usuário ──
-const APP_VERSION='20260810-2149';
+const APP_VERSION='20260812-1531';
 let _verTimer=null;
 async function checarVersao(){
   try{
@@ -1044,7 +1045,7 @@ function getActivity(){
       const iso=dp[2]+'-'+String(dp[1]).padStart(2,'0')+'-'+String(dp[0]).padStart(2,'0');
       const paraN=norm(h.para||'');
       const sub=subAreaOf(r);
-      if(h.campo==='Pendência boleta'&&paraN==='boletado'){
+      if(h.campo==='Pendência boleta'&&pbFechada(h.para)&&!pbFechada(h.de)){
         acts.push({date:iso,area:r.area,sub,tipo:'boleta',valor:r.atual||r.pipe||0,usuario:h.usuario,cliente:r.cliente});
       }else if(h.campo==='Status comercial'&&paraN.includes('reuni')){
         acts.push({date:iso,area:r.area,sub,tipo:'reuniao',valor:0,usuario:h.usuario,cliente:r.cliente});
@@ -1233,13 +1234,18 @@ function renderDiretor(c=document.getElementById('main-content')){
         for(let i=0;i<5;i++){const d=new Date(seg0);d.setDate(seg0.getDate()+i);dias.push(d);}
         const hjISO=localISO(hj);
         const nomes=['SEG','TER','QUA','QUI','SEX'];
-        const porDiaArea={};
+        const porDiaArea={};const porDiaProd={};const prodsSeg={};
         OPPS.forEach(r=>{
           // fechada: dia real do fechamento (linha do tempo); sem registro, dia planejado. Aberta: dia planejado.
           const db=isB(r)?(boletadoEmISO(r)||parseDataBoleta(r.data_boleta)):parseDataBoleta(r.data_boleta);
           if(!db)return;
-          const chave=db+'|'+subAreaOf(r);
+          const sk2=subAreaOf(r);
+          const chave=db+'|'+sk2;
           (porDiaArea[chave]=porDiaArea[chave]||[]).push(r);
+          const pk=norm(r.produto||'(sem produto)');
+          (porDiaProd[db+'|'+sk2+'|'+pk]=porDiaProd[db+'|'+sk2+'|'+pk]||[]).push(r);
+          if(!prodsSeg[sk2])prodsSeg[sk2]=new Map();
+          if(!prodsSeg[sk2].has(pk))prodsSeg[sk2].set(pk,r.produto||'(sem produto)');
         });
         const cel=(arr,dISO,destaque)=>{
           if(!arr||!arr.length)return '<td style="text-align:center;padding:7px 4px;'+(destaque?'background:rgba(255,255,255,.14);':'')+'opacity:.5">—</td>';
@@ -1254,11 +1260,26 @@ function renderDiretor(c=document.getElementById('main-content')){
         };
         const linhas=subareasVis().map(([sk,a])=>{
           const tot=dias.reduce((s2,d)=>{const arr=porDiaArea[localISO(d)+'|'+sk];return s2+(arr?arr.reduce((x,r)=>x+(r.atual||r.pipe||0),0):0)},0);
-          return '<tr style="border-top:0.5px solid rgba(255,255,255,.18)">'
-            +'<td style="padding:7px 8px;white-space:nowrap;font-size:11px"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+a.color+';margin-right:6px;filter:brightness(1.5)"></span>'+a.name+'</td>'
+          const prods=[...(prodsSeg[sk]||new Map()).entries()];
+          const temProd=prods.length>0;
+          const exp=temProd&&(window._smExpand||{})[sk];
+          let html='<tr style="border-top:0.5px solid rgba(255,255,255,.18);'+(temProd?'cursor:pointer':'')+'" '+(temProd?'onclick="smToggle(\''+sk+'\')" title="Clique para '+(exp?'recolher':'ver por produto')+'"':'')+'>'
+            +'<td style="padding:7px 8px;white-space:nowrap;font-size:11px"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+a.color+';margin-right:6px;filter:brightness(1.5)"></span>'+a.name+(temProd?' <span style="font-size:9px;opacity:.7">'+(exp?'▾':'▸')+'</span>':'')+'</td>'
             +dias.map(d=>cel(porDiaArea[localISO(d)+'|'+sk],localISO(d),localISO(d)===hjISO)).join('')
             +'<td style="text-align:center;padding:7px 4px;font-weight:600">'+(fmt(tot)||'—')+'</td>'
             +'</tr>';
+          if(exp){
+            const comTotal=prods.map(([pk,nome])=>{
+              const totP=dias.reduce((s2,d)=>{const arr=porDiaProd[localISO(d)+'|'+sk+'|'+pk];return s2+(arr?arr.reduce((x,r)=>x+(r.atual||r.pipe||0),0):0)},0);
+              return {pk,nome,totP};
+            }).sort((x,y)=>y.totP-x.totP);
+            html+=comTotal.map(({pk,nome,totP})=>'<tr style="opacity:.88">'
+              +'<td style="padding:4px 8px 4px 22px;white-space:nowrap;font-size:10px"><span style="opacity:.6">↳</span> <span style="border:1px solid rgba(255,255,255,.35);border-radius:3px;padding:1px 5px;font-size:9px;letter-spacing:.03em">'+nome.toUpperCase()+'</span></td>'
+              +dias.map(d=>cel(porDiaProd[localISO(d)+'|'+sk+'|'+pk],localISO(d),localISO(d)===hjISO)).join('')
+              +'<td style="text-align:center;padding:4px;font-weight:600;font-size:10px">'+(fmt(totP)||'—')+'</td>'
+              +'</tr>').join('');
+          }
+          return html;
         }).join('');
         const totDia=dias.map(d=>{
           const arrs=subareasVis().map(([sk])=>porDiaArea[localISO(d)+'|'+sk]||[]).flat();
@@ -2086,6 +2107,11 @@ function initKbScrollTop(){
   });
 }
 
+function smToggle(sk){
+  window._smExpand=window._smExpand||{};
+  window._smExpand[sk]=!window._smExpand[sk];
+  renderDiretor();
+}
 function rfToggle(sk){
   window._rfExpand=window._rfExpand||{};
   window._rfExpand[sk]=!window._rfExpand[sk];
@@ -3333,9 +3359,9 @@ async function doUploadMain(input){
             // Só atualiza pipe (volume). Campos vazios no sistema são preenchidos pela planilha.
             const upd={id:ex.id,pipe:nr.pipe,updated_at:new Date().toISOString()};
             if(!ex.sc&&nr.sc)upd.sc=nr.sc;
-            if(!ex.pb&&nr.pb)upd.pb=nr.pb;
+            if(!ex.pb&&nr.pb){upd.pb=nr.pb;if(pbFechada(nr.pb)&&!pbFechada(ex.pb)){const iso2=parseDataBoleta(nr.data_boleta);const dbr2=iso2?iso2.split('-').reverse().join('/'):new Date().toLocaleDateString('pt-BR');upd.historico=[...(ex.historico||[]),{campo:'Pendência boleta',de:ex.pb||'',para:nr.pb,usuario:(USER?USER.nome:'')+' (planilha)',data:dbr2}];}}
             if(!ex.todo&&nr.todo)upd.todo=nr.todo;
-            if(!ex.obs&&nr.obs)upd.obs=nr.obs;
+            if(nr.obs&&limpaTraco(nr.obs)&&nr.obs!==ex.obs)upd.obs=nr.obs;else if(!ex.obs&&nr.obs)upd.obs=nr.obs;
             if((!ex.atual||ex.atual===0)&&nr.atual)upd.atual=nr.atual;
             if(nr.responsavel)upd.responsavel=nr.responsavel;
             toUpdate.push(upd);
@@ -3455,9 +3481,9 @@ async function doUploadArea(cfgKey,input){
         if(ex){
           const upd={id:ex.id,pipe:nr.pipe,updated_at:new Date().toISOString()};
           if(!ex.sc&&nr.sc)upd.sc=nr.sc;
-          if(!ex.pb&&nr.pb)upd.pb=nr.pb;
+          if(!ex.pb&&nr.pb){upd.pb=nr.pb;if(pbFechada(nr.pb)&&!pbFechada(ex.pb)){const iso2=parseDataBoleta(nr.data_boleta);const dbr2=iso2?iso2.split('-').reverse().join('/'):new Date().toLocaleDateString('pt-BR');upd.historico=[...(ex.historico||[]),{campo:'Pendência boleta',de:ex.pb||'',para:nr.pb,usuario:(USER?USER.nome:'')+' (planilha)',data:dbr2}];}}
           if(!ex.todo&&nr.todo)upd.todo=nr.todo;
-          if(!ex.obs&&nr.obs)upd.obs=nr.obs;
+          if(nr.obs&&limpaTraco(nr.obs)&&nr.obs!==ex.obs)upd.obs=nr.obs;else if(!ex.obs&&nr.obs)upd.obs=nr.obs;
           if((!ex.atual||ex.atual===0)&&nr.atual)upd.atual=nr.atual;
           if(nr.responsavel)upd.responsavel=nr.responsavel;
           toUpdate.push(upd);
@@ -3476,6 +3502,7 @@ async function doUploadArea(cfgKey,input){
   reader.readAsBinaryString(file);
 }
 
+function limpaTraco(v){return ['-','--','—','.','n/a','na'].includes(String(v).toLowerCase())?'':v}
 function parsePipeCfg(raw,area,cfg){
   // Find header row
   let hr=-1;
@@ -3509,11 +3536,18 @@ function parsePipeCfg(raw,area,cfg){
     sc:String(r[ci.sc]||'').trim(),
     pb:String(r[ci.pb]||'').trim(),
     data_boleta:ci.data>=0&&r[ci.data]&&String(r[ci.data]).trim()!=='nan'?String(r[ci.data]).trim():null,
-    todo:String(r[ci.todo]||'').trim(),
-    obs:String(r[ci.obs]||'').trim(),
+    todo:limpaTraco(String(r[ci.todo]||'').trim()),
+    obs:limpaTraco(String(r[ci.obs]||'').trim()),
     responsavel:ci.resp>=0?String(r[ci.resp]||'').trim():'',
     historico:[]
-  })).filter(r=>r.assessor&&r.cliente);
+  })).filter(r=>r.assessor&&r.cliente).map(r=>{
+    if(pbFechada(r.pb)){
+      const iso=parseDataBoleta(r.data_boleta);
+      const dbr=iso?iso.split('-').reverse().join('/'):new Date().toLocaleDateString('pt-BR');
+      r.historico=[{campo:'Pendência boleta',de:'',para:r.pb,usuario:(typeof USER!=='undefined'&&USER?USER.nome:'')+' (planilha)',data:dbr}];
+    }
+    return r;
+  });
 }
 
 function parsePipe(raw,area){
