@@ -479,8 +479,8 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
           <option value="seg">Seguro de vida</option>
         </select>
       </div>
-      <div class="fg"><label>Assessor *</label>
-        <input type="text" id="n-assessor" list="dl-assessores" placeholder="Nome do assessor">
+      <div class="fg"><label>Assessor * <span style="font-weight:400;text-transform:none;font-size:9px">(escolha ou digite um novo para incluí-lo)</span></label>
+        <input type="text" id="n-assessor" list="dl-assessores" placeholder="Escolha da lista ou digite um nome novo">
         <datalist id="dl-assessores"></datalist>
       </div>
     </div>
@@ -660,6 +660,18 @@ function canonAssessor(nome){
   _canonCache[nome]=result;
   return result;
 }
+// Lista viva: oficiais + novos que aparecem nas oportunidades (modal ou planilha)
+function todosAssessores(){
+  const m=new Map();
+  ASSESSORES_OFICIAIS.forEach(a=>m.set(norm(a),a));
+  OPPS.map(r=>r.assessor).filter(Boolean).forEach(a=>{
+    const c=canonAssessor(a);
+    const nome=c||stripAcc(String(a).trim().toUpperCase());
+    if(!m.has(norm(nome)))m.set(norm(nome),nome);
+  });
+  return[...m.values()].sort((a,b)=>a.localeCompare(b));
+}
+const assDe=r=>canonAssessor(r.assessor)||stripAcc(String(r.assessor||'').trim().toUpperCase());
 const fmt=v=>{if(!v||isNaN(v)||v==0)return'—';if(v>=1e6)return'R$'+(v/1e6).toFixed(1)+'M';if(v>=1e3)return'R$'+(v/1e3).toFixed(0)+'k';return'R$'+Math.round(v)};
 const isB=r=>{const k=norm(r.pb||'');return k==='boletado'||k==='a boletar'};
 const pbFechada=v=>{const k=norm(v||'');return k.startsWith('boletado')||k==='a boletar'};
@@ -912,7 +924,7 @@ function tempoAtras(iso){
   return{txt:'há '+d+' dia'+(d>1?'s':''),on:false};
 }
 // ── AUTO-ATUALIZAÇÃO: detecta versão nova publicada e avisa o usuário ──
-const APP_VERSION='20260813-1733';
+const APP_VERSION='20260819-1833';
 let _verTimer=null;
 async function checarVersao(){
   try{
@@ -1094,7 +1106,7 @@ function renderDiretor(c=document.getElementById('main-content')){
   // Assessor ranking
   const assMap={};
   OPPS.forEach(r=>{
-    const cn=canonAssessor(r.assessor);
+    const cn=assDe(r);
     if(!cn)return;
     if(!assMap[cn])assMap[cn]={bol:0,bolN:0,pipe:0,n:0,pend:0,area:r.area};
     assMap[cn].n++;assMap[cn].pipe+=(r.pipe||0);
@@ -1127,6 +1139,21 @@ function renderDiretor(c=document.getElementById('main-content')){
         <div class="area-cell"><div class="area-cell-l">Efetiv.</div><div class="area-cell-v" style="color:${ef>=70?'#085041':ef>=40?'#854F0B':'var(--text)'}">${ef}%</div></div>
         ${(()=>{const pr=rows.filter(r=>!isB(r)&&isPerdida(r));const pv=pr.reduce((s2,r)=>s2+(r.pipe||0),0);return '<div class="area-cell"><div class="area-cell-l">Perdido</div><div class="area-cell-v" style="color:'+(pr.length?'#A32D2D':'var(--muted-l)')+'" title="'+pr.length+' oportunidades">'+(fmt(pv)||'—')+'</div></div>';})()}
       </div>
+      ${(()=>{
+        const topRows=rows.filter(r=>!isB(r)&&!isPerdida(r)&&norm(r.sc||'').includes('topou'));
+        const topV=topRows.reduce((s2,r)=>s2+(r.atual||r.pipe||0),0);
+        const proj=bol+topV;
+        return '<div style="background:#FDF6EC;border:1px solid #F5E3C2;border-radius:4px;padding:9px 12px;margin-top:8px">'
+          +'<div style="display:flex;justify-content:space-between;align-items:baseline">'
+          +'<span style="font-size:10px;font-weight:700;color:#854F0B;text-transform:uppercase;letter-spacing:.04em">🤝 Topadas</span>'
+          +'<span style="font-size:13px;font-weight:700;color:#854F0B">'+(topRows.length?(fmt(topV)||'—')+' <span style=\'font-size:10px;font-weight:600\'>('+topRows.length+')</span>':'—')+'</span>'
+          +'</div>'
+          +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:5px;padding-top:5px;border-top:1px dashed #F0DDBE">'
+          +'<span style="font-size:10px;font-weight:700;color:#6B5310;text-transform:uppercase;letter-spacing:.04em">📈 Projeção c/ topadas</span>'
+          +'<span style="font-size:14px;font-weight:800;color:'+(proj>bol?'#6B5310':'var(--muted-l)')+'">'+(fmt(proj)||'—')+'</span>'
+          +'</div>'
+          +'</div>';
+      })()}
       ${ak==='inv'?(()=>{
         const rvRows=rows.filter(r=>subAreaOf(r)==='rv');
         const rfRows=rows.filter(r=>subAreaOf(r)==='rf');
@@ -1700,7 +1727,7 @@ function applyFilter(){
   const fPB=document.getElementById('f-pb')?.value;
   const fCli=(document.getElementById('f-cli')?.value||'').toLowerCase();
   if(fA)rows=rows.filter(r=>r.area===fA);
-  if(fAss)rows=rows.filter(r=>canonAssessor(r.assessor)===fAss);
+  if(fAss)rows=rows.filter(r=>assDe(r)===fAss);
   if(fSC)rows=rows.filter(r=>r.sc===fSC);
   if(fPB)rows=rows.filter(r=>r.pb===fPB);
   if(fCli)rows=rows.filter(r=>(r.cliente||'').toLowerCase().includes(fCli));
@@ -1871,7 +1898,7 @@ function toggleSelectAll(checked){
     const fPB=document.getElementById('f-pb')?.value;
     const fCli=(document.getElementById('f-cli')?.value||'').toLowerCase();
     if(fA)rows=rows.filter(r=>r.area===fA);
-    if(fAss)rows=rows.filter(r=>canonAssessor(r.assessor)===fAss);
+    if(fAss)rows=rows.filter(r=>assDe(r)===fAss);
     if(fSC)rows=rows.filter(r=>r.sc===fSC);
     if(fPB)rows=rows.filter(r=>r.pb===fPB);
     if(fCli)rows=rows.filter(r=>(r.cliente||'').toLowerCase().includes(fCli));
@@ -2283,7 +2310,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   const fCliKb=window._kbCli||'';
   let kbOpps=myOpps;
   if(fArea)kbOpps=kbOpps.filter(r=>subAreaOf(r)===fArea);
-  if(fAssKb)kbOpps=kbOpps.filter(r=>canonAssessor(r.assessor)===fAssKb);
+  if(fAssKb)kbOpps=kbOpps.filter(r=>assDe(r)===fAssKb);
   if(fSCKb)kbOpps=kbOpps.filter(r=>norm(r.sc||'')===norm(fSCKb));
   if(fPBKb)kbOpps=kbOpps.filter(r=>r.pb===fPBKb);
   const fAg=window._kbAg||'';
@@ -2483,7 +2510,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'</select>'
     +'<select class="filter-sel" onchange="window._kbAss=this.value;renderAssessorOpps()">'
     +'<option value="">Todos assessores</option>'
-    +ASSESSORES_OFICIAIS.filter(a=>myOpps.some(r=>canonAssessor(r.assessor)===a)).map(a=>'<option'+((window._kbAss||'')===a?' selected':'')+'>'+a+'</option>').join('')
+    +todosAssessores().filter(a=>myOpps.some(r=>assDe(r)===a)).map(a=>'<option'+((window._kbAss||'')===a?' selected':'')+'>'+a+'</option>').join('')
     +'</select>'
     +(()=>{const m=new Map();myOpps.map(r=>r.produto).filter(Boolean).forEach(p=>{if(!m.has(norm(p)))m.set(norm(p),p)});
       const prods=[...m.values()].sort((a,b)=>a.localeCompare(b));
@@ -2974,7 +3001,7 @@ function openNewOpp(){
   fillStatusDatalists();
   fillSelect('n-sc',[...SC_PADRAO,...OPPS.map(x=>x.sc)],'');
   fillSelect('n-pb',[...PB_PADRAO,...OPPS.map(x=>x.pb)],'');
-  document.getElementById('dl-assessores').innerHTML=ASSESSORES_OFICIAIS.map(a=>'<option value="'+a+'">').join('');
+  document.getElementById('dl-assessores').innerHTML=todosAssessores().map(a=>'<option value="'+a.replace(/"/g,'&quot;')+'">').join('');
   updateNovoProdutos();
   // Todos podem escolher qualquer assessor e qualquer área
   const areaSel=document.getElementById('n-area');
