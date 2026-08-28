@@ -14,16 +14,18 @@ document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --wine:#8B1C2A;--wine-d:#6B0010;--wine-l:#F5EAE8;--wine-ll:#FDF5F4;
-  --cream:#F5F0EB;--card:#FFFFFF;--border:#E5DCD4;--border-l:#F0E8E3;
-  --text:#1A0508;--muted:#8A6A6E;--muted-l:#C4A8AC;
-  --green:#085041;--green-bg:#E1F5EE;--green-b:#9FD5B0;
-  --amber:#854F0B;--amber-bg:#FEF3E2;--amber-b:#FAC775;
-  --red:#791F1F;--red-bg:#FCEBEB;--red-b:#E8B0B0;
-  --blue:#0C447C;--blue-bg:#E6F1FB;--blue-b:#B5CEF0;
-  --purple:#3C3489;--purple-bg:#EEEDFE;--purple-b:#C5C2F8;
-  --surf2:#FBF8F5;--surf3:#F1E9E4;--hover:#FDF8F6;--accent-b:#C8A0A8;
-  --sb:#4A0E16;--sb-txt:rgba(245,233,227,.75);
+  /* Institucional: superfícies neutras, marca dessaturada e fundo de chip quase branco —
+     como os chips já têm borda, eles passam a ler como contornados em vez de preenchidos. */
+  --wine:#7A2233;--wine-d:#5E1A27;--wine-l:#F3EDEE;--wine-ll:#FAF7F7;
+  --cream:#EFEEEC;--card:#FFFFFF;--border:#DCD9D5;--border-l:#E7E4E0;
+  --text:#1C1B1A;--muted:#87837E;--muted-l:#B3AFAA;
+  --green:#1F5741;--green-bg:#F1F6F3;--green-b:#BCD2C8;
+  --amber:#8A6320;--amber-bg:#F8F5EF;--amber-b:#DDD0B8;
+  --red:#8C2F2F;--red-bg:#F9F2F2;--red-b:#D9BDBD;
+  --blue:#2F6795;--blue-bg:#F1F4F7;--blue-b:#C2CFDA;
+  --purple:#5E5896;--purple-bg:#F3F2F7;--purple-b:#CBC8DE;
+  --surf2:#F7F6F4;--surf3:#EFEEEC;--hover:#F7F6F4;--accent-b:#C9C4BE;
+  --sb:#2E2523;--sb-txt:rgba(233,229,226,.72);
 }
 /* ══ MODO ESCURO ══ */
 html[data-theme="dark"]{
@@ -124,7 +126,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .topbar-brand h1{font-size:16px;font-weight:700;color:var(--text)}
 .topbar-date{font-size:11px;color:var(--muted)}
 .topbar-right{display:flex;align-items:center;gap:10px}
-.user-pill{display:flex;align-items:center;gap:6px;background:var(--wine-l);border:1px solid #C8A0A8;border-radius:4px;padding:4px 12px 4px 6px}
+.user-pill{display:flex;align-items:center;gap:6px;background:var(--wine-l);border:1px solid var(--accent-b);border-radius:4px;padding:4px 12px 4px 6px}
 .user-avatar{width:24px;height:24px;border-radius:50%;background:var(--wine);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
 .user-name{font-size:12px;font-weight:600;color:var(--wine-d)}
 .btn-logout{font-size:11px;color:var(--muted);cursor:pointer;background:none;border:none;padding:4px 8px;border-radius:4px}
@@ -220,9 +222,9 @@ tr.bol td{background:var(--green-bg)}
 .b-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-b)}
 .b-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-b)}
 .b-purple{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-b)}
-.b-wine{background:var(--wine-l);color:var(--wine-d);border:1px solid #C8A0A8}
-.b-gray{background:#F5F0EB;color:var(--muted);border:1px solid var(--border)}
-.b-teal{background:#E1F5EE;color:#085041;border:1px solid #9FD5B0}
+.b-wine{background:var(--wine-l);color:var(--wine-d);border:1px solid var(--accent-b)}
+.b-gray{background:var(--surf2);color:var(--muted);border:1px solid var(--border)}
+.b-teal{background:var(--green-bg);color:var(--green);border:1px solid var(--green-b)}
 
 /* ── ASSESSOR CARDS ── */
 .opp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:20px}
@@ -329,6 +331,8 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
 .dprog-txt{font-size:11px;font-weight:700;white-space:nowrap;opacity:.9}
 
 .dlog-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:20px}
+.dlog-quad{margin-bottom:16px}
+.dlog-quad .dquad-body{gap:0;padding:12px 16px}
 .dlog-empty{font-size:12px;color:var(--muted-l);text-align:center;padding:8px 0}
 .dlog-item{display:flex;align-items:flex-start;gap:10px;font-size:12px;border-bottom:1px solid var(--border-l);padding-bottom:8px;margin-bottom:8px}
 .dlog-item:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
@@ -343,7 +347,12 @@ input.inp-acao:focus{outline:none;border-color:var(--wine)}
 .dquad-title{font-size:13px;font-weight:700;flex:1}
 .dquad-cnt{font-size:11px;font-weight:700;background:var(--qbg);color:var(--qc);border-radius:10px;padding:2px 9px}
 .dquad-val{font-size:12px;font-weight:700;color:var(--qc)}
-.dquad-body{padding:8px;display:flex;flex-direction:column;gap:6px;min-height:36px}
+.dquad-hdr{cursor:pointer}
+.dquad.vazio .dquad-hdr{cursor:default}
+.dquad-chev{font-size:13px;color:var(--muted);transition:transform .2s;flex-shrink:0;width:14px;text-align:center;line-height:1}
+.dquad.open .dquad-chev{transform:rotate(180deg)}
+.dquad-body{display:none;padding:8px;flex-direction:column;gap:6px;min-height:36px}
+.dquad.open .dquad-body,.dquad.vazio .dquad-body{display:flex}
 .dquad-empty{font-size:11px;color:var(--muted-l);text-align:center;padding:14px 0}
 
 /* card da oportunidade dentro do quadrante */
@@ -382,6 +391,183 @@ html[data-theme="dark"] .oppd-row:hover{box-shadow:0 4px 16px rgba(0,0,0,.55)}
 .oppd-work-field select,.oppd-work-field input{border:1px solid var(--border);border-radius:6px;padding:6px 7px;font-size:11.5px;font-family:inherit;background:var(--card);color:var(--text)}
 .oppd-work-ftr{display:flex;gap:8px;align-items:center}
 .oppd-full{font-size:10.5px;color:var(--muted);text-decoration:underline;cursor:pointer;flex-shrink:0;white-space:nowrap}
+
+/* ── GERENCIAL DO ASSESSOR (meta × levantado × realizado) ── */
+.ger-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px}
+.ger-kpi{background:var(--surf2);border:1px solid var(--border);border-radius:6px;padding:11px 13px;border-top:3px solid var(--kc)}
+.ger-kpi .l{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.ger-kpi .v{font-size:19px;font-weight:700;color:var(--kc);margin-top:3px;font-variant-numeric:tabular-nums}
+.ger-kpi .s{font-size:10px;color:var(--muted);margin-top:2px}
+.ger-seg{border:1px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden}
+.ger-seg-h{display:flex;align-items:center;gap:10px;padding:10px 13px;cursor:pointer;background:var(--card)}
+.ger-seg-h:hover{background:var(--hover)}
+.ger-seg-nm{font-size:12.5px;font-weight:700;flex:1;min-width:0}
+.ger-seg-n{font-size:10px;color:var(--muted);font-weight:600}
+.ger-barra{position:relative;height:20px;background:var(--border);border-radius:4px;overflow:visible;margin-top:7px}
+.ger-lev{position:absolute;left:0;top:0;height:20px;background:var(--blue-b);border-radius:4px}
+.ger-real{position:absolute;left:0;top:0;height:20px;border-radius:4px}
+.ger-meta-marca{position:absolute;top:-3px;width:3px;height:26px;background:var(--text);border-radius:2px}
+.ger-legenda{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:var(--muted);margin-top:6px}
+.ger-legenda b{font-variant-numeric:tabular-nums}
+.ger-chip{font-size:9.5px;font-weight:700;border-radius:5px;padding:2px 7px;white-space:nowrap}
+.ger-opps{border-top:1px solid var(--border-l);background:var(--surf2);padding:4px 13px 10px;display:none}
+.ger-seg.open .ger-opps{display:block}
+.ger-opp{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border-l);font-size:11.5px}
+.ger-opp:last-child{border-bottom:none}
+.ger-opp-nm{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ger-opp-st{font-size:9.5px;color:var(--muted);white-space:nowrap}
+.ger-opp-v{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ger-vazio{font-size:11px;color:var(--muted);padding:8px 0}
+
+/* ── QUADRO DE ACORDOS ── */
+.area-card.clicavel{cursor:pointer;transition:box-shadow .15s,transform .15s}
+.area-card.clicavel:hover{box-shadow:0 6px 20px rgba(26,5,8,.12);transform:translateY(-2px)}
+html[data-theme="dark"] .area-card.clicavel:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
+.ba-sec{margin-bottom:18px}
+.ba-hdr{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.ba-hdr .t{font-size:12.5px;font-weight:700;color:var(--bc)}
+.ba-hdr .n{font-size:10px;font-weight:700;background:var(--bbg);color:var(--bc);border-radius:10px;padding:1px 8px}
+.ba-hdr .v{margin-left:auto;font-size:13px;font-weight:700;color:var(--bc);font-variant-numeric:tabular-nums}
+.ba-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.ba-tbl th{background:var(--surf2);color:var(--muted);font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:6px 9px;white-space:nowrap}
+.ba-tbl th.r,.ba-tbl td.r{text-align:right}
+.ba-tbl td{padding:7px 9px;border-bottom:1px solid var(--border-l);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px}
+.ba-tbl tr{cursor:pointer}
+.ba-tbl tbody tr:hover td{background:var(--hover)}
+.ba-tbl td.val{font-weight:700;font-variant-numeric:tabular-nums}
+.ba-vazio{font-size:11.5px;color:var(--muted);padding:8px 0}
+.quadro-ass{transition:box-shadow .15s,transform .15s}
+.quadro-ass:hover{box-shadow:0 6px 20px rgba(26,5,8,.12);transform:translateY(-2px)}
+html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
+.acordo-wrap{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:auto;max-height:72vh}
+.acordo-tbl{border-collapse:separate;border-spacing:0;width:100%;font-size:12px;min-width:840px}
+.acordo-tbl th,.acordo-tbl td{padding:0;border-bottom:1px solid var(--border-l);border-right:1px solid var(--border-l);white-space:nowrap}
+.acordo-tbl thead th{position:sticky;top:0;z-index:3;background:var(--wine);color:#fff;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:9px 10px;text-align:right;border-bottom:none}
+.acordo-tbl thead th.lft{text-align:left}
+.acordo-tbl thead th.ai{left:0;z-index:4;min-width:190px}
+.acordo-tbl tbody td.ai{position:sticky;left:0;z-index:2;background:var(--surf2);font-weight:700;font-size:11.5px;padding:0 10px;color:var(--text)}
+.acordo-tbl tbody tr:hover td{background:var(--hover)}
+.acordo-tbl tbody tr:hover td.ai{background:var(--wine-l)}
+.acordo-tbl td.inv{text-align:center;width:74px}
+.acordo-tbl td.inv input{width:16px;height:16px;cursor:pointer;accent-color:var(--wine)}
+.ac-in{width:100%;border:none;background:transparent;font-family:inherit;font-size:12px;color:var(--text);padding:8px 10px;text-align:right;font-variant-numeric:tabular-nums}
+.ac-in:focus{outline:2px solid var(--wine);outline-offset:-2px;background:var(--card);border-radius:3px}
+.ac-in::placeholder{color:var(--muted-l)}
+.ac-in.preenchido{font-weight:700}
+/* resumo por segmento — fica acima da tabela, como as linhas Metas/Acordos da planilha */
+.ac-resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.ac-seg{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--wine);border-radius:6px;padding:10px 12px}
+.ac-seg-t{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ac-seg-v{font-size:17px;font-weight:700;color:var(--text);margin-top:3px;font-variant-numeric:tabular-nums}
+.ac-seg-m{display:flex;align-items:center;gap:5px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)}
+.ac-seg-m label{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;flex-shrink:0}
+.ac-seg-m input{flex:1;min-width:0;border:1px solid var(--border);border-radius:4px;background:var(--surf2);color:var(--text);font-family:inherit;font-size:11px;padding:3px 6px;text-align:right;font-variant-numeric:tabular-nums}
+.ac-seg-m input:focus{outline:none;border-color:var(--wine);background:var(--card)}
+.ac-delta{font-size:10px;font-weight:700;margin-top:5px;display:block}
+
+/* ── FUNIL DE EFETIVIDADE ── */
+.fnl{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px 22px;margin-bottom:16px}
+.fnl-top{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.fnl-lbl{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.09em}
+.fnl-per{font-size:11.5px;color:var(--muted-l);margin-top:2px}
+.fnl-rec{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.fnl-rec span{font-size:10px;font-weight:700;background:var(--wine-l);color:var(--wine);border:1px solid var(--accent-b);border-radius:10px;padding:1px 9px}
+.fnl-chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.fnl-chip{font-size:11px;font-weight:600;border:1px solid var(--border);background:var(--card);color:var(--muted);border-radius:5px;padding:4px 11px;cursor:pointer;font-family:inherit}
+.fnl-chip:hover{border-color:var(--accent-b);color:var(--text)}
+.fnl-chip.on{background:var(--wine);border-color:var(--wine);color:#fff}
+.fnl-et{display:grid;grid-template-columns:150px 1fr 150px;align-items:center;gap:14px;padding:8px 0}
+.fnl-et.clic{cursor:pointer;border-radius:6px;margin:0 -8px;padding:8px;transition:background .12s}
+.fnl-et.clic:hover{background:var(--hover)}
+.fnl-et.clic:hover .fnl-barra{filter:brightness(1.08)}
+.fnl-et.clic .fnl-nm small::after{content:' · ver lista';color:var(--muted-l);opacity:0}
+.fnl-et.clic:hover .fnl-nm small::after{opacity:1}
+.fn-ev{font-size:11px;color:var(--muted)}
+.mk{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;
+    border:1px dashed var(--accent-b);color:var(--muted-l);background:transparent;cursor:pointer;user-select:none;
+    white-space:nowrap;transition:all .12s}
+.mk:hover{border-style:solid;border-color:var(--wine);color:var(--wine)}
+.mk.on{background:var(--green-bg);border:1px solid var(--green-b);color:var(--green)}
+.mk.on::before{content:'✓ '}
+.mk.lg{font-size:11.5px;padding:6px 12px}
+.ag{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.ag-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.ag-tit{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+.ag-tit small{font-size:10.5px;font-weight:400;color:var(--muted)}
+.ag-nav{margin-left:auto;display:flex;align-items:center;gap:6px}
+.ag-nav button{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:5px;
+  padding:3px 9px;font-size:12px;font-weight:700;cursor:pointer}
+.ag-nav button:hover{border-color:var(--wine);color:var(--wine)}
+.ag-mes{font-size:12px;font-weight:700;min-width:132px;text-align:center}
+.ag-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:8px;margin-bottom:13px}
+.ag-real{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:13px;align-items:stretch}
+.ag-rt{flex:1;min-width:340px;border-collapse:collapse;font-size:12px}
+.ag-rt th{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);
+  text-align:right;padding:0 10px 5px;border-bottom:1px solid var(--border)}
+.ag-rt th:first-child{text-align:left}
+.ag-rt td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--border-l);font-variant-numeric:tabular-nums;
+  font-weight:700;font-size:15px}
+.ag-rt td:first-child{text-align:left;font-weight:600;font-size:12px;color:var(--muted)}
+.ag-rt td.zero{color:var(--muted-l);font-weight:400}
+.ag-rt tr.mes td{background:var(--surf2);font-size:18px}
+.ag-rt tr.mes td:first-child{font-weight:700;color:var(--text)}
+.ag-rt tr.fora td{opacity:.4}
+.ag-rt .per{font-size:9.5px;font-weight:400;color:var(--muted-l);display:block}
+.ag-rt .vv{font-size:9.5px;font-weight:600;color:var(--green);display:block}
+.ag-kpi{border:1px solid var(--border);border-radius:8px;padding:9px 12px;background:var(--surf2)}
+.ag-kpi .k{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.ag-kpi .v{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.ag-kpi .s{font-size:10px;color:var(--muted)}
+.ag-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.ag-dow{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;text-align:center;padding-bottom:2px}
+.ag-cel{border:1px solid var(--border-l);border-radius:6px;min-height:64px;padding:4px 5px;background:var(--card);
+  display:flex;flex-direction:column;gap:2px;align-items:stretch;overflow:hidden}
+.ag-item{font-size:9.5px;font-weight:600;line-height:1.3;border-radius:3px;padding:1px 4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.ag-item.l{background:var(--wine-l);color:var(--wine)}
+.ag-item.r{background:var(--blue-bg);color:var(--blue)}
+.ag-item.furo{background:var(--red-bg);color:var(--red)}
+.ag-item.ok::before{content:'✓ '}
+.ag-mais{font-size:9px;color:var(--muted-l);font-weight:700;padding-left:2px}
+.ag-cel.tem{cursor:pointer}
+.ag-cel.tem:hover{border-color:var(--wine);background:var(--hover)}
+.ag-cel.fora{opacity:.32}
+.ag-cel.hoje{border:1.5px solid var(--wine);background:var(--wine-ll)}
+.ag-cel.sel{border:1.5px solid var(--wine);box-shadow:0 0 0 2px var(--wine-l)}
+.ag-num{font-size:11px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.ag-cel.hoje .ag-num{color:var(--wine)}
+.ag-tag{font-size:9.5px;font-weight:700;border-radius:4px;padding:1px 5px;white-space:nowrap}
+.ag-tag.l{background:var(--wine-l);color:var(--wine)}
+.ag-tag.r{background:var(--blue-bg);color:var(--blue)}
+.ag-tag.pend{background:var(--red-bg);color:var(--red)}
+.ag-lista{margin-top:12px;border-top:1px solid var(--border-l);padding-top:11px}
+.ag-lin{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid var(--border-l);flex-wrap:wrap}
+.ag-lin .cli{font-weight:700;font-size:12.5px;cursor:pointer}
+.ag-lin .cli:hover{color:var(--wine);text-decoration:underline}
+.ag-lin .sub{font-size:10.5px;color:var(--muted)}
+.ag-lin .vol{margin-left:auto;font-weight:700;font-size:12px;font-variant-numeric:tabular-nums}
+.ag-nota{font-size:10.5px;color:var(--muted);margin-top:9px;line-height:1.45}
+.ba-tbl td.fn-prova{white-space:normal;max-width:250px;line-height:1.35}
+.fn-quando{font-size:11px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.fnl-nm{font-size:12.5px;font-weight:700}
+.fnl-nm small{display:block;font-size:10px;color:var(--muted);font-weight:400;margin-top:1px}
+.fnl-trilho{position:relative;height:26px;background:var(--surf2);border-radius:3px;overflow:hidden}
+.fnl-barra{position:absolute;left:0;top:0;height:26px;border-radius:3px;display:flex;align-items:center;padding-left:11px;transition:width .6s ease}
+.fnl-barra b{font-size:13px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+.fnl-dir{text-align:right;font-size:11.5px;color:var(--muted)}
+.fnl-dir b{font-size:15px;color:var(--text);font-variant-numeric:tabular-nums}
+.fnl-passo{display:grid;grid-template-columns:150px 1fr 150px;gap:14px}
+.fnl-mid{display:flex;align-items:center;gap:9px;font-size:11px;color:var(--muted);padding-left:11px;flex-wrap:wrap}
+.fnl-seta{color:var(--muted-l);font-size:13px;line-height:1}
+.fnl-taxa{font-weight:800;font-variant-numeric:tabular-nums}
+.fnl-perda{color:var(--red);font-size:10.5px}
+.fnl-nota{font-size:11.5px;color:var(--muted);background:var(--surf2);border:1px solid var(--border-l);border-radius:7px;padding:10px 13px;margin-top:14px;line-height:1.5}
+.fnl-nota strong{color:var(--text)}
+.fnl-obs{display:block;margin-top:5px;font-size:10.5px;color:var(--muted-l)}
+@media(max-width:760px){
+  .fnl-et,.fnl-passo{grid-template-columns:110px 1fr}
+  .fnl-dir{display:none}
+}
 
 /* ── MODAL ── */
 .modal-bg{position:fixed;inset:0;background:rgba(26,5,8,.35);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
@@ -556,14 +742,22 @@ html[data-theme="dark"] .oppd-row:hover{box-shadow:0 4px 16px rgba(0,0,0,.55)}
       </div>
     </div>
     <div class="form-row">
+      <div class="fg"><label>📞 Ligação marcada (data)</label>
+        <input type="date" id="e-ligacao">
+      </div>
       <div class="fg"><label>📅 Reunião marcada (data)</label>
         <input type="date" id="e-reuniao">
       </div>
-      <div class="fg"><label>👤 Responsável (time)</label>
+    </div>
+    <div class="form-row">
+      <div class="fg" style="grid-column:1/-1"><label>👤 Responsável (time)</label>
         <select id="e-resp"><option value="">Sem responsável</option></select>
       </div>
     </div>
-    <div id="e-escala-box" style="border:1px dashed #C8A0A8;border-radius:6px;padding:10px 12px;margin-bottom:12px">
+    <div class="fg"><label>✅ Confirmar o que aconteceu <span style="font-weight:400;text-transform:none;font-size:9px">(salva na hora)</span></label>
+      <div id="e-marcas" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+    <div id="e-escala-box" style="border:1px dashed var(--accent-b);border-radius:6px;padding:10px 12px;margin-bottom:12px">
       <div id="e-escala-info" style="display:none;font-size:12px;color:var(--wine-d);margin-bottom:8px"></div>
       <div class="form-row">
         <div class="fg" style="margin-bottom:0"><label>🚨 Escalar para</label>
@@ -574,7 +768,7 @@ html[data-theme="dark"] .oppd-row:hover{box-shadow:0 4px 16px rgba(0,0,0,.55)}
         </div>
       </div>
     </div>
-    <div id="e-obs-atual" style="display:none;background:#FBF6EE;border:1px solid #E8D9C4;border-radius:6px;padding:10px 12px;margin-bottom:10px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#8A6A3B;margin-bottom:4px">💬 Observação salva no card</div><div id="e-obs-atual-txt" style="font-size:13px;color:var(--text);white-space:pre-wrap"></div></div>
+    <div id="e-obs-atual" style="display:none;background:var(--amber-bg);border:1px solid var(--amber-b);border-radius:6px;padding:10px 12px;margin-bottom:10px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#8A6A3B;margin-bottom:4px">💬 Observação salva no card</div><div id="e-obs-atual-txt" style="font-size:13px;color:var(--text);white-space:pre-wrap"></div></div>
     <div class="fg"><label>💬 Nova observação (entra na linha do tempo)</label>
       <textarea id="e-obs" placeholder="Escreva o que aconteceu nesse contato... Ex: 'Cliente pediu proposta revisada com prazo maior'"></textarea>
     </div>
@@ -717,6 +911,20 @@ html[data-theme="dark"] .oppd-row:hover{box-shadow:0 4px 16px rgba(0,0,0,.55)}
 </div>
 
 <!-- ── MODAL TODO EM MASSA ── -->
+<div id="modal-area" class="modal-bg" style="display:none">
+  <div class="modal" style="max-width:820px">
+    <div class="modal-hdr"><h2 id="ba-title">Boletas da área</h2><button class="modal-x" onclick="closeModal('area')">×</button></div>
+    <div id="ba-body"></div>
+  </div>
+</div>
+
+<div id="modal-gerencial" class="modal-bg" style="display:none">
+  <div class="modal" style="max-width:860px">
+    <div class="modal-hdr"><h2 id="ger-title">Gerencial do assessor</h2><button class="modal-x" onclick="closeModal('gerencial')">×</button></div>
+    <div id="ger-body"></div>
+  </div>
+</div>
+
 <div id="modal-bulktodo" class="modal-bg" style="display:none">
   <div class="modal" style="max-width:380px">
     <div class="modal-hdr"><h2>📋 TODO em massa</h2><button class="modal-x" onclick="document.getElementById('modal-bulktodo').style.display='none'">×</button></div>
@@ -744,7 +952,9 @@ const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6
 // Cores de marca. No modo escuro elas clareiam, senão vinho sobre fundo escuro fica ilegível.
 // `color` é um getter: quem lê AREAS[x].color já recebe a cor certa do tema atual, sem mudar nada nas chamadas.
 const CORES_DARK={'#8B1C2A':'#E0697D','#6B0010':'#EE93A2','#EF9F27':'#F2B45A','#7F77DD':'#A9A2F5','#378ADD':'#6FB2F0','#185FA5':'#6FB2F0'};
-function corMarca(hex){return temaAtual()==='dark'?(CORES_DARK[hex]||hex):hex}
+// no claro as cores de área também são dessaturadas — a cor vira assinatura, não preenchimento
+const CORES_LIGHT={'#8B1C2A':'#7A2233','#6B0010':'#5E1A27','#EF9F27':'#B07A2B','#7F77DD':'#5E5896','#378ADD':'#2F6795','#185FA5':'#2F6795'};
+function corMarca(hex){return temaAtual()==='dark'?(CORES_DARK[hex]||hex):(CORES_LIGHT[hex]||hex)}
 // preto ou branco sobre um fundo colorido, conforme a luminância — evita branco em cima de âmbar claro
 function corTexto(hex){
   if(!hex||hex[0]!=='#')return '#fff';
@@ -832,6 +1042,42 @@ function todosAssessores(){
   return[...m.values()].sort((a,b)=>a.localeCompare(b));
 }
 const assDe=r=>canonAssessor(r.assessor)||stripAcc(String(r.assessor||'').trim().toUpperCase());
+
+// ── ACORDOS DO MÊS ──
+// Ficam na MESMA tabela `metas` (uma vez por mês, sem histórico), marcados com area='acordo'
+// pra não se misturarem com as metas de Definições do mês.
+const AREA_ACORDO='acordo';
+const SEG_INVESTOR='The Investor';
+const LINHA_CASA='__CASA__'; // guarda a meta da casa por segmento (linha "Metas" da planilha)
+const SEGMENTOS_ACORDO=['Asset Allocation','Collar','Hawk','ES','Seg vida','Consórcio'];
+// De/para segmento do acordo → oportunidades. ES = COE; Asset Allocation = o resto de Investimentos.
+const SEG_EXPLICITOS=['collar','hawk','coe'];
+const SEG_MATCH={
+  'Asset Allocation':r=>r.area==='inv'&&!SEG_EXPLICITOS.includes(norm(r.produto||'')),
+  'Collar':r=>r.area==='inv'&&norm(r.produto||'')==='collar',
+  'Hawk':r=>r.area==='inv'&&norm(r.produto||'')==='hawk',
+  'ES':r=>r.area==='inv'&&norm(r.produto||'')==='coe',
+  'Seg vida':r=>r.area==='seg',
+  'Consórcio':r=>r.area==='cons',
+};
+function segmentoDaOpp(r){
+  for(const s of SEGMENTOS_ACORDO){if(SEG_MATCH[s]&&SEG_MATCH[s](r))return s;}
+  return null;
+}
+const metasDoMes=()=>METAS.filter(m=>m.area!==AREA_ACORDO);
+const acordosDoMes=()=>METAS.filter(m=>m.area===AREA_ACORDO);
+// aceita "150000", "150.000,00", "R$ 150.000" e devolve número
+function parseMoeda(s){
+  if(s===null||s===undefined)return 0;
+  let t=String(s).replace(/[R$\s]/gi,'').trim();
+  if(!t)return 0;
+  if(t.includes(',')){t=t.replace(/\./g,'').replace(',','.');}
+  else if((t.match(/\./g)||[]).length>1){t=t.replace(/\./g,'');}
+  else if(/\.\d{3}$/.test(t)){t=t.replace(/\./g,'');}
+  const n=parseFloat(t);
+  return isNaN(n)?0:n;
+}
+const fmtMoedaBR=v=>!v?'':v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
 const fmt=v=>{if(!v||isNaN(v)||v==0)return'—';if(v>=1e6)return'R$'+(v/1e6).toFixed(1)+'M';if(v>=1e3)return'R$'+(v/1e3).toFixed(0)+'k';return'R$'+Math.round(v)};
 const isB=r=>{const k=norm(r.pb||'');return k==='boletado'||k==='a boletar'};
 // "A Boletar" = o cliente fechou mas a boleta ainda não foi processada.
@@ -993,7 +1239,7 @@ function getLastMoveDate(r){
 }
 
 function renderTimeline(r){
-  const hist=(r.historico||[]).filter(h=>h.campo==='Status comercial'||h.campo==='Pendência boleta'||h.campo==='Observação'||h.campo==='Criação');
+  const hist=(r.historico||[]).filter(h=>h.campo==='Status comercial'||h.campo==='Pendência boleta'||h.campo==='Observação'||h.campo==='Criação'||h.campo==='Ligação'||h.campo==='Reunião'||h.campo===CAMPO_LIG_DATA||h.campo==='Reunião marcada');
   if(!hist.length)return'<div style="font-size:12px;color:var(--muted);padding:8px 0">Nenhuma movimentação registrada ainda. As mudanças de status e observações vão contar a história desta oportunidade aqui.</div>';
   return '<div style="position:relative;padding-left:20px">'
     +hist.map(function(h,i){
@@ -1006,7 +1252,7 @@ function renderTimeline(r){
         +'<div style="position:absolute;left:-16px;top:4px;width:10px;height:10px;border-radius:50%;background:'+cor+';border:2px solid #fff;box-shadow:0 0 0 2px '+cor+'33"></div>'
         +(!isLast?'<div style="position:absolute;left:-12px;top:14px;bottom:0;width:2px;background:var(--border)"></div>':'')
         +(isObs
-          ?'<div style="font-size:12px;color:var(--text);background:#FEF9F0;border:1px solid #FAC77555;border-radius:4px;padding:7px 10px;font-style:italic">💬 "'+h.para+'"</div>'
+          ?'<div style="font-size:12px;color:var(--text);background:var(--amber-bg);border:1px solid var(--amber-b)55;border-radius:4px;padding:7px 10px;font-style:italic">💬 "'+h.para+'"</div>'
           :'<div style="font-size:12px;font-weight:600;color:var(--text)">'+h.para+'</div>')
         +'<div style="font-size:11px;color:var(--muted);margin-top:2px">'+(isObs?'Observação':h.campo)+' · '+h.data+' · por <strong>'+h.usuario+'</strong></div>'
         +(h.de&&!isObs?'<div style="font-size:10px;color:var(--muted-l);margin-top:1px">anterior: '+h.de+'</div>':'')
@@ -1185,7 +1431,7 @@ let curView='';
 function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
-    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Definições do mês'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários']]
+    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Definições do mês'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários'],['d-acordos','📋 Acordos por AI']]
     :USER.perfil==='gestor'
     ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']]
     :[['diretor','📊 Dashboard'],['a-opps','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']];
@@ -1220,6 +1466,7 @@ function renderCurView(){
   else if(v==='d-metas')renderMetas(c);
   else if(v==='d-upload')renderUpload(c);
   else if(v==='d-usuarios')renderUsuarios(c);
+  else if(v==='d-acordos')renderAcordos(c);
   else if(v==='a-opps')renderAssessorOpps(c);
   else if(v==='a-upload')renderTeamUpload(c);
   else if(v==='a-dash')renderAssessorDash(c);
@@ -1354,7 +1601,7 @@ function renderDiretor(c=document.getElementById('main-content')){
   <div class="section-label">Desempenho por área</div>
   <div class="area-cards">
     ${aData.map(({ak,a,rows,bol,bolN:bN,pipe:p,pend:pend2,ef,pct})=>`
-    <div class="area-card" style="border-left-color:${a.color}">
+    <div class="area-card${rows.length?' clicavel':''}" style="border-left-color:${a.color}"${rows.length?` onclick="abrirBoletasArea('${ak}')" title="Ver boletas fechadas e topadas de ${a.name}"`:''}>
       <div class="area-card-header">
         <div class="area-tag" style="color:${a.color}">${a.name}</div>
         ${rows.length?`<span style="font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 7px">${rows.length} opor.</span>`:`<span style="font-size:10px;color:var(--muted-l)">0 opor.</span>`}
@@ -1375,13 +1622,13 @@ function renderDiretor(c=document.getElementById('main-content')){
         const topRows=rows.filter(r=>!isB(r)&&!isPerdida(r)&&norm(r.sc||'').includes('topou'));
         const topV=topRows.reduce((s2,r)=>s2+(r.atual||r.pipe||0),0);
         const proj=bol+topV;
-        return '<div style="background:#FDF6EC;border:1px solid #F5E3C2;border-radius:4px;padding:9px 12px;margin-top:8px">'
+        return '<div style="background:var(--amber-bg);border:1px solid var(--amber-b);border-radius:4px;padding:9px 12px;margin-top:8px">'
           +'<div style="display:flex;justify-content:space-between;align-items:baseline">'
-          +'<span style="font-size:10px;font-weight:700;color:#854F0B;text-transform:uppercase;letter-spacing:.04em">🤝 Topadas</span>'
+          +'<span style="font-size:10px;font-weight:700;color:#854F0B;text-transform:uppercase;letter-spacing:.04em">Topadas</span>'
           +'<span style="font-size:13px;font-weight:700;color:#854F0B">'+(topRows.length?(fmt(topV)||'—')+' <span style=\'font-size:10px;font-weight:600\'>('+topRows.length+')</span>':'—')+'</span>'
           +'</div>'
-          +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:5px;padding-top:5px;border-top:1px dashed #F0DDBE">'
-          +'<span style="font-size:10px;font-weight:700;color:#6B5310;text-transform:uppercase;letter-spacing:.04em">📈 Projeção c/ topadas</span>'
+          +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:5px;padding-top:5px;border-top:1px dashed var(--amber-b)">'
+          +'<span style="font-size:10px;font-weight:700;color:#6B5310;text-transform:uppercase;letter-spacing:.04em">Projeção c/ topadas</span>'
           +'<span style="font-size:14px;font-weight:800;color:'+(proj>bol?'#6B5310':'var(--muted-l)')+'">'+(fmt(proj)||'—')+'</span>'
           +'</div>'
           +'</div>';
@@ -1582,7 +1829,8 @@ function renderDiretor(c=document.getElementById('main-content')){
       outras.forEach(r=>{const k=r.sc||'Sem status';if(!scMap[k])scMap[k]=0;scMap[k]++;});
       const scList=Object.entries(scMap).sort((a,b)=>b[1]-a[1]);
       const inits=name.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
-      return '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px;border-left:4px solid '+cor+'">'
+      const nomeJS=String(name).replace(/'/g,"\\'");
+      return '<div class="quadro-ass" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px;border-left:4px solid '+cor+';cursor:pointer" onclick="abrirGerencial(\''+nomeJS+'\')" title="Ver o gerencial da meta de '+String(name).replace(/"/g,'&quot;')+'">'
         +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
         +'<div style="width:36px;height:36px;border-radius:50%;background:'+cor+';color:'+corTexto(cor)+';font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+inits+'</div>'
         +'<div style="min-width:0;flex:1">'
@@ -1603,8 +1851,9 @@ function renderDiretor(c=document.getElementById('main-content')){
           +'<span style="font-size:9px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.04em">⏳ A boletar · não pontua</span>'
           +'<span style="font-size:12px;font-weight:700;color:var(--amber)">'+(fmt(aBolVol)||'—')+' <span style="font-size:10px;font-weight:600">('+aBolRows.length+')</span></span>'
           +'</div>':'')
-        +'<div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Status das demais ('+outras.length+')</div>'
-        +(scList.length?scList.map(([sc,n])=>{
+        +metasCardHtml(name)
+        +'<div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:12px 0 8px;padding-top:10px;border-top:1px solid var(--border-l)">Status das demais ('+outras.length+')</div>'
+        +(scList.length?scList.slice(0,5).map(([sc,n])=>{
           const b=matchBadge(sc,SC_BADGE)||'b-gray';
           const pct=outras.length?Math.round(n/outras.length*100):0;
           return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">'
@@ -1612,7 +1861,9 @@ function renderDiretor(c=document.getElementById('main-content')){
             +'<div style="flex:1;height:4px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:'+pct+'%;height:4px;background:'+cor+';border-radius:3px"></div></div>'
             +'<span style="font-size:11px;font-weight:700;min-width:18px;text-align:right">'+n+'</span>'
             +'</div>';
-        }).join(''):'<div style="font-size:11px;color:var(--muted)">Todas boletadas! 🎉</div>')
+        }).join('')
+          +(scList.length>5?'<div style="font-size:9.5px;color:var(--muted-l);margin-top:4px">+'+(scList.length-5)+' outro'+(scList.length-5>1?'s':'')+' status</div>':'')
+          :'<div style="font-size:11px;color:var(--muted)">Todas boletadas! 🎉</div>')
         +'</div>';
     }).join('')}
   </div>`;
@@ -1629,7 +1880,7 @@ function renderDiretor(c=document.getElementById('main-content')){
     if(bctx){charts.ass=new Chart(bctx,{type:'bar',data:{
       labels:top8.map(([n])=>n.split(' ')[0]),
       datasets:[
-        {label:'Pipe',data:top8.map(([,v])=>v.pipe),backgroundColor:temaAtual()==='dark'?'#4A3A3D':'#E8D5CC',borderRadius:4},
+        {label:'Pipe',data:top8.map(([,v])=>v.pipe),backgroundColor:temaAtual()==='dark'?'#4A3A3D':'var(--border)',borderRadius:4},
         {label:'Boletado',data:top8.map(([,v])=>v.bol),backgroundColor:corMarca('#8B1C2A'),borderRadius:4}
       ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{font:{size:11}}}},scales:{y:{ticks:{callback:v=>fmt(v),font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{size:10}}}}}})
     }
@@ -1682,6 +1933,9 @@ function estudoDoDia(nome){
     else if(db&&db<hj)b.atrasado.push({r,m:'Boleta venceu '+brData(db)+' — cobre e reagende a data'});
     if(dr===hj)b.reunioes.push({r,m:'Reunião hoje'+(r.sc?' · '+r.sc:'')});
     else if(dr&&dr<hj)b.atrasado.push({r,m:'Reunião era '+brData(dr)+' e não avançou — remarque já'});
+    const dl=dataLigacao(r);
+    if(dl===hj)b.fazer.push({r,m:'📞 Ligação marcada para hoje — ligue e confirme no card'});
+    else if(dl&&dl<hj&&!cumpriu(r,dl,'lig'))b.atrasado.push({r,m:'📞 Ligação era '+brData(dl)+' e não há registro — ligue ou remarque'});
     if(dt===hj)b.fazer.push({r,m:r.todo||'TODO marcado para hoje'});
     else if(dt&&dt<hj)b.atrasado.push({r,m:(r.todo||'TODO')+' · vencido '+brData(dt)});
     const sck=norm(r.sc||'');
@@ -1694,7 +1948,7 @@ function estudoDoDia(nome){
     else if(/agendar/.test(sck)&&!dr)b.semData.push({r,m:'Status pede reunião e não há data marcada'});
     else if(/agendad/.test(sck)&&!dr)b.semData.push({r,m:'Reunião consta agendada mas sem data no sistema'});
     else if(/topou|confirmar/.test(sck)&&!db)b.semData.push({r,m:'Cliente quente sem data de boleta — marque a data'});
-    else if(!db&&!dr&&!dt)b.semData.push({r,m:'Nenhuma data em nada — defina o próximo passo'});
+    else if(!db&&!dr&&!dt&&!dl)b.semData.push({r,m:'Nenhuma data em nada — defina o próximo passo'});
   });
   return b;
 }
@@ -1733,10 +1987,10 @@ function atividadeHojeDe(nome){
   return n;
 }
 // ── FUNIL DO PIPELINE — visão executiva por área ──
-const FUNIL_ETAPAS=[['Ligar Cliente','Ligar'],['Agendar Reunião','Agendar reunião'],['Reunião Agendada','Reunião agendada'],['Cliente Confirmar','Confirmar'],['Cliente Topou','Topou'],['__BOL__','✓ Boletado'],['__PERD__','❌ Perdido']];
+const FUNIL_ETAPAS=[['Ligar Cliente','Ligar'],['Agendar Reunião','Agendar reunião'],['Reunião Agendada','Reunião agendada'],['Cliente Confirmar','Confirmar'],['Cliente Topou','Topou'],['__BOL__','Boletado'],['__PERD__','❌ Perdido']];
 function funilPipelineHtml(){
   return '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;margin-bottom:24px">'
-    +'<h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:16px">🎯 Funil do pipeline — visão executiva por área</h3>'
+    +'<h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:16px">Funil do pipeline — visão executiva por área</h3>'
     +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">'
     +subareasVis().map(([ak,a])=>{
       const areaOpps=OPPS.filter(r=>subAreaOf(r)===ak);
@@ -1794,7 +2048,7 @@ function timeGerencialHtml(){
     const pipeV=todas.filter(r=>!isB(r)&&!isPerdida(r)).reduce((s,r)=>s+(r.pipe||0),0);
     const pend=todas.filter(isPend).length;
     const e=estudoDoDia(nome);
-    const metas=METAS.filter(m=>norm(m.assessor)===norm(nome));
+    const metas=metasDoMes().filter(m=>norm(m.assessor)===norm(nome));
     const metaV=metas.reduce((s,m)=>s+(m.meta_valor||0),0);
     const pct=metaV>0?Math.min(Math.round(bol/metaV*100),100):0;
     return{nome,bol,bolN:bolRows.length,aBol,aBolN:aBolRows.length,pipeV,pend,atras:e.atrasado.length,semData:e.semData.length,metaV,pct,ativHoje:atividadeHojeDe(nome)};
@@ -1812,7 +2066,7 @@ function timeGerencialHtml(){
       +'<span style="font-size:11px;color:#0F6E56;font-weight:600">'+d.bolN+' boletada'+(d.bolN!==1?'s':'')+'</span>'
       +'</div>'
       +'<div style="font-size:11px;color:var(--muted);margin:3px 0 '+(d.aBolN?'6px':'10px')+'">'+(d.metaV?'meta '+fmt(d.metaV):'sem meta definida')+'</div>'
-      +(d.aBolN?'<div style="font-size:10px;font-weight:700;color:#854F0B;background:#FEF3E2;border-radius:4px;padding:3px 8px;display:inline-block;margin-bottom:10px" title="Cliente fechou, mas a boleta ainda não foi processada — não conta no ranking nem na meta">⏳ '+(fmt(d.aBol)||'—')+' a boletar ('+d.aBolN+')</div>':'')
+      +(d.aBolN?'<div style="font-size:10px;font-weight:700;color:#854F0B;background:var(--amber-bg);border-radius:4px;padding:3px 8px;display:inline-block;margin-bottom:10px" title="Cliente fechou, mas a boleta ainda não foi processada — não conta no ranking nem na meta">⏳ '+(fmt(d.aBol)||'—')+' a boletar ('+d.aBolN+')</div>':'')
       +(d.metaV?'<div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:12px"><div style="width:'+d.pct+'%;min-width:4px;height:5px;background:'+(d.pct>=100?'#085041':'var(--wine)')+';border-radius:3px"></div></div>':'')
       +'<div class="area-strip" style="margin-bottom:10px">'
       +'<div class="area-cell"><div class="area-cell-l">Pipe</div><div class="area-cell-v">'+(fmt(d.pipeV)||'—')+'</div></div>'
@@ -1821,10 +2075,13 @@ function timeGerencialHtml(){
       +'<div class="area-cell"><div class="area-cell-l">S/ data</div><div class="area-cell-v" style="color:'+(d.semData>0?'#854F0B':'var(--muted-l)')+'">'+(d.semData||'—')+'</div></div>'
       +'</div>'
       +'<div style="font-size:10px;font-weight:700;color:'+(d.ativHoje?'#0F6E56':'#A32D2D')+';margin-bottom:10px">'+(d.ativHoje?'📝 '+d.ativHoje+' registro'+(d.ativHoje!==1?'s':'')+' hoje':'😴 nenhum registro hoje')+'</div>'
-      +'<button class="btn sm" style="width:100%" onclick="verDailyDe(\''+nomeSafe+'\')">☀️ Ver dia de atuação</button>'
+      +'<div style="display:flex;gap:6px">'
+      +'<button class="btn sm" style="flex:1" onclick="abrirGerencial(\''+nomeSafe+'\')">📊 Meta</button>'
+      +'<button class="btn sm" style="flex:1" onclick="verDailyDe(\''+nomeSafe+'\')">☀️ Dia</button>'
+      +'</div>'
       +'</div>';
   }).join('');
-  return '<div class="section-label">👥 Gestão do time</div>'
+  return '<div class="section-label">Gestão do time</div>'
     +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-bottom:24px">'+cards+'</div>';
 }
 // ── priorização da Daily: mais parado + maior valor primeiro ──
@@ -1848,6 +2105,9 @@ function tocadoHojePor(r,nome){
 }
 function iconCampo(campo){
   if(campo==='Observação')return '📝';
+  if(campo==='Ligação'||campo==='Ligação marcada')return '📞';
+  if(campo==='Reunião')return '🤝';
+  if(campo==='Reunião marcada')return '📅';
   if(campo==='Escala')return '🚨';
   if(campo==='TODO')return '📋';
   if(campo==='Criação')return '✨';
@@ -1855,6 +2115,9 @@ function iconCampo(campo){
 }
 function descHist(h){
   if(h.campo==='Observação')return '"'+h.para+'"';
+  if(h.campo==='Ligação'||h.campo==='Reunião')return h.para;
+  if(h.campo===CAMPO_LIG_DATA)return h.para?'Ligação marcada para '+brData(h.para):'Ligação desmarcada';
+  if(h.campo==='Reunião marcada')return h.para?'Reunião marcada para '+brData(h.para):'Reunião desmarcada';
   if(h.para&&h.de)return h.campo+': '+h.de+' → '+h.para;
   if(h.para)return h.campo+': '+h.para;
   return h.campo||'atualizado';
@@ -1906,6 +2169,15 @@ function selectHtmlPB(qKey,r){
     .concat(PB_PADRAO.map(s=>'<option value="'+s.replace(/"/g,'&quot;')+'"'+(norm(s)===norm(cur)?' selected':'')+'>'+s+'</option>'));
   return '<select id="pb-'+qKey+'-'+r.id+'">'+opts.join('')+'</select>';
 }
+window._quadOpen=window._quadOpen||new Set();   // vazio = todos fechados por padrão
+function toggleQuad(k){
+  const el=document.getElementById('dquad-'+k);
+  if(!el)return;
+  if(window._quadOpen.has(k)){window._quadOpen.delete(k);el.classList.remove('open');}
+  else{window._quadOpen.add(k);el.classList.add('open');}
+  const h=el.querySelector('.dquad-hdr');
+  if(h)h.title=window._quadOpen.has(k)?'Recolher':'Ver as oportunidades';
+}
 window._dailyOpen=window._dailyOpen||new Set();
 window._dailyWorkOpen=window._dailyWorkOpen||new Set();
 function toggleRowDaily(qKey,id){
@@ -1951,7 +2223,9 @@ async function registrarNotaDaily(qKey,id){
 async function salvarTrabalhoDaily(qKey,id){
   const r=OPPS.find(o=>o.id===id);if(!r)return;
   const scSel=document.getElementById('sc-'+qKey+'-'+id),pbSel=document.getElementById('pb-'+qKey+'-'+id),dataInp=document.getElementById('data-'+qKey+'-'+id);
+  const ligInp=document.getElementById('lig-'+qKey+'-'+id),reuInp=document.getElementById('reu-'+qKey+'-'+id);
   const scNovo=scSel?scSel.value:'',pbNovo=pbSel?pbSel.value:'',dataNova=dataInp?dataInp.value:'';
+  const ligNova=ligInp?ligInp.value:null,reuNova=reuInp?reuInp.value:null;
   const now=new Date();
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const hist=[...(r.historico||[])];
@@ -1960,6 +2234,8 @@ async function salvarTrabalhoDaily(qKey,id){
   if(scNovo&&norm(scNovo)!==norm(r.sc||'')){hist.push({campo:'Status comercial',de:r.sc||'',para:scNovo,usuario:USER.nome,data:ds});patch.sc=scNovo;mudou=true;}
   if(pbNovo&&norm(pbNovo)!==norm(r.pb||'')){hist.push({campo:'Pendência boleta',de:r.pb||'',para:pbNovo,usuario:USER.nome,data:ds});patch.pb=pbNovo;mudou=true;}
   if(dataNova&&dataNova!==(parseDataBoleta(r.data_boleta)||'')){hist.push({campo:'Pendência boleta',de:'',para:'Boleta marcada p/ '+dataNova.split('-').reverse().join('/'),usuario:USER.nome,data:ds});patch.data_boleta=dataNova;mudou=true;}
+  if(ligNova!==null&&ligNova!==(dataLigacao(r)||'')){hist.push({campo:CAMPO_LIG_DATA,de:dataLigacao(r)||'',para:ligNova,usuario:USER.nome,data:ds});mudou=true;}
+  if(reuNova!==null&&reuNova!==((r.reuniao_data||'').slice(0,10))){hist.push({campo:'Reunião marcada',de:(r.reuniao_data||'').slice(0,10),para:reuNova,usuario:USER.nome,data:ds});patch.reuniao_data=reuNova||null;mudou=true;}
   if(!mudou){showToast('Escolha algo pra mudar antes de salvar');return}
   patch.historico=hist;
   try{
@@ -1968,6 +2244,189 @@ async function salvarTrabalhoDaily(qKey,id){
     await loadData();renderCurView();
   }catch(e){showToast('Erro: '+e.message)}
 }
+// ══════════════════════════════════════════════════════════
+// ── AGENDA DE CONTATOS: calendário de ligações e reuniões ──
+// O compromisso vem do próprio card (data da ligação / data da reunião).
+// O "feito" vem da MESMA prova do funil de efetividade — assim agenda e
+// funil nunca contam coisas diferentes.
+// ══════════════════════════════════════════════════════════
+function todasDoComercial(nome){
+  return OPPS.filter(r=>norm(r.responsavel||'')===norm(nome)||norm(r.assessor||'')===norm(nome));
+}
+const mesISO=iso=>(iso||'').slice(0,7);
+const mesDeData=s=>{const k=dtKey(s);if(!k)return '';const d=new Date(k);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+function agRef(){return window._agRef||localISO(new Date()).slice(0,7)}
+function agNav(d){
+  const [y,m]=agRef().split('-').map(Number);
+  const nd=new Date(y,m-1+d,1);
+  window._agRef=nd.getFullYear()+'-'+String(nd.getMonth()+1).padStart(2,'0');
+  window._agDia='';renderDPipeline();
+}
+function agHoje(){window._agRef=null;window._agDia='';renderDPipeline();}
+function agDia(iso){window._agDia=(window._agDia===iso)?'':iso;renderDPipeline();}
+function agendaDoComercial(nome){
+  const mapa={};
+  const add=(iso,k,r)=>{if(!iso)return;(mapa[iso]=mapa[iso]||{lig:[],reu:[]})[k].push(r)};
+  todasDoComercial(nome).forEach(r=>{
+    add(dataLigacao(r),'lig',r);
+    add((r.reuniao_data||'').slice(0,10),'reu',r);
+  });
+  return mapa;
+}
+// Um compromisso marcado para o dia D só conta como cumprido se houver registro
+// em D ou depois. "Já ligou algum dia" não paga a ligação combinada para ontem.
+function cumpriu(r,iso,k){
+  if(!iso)return true;
+  const alvo=+new Date(iso+'T00:00:00');
+  const mi=marcaInfo(r,k);
+  if(mi&&dtKey(mi.data)>=alvo)return true;
+  if(k==='reu'&&isBoletadoFirmado(r))return true;
+  return (r.historico||[]).some(h=>
+    (h.campo==='Observação'||h.campo==='Status comercial'||h.campo==='Pendência boleta')&&dtKey(h.data)>=alvo);
+}
+// O QUE FOI REALIZADO num intervalo. A data de "realizado" é a mesma prova
+// que o funil de efetividade usa — confirmação no card, movimento de status
+// ou a data da reunião que já passou.
+function realizadoEntre(nome,de,ate){
+  const rows=todasDoComercial(nome);
+  const dentro=st=>{const k=dtKey(st);if(!k)return false;const d=localISO(new Date(k));return d>=de&&d<=ate};
+  const bol=rows.filter(r=>{const d=parseDataBoleta(r.data_boleta);return isBoletadoFirmado(r)&&d&&d>=de&&d<=ate});
+  return{
+    lig:rows.filter(r=>teveLigacao(r)&&dentro(provaEtapa('ligacao',r).d)).length,
+    reu:rows.filter(r=>teveReuniao(r)&&dentro(provaEtapa('reuniao',r).d)).length,
+    bol:bol.length, vol:bol.reduce((a,r)=>a+(r.atual||0),0)};
+}
+function semanaDe(d){
+  const dow=(d.getDay()+6)%7;                       // 0 = segunda
+  const ini=new Date(d.getFullYear(),d.getMonth(),d.getDate()-dow);
+  const fim=new Date(ini.getFullYear(),ini.getMonth(),ini.getDate()+6);
+  return [localISO(ini),localISO(fim)];
+}
+function resumoAgenda(nome,ref){
+  const rows=todasDoComercial(nome), hj=localISO(new Date());
+  const feitoNoMes=(r,k)=>{const p=provaEtapa(k,r);return mesDeData(p&&p.d)===ref};
+  const ligFeitas=rows.filter(r=>teveLigacao(r)&&feitoNoMes(r,'ligacao'));
+  const reuFeitas=rows.filter(r=>teveReuniao(r)&&feitoNoMes(r,'reuniao'));
+  const ligAg=rows.filter(r=>mesISO(dataLigacao(r))===ref);
+  const reuAg=rows.filter(r=>mesISO((r.reuniao_data||'').slice(0,10))===ref);
+  const bol=rows.filter(r=>isBoletadoFirmado(r)&&mesISO(parseDataBoleta(r.data_boleta)||'')===ref);
+  // compromissos que já venceram no mês: quantos têm registro
+  const vencLig=ligAg.filter(r=>dataLigacao(r)<hj), vencReu=reuAg.filter(r=>(r.reuniao_data||'').slice(0,10)<hj);
+  const cumpridos=vencLig.filter(r=>cumpriu(r,dataLigacao(r),'lig')).length
+                 +vencReu.filter(r=>cumpriu(r,(r.reuniao_data||'').slice(0,10),'reu')).length;
+  const vencidos=vencLig.length+vencReu.length;
+  return{ligFeitas:ligFeitas.length,reuFeitas:reuFeitas.length,
+    ligAg:ligAg.length,reuAg:reuAg.length,
+    bol:bol.length,volBol:bol.reduce((a,r)=>a+(r.atual||0),0),
+    vencidos,cumpridos,furos:vencidos-cumpridos,
+    ader:vencidos?Math.round(cumpridos/vencidos*100):null};
+}
+function realizadoHtml(sel,ref,f){
+  const hj=localISO(new Date());
+  const [sIni,sFim]=semanaDe(new Date());
+  const [y,m]=ref.split('-').map(Number);
+  const mIni=ref+'-01', mFim=localISO(new Date(y,m,0));
+  const refAtual=ref===hj.slice(0,7);
+  const nm=new Date(y,m-1,1).toLocaleDateString('pt-BR',{month:'long'});
+  const nomeMes=nm.charAt(0).toUpperCase()+nm.slice(1);
+
+  const linha=(rot,sub,de,ate,cls)=>{
+    const x=realizadoEntre(sel,de,ate);
+    const c=n=>'<td'+(n?'':' class="zero"')+'>'+n+'</td>';
+    return '<tr class="'+(cls||'')+'"><td>'+rot+(sub?'<span class="per">'+sub+'</span>':'')+'</td>'
+      +c(x.lig)+c(x.reu)
+      +'<td'+(x.bol?'':' class="zero"')+'>'+x.bol+(x.vol?'<span class="vv">'+fmt(x.vol)+'</span>':'')+'</td></tr>';
+  };
+
+  return '<table class="ag-rt">'
+    +'<thead><tr><th>Realizado de fato</th><th>📞 Ligações</th><th>🤝 Reuniões</th><th>✅ Boletas</th></tr></thead><tbody>'
+    +linha('Hoje',brData(hj),hj,hj,refAtual?'':'fora')
+    +linha('Esta semana',brData(sIni)+' a '+brData(sFim),sIni,sFim,refAtual?'':'fora')
+    +linha(nomeMes,brData(mIni)+' a '+brData(mFim),mIni,mFim,'mes')
+    +'</tbody></table>'
+    +'<div style="display:flex;flex-direction:column;gap:8px;min-width:190px">'
+    +'<div class="ag-kpi"><div class="k">🎯 Agenda cumprida</div>'
+    +'<div class="v"'+(f.ader===null?'':' style="color:'+(f.ader>=70?'var(--green)':f.ader>=45?'var(--amber)':'var(--red)')+'"')+'>'
+    +(f.ader===null?'—':f.ader+'%')+'</div>'
+    +'<div class="s">'+(f.vencidos?f.cumpridos+' de '+f.vencidos+' compromissos vencidos'+(f.furos?' · '+f.furos+' sem registro':''):'nada venceu ainda')+'</div></div>'
+    +'<div class="ag-kpi"><div class="k">📌 Marcado no mês</div>'
+    +'<div class="v" style="font-size:15px">'+f.ligAg+' 📞 · '+f.reuAg+' 🤝</div>'
+    +'<div class="s">compromissos na agenda</div></div>'
+    +'</div>';
+}
+function agendaContatosHtml(sel){
+  const ref=agRef(), [y,m]=ref.split('-').map(Number);
+  const hj=localISO(new Date());
+  const mapa=agendaDoComercial(sel);
+  const f=resumoAgenda(sel,ref);
+  const nm=new Date(y,m-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const nomeMes=nm.charAt(0).toUpperCase()+nm.slice(1);
+
+  const kpi=(k,v,sub,cor)=>'<div class="ag-kpi"><div class="k">'+k+'</div>'
+    +'<div class="v"'+(cor?' style="color:'+cor+'"':'')+'>'+v+'</div><div class="s">'+sub+'</div></div>';
+
+  const primeiro=new Date(y,m-1,1), ultimo=new Date(y,m,0);
+  const inicio=new Date(y,m-1,1-primeiro.getDay());
+  const nCels=Math.ceil((primeiro.getDay()+ultimo.getDate())/7)*7;
+  let cels='';
+  for(let i=0;i<nCels;i++){
+    const d=new Date(inicio.getFullYear(),inicio.getMonth(),inicio.getDate()+i);
+    const iso=localISO(d), fora=d.getMonth()!==m-1, dia=mapa[iso]||{lig:[],reu:[]};
+    const nL=dia.lig.length, nR=dia.reu.length, tem=nL+nR>0;
+    const pend=iso<hj?dia.lig.filter(r=>!cumpriu(r,iso,'lig')).length+dia.reu.filter(r=>!cumpriu(r,iso,'reu')).length:0;
+    // o nome do cliente vem primeiro: o assessor precisa saber PARA QUEM vai ligar
+    const itens=[...dia.lig.map(r=>({r,k:'lig',ico:'📞',cls:'l'})),...dia.reu.map(r=>({r,k:'reu',ico:'🤝',cls:'r'}))];
+    const MAX=3;
+    const linhas=itens.slice(0,MAX).map(x=>{
+      const feito=cumpriu(x.r,iso,x.k), furo=iso<hj&&!feito;   // hoje ainda não acabou
+      const nome=(x.r.cliente||'—');
+      return '<span class="ag-item '+(furo?'furo':x.cls)+(feito&&iso<hj?' ok':'')+'" title="'+
+        String(nome).replace(/"/g,'&quot;')+' · '+(x.k==='lig'?'ligação':'reunião')+(furo?' · sem registro':'')+'">'
+        +x.ico+' '+nome+'</span>';
+    }).join('');
+    cels+='<div class="ag-cel'+(fora?' fora':'')+(tem?' tem':'')+(iso===hj?' hoje':'')+(iso===window._agDia?' sel':'')+'"'
+      +(tem?' onclick="agDia(\''+iso+'\')" title="Ver os '+(nL+nR)+' compromissos de '+brData(iso)+'"':'')+'>'
+      +'<span class="ag-num">'+d.getDate()
+      +(pend?' <span class="ag-tag pend">'+pend+' sem registro</span>':'')+'</span>'
+      +linhas
+      +(itens.length>MAX?'<span class="ag-mais">+'+(itens.length-MAX)+' — abrir o dia</span>':'')
+      +'</div>';
+  }
+  const dows=['dom','seg','ter','qua','qui','sex','sáb'].map(x=>'<div class="ag-dow">'+x+'</div>').join('');
+
+  // lista do dia escolhido
+  let lista='';
+  if(window._agDia&&mapa[window._agDia]){
+    const d=mapa[window._agDia];
+    const linha=(r,k)=>'<div class="ag-lin">'
+      +'<span class="ag-tag '+(k==='lig'?'l">📞 ligação':'r">🤝 reunião')+'</span>'
+      +'<span><span class="cli" onclick="openEdit(\''+r.id+'\')">'+(r.cliente||'—')+'</span>'
+      +'<div class="sub">'+((SUBAREAS[subAreaOf(r)]||{}).name||'')+' · '+(r.produto||'—')+' · '+(r.sc||'sem status')+'</div></span>'
+      +mkChip(r,k)
+      +'<span class="vol">'+(fmt(r.atual||r.pipe)||'—')+'</span></div>';
+    lista='<div class="ag-lista">'
+      +'<div style="font-size:11px;font-weight:700;margin-bottom:6px">'+brData(window._agDia)+' · '
+      +(d.lig.length+d.reu.length)+' compromisso'+((d.lig.length+d.reu.length)!==1?'s':'')
+      +' <span style="font-weight:400;color:var(--muted-l)">— clique no chip para confirmar que aconteceu</span></div>'
+      +d.lig.map(r=>linha(r,'lig')).join('')+d.reu.map(r=>linha(r,'reu')).join('')
+      +'</div>';
+  }
+
+  return '<div class="ag">'
+    +'<div class="ag-top"><div class="ag-tit">📆 Agenda de contatos <small>· ligações e reuniões marcadas nos cards de '+sel.split(' ')[0]+'</small></div>'
+    +'<div class="ag-nav"><button onclick="agNav(-1)" title="Mês anterior">‹</button>'
+    +'<span class="ag-mes">'+nomeMes+'</span>'
+    +'<button onclick="agNav(1)" title="Próximo mês">›</button>'
+    +'<button onclick="agHoje()" title="Voltar para o mês atual">hoje</button></div></div>'
+    +'<div class="ag-real">'+realizadoHtml(sel,ref,f)+'</div>'
+    +'<div class="ag-grid">'+dows+cels+'</div>'
+    +lista
+    +'<div class="ag-nota">A data do compromisso sai do card — <strong>📞 Vou ligar em</strong> e <strong>📅 Reunião em</strong>, no bloco “Trabalhar oportunidade” ou no modal da oportunidade. '
+    +'“Feito” usa a mesma prova do quadro de efetividade: a confirmação no card, o movimento de status ou a data da reunião que já passou.</div>'
+    +'</div>';
+}
+
 function diaAtuacaoHtml(){
   const isDirG=USER.perfil==='diretor'||USER.perfil==='gestor';
   let comerciais;
@@ -2017,13 +2476,21 @@ function diaAtuacaoHtml(){
     +'<div class="dprog-txt">'+feitos+' de '+tot+' já tocadas hoje</div></div>'
     +'</div>';
 
+  // o log usa o mesmo quadrante dos demais: nasce fechado, a seta abre
   const log=logHojeDe(sel);
-  const logHtml='<div class="section-label" style="margin-top:0">📋 O que '+(sel===USER.nome?'você já fez':sel.split(' ')[0]+' já fez')+' hoje'
-    +' <span style="background:var(--wine-l);color:var(--wine);border-radius:10px;padding:1px 8px;font-size:11px;text-transform:none;letter-spacing:0;font-weight:700">'+log.length+' registro'+(log.length!==1?'s':'')+'</span></div>'
-    +'<div class="dlog-box">'
+  const logAberto=window._quadOpen.has('log')&&log.length>0;
+  const logHtml='<div class="dquad dlog-quad'+(logAberto?' open':'')+(log.length?'':' vazio')+'" id="dquad-log" style="--qc:var(--wine);--qbg:var(--wine-l)">'
+    +'<div class="dquad-hdr"'+(log.length?' onclick="toggleQuad(\'log\')" title="'+(logAberto?'Recolher':'Ver os '+log.length+' registros')+'"':'')+'>'
+    +'<span>📋</span>'
+    +'<span class="dquad-title">O que '+(sel===USER.nome?'você já fez':sel.split(' ')[0]+' já fez')+' hoje</span>'
+    +'<span class="dquad-cnt">'+log.length+'</span>'
+    +(log.length?'<span class="dquad-chev">⌄</span>':'')
+    +'</div>'
+    +'<div class="dquad-body">'
     +(log.length?log.slice(0,20).map(it=>'<div class="dlog-item"><span>'+it.ico+'</span><div class="dlog-txt"><b>'+it.cliente+'</b> — '+it.desc+'<span class="d">'+it.hora+'</span></div></div>').join('')
+      +(log.length>20?'<div style="font-size:10.5px;color:var(--muted-l);text-align:center;padding-top:4px">+'+(log.length-20)+' registros anteriores</div>':'')
       :'<div class="dlog-empty">Nada por aqui ainda — marque ✓, registre uma nota ou trabalhe uma oportunidade abaixo que isso vai se preenchendo sozinho.</div>')
-    +'</div>';
+    +'</div></div>';
 
   const q_ico=Object.fromEntries(QUADS.map(q=>[q.key,q.ico]));
   const rowHtml=({r,m},qKey)=>{
@@ -2049,7 +2516,8 @@ function diaAtuacaoHtml(){
       +(r.sc?'<span class="oppd-badge" style="background:var(--wine-l);color:var(--wine)">'+r.sc+'</span>':'')
       +(r.pb?'<span class="oppd-badge" style="background:var(--border-l);color:var(--muted)">'+r.pb+'</span>':'')
       +'<span class="oppd-badge" style="background:'+risk.bg+';color:'+risk.color+'" title="'+(dias?dias+' dias sem movimentação':'movimentada hoje')+'">'+risk.icon+' '+(dias===0?'mexida hoje':dias+'d parado')+'</span>'
-      +(done?'<span class="oppd-badge" style="background:#E1F5EE;color:#085041">✓ tocada hoje</span>':'')
+      +(done?'<span class="oppd-badge" style="background:var(--green-bg);color:#085041">✓ tocada hoje</span>':'')
+      +mkChip(r,'lig')+mkChip(r,'reu')
       +'</div>'
       +'</div>'
       +'<div class="oppd-detail">'
@@ -2060,6 +2528,8 @@ function diaAtuacaoHtml(){
       +'<div class="oppd-work-field"><label>Status comercial</label>'+selectHtmlSC(qKey,r)+'</div>'
       +'<div class="oppd-work-field"><label>Pendência boleta</label>'+selectHtmlPB(qKey,r)+'</div>'
       +'<div class="oppd-work-field"><label>Data boleta</label><input type="date" id="data-'+key+'" value="'+(parseDataBoleta(r.data_boleta)||'')+'"></div>'
+      +'<div class="oppd-work-field"><label>📞 Vou ligar em</label><input type="date" id="lig-'+key+'" value="'+(dataLigacao(r)||'')+'"></div>'
+      +'<div class="oppd-work-field"><label>📅 Reunião em</label><input type="date" id="reu-'+key+'" value="'+((r.reuniao_data||'').slice(0,10))+'"></div>'
       +'</div>'
       +'<div class="oppd-work-ftr"><button class="btn sm" style="background:var(--green);color:#fff;border-color:var(--green)" onclick="salvarTrabalhoDaily(\''+qKey+'\',\''+r.id+'\')">💾 Salvar e concluir</button>'
       +'<span class="oppd-full" onclick="openEdit(\''+r.id+'\')">abrir oportunidade completa</span></div>'
@@ -2068,22 +2538,27 @@ function diaAtuacaoHtml(){
       +'</div>';
   };
 
+  // quadrantes nascem fechados: só o cabeçalho com contagem e valor. A seta abre.
   const quadHtml=QUADS.map(q=>{
     const val=q.itens.reduce((s,x)=>s+(x.r.atual||x.r.pipe||0),0);
+    const aberto=window._quadOpen.has(q.key)&&q.itens.length>0;
     // --qc/--qbg ficam no quadrante inteiro: os cards lá dentro herdam a cor do quadrante
-    return '<div class="dquad" style="--qc:'+q.cor+';--qbg:'+q.bg+'">'
-      +'<div class="dquad-hdr"><span>'+q.ico+'</span><span class="dquad-title">'+q.titulo+'</span>'
+    return '<div class="dquad'+(aberto?' open':'')+(q.itens.length?'':' vazio')+'" id="dquad-'+q.key+'" style="--qc:'+q.cor+';--qbg:'+q.bg+'">'
+      +'<div class="dquad-hdr"'+(q.itens.length?' onclick="toggleQuad(\''+q.key+'\')" title="'+(aberto?'Recolher':'Ver as '+q.itens.length+' oportunidades')+'"':'')+'>'
+      +'<span>'+q.ico+'</span><span class="dquad-title">'+q.titulo+'</span>'
       +'<span class="dquad-cnt">'+q.itens.length+'</span>'
       +(q.itens.length?'<span class="dquad-val">'+(fmt(val)||'')+'</span>':'')
+      +(q.itens.length?'<span class="dquad-chev">⌄</span>':'')
       +'</div>'
       +'<div class="dquad-body">'
-      +(q.itens.length?q.itens.map(x=>rowHtml(x,q.key)).join(''):'<div class="dquad-empty">🎉 quadrante limpo</div>')
+      +(q.itens.length?q.itens.map(x=>rowHtml(x,q.key)).join(''):'<div class="dquad-empty">quadrante limpo</div>')
       +'</div>'
       +'</div>';
   }).join('');
 
   return banner+logHtml
-    +'<div class="section-label">🧭 O que tem pra fazer <span style="text-transform:none;font-weight:400;letter-spacing:0;color:var(--muted-l)">— organizado por quadrante</span></div>'
+    +agendaContatosHtml(sel)
+    +'<div class="section-label">O que tem pra fazer <span style="text-transform:none;font-weight:400;letter-spacing:0;color:var(--muted-l)">— organizado por quadrante</span></div>'
     +chips
     +'<div class="dquads">'+quadHtml+'</div>';
 }
@@ -2151,11 +2626,11 @@ function applyFilter(){
       const attn=rows.filter(r=>!isB(r)&&daysSince(getLastMoveDate(r))>3&&daysSince(getLastMoveDate(r))<=7);
       const ok=rows.filter(r=>!isB(r)&&daysSince(getLastMoveDate(r))<=3);
       const riskHtml='<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">'
-        +'<div style="background:#FCEBEB;border:1px solid #E8B0B0;border-radius:6px;padding:10px 14px;display:flex;align-items:center;gap:8px">'
+        +'<div style="background:var(--red-bg);border:1px solid var(--red-b);border-radius:6px;padding:10px 14px;display:flex;align-items:center;gap:8px">'
         +'<span style="font-size:20px">🔴</span><div><div style="font-size:18px;font-weight:700;color:#791F1F">'+atRisk.length+'</div><div style="font-size:10px;color:#791F1F;font-weight:600">Paradas +7 dias</div><div style="font-size:11px;color:var(--muted)">'+fmt(atRisk.reduce((s,r)=>s+(r.pipe||0),0))+'</div></div></div>'
-        +'<div style="background:#FEF3E2;border:1px solid #FAC775;border-radius:6px;padding:10px 14px;display:flex;align-items:center;gap:8px">'
+        +'<div style="background:var(--amber-bg);border:1px solid var(--amber-b);border-radius:6px;padding:10px 14px;display:flex;align-items:center;gap:8px">'
         +'<span style="font-size:20px">🟡</span><div><div style="font-size:18px;font-weight:700;color:#854F0B">'+attn.length+'</div><div style="font-size:10px;color:#854F0B;font-weight:600">Atenção 4-7 dias</div><div style="font-size:11px;color:var(--muted)">'+fmt(attn.reduce((s,r)=>s+(r.pipe||0),0))+'</div></div></div>'
-        +'<div style="background:#E1F5EE;border:1px solid #9FD5B0;border-radius:6px;padding:10px 14px;display:flex;align-items:center;gap:8px">'
+        +'<div style="background:var(--green-bg);border:1px solid var(--green-b);border-radius:6px;padding:10px 14px;display:flex;align-items:center;gap:8px">'
         +'<span style="font-size:20px">🟢</span><div><div style="font-size:18px;font-weight:700;color:#085041">'+ok.length+'</div><div style="font-size:10px;color:#085041;font-weight:600">Em dia ≤3 dias</div><div style="font-size:11px;color:var(--muted)">'+fmt(ok.reduce((s,r)=>s+(r.pipe||0),0))+'</div></div></div>'
         +'</div>';
 
@@ -2221,7 +2696,7 @@ function applyFilter(){
   });
 
   const selCount=SELECTED.size;
-  const bulkBar=selCount>0?'<div style="display:flex;align-items:center;gap:12px;background:var(--wine-l);border:1px solid #C8A0A8;border-radius:6px;padding:10px 16px;margin-bottom:12px">'
+  const bulkBar=selCount>0?'<div style="display:flex;align-items:center;gap:12px;background:var(--wine-l);border:1px solid var(--accent-b);border-radius:6px;padding:10px 16px;margin-bottom:12px">'
     +'<span style="font-size:13px;font-weight:700;color:var(--wine-d)">'+selCount+' selecionada'+(selCount>1?'s':'')+'</span>'
     +'<button class="btn sm" style="border-color:var(--red-b);background:var(--red-bg);color:var(--red)" onclick="deleteSelected()">🗑️ Excluir selecionadas</button>'
     +'<button class="btn sm" onclick="clearSelection()">Limpar seleção</button>'
@@ -2400,6 +2875,7 @@ function scFunil(sc){
   if(chain)return norm(chain);
   if(/r2/.test(k)&&/agendar/.test(k))return norm('Agendar Reunião');
   if(/r2/.test(k)&&/agendad/.test(k))return norm('Reunião Agendada');
+  if(/^ligar/.test(k))return norm('Ligar Cliente');   // "Ligar Cliente c AI" e variantes
   return k;
 }
 
@@ -2501,9 +2977,13 @@ function kbCliDebounce(){
   },350);
 }
 // ── Barra de rolagem horizontal também ACIMA de cada kanban ──
+// A posição fica guardada em _kbScroll: toda re-renderização (auto-atualização de 60s,
+// mover card, mudar status) recria o board do zero, e sem isso a rolagem voltava pro início.
+window._kbScroll=window._kbScroll||{};
 function initKbScrollTop(){
-  document.querySelectorAll('.kb-board').forEach(board=>{
-    if(board.scrollWidth<=board.clientWidth+4)return;
+  document.querySelectorAll('.kb-board').forEach((board,idx)=>{
+    const chave=curView+'#'+idx;
+    if(board.scrollWidth<=board.clientWidth+4){delete window._kbScroll[chave];return}
     if(board.previousElementSibling&&board.previousElementSibling.classList.contains('kb-scroll-top'))board.previousElementSibling.remove();
     const proxy=document.createElement('div');
     proxy.className='kb-scroll-top';
@@ -2512,9 +2992,23 @@ function initKbScrollTop(){
     spacer.style.cssText='height:1px;width:'+board.scrollWidth+'px';
     proxy.appendChild(spacer);
     board.parentNode.insertBefore(proxy,board);
-    let lock=false;
-    proxy.addEventListener('scroll',()=>{if(lock){lock=false;return}lock=true;board.scrollLeft=proxy.scrollLeft});
-    board.addEventListener('scroll',()=>{if(lock){lock=false;return}lock=true;proxy.scrollLeft=board.scrollLeft});
+
+    // espelha uma barra na outra. A trava é liberada no próximo quadro (e não pelo
+    // evento seguinte): se a atribuição não gerar evento — valor igual ou no limite —
+    // a trava não fica presa engolindo a próxima rolagem do usuário.
+    let travado=false;
+    const espelha=(de,para)=>()=>{
+      if(travado)return;
+      travado=true;
+      para.scrollLeft=de.scrollLeft;
+      requestAnimationFrame(()=>{travado=false});
+    };
+    proxy.addEventListener('scroll',espelha(proxy,board));
+    board.addEventListener('scroll',espelha(board,proxy));
+
+    board.addEventListener('scroll',()=>{window._kbScroll[chave]=board.scrollLeft});
+    const salvo=window._kbScroll[chave]||0;
+    if(salvo>0){board.scrollLeft=salvo;proxy.scrollLeft=board.scrollLeft;}
   });
 }
 
@@ -2588,19 +3082,22 @@ async function kbDrop(ev,statusKey){
   }catch(e){showToast('Erro: '+e.message)}
 }
 
-function renderAssessorOpps(c=document.getElementById('main-content')){
-  const isDir=USER.perfil==='diretor'||USER.perfil==='gestor';
-  const myOpps=isDir?[...OPPS]:OPPS.filter(r=>{
+// o que este usuário enxerga — diretor/gestor vê tudo, o resto vê o que é seu
+function oppsDoUsuario(){
+  if(USER.perfil==='diretor'||USER.perfil==='gestor')return [...OPPS];
+  return OPPS.filter(r=>{
     if(norm(r.assessor)===norm(USER.nome))return true;
     if(!(USER.areas||[]).includes(r.area))return false;
     if(r.responsavel&&norm(r.responsavel)!==norm(USER.nome))return false;
     return true;
   });
+}
+function renderAssessorOpps(c=document.getElementById('main-content')){
+  const isDir=USER.perfil==='diretor'||USER.perfil==='gestor';
+  const myOpps=oppsDoUsuario();
   const hoje=today();
-  const hora=new Date().getHours();
-  const saud=hora<12?'Bom dia':hora<18?'Boa tarde':'Boa noite';
 
-  const bolVol=myOpps.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+
   const ativos=myOpps.filter(r=>!isB(r));
 
   // Priority buckets
@@ -2672,6 +3169,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       +(r.reuniao_data?'<div class="kb-meta" style="color:#0C447C;font-weight:700">📅 Reunião '+fmtReuniao(r.reuniao_data)+'</div>':'')
       +(r.todo?'<div class="kb-meta" style="color:var(--amber)">📋 '+r.todo.substring(0,40)+(r.todo_data?' ('+r.todo_data.split('-')[2]+'/'+r.todo_data.split('-')[1]+''+')':'')+'</div>':'')
       +(r.obs&&limpaTraco(r.obs)?'<div class="kb-meta" title="'+String(r.obs).replace(/"/g,'&quot;')+'" style="color:#8A6A3B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 '+String(r.obs).substring(0,48)+(r.obs.length>48?'…':'')+'</div>':'')
+      +'<div class="kb-meta" style="display:flex;gap:4px;flex-wrap:wrap">'+mkChip(r,'lig')+mkChip(r,'reu')+'</div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between">'
       +'<div class="kb-vol">'+fmt(r.atual||r.pipe)+'</div>'
       +(risk?'<span style="font-size:10px;font-weight:700;color:'+risk.color+'">'+risk.icon+' '+dias+'d</span>':'<span style="font-size:12px">✅</span>')
@@ -2700,6 +3198,18 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   const fProd=window._kbProd||'';
   if(fProd)kbOpps=kbOpps.filter(r=>norm(r.produto||'')===norm(fProd));
   if(fCliKb)kbOpps=kbOpps.filter(r=>(r.cliente||'').toLowerCase().includes(fCliKb.toLowerCase()));
+
+  // ── população do funil de efetividade ──
+  // Segue os filtros que definem QUEM/O QUÊ: área, assessor, responsável, produto, cliente.
+  // NÃO segue status / pendência / agenda: esses selecionam uma etapa do pipeline, e filtrar
+  // por etapa faria o funil medir a si mesmo (tudo viraria 100% na etapa escolhida).
+  let funilOpps=myOpps;
+  const recorte=[];
+  if(fArea){funilOpps=funilOpps.filter(r=>subAreaOf(r)===fArea);recorte.push((SUBAREAS[fArea]||{}).name||fArea);}
+  if(fAssKb){funilOpps=funilOpps.filter(r=>assDe(r)===fAssKb);recorte.push(fAssKb);}
+  if(fResp){funilOpps=funilOpps.filter(r=>norm(r.responsavel||'')===norm(fResp));recorte.push(fResp);}
+  if(fProd){funilOpps=funilOpps.filter(r=>norm(r.produto||'')===norm(fProd));recorte.push(fProd);}
+  if(fCliKb){funilOpps=funilOpps.filter(r=>(r.cliente||'').toLowerCase().includes(fCliKb.toLowerCase()));recorte.push('cliente "'+fCliKb+'"');}
 
   function buildKanban(opps,seg){
     seg=seg||'';
@@ -2785,16 +3295,8 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   const semStatus=kbOpps.filter(r=>!isB(r)&&![...SC_CHAIN,...kbCustomCols()].some(s=>norm(s)===norm(r.sc||''))&&norm(r.sc||'')!=='cliente negou');
 
   c.innerHTML=''
-    // Hero
-    +'<div class="cockpit-hero">'
-    +'<div class="cockpit-hello">'+saud+', '+USER.nome.split(' ')[0]+'! 👋</div>'
-    +'<div class="cockpit-sub">'+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+' — '+(isDir?'guia do dia do time completo':'aqui está o seu guia de hoje')+'</div>'
-    +'<div class="cockpit-stats">'
-    +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+(atrasados.length+hojeList.length)+'</div><div class="cockpit-stat-l">🎯 Ações p/ hoje</div></div>'
-    +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+reunioesHoje.length+'</div><div class="cockpit-stat-l">📅 Reuniões hoje</div></div>'
-    +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+quaseLa.length+'</div><div class="cockpit-stat-l">🔥 Prontas p/ fechar</div></div>'
-    +'<div class="cockpit-stat"><div class="cockpit-stat-v">'+(fmt(bolVol)||'R$0')+'</div><div class="cockpit-stat-l">✓ Já boletado</div></div>'
-    +'</div></div>'
+    // Efetividade do funil (no lugar do banner de saudação)
+    +funilHtml(funilOpps,recorte)
 
     // Nova oportunidade
     +'<div style="display:flex;justify-content:flex-end;margin-bottom:14px">'
@@ -2852,7 +3354,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
           +'<td style="text-align:right;padding:8px 10px;color:var(--muted);font-weight:600">'+fmt(g.pipeAtivo)+'</td>'
           +'<td style="text-align:right;padding:8px 10px;font-weight:700;color:#085041">'+(fmt(g.bolV)||'—')+'</td>'
           +'</tr>'
-          +(exp?g.produtos.map(p=>'<tr style="background:#FCFAF8">'
+          +(exp?g.produtos.map(p=>'<tr style="background:var(--surf2)">'
             +'<td style="padding:5px 10px 5px 26px;font-size:11px;color:var(--muted)">↳ <span style="border:1px solid '+g.a.color+'55;color:'+g.a.color+';border-radius:4px;padding:0 6px;font-size:9px;font-weight:700;text-transform:uppercase">'+p.nome+'</span></td>'
             +p.etapas.map(n=>'<td style="text-align:center;padding:5px;font-size:11px;color:'+(n>0?'var(--text)':'var(--muted-l)')+'">'+(n||'—')+'</td>').join('')
             +'<td style="text-align:center;padding:5px;font-size:11px;font-weight:600;color:'+(p.bolN?'#085041':'var(--muted-l)')+'">'+(p.bolN||'—')+'</td>'
@@ -2861,7 +3363,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
             +'<td style="text-align:right;padding:5px 10px;font-size:11px;font-weight:600;color:'+(p.bolV?'#085041':'var(--muted-l)')+'">'+(fmt(p.bolV)||'—')+'</td>'
             +'</tr>').join(''):'');
         }).join('')
-        +'<tr style="border-top:2px solid var(--border);background:#FAF5F3">'
+        +'<tr style="border-top:2px solid var(--border);background:var(--surf2)">'
         +'<td style="padding:8px 10px;font-weight:700">Total</td>'
         +totE.map(n=>'<td style="text-align:center;padding:8px;font-weight:700">'+n+'</td>').join('')
         +'<td style="text-align:center;padding:8px;font-weight:700;color:#085041">'+totBolN+'</td>'
@@ -2919,7 +3421,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       const pbMap=new Map();
       ['Boletado','A Boletar','TO DO COMERCIAL','TO DO OPERACIONAL','Aguardando Comercial','EMAIL','Não se Aplica'].concat(OPPS.map(r=>r.pb).filter(Boolean)).forEach(p=>{if(!pbMap.has(norm(p)))pbMap.set(norm(p),p)});
       const pbOpts=[...pbMap.values()].map(x=>'<option>'+x+'</option>').join('');
-      return '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--wine-l);border:1px solid #C8A0A8;border-radius:6px;padding:10px 16px;margin-bottom:12px">'
+      return '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--wine-l);border:1px solid var(--accent-b);border-radius:6px;padding:10px 16px;margin-bottom:12px">'
         +'<span style="font-size:13px;font-weight:700;color:var(--wine-d)">'+SELECTED.size+' selecionada'+(SELECTED.size>1?'s':'')+'</span>'
         +'<span style="display:flex;align-items:center;gap:5px"><select class="filter-sel" id="bulk-sc" style="font-size:11px"><option value="">Mudar status para...</option>'+scOpts+'</select>'
         +'<button class="btn sm wine" onclick="bulkAplicar(\'sc\')">Aplicar</button></span>'
@@ -2931,17 +3433,17 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
         +'</div>';
     })():'')
     +kbHtml
-    +(semStatus.length?'<div class="kb-board" style="margin-top:-8px"><div class="kb-col" style="border:1.5px dashed #B0A89C;background:#FBF8F4">'
+    +(semStatus.length?'<div class="kb-board" style="margin-top:-8px"><div class="kb-col" style="border:1.5px dashed var(--muted-l);background:var(--surf2)">'
       +(()=>{window._kbColIds=window._kbColIds||{};window._kbColIds['|classificar']=semStatus.map(r=>r.id);const csel=semStatus.length>0&&semStatus.every(r=>SELECTED.has(r.id));
-        return '<div class="kb-col-hdr" style="color:var(--muted)"><span style="display:flex;align-items:center;gap:6px"><input type="checkbox" '+(csel?'checked ':'')+'title="Selecionar a coluna inteira" onclick="event.stopPropagation()" onchange="kbSelCol(\'|classificar\',this.checked)" style="width:13px;height:13px;cursor:pointer;accent-color:#B0A89C">❔ Classificar</span><span class="kb-count">'+semStatus.length+'</span></div>';})()
+        return '<div class="kb-col-hdr" style="color:var(--muted)"><span style="display:flex;align-items:center;gap:6px"><input type="checkbox" '+(csel?'checked ':'')+'title="Selecionar a coluna inteira" onclick="event.stopPropagation()" onchange="kbSelCol(\'|classificar\',this.checked)" style="width:13px;height:13px;cursor:pointer;accent-color:var(--muted-l)">❔ Classificar</span><span class="kb-count">'+semStatus.length+'</span></div>';})()
       +'<div style="font-size:10px;color:var(--muted);padding:0 8px 8px">Status fora do funil — escolha um existente ou crie uma coluna</div>'
       +semStatus.slice(0,(window._kbMore||{})['|classificar']?semStatus.length:15).map(r=>{
         const scBruto=(r.sc||'').replace(/"/g,'&quot;');
         const opts=[...SC_CHAIN,...kbCustomCols(),'Cliente Negou','Não se Aplica'].map(s=>'<option value="'+s.replace(/"/g,'&quot;')+'">'+s+'</option>').join('');
         return kbCard(r)
-          +'<div style="background:#fff;border:1px dashed #C9BFB2;border-radius:6px;padding:8px;margin:-6px 0 10px">'
+          +'<div style="background:#fff;border:1px dashed var(--border);border-radius:6px;padding:8px;margin:-6px 0 10px">'
           +'<div style="font-size:10px;color:var(--muted);margin-bottom:5px">Status atual: <b>'+(r.sc||'(vazio)')+'</b></div>'
-          +'<select style="width:100%;font-size:11px;padding:5px;border:1px solid #D8CFC4;border-radius:4px" onchange="setStatusManual(\''+r.id+'\',this.value)">'
+          +'<select style="width:100%;font-size:11px;padding:5px;border:1px solid var(--border);border-radius:4px" onchange="setStatusManual(\''+r.id+'\',this.value)">'
           +'<option value="">Mudar para status existente...</option>'+opts+'</select>'
           +(r.sc?'<button class="btn sm" style="width:100%;margin-top:5px" onclick="promoteStatus(\''+scBruto+'\')">📌 Criar coluna "'+(r.sc.length>22?r.sc.substring(0,22)+'…':r.sc)+'"</button>':'')
           +'</div>';
@@ -3020,7 +3522,7 @@ function renderAssessorDash(c=document.getElementById('main-content')){
   const efet=myOpps.length?Math.round(bolRows.length/myOpps.length*100):0;
 
   // Minhas metas (responsável = eu)
-  const minhasMetas=METAS.filter(m=>norm(m.assessor)===norm(USER.nome)).map(m=>{
+  const minhasMetas=metasDoMes().filter(m=>norm(m.assessor)===norm(USER.nome)).map(m=>{
     const rows=OPPS.filter(r=>{
       if(m.area&&r.area!==m.area)return false;
       if(m.produto&&norm(r.produto||'')!==norm(m.produto))return false;
@@ -3073,7 +3575,7 @@ function renderAssessorDash(c=document.getElementById('main-content')){
     +'</div>'
 
     // Minhas metas
-    +(minhasMetas.length?'<div class="section-label">🏆 Minhas metas do mês</div>'
+    +(minhasMetas.length?'<div class="section-label">Minhas metas do mês</div>'
       +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:22px">'
       +minhasMetas.map(m=>{
         const a=AREAS[m.area]||{color:corMarca('#8B1C2A'),name:m.area};
@@ -3099,7 +3601,7 @@ function renderAssessorDash(c=document.getElementById('main-content')){
     +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:22px">'+segCards+'</div>'
 
     // Esteira por etapa
-    +'<div class="section-label">🔄 O que está na esteira</div>'
+    +'<div class="section-label">O que está na esteira</div>'
     +'<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:18px 20px;margin-bottom:20px">'
     +funilRows.map(f=>{
       const w=Math.max(Math.round(f.n/maxF*100),3);
@@ -3270,8 +3772,10 @@ function fillStatusDatalists(){
 
 function openEdit(id){
   fillStatusDatalists();
-  const r=OPPS.find(o=>o.id===id);if(!r)return;
-  editId=id;
+  // compara como texto: o id vem de onclick (string) e no banco é uuid — se um dia vier
+  // número, a comparação estrita falhava calada e o modal simplesmente não abria
+  const r=OPPS.find(o=>String(o.id)===String(id));if(!r)return;
+  editId=r.id;
   document.getElementById('modal-edit-title').textContent=r.cliente+' — '+(r.produto||AREAS[r.area]?.name||r.area);
   fillSelect('e-sc',[...SC_PADRAO,...OPPS.map(x=>x.sc)],r.sc||'');
   fillSelect('e-pb',[...PB_PADRAO,...OPPS.map(x=>x.pb)],r.pb||'');
@@ -3290,6 +3794,8 @@ function openEdit(id){
     else info.style.display='none';
   })();
   document.getElementById('e-reuniao').value=r.reuniao_data||'';
+  document.getElementById('e-ligacao').value=dataLigacao(r)||'';
+  document.getElementById('e-marcas').innerHTML=mkChip(r,'lig',true)+mkChip(r,'reu',true);
   const respSel=document.getElementById('e-resp');
   const timeUsers=USUARIOS.filter(u=>u.ativo&&u.perfil!=='diretor').map(u=>u.nome);
   respSel.innerHTML='<option value="">Sem responsável</option>'+timeUsers.map(n=>'<option'+(norm(n)===norm(r.responsavel||'')?' selected':'')+'>'+n+'</option>').join('');
@@ -3337,6 +3843,8 @@ async function saveEdit(){
   const newAtual=parseFloat(document.getElementById('e-atual').value)||0;
   const hist=[...(r.historico||[])];
   [['Status comercial',r.sc,newSc],['Pendência boleta',r.pb,newPb],['Volume atual',String(r.atual||0),String(newAtual)]].forEach(([campo,de,para])=>{if(de!==para&&para)hist.push({campo,de,para,usuario:USER.nome,data:ds})});
+  const ligNova=document.getElementById('e-ligacao').value||'';
+  if(ligNova!==(dataLigacao(r)||''))hist.push({campo:CAMPO_LIG_DATA,de:dataLigacao(r)||'',para:ligNova,usuario:USER.nome,data:ds});
   const newObs=document.getElementById('e-obs').value.trim();
   if(newObs)hist.push({campo:'Observação',de:'',para:newObs,usuario:USER.nome,data:ds});
   const escPara=document.getElementById('e-escala-para')?document.getElementById('e-escala-para').value:'';
@@ -3420,200 +3928,970 @@ async function saveNewOpp(){
   }catch(e){showToast('Erro: '+e.message)}
 }
 
+// anel de progresso em SVG — sem dependência, funciona nos dois temas
+function anelPct(pct,cor,size,stroke){
+  size=size||96;stroke=stroke||10;
+  const r=(size-stroke)/2,c=2*Math.PI*r,cx=size/2;
+  const p=Math.max(Math.min(pct,100),0);
+  const off=c*(1-p/100);
+  const fonte=size>=110?24:size>=90?19:16;
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" style="display:block;flex-shrink:0">'
+    +'<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="var(--border)" stroke-width="'+stroke+'"/>'
+    +'<circle cx="'+cx+'" cy="'+cx+'" r="'+r+'" fill="none" stroke="'+cor+'" stroke-width="'+stroke+'" stroke-linecap="round"'
+    +' stroke-dasharray="'+c.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 '+cx+' '+cx+')"'
+    +' style="transition:stroke-dashoffset .7s ease"/>'
+    +'<text x="'+cx+'" y="'+cx+'" text-anchor="middle" dominant-baseline="central" '
+    +'style="font-size:'+fonte+'px;font-weight:700;fill:'+cor+';font-family:inherit">'+Math.round(pct)+'%</text>'
+    +'</svg>';
+}
+// barra com marcador de ritmo: onde deveria estar hoje vs onde está
+function barraRitmo(real,meta,esperado,cor,alt){
+  alt=alt||10;
+  const w=meta>0?Math.min(real/meta*100,100):0;
+  const we=meta>0?Math.min(esperado/meta*100,100):0;
+  return '<div style="position:relative;height:'+alt+'px;background:var(--border);border-radius:'+(alt/2)+'px;overflow:visible">'
+    +'<div style="width:'+w.toFixed(1)+'%;height:'+alt+'px;border-radius:'+(alt/2)+'px;background:'+cor+';transition:width .7s ease"></div>'
+    +(meta>0&&esperado<meta?'<div title="onde deveria estar hoje" style="position:absolute;top:-3px;left:calc('+we.toFixed(1)+'% - 1px);width:2px;height:'+(alt+6)+'px;background:var(--text);border-radius:1px;opacity:.55"></div>':'')
+    +'</div>';
+}
+function corPct(p){return p>=100?'var(--green)':p>=60?'var(--amber)':'var(--red)'}
+
 // ── DEFINIÇÕES DO MÊS (METAS) ──
 function renderMetas(c=document.getElementById('main-content')){
-  const mesLabel=new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const ml=new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const mesLabel=ml.charAt(0).toUpperCase()+ml.slice(1);
+  const du=diasUteis();
+  const ehDiretor=USER.perfil==='diretor';
 
-  // Compute progress for each meta (individual: by area+produto)
-  const metasComProgresso=METAS.map(m=>{
-    const rows=OPPS.filter(r=>{
-      if(m.area){
-        if(m.area==='rv'||m.area==='rf'){if(subAreaOf(r)!==m.area)return false;}
-        else if(r.area!==m.area)return false;
-      }
+  // oportunidades de um comercial (mesma regra da Gestão do time)
+  const oppsDe=nome=>OPPS.filter(r=>norm(r.responsavel||'')===norm(nome)||norm(r.assessor||'')===norm(nome));
+  const rowsGrupo=ak=>OPPS.filter(r=>(ak==='rv'||ak==='rf')?subAreaOf(r)===ak:r.area===ak);
+  const noGrupo=(r,ak)=>(ak==='rv'||ak==='rf')?subAreaOf(r)===ak:r.area===ak;
+
+  // progresso de cada meta — AGORA filtrando pela pessoa dona da meta
+  const metasComProgresso=metasDoMes().map(m=>{
+    const rows=oppsDe(m.assessor).filter(r=>{
+      if(m.area&&!noGrupo(r,m.area))return false;
       if(m.produto&&norm(r.produto||'')!==norm(m.produto))return false;
       return true;
     });
-    const boletado=rows.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
-    const pipe=rows.reduce((s,r)=>s+(r.pipe||0),0);
-    const pct=m.meta_valor>0?Math.min(Math.round(boletado/m.meta_valor*100),999):0;
-    return{...m,boletado,pipe,pct,nOpps:rows.length};
+    const boletado=rows.filter(isBoletadoFirmado).reduce((s,r)=>s+(r.atual||0),0);
+    const aBoletar=rows.filter(isABoletar).reduce((s,r)=>s+(r.atual||r.pipe||0),0);
+    const pipe=rows.filter(r=>!isB(r)&&!isPerdida(r)).reduce((s,r)=>s+(r.pipe||0),0);
+    const pct=m.meta_valor>0?Math.round(boletado/m.meta_valor*100):0;
+    return{...m,boletado,aBoletar,pipe,pct,nOpps:rows.length};
   });
 
-  // Group by area
+  if(!metasComProgresso.length){
+    c.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">'
+      +'<div><div style="font-size:18px;font-weight:700">Definições do mês</div>'
+      +'<div style="font-size:12px;color:var(--muted)">'+mesLabel+'</div></div>'
+      +(ehDiretor?'<button class="btn wine" onclick="openNewMeta()">+ Nova meta</button>':'')
+      +'</div>'
+      +'<div class="empty"><div class="empty-icon">🎯</div><p>Nenhuma meta definida para este mês ainda.<br>Clique em <strong>+ Nova meta</strong> para começar.</p></div>';
+    return;
+  }
+
+  // ── agrupamentos ──
   const porArea={};
-  metasComProgresso.forEach(m=>{
-    if(!porArea[m.area])porArea[m.area]=[];
-    porArea[m.area].push(m);
+  metasComProgresso.forEach(m=>{(porArea[m.area]=porArea[m.area]||[]).push(m)});
+  const GRUPOS=[...subareasVis().filter(([k])=>k==='rv'||k==='rf'),...areasVis()].filter(([ak])=>porArea[ak]&&porArea[ak].length);
+
+  const areas=GRUPOS.map(([ak,a])=>{
+    const meta=porArea[ak].reduce((s,m)=>s+(m.meta_valor||0),0);
+    const rows=rowsGrupo(ak);
+    const real=rows.filter(isBoletadoFirmado).reduce((s,r)=>s+(r.atual||0),0);
+    const aBol=rows.filter(isABoletar).reduce((s,r)=>s+(r.atual||r.pipe||0),0);
+    const pipe=rows.filter(r=>!isB(r)&&!isPerdida(r)).reduce((s,r)=>s+(r.pipe||0),0);
+    const pct=meta>0?Math.round(real/meta*100):0;
+    const esperado=meta/du.tot*du.ate;
+    return{ak,a,meta,real,aBol,pipe,pct,esperado,delta:real-esperado,precisaDia:Math.max(meta-real,0)/Math.max(du.rest,1)};
   });
-  const GRUPOS_META=[...subareasVis().filter(([k])=>k==='rv'||k==='rf'),...areasVis()].filter(([ak])=>porArea[ak]&&porArea[ak].length);
-  const rowsGrupo=ak=>OPPS.filter(r=>(ak==='rv'||ak==='rf')?subAreaOf(r)===ak:r.area===ak);
 
-  // Global totals
-  const totalMeta=metasComProgresso.reduce((s,m)=>s+(m.meta_valor||0),0);
-  const totalBolGlobal=Object.keys(porArea).reduce((s,ak)=>{
-    const rows=OPPS.filter(r=>r.area===ak);
-    return s+rows.filter(isB).reduce((s2,r)=>s2+(r.atual||0),0);
-  },0);
-  const totalPct=totalMeta>0?Math.round(totalBolGlobal/totalMeta*100):0;
+  // totais globais somando os GRUPOS (rv/rf entram certo, sem dupla contagem com inv)
+  const tMeta=areas.reduce((s,x)=>s+x.meta,0);
+  const tReal=areas.reduce((s,x)=>s+x.real,0);
+  const tPipe=areas.reduce((s,x)=>s+x.pipe,0);
+  const tABol=areas.reduce((s,x)=>s+x.aBol,0);
+  const tPct=tMeta>0?Math.round(tReal/tMeta*100):0;
+  const tEsp=tMeta/du.tot*du.ate;
+  const tDelta=tReal-tEsp;
+  const falta=Math.max(tMeta-tReal,0);
+  const precisaDia=falta/Math.max(du.rest,1);
 
-  c.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">'
-    +'<div><div style="font-size:18px;font-weight:700">🎯 Definições do mês</div>'
-    +'<div style="font-size:12px;color:var(--muted);text-transform:capitalize">'+mesLabel+'</div></div>'
-    +(USER.perfil==='diretor'?'<button class="btn wine" onclick="openNewMeta()">+ Nova meta</button>':'')
-    +'</div>'
-
-    // Global summary
-    +(METAS.length?(()=>{
-      const areaLine=(getVal)=>'<div style="display:flex;gap:10px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border-l);flex-wrap:wrap">'
-        +GRUPOS_META.map(([ak,a])=>{
-          const metasA=porArea[ak]||[];
-          const metaA=metasA.reduce((s,m)=>s+(m.meta_valor||0),0);
-          const bolA=rowsGrupo(ak).filter(isB).reduce((s,r)=>s+(r.atual||0),0);
-          const pctA=metaA>0?Math.round(bolA/metaA*100):0;
-          return '<div style="display:flex;align-items:center;gap:4px" title="'+a.name+'">'
-            +'<span style="width:8px;height:8px;border-radius:50%;background:'+a.color+';flex-shrink:0"></span>'
-            +'<span style="font-size:11px;font-weight:700;color:'+a.color+'">'+getVal(metaA,bolA,pctA)+'</span>'
-            +'</div>';
-        }).join('')+'</div>';
-      return '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px">'
-      +'<div class="kpi wine"><div class="kpi-lbl">Meta total do mês</div><div class="kpi-val">'+fmt(totalMeta)+'</div>'+areaLine((m,b,p)=>fmt(m))+'</div>'
-      +'<div class="kpi green"><div class="kpi-lbl">Realizado</div><div class="kpi-val">'+(fmt(totalBolGlobal)||'R$0')+'</div>'+areaLine((m,b,p)=>fmt(b)||'R$0')+'</div>'
-      +'<div class="kpi '+(totalPct>=100?'green':totalPct>=60?'amber':'')+'"><div class="kpi-lbl">Atingimento</div><div class="kpi-val">'+totalPct+'%</div>'+areaLine((m,b,p)=>p+'%')+'</div>'
-      +'</div>';
-    })():'')
-
-    // ── RITMO DO MÊS: pace por dia útil + boletas fechadas ──
-    +(METAS.length?(()=>{
-      const du=diasUteis();
-      const paceCards=GRUPOS_META.map(([ak,a])=>{
-        const metaA=(porArea[ak]||[]).reduce((s,m)=>s+(m.meta_valor||0),0);
-        if(!metaA)return '';
-        const bolA=rowsGrupo(ak).filter(isB).reduce((s,r)=>s+(r.atual||0),0);
-        const esperado=metaA/du.tot*du.ate;
-        const delta=bolA-esperado;
-        const porDia=metaA/du.tot;
-        const precisaDia=Math.max(metaA-bolA,0)/Math.max(du.rest,1);
-        const pctReal=Math.min(Math.round(bolA/metaA*100),100);
-        const pctEsp=Math.min(Math.round(esperado/metaA*100),100);
-        const batida=bolA>=metaA;
-        const badge=batida
-          ?'<span style="background:#E1F5EE;color:#085041;border:1px solid #9FE1CB;border-radius:3px;padding:3px 12px;font-size:12px;font-weight:700">🏁 Meta batida!</span>'
-          :delta>=0
-          ?'<span style="background:#E1F5EE;color:#085041;border:1px solid #9FE1CB;border-radius:3px;padding:3px 12px;font-size:12px;font-weight:700">🔥 Adiantado '+fmt(delta)+'</span>'
-          :'<span style="background:#FCEBEB;color:#A32D2D;border:1px solid #F7C1C1;border-radius:3px;padding:3px 12px;font-size:12px;font-weight:700">⚠️ Atrasado '+fmt(-delta)+'</span>';
-        return '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid '+a.color+';border-radius:6px;padding:16px 18px;margin-bottom:12px">'
-          +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">'
-          +'<div style="font-size:13px;font-weight:700;color:'+a.color+';text-transform:uppercase;letter-spacing:.03em">'+a.name+'</div>'
-          +badge
+  // ── BLOCO DE RITMO (o mesmo desenho para o total do mês e para cada área) ──
+  // quebra por produto: trilha clara = pipe em aberto, barra cheia = boletado
+  const produtosDaArea=(ak,cor)=>{
+    const map={};
+    rowsGrupo(ak).forEach(r=>{
+      const pk=r.produto||'Outros';
+      if(!map[pk])map[pk]={real:0,pipe:0};
+      if(isBoletadoFirmado(r))map[pk].real+=(r.atual||0);
+      if(!isB(r)&&!isPerdida(r))map[pk].pipe+=(r.pipe||0);
+    });
+    const itens=Object.entries(map).sort((a,b)=>(b[1].real-a[1].real)||(b[1].pipe-a[1].pipe));
+    if(itens.length<2)return '';
+    const base=Math.max(...itens.map(([,v])=>v.real+v.pipe),1);
+    const track=tint(cor,.82);
+    return '<div style="margin-top:16px;padding-top:13px;border-top:1px solid var(--border-l)">'
+      +'<div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Por produto</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,340px));gap:5px 26px">'
+      +itens.map(([nome,v])=>{
+        const wT=Math.min((v.real+v.pipe)/base*100,100);
+        const wR=Math.min(v.real/base*100,100);
+        return '<div style="display:flex;align-items:center;gap:8px">'
+          +'<span title="'+String(nome).replace(/"/g,'&quot;')+'" style="font-size:10.5px;font-weight:600;width:88px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+nome+'</span>'
+          +'<div style="flex:1;position:relative;height:9px;min-width:40px">'
+          +(wT?'<div style="position:absolute;left:0;top:0;height:9px;width:'+wT.toFixed(1)+'%;background:'+track+';border-radius:3px"></div>':'')
+          +(wR?'<div style="position:absolute;left:0;top:0;height:9px;width:'+wR.toFixed(1)+'%;background:'+cor+';border-radius:3px"></div>':'')
           +'</div>'
-          +'<div style="position:relative;height:14px;background:var(--border);border-radius:3px;margin-bottom:6px">'
-          +'<div style="width:'+pctReal+'%;height:14px;border-radius:3px;background:'+(batida?'#085041':delta>=0?'#1D9E75':'#E24B4A')+';transition:width .6s"></div>'
-          +(!batida?'<div title="onde você deveria estar hoje" style="position:absolute;top:-3px;left:'+pctEsp+'%;width:3px;height:20px;background:#2C2C2A;border-radius:2px"></div>':'')
-          +'</div>'
-          +'<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:10px">'
-          +'<span>'+(fmt(bolA)||'R$0')+' feito</span>'
-          +(!batida?'<span>▮ esperado hoje: '+fmt(esperado)+'</span>':'')
-          +'<span>meta '+fmt(metaA)+'</span>'
-          +'</div>'
-          +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">'
-          +'<div style="background:var(--cream);border-radius:4px;padding:7px 4px"><div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase">Dia útil</div><div style="font-size:14px;font-weight:700">'+du.ate+' <span style="font-size:10px;color:var(--muted);font-weight:600">/ '+du.tot+'</span></div></div>'
-          +'<div style="background:var(--cream);border-radius:4px;padding:7px 4px"><div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase">Meta/dia</div><div style="font-size:14px;font-weight:700">'+fmt(porDia)+'</div></div>'
-          +'<div style="background:'+(batida?'#E1F5EE':'#FDF6EC')+';border-radius:4px;padding:7px 4px"><div style="font-size:9px;font-weight:700;color:'+(batida?'#085041':'#854F0B')+';text-transform:uppercase">'+(batida?'Concluído':'Precisa/dia')+'</div><div style="font-size:14px;font-weight:700;color:'+(batida?'#085041':'#854F0B')+'">'+(batida?'🏆':fmt(precisaDia))+'</div></div>'
-          +'</div>'
-          +'</div>';
-      }).join('');
-      const bols=OPPS.filter(r=>isB(r)&&(r.atual||0)>0)
-        .sort((x,y)=>String(parseDataBoleta(y.data_boleta)||'').localeCompare(String(parseDataBoleta(x.data_boleta)||'')));
-      const bolPanel='<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:14px 16px">'
-        +'<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">✅ Boletas do mês <span style="background:var(--cream);border-radius:3px;padding:1px 8px;margin-left:4px">'+bols.length+'</span></div>'
-        +(bols.length?'<div style="max-height:330px;overflow-y:auto">'
-          +bols.slice(0,25).map(r=>{
-            const sub=subAreaOf(r);const cor=(SUBAREAS[sub]||{}).color||'#888';
-            const db=parseDataBoleta(r.data_boleta);
-            return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border-l)">'
-              +'<span style="width:8px;height:8px;border-radius:50%;background:'+cor+';flex-shrink:0"></span>'
-              +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(r.cliente||'—')+'</div>'
-              +'<div style="font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(r.assessor||'')+(db?' · '+db.split('-')[2]+'/'+db.split('-')[1]:'')+'</div></div>'
-              +'<div style="font-size:12px;font-weight:700;color:#085041;flex-shrink:0">'+fmt(r.atual||0)+'</div>'
-              +'</div>';
-          }).join('')
-          +(bols.length>25?'<div style="font-size:10px;color:var(--muted);text-align:center;padding-top:6px">+'+(bols.length-25)+' boletas</div>':'')
-          +'</div>'
-          :'<div style="font-size:12px;color:var(--muted);padding:10px 0">Nenhuma boleta fechada ainda neste mês — bora abrir o placar! 💪</div>')
-        +'</div>';
-      return '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">⚡ Ritmo do mês</div>'
-        +'<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:24px">'
-        +'<div style="flex:1;min-width:320px">'+paceCards+'</div>'
-        +'<div style="width:300px;flex-shrink:0">'+bolPanel+'</div>'
-        +'</div>';
-    })():'')
-
-    // Area groups
-    +(Object.keys(porArea).length
-      ?GRUPOS_META.map(([ak,a])=>{
-        const metas=porArea[ak];
-        const areaMeta=metas.reduce((s,m)=>s+(m.meta_valor||0),0);
-        // Realizado da área = boletado total da área
-        const areaRows=rowsGrupo(ak);
-        const areaBol=areaRows.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
-        const areaPipe=areaRows.reduce((s,r)=>s+(r.pipe||0),0);
-        const areaPct=areaMeta>0?Math.min(Math.round(areaBol/areaMeta*100),999):0;
-        const areaPctColor=areaPct>=100?'#085041':areaPct>=60?'#854F0B':a.color;
-        const areaBarW=Math.min(areaPct,100);
-
-        return '<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:20px;overflow:hidden;border-left:3px solid '+a.color+'">'
-
-          // Area header with total
-          +'<div style="padding:20px 22px;border-bottom:1px solid var(--border-l)">'
-          +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">'
-          +'<div style="display:flex;align-items:center;gap:8px">'
-          +'<span style="width:12px;height:12px;border-radius:50%;background:'+a.color+'"></span>'
-          +'<span style="font-size:17px;font-weight:700;color:'+a.color+';text-transform:uppercase;letter-spacing:.03em">'+a.name+'</span>'
-          +'</div>'
-          +'<span style="font-size:20px;font-weight:700;color:'+areaPctColor+'">'+areaPct+'%</span>'
-          +'</div>'
-          +'<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px">'
-          +'<span style="font-size:26px;font-weight:700;color:'+areaPctColor+'">'+(fmt(areaBol)||'R$0')+'</span>'
-          +'<span style="font-size:14px;color:var(--muted)">/ meta '+fmt(areaMeta)+'</span>'
-          +'<span style="margin-left:auto;font-size:12px;color:var(--muted)">pipe disponível: '+fmt(areaPipe)+'</span>'
-          +'</div>'
-          +'<div style="height:10px;background:var(--border);border-radius:3px;overflow:hidden">'
-          +'<div style="width:'+areaBarW+'%;height:10px;border-radius:3px;background:'+areaPctColor+';transition:width .6s"></div>'
-          +'</div>'
-          +'<div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:right">'
-          +(areaMeta>areaBol?'falta '+fmt(areaMeta-areaBol)+' para a meta':'✅ meta da área atingida!')
-          +'</div>'
-          +'</div>'
-
-          // Team members
-          +'<div style="padding:14px 22px 18px">'
-          +'<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Time responsável</div>'
-          +metas.map(m=>{
-            const pctColor=m.pct>=100?'#085041':m.pct>=60?'#854F0B':a.color;
-            const barW=Math.min(m.pct,100);
-            return '<div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid var(--border-l)">'
-              +'<div style="width:34px;height:34px;border-radius:50%;background:'+a.color+';color:'+corTexto(a.color)+';font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+m.assessor.substring(0,2).toUpperCase()+'</div>'
-              +'<div style="flex:1;min-width:0">'
-              +'<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">'
-              +'<div style="font-size:13px;font-weight:700">'+m.assessor
-              +(m.produto?' <span class="badge b-gray" style="font-size:9px;margin-left:4px">'+m.produto+'</span>':'')
-              +'</div>'
-              +'<div style="font-size:12px;white-space:nowrap"><strong style="color:'+pctColor+'">'+(fmt(m.boletado)||'R$0')+'</strong>'
-              +'<span style="color:var(--muted)"> / '+fmt(m.meta_valor)+'</span>'
-              +'<strong style="color:'+pctColor+';margin-left:8px">'+m.pct+'%</strong></div>'
-              +'</div>'
-              +'<div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:6px">'
-              +'<div style="width:'+barW+'%;height:6px;border-radius:3px;background:'+pctColor+'"></div>'
-              +'</div>'
-              +'</div>'
-              +(USER.perfil==='diretor'?'<button class="btn sm" style="flex-shrink:0" onclick="openEditMeta(\''+m.id+'\')">✏️</button><button class="btn sm" style="border-color:var(--red-b);background:var(--red-bg);color:var(--red);flex-shrink:0" onclick="delMeta(\''+m.id+'\')">×</button>':'')
-              +'</div>';
-          }).join('')
-          +'</div>'
+          +'<span style="font-size:10.5px;font-weight:700;width:58px;flex-shrink:0;text-align:right;font-variant-numeric:tabular-nums;color:'+(v.real?cor:'var(--muted-l)')+'">'+(v.real?fmt(v.real):'—')+'</span>'
           +'</div>';
       }).join('')
-      :'<div class="empty"><div class="empty-icon">🎯</div><p>Nenhuma meta definida para este mês ainda.<br>Clique em <strong>+ Nova meta</strong> para começar.</p></div>');
+      +'</div></div>';
+  };
+
+  // rotulo/corBorda mudam; todo o resto do desenho é idêntico entre o total e as áreas
+  const blocoRitmo=o=>{
+    const meta=o.meta||0, real=o.real||0;
+    const pct=meta>0?Math.round(real/meta*100):0;
+    const esperado=meta/du.tot*du.ate;
+    const delta=real-esperado;
+    const falta=Math.max(meta-real,0);
+    const precisaDia=falta/Math.max(du.rest,1);
+    const cor=corPct(pct);
+    const selo=real>=meta&&meta>0
+      ?'<span style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-b);border-radius:20px;padding:5px 14px;font-size:12.5px;font-weight:700">🏁 Meta batida</span>'
+      :delta>=0
+      ?'<span style="background:var(--green-bg);color:var(--green);border:1px solid var(--green-b);border-radius:20px;padding:5px 14px;font-size:12.5px;font-weight:700">🔥 Adiantado '+fmt(delta)+'</span>'
+      :'<span style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-b);border-radius:20px;padding:5px 14px;font-size:12.5px;font-weight:700">⚠️ Atrasado '+fmt(-delta)+'</span>';
+    const miniStat=(l,v,c)=>'<div style="flex:1;min-width:105px">'
+      +'<div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">'+l+'</div>'
+      +'<div style="font-size:16px;font-weight:700;color:'+(c||'var(--text)')+';margin-top:2px;font-variant-numeric:tabular-nums">'+v+'</div></div>';
+    return '<div style="background:var(--card);border:1px solid var(--border);border-left:4px solid '+o.corBorda+';border-radius:10px;padding:20px 24px;margin-bottom:14px">'
+      +'<div style="display:flex;align-items:center;gap:26px;flex-wrap:wrap">'
+      +anelPct(pct,cor,118,12)
+      +'<div style="flex:1;min-width:260px">'
+      +'<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">'
+      +'<span style="font-size:11px;font-weight:700;color:'+(o.corRotulo||'var(--muted)')+';text-transform:uppercase;letter-spacing:.05em">'+o.rotulo+'</span>'+selo+'</div>'
+      +'<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">'
+      +'<span style="font-size:40px;font-weight:700;line-height:1;color:'+cor+'">'+(fmt(real)||'R$0')+'</span>'
+      +'<span style="font-size:15px;color:var(--muted)">de '+fmt(meta)+'</span></div>'
+      +'<div style="margin:12px 0 6px">'+barraRitmo(real,meta,esperado,cor,12)+'</div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);flex-wrap:wrap;gap:8px">'
+      +'<span>▮ ritmo esperado hoje: '+fmt(esperado)+'</span>'
+      +'<span>dia útil <strong style="color:var(--text)">'+du.ate+'</strong> de '+du.tot+' · faltam '+du.rest+'</span>'
+      +'</div></div>'
+      +'<div style="display:flex;gap:16px;flex-wrap:wrap;min-width:220px;padding-left:18px;border-left:1px solid var(--border-l)">'
+      +miniStat('Falta',falta?fmt(falta):'—',falta?'var(--amber)':'var(--green)')
+      +miniStat('Precisa/dia',(du.rest&&falta)?fmt(precisaDia):'—')
+      +miniStat('Pipe aberto',fmt(o.pipe)||'—','var(--blue)')
+      +(o.aBol?miniStat('A boletar',fmt(o.aBol),'var(--amber)'):'')
+      +'</div>'
+      +'</div>'
+      +(o.produtos||'')
+      +'</div>';
+  };
+
+  const hero=blocoRitmo({rotulo:'Realizado do mês',corBorda:'var(--wine)',real:tReal,meta:tMeta,pipe:tPipe,aBol:tABol});
+
+  const cardsArea=areas.map(x=>blocoRitmo({
+    rotulo:x.a.name, corRotulo:x.a.color, corBorda:x.a.color,
+    real:x.real, meta:x.meta, pipe:x.pipe, aBol:x.aBol,
+    produtos:produtosDaArea(x.ak,x.a.color),
+  })).join('');
+
+  // ── POR COMERCIAL (ranking) ──
+  const porPessoa={};
+  metasComProgresso.forEach(m=>{
+    const k=m.assessor||'—';
+    if(!porPessoa[k])porPessoa[k]={nome:k,metas:[],meta:0,real:0,aBol:0,pipe:0};
+    const p=porPessoa[k];
+    p.metas.push(m);p.meta+=(m.meta_valor||0);p.real+=m.boletado;p.aBol+=m.aBoletar;p.pipe+=m.pipe;
+  });
+  const pessoas=Object.values(porPessoa).map(p=>{
+    p.pct=p.meta>0?Math.round(p.real/p.meta*100):0;
+    p.esperado=p.meta/du.tot*du.ate;
+    p.delta=p.real-p.esperado;
+    return p;
+  }).sort((a,b)=>b.pct-a.pct||b.real-a.real);
+  const medalha=['🥇','🥈','🥉'];
+
+  const linhasPessoa=pessoas.map((p,ix)=>{
+    const cor=corPct(p.pct);
+    const inits=String(p.nome).trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const subs=p.metas.map(m=>{
+      const g=(SUBAREAS[m.area]||AREAS[m.area]||{});
+      const pc=m.meta_valor>0?Math.round(m.boletado/m.meta_valor*100):0;
+      return '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--surf2);border:1px solid var(--border-l);border-radius:12px;padding:2px 8px;font-size:9.5px;white-space:nowrap">'
+        +'<span style="width:6px;height:6px;border-radius:50%;background:'+(g.color||'var(--muted)')+'"></span>'
+        +'<span style="font-weight:700">'+(g.name||m.area||'—')+(m.produto?' · '+m.produto:'')+'</span>'
+        +'<span style="color:var(--muted)">'+fmtC(m.boletado)+'/'+fmtC(m.meta_valor)+'</span>'
+        +'<strong style="color:'+corPct(pc)+'">'+pc+'%</strong>'
+        +(ehDiretor?'<span onclick="event.stopPropagation();openEditMeta(\''+m.id+'\')" title="Editar meta" style="cursor:pointer;opacity:.5;margin-left:2px">✏️</span>'
+          +'<span onclick="event.stopPropagation();delMeta(\''+m.id+'\')" title="Excluir meta" style="cursor:pointer;opacity:.5">×</span>':'')
+        +'</span>';
+    }).join(' ');
+    return '<div style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--border-l)">'
+      +'<div style="width:28px;text-align:center;font-size:19px;line-height:1;flex-shrink:0">'+(medalha[ix]||'<span style="font-size:11px;color:var(--muted-l);font-weight:700">'+(ix+1)+'º</span>')+'</div>'
+      +'<div style="width:38px;height:38px;border-radius:50%;background:'+cor+';color:var(--card);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+inits+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap">'
+      +'<span style="font-size:13.5px;font-weight:700">'+p.nome+'</span>'
+      +'<span style="font-size:12px;white-space:nowrap"><strong style="color:'+cor+'">'+(fmt(p.real)||'R$0')+'</strong>'
+      +'<span style="color:var(--muted)"> / '+fmt(p.meta)+'</span>'
+      +'<strong style="color:'+cor+';margin-left:8px;font-size:14px">'+p.pct+'%</strong></span>'
+      +'</div>'
+      +'<div style="margin:7px 0 6px">'+barraRitmo(p.real,p.meta,p.esperado,cor,9)+'</div>'
+      +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+subs
+      +(p.aBol?'<span style="font-size:9.5px;font-weight:700;color:var(--amber);background:var(--amber-bg);border-radius:12px;padding:2px 8px">⏳ '+fmtC(p.aBol)+' a boletar</span>':'')
+      +(p.delta<0&&p.real<p.meta?'<span style="font-size:9.5px;font-weight:700;color:var(--red)">▮ atrasado '+fmt(-p.delta)+'</span>':'')
+      +'</div></div></div>';
+  }).join('');
+
+  // ── BOLETAS DO MÊS ──
+  const bols=OPPS.filter(r=>isBoletadoFirmado(r)&&(r.atual||0)>0)
+    .sort((x,y)=>String(parseDataBoleta(y.data_boleta)||'').localeCompare(String(parseDataBoleta(x.data_boleta)||'')));
+  const painelBoletas='<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Boletas do mês '
+    +'<span style="background:var(--green-bg);color:var(--green);border-radius:10px;padding:1px 9px;margin-left:4px">'+bols.length+'</span></div>'
+    +(bols.length?'<div style="max-height:360px;overflow-y:auto">'
+      +bols.slice(0,25).map(r=>{
+        const cor=(SUBAREAS[subAreaOf(r)]||{}).color||'var(--muted)';
+        const db=parseDataBoleta(r.data_boleta);
+        return '<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--border-l)">'
+          +'<span style="width:8px;height:8px;border-radius:50%;background:'+cor+';flex-shrink:0"></span>'
+          +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(r.cliente||'—')+'</div>'
+          +'<div style="font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(r.responsavel||r.assessor||'')+(db?' · '+db.split('-')[2]+'/'+db.split('-')[1]:'')+'</div></div>'
+          +'<div style="font-size:12px;font-weight:700;color:var(--green);flex-shrink:0;font-variant-numeric:tabular-nums">'+fmt(r.atual||0)+'</div>'
+          +'</div>';
+      }).join('')
+      +(bols.length>25?'<div style="font-size:10px;color:var(--muted);text-align:center;padding-top:8px">+'+(bols.length-25)+' boletas</div>':'')
+      +'</div>'
+      :'<div style="font-size:12px;color:var(--muted);padding:10px 0">Nenhuma boleta fechada ainda neste mês — bora abrir o placar! 💪</div>')
+    +'</div>';
+
+  c.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px">'
+    +'<div><div style="font-size:18px;font-weight:700">Definições do mês</div>'
+    +'<div style="font-size:12px;color:var(--muted)">'+mesLabel+' · meta por área e por comercial</div></div>'
+    +(ehDiretor?'<button class="btn wine" onclick="openNewMeta()">+ Nova meta</button>':'')
+    +'</div>'
+    +hero
+    +'<div class="section-label" style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">Por área'
+    +'<span style="font-size:9.5px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted-l)">'
+    +'— na quebra por produto: barra cheia = boletado, trilha clara = pipe em aberto</span></div>'
+    +'<div style="margin-bottom:22px">'+cardsArea+'</div>'
+    +'<div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">'
+    +'<div style="flex:1;min-width:400px">'
+    +'<div class="section-label">Por comercial</div>'
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden">'+linhasPessoa+'</div>'
+    +'<div style="font-size:10px;color:var(--muted);margin-top:8px">▮ marca onde a pessoa deveria estar hoje, considerando o dia útil '+du.ate+' de '+du.tot+'. Só conta boleta <strong>Boletado</strong> — "A Boletar" aparece à parte.</div>'
+    +'</div>'
+    +'<div style="width:320px;flex-shrink:0;min-width:280px">'+painelBoletas+'</div>'
+    +'</div>';
+}
+
+// ══════════════════════════════════════════════════════════
+// ── FUNIL DE EFETIVIDADE: geradas > ligação > reunião > conversão ──
+// Lê a MAIOR etapa que a oportunidade já alcançou (histórico + status atual).
+// Usar só o status de hoje mentiria a favor: quem teve reunião e depois virou
+// "Cliente Negou" sumiria da etapa de reunião e inflaria a taxa de conversão.
+// ══════════════════════════════════════════════════════════
+const ETAPA_IDX=s=>{
+  const k=scFunil(s);
+  if(!k)return -1;
+  const i=SC_CHAIN.findIndex(x=>norm(x)===k);
+  return i;
+};
+function etapaMaxima(r){
+  let max=ETAPA_IDX(r.sc);
+  (r.historico||[]).forEach(h=>{
+    if(h.campo!=='Status comercial')return;
+    const a=ETAPA_IDX(h.para), b=ETAPA_IDX(h.de);
+    if(a>max)max=a;
+    if(b>max)max=b;
+  });
+  return max;
+}
+const veioDePlanilha=r=>(r.historico||[]).some(h=>/\(planilha\)\s*$/.test(h.usuario||''));
+
+// ── MARCAÇÃO EXPLÍCITA: o assessor confirma no card que ligou / que reuniu ──
+// Vale mais que qualquer inferência: é o próprio time afirmando o fato.
+// Guardado no histórico (sem coluna nova no banco); a última marcação de cada
+// tipo é a que vale, então desmarcar realmente desmarca.
+const MARCAS={
+  lig:{campo:'Ligação',on:'Ligou para o cliente',off:'Desmarcou a ligação',ico:'📞',rot:'Ligou'},
+  reu:{campo:'Reunião',on:'Reunião aconteceu',off:'Desmarcou a reunião',ico:'🤝',rot:'Fez reunião'},
+};
+// Data em que o assessor VAI LIGAR. Guardada como marcador no histórico — a
+// última entrada é a que vale — para não exigir coluna nova no banco.
+const CAMPO_LIG_DATA='Ligação marcada';
+function dataLigacao(r){
+  let v='';
+  (r.historico||[]).forEach(h=>{if(h.campo===CAMPO_LIG_DATA)v=parseDataBoleta(h.para)||''});
+  return v;
+}
+function marcaInfo(r,k){
+  const M=MARCAS[k];let e=null;
+  (r.historico||[]).forEach(h=>{if(h.campo===M.campo)e=(h.para===M.on)?h:null});
+  return e;
+}
+const marcado=(r,k)=>!!marcaInfo(r,k);
+async function toggleMarca(id,k,ev){
+  if(ev){ev.stopPropagation();ev.preventDefault();}
+  const r=OPPS.find(o=>String(o.id)===String(id));if(!r)return;
+  const M=MARCAS[k],liga=!marcado(r,k);
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const hist=[...(r.historico||[]),{campo:M.campo,de:'',para:liga?M.on:M.off,usuario:USER.nome,data:ds}];
+  r.historico=hist;                 // pinta na hora, sem esperar o banco
+  pintaMarcas();
+  const stampAntes=window._funilStamp||0;
+  try{
+    await db('PATCH','oportunidades',{historico:hist,updated_at:now.toISOString()},'id=eq.'+r.id);
+  }catch(e){showToast('Não consegui salvar a marcação: '+e.message);return;}
+  await loadData();renderCurView();pintaMarcas();
+  // o aviso mostra o número novo do quadro de efetividade — a agulha mexe na hora,
+  // mesmo quando o quadro não está visível na tela em que o clique aconteceu
+  const naTela=(window._funilStamp||0)!==stampAntes;
+  const f=calcFunil(naTela?(window._funilRows||[]):opsDoPeriodo(oppsDoUsuario()));
+  const n=(k==='lig'?f.comLig:f.comReu), tot=f.geradas;
+  const pct=tot?Math.round(n/tot*100):0;
+  const quadro=' · efetividade: '+n+' de '+tot+(k==='lig'?' ligadas':' com reunião')+' ('+pct+'%)';
+  showToast((liga?M.ico+' '+M.rot+' em '+(r.cliente||'oportunidade'):'Marcação removida de '+(r.cliente||'oportunidade'))+quadro,liga);
+}
+// repinta todo chip [data-mk="id|tipo"] a partir do estado atual
+function pintaMarcas(){
+  document.querySelectorAll('[data-mk]').forEach(el=>{
+    const [id,k]=el.getAttribute('data-mk').split('|');
+    const r=OPPS.find(o=>String(o.id)===String(id));
+    el.classList.toggle('on',!!(r&&marcado(r,k)));
+  });
+}
+function mkChip(r,k,grande){
+  const M=MARCAS[k];
+  return '<span class="mk'+(grande?' lg':'')+(marcado(r,k)?' on':'')+'" data-mk="'+r.id+'|'+k+'"'
+    +' onclick="toggleMarca(\''+r.id+'\',\''+k+'\',event)"'
+    +' title="'+(marcado(r,k)?'Marcado — clique para desmarcar':'Marcar que '+(k==='lig'?'ligou para o cliente':'a reunião aconteceu'))+'">'
+    +M.ico+' '+(grande?(k==='lig'?'Ligou para o cliente':'Fez reunião'):M.rot)+'</span>';
+}
+
+// ── EVIDÊNCIA DE TOQUE REAL ──
+// Uma ligação de verdade deixa rastro no card mesmo quando NÃO avança a etapa:
+// o cliente não atendeu, pediu para ligar depois, e o card continua em "Ligar Cliente".
+// Contam como toque: mexer no status saindo da etapa de ligação, escrever uma
+// observação, marcar como feito na Daily (que grava observação) e agendar a reunião.
+// Card parado em "Ligar Cliente" sem NENHUM registro é o único caso de "não ligou".
+function teveAtividade(r){
+  if(r.reuniao_data)return true;
+  return (r.historico||[]).some(h=>{
+    if(h.campo==='Observação')return !!String(h.para||'').trim();
+    if(h.campo==='Status comercial')return ETAPA_IDX(h.de)===0&&norm(h.para||'')!==norm(h.de||'');
+    return false;
+  });
+}
+// LIGOU DE FATO = avançou de etapa, ou registrou atividade no card, ou já fechou.
+const teveLigacao=r=>marcado(r,'lig')||etapaMaxima(r)>=1||teveAtividade(r)||isB(r);
+// REUNIU DE FATO = a data da reunião já passou, ou o card SAIU da etapa de reunião
+// (só sai depois do encontro acontecer), ou passou de "Cliente Confirmar", ou fechou.
+// Reunião marcada para frente NÃO conta: ainda não aconteceu.
+const reuniaoFutura=r=>!!r.reuniao_data&&r.reuniao_data.slice(0,10)>=today()&&!isB(r)&&!marcado(r,'reu');
+function teveReuniao(r){
+  if(marcado(r,'reu'))return true;   // o time confirmou: acabou a discussão
+  if(isB(r))return true;
+  if(r.reuniao_data&&r.reuniao_data.slice(0,10)<today())return true;   // a data já passou
+  if(ETAPA_IDX(r.sc)>=3)return true;   // já passou de "Reunião Agendada"
+  return (r.historico||[]).some(h=>h.campo==='Status comercial'&&ETAPA_IDX(h.de)>=2);
+}
+
+function calcFunil(rows){
+  const geradas=rows.length;
+  const comLig=rows.filter(teveLigacao).length;
+  const comReu=rows.filter(teveReuniao).length;
+  const conv=rows.filter(isBoletadoFirmado);
+  const convN=conv.length;
+  const pct=(a,b)=>b>0?Math.round(a/b*100):0;
+  return{
+    geradas, comLig, comReu, convN,
+    volume:conv.reduce((a,r)=>a+(r.atual||0),0),
+    tLig:pct(comLig,geradas), tReu:pct(comReu,comLig), tConv:pct(convN,comReu),
+    pontaAPonta:pct(convN,geradas),
+    pDeLig:geradas-comLig, pDeReu:comLig-comReu, pDeConv:comReu-convN,
+    dePlanilha:rows.filter(r=>veioDePlanilha(r)&&etapaMaxima(r)>=1).length,
+    reuAgendada:rows.filter(r=>reuniaoFutura(r)&&!teveReuniao(r)).length,
+  };
+}
+
+// período: 'mes' | 'tri' | 'ano' | 'tudo'
+window._funilPer=window._funilPer||'mes';
+function setFunilPer(p){window._funilPer=p;renderCurView();}
+function opsDoPeriodo(rows){
+  const p=window._funilPer;
+  if(p==='tudo')return rows;
+  const hoje=new Date();
+  const ini=new Date(hoje);
+  if(p==='mes')ini.setDate(1);
+  else if(p==='tri')ini.setMonth(hoje.getMonth()-2,1);
+  else if(p==='ano')ini.setMonth(0,1);
+  ini.setHours(0,0,0,0);
+  return rows.filter(r=>{
+    if(!r.created_at)return true;           // sem data conhecida: não some do funil
+    const d=new Date(r.created_at);
+    return isNaN(d)?true:d>=ini;
+  });
+}
+
+function funilHtml(rows,recorte){
+  const perRows=opsDoPeriodo(rows);
+  const f=calcFunil(perRows);
+  // guardado para o modal de detalhe: o clique na barra abre exatamente esta população
+  window._funilRows=perRows; window._funilRec=recorte||[];
+  window._funilStamp=(window._funilStamp||0)+1;
+  const rot={mes:'Este mês',tri:'Trimestre',ano:'Ano',tudo:'Tudo'};
+  const rec=(recorte&&recorte.length)
+    ?'<span class="fnl-rec">'+recorte.map(x=>'<span>'+x+'</span>').join('')+'</span>':'';
+  const chips=Object.keys(rot).map(k=>'<button class="fnl-chip'+(window._funilPer===k?' on':'')+'" onclick="setFunilPer(\''+k+'\')">'+rot[k]+'</button>').join('');
+  if(!f.geradas){
+    return '<div class="fnl">'
+      +'<div class="fnl-top"><div><div class="fnl-lbl">Efetividade do funil</div>'
+      +'<div class="fnl-per">nenhuma oportunidade no período'+(recorte&&recorte.length?' com esse filtro':'')+'</div>'+rec+'</div>'
+      +'<div class="fnl-chips">'+chips+'</div></div></div>';
+  }
+  const base=f.geradas;
+  const larg=n=>Math.max(n/base*100,2);
+  const etapa=(nome,sub,n,cor,pctTxt,key)=>'<div class="fnl-et'+(n&&key?' clic':'')+'"'
+    +(n&&key?' onclick="abrirFunilEtapa(\''+key+'\')" title="Ver as '+n+' oportunidades"':'')+'>'
+    +'<div class="fnl-nm">'+nome+'<small>'+sub+'</small></div>'
+    +'<div class="fnl-trilho"><div class="fnl-barra" style="width:'+larg(n).toFixed(1)+'%;background:'+cor+'"><b>'+n+'</b></div></div>'
+    +'<div class="fnl-dir"><b>'+pctTxt+'</b> das geradas</div></div>';
+  // o verbo concorda com quantas AVANÇARAM; o complemento, com quantas PARARAM
+  const passo=(taxa,avancaram,vSing,vPlur,perda,pSing,pPlur,cor)=>'<div class="fnl-passo"><div></div>'
+    +'<div class="fnl-mid"><span class="fnl-seta">↓</span>'
+    +'<span class="fnl-taxa" style="color:'+cor+'">'+taxa+'%</span> '+(avancaram===1?vSing:vPlur)
+    +(perda>0?'<span class="fnl-perda">· '+perda+' '+(perda===1?pSing:pPlur)+'</span>':'')
+    +'</div><div></div></div>';
+  const corTaxa=t=>t>=70?'var(--green)':t>=45?'var(--amber)':'var(--red)';
+  // a passagem mais fraca é o gargalo do período
+  const passagens=[{n:'geradas → ligação',t:f.tLig},{n:'ligação → reunião',t:f.tReu},{n:'reunião → boleta',t:f.tConv}];
+  const pior=passagens.reduce((a,b)=>b.t<a.t?b:a);
+
+  return '<div class="fnl">'
+    +'<div class="fnl-top">'
+    +'<div><div class="fnl-lbl">Efetividade do funil</div>'
+    +'<div class="fnl-per">'+f.geradas+(f.geradas===1?' oportunidade':' oportunidades')+' no período</div>'+rec+'</div>'
+    +'<div class="fnl-chips">'+chips+'</div></div>'
+    +etapa('Geradas','oportunidades criadas',f.geradas,'var(--wine)','100%','geradas')
+    +passo(f.tLig,f.comLig,'foi trabalhada','foram trabalhadas',f.pDeLig,'sem nenhum registro','sem nenhum registro',corTaxa(f.tLig))
+    +etapa('Ligaram','atividade registrada no card',f.comLig,'#8E4152',(f.geradas?Math.round(f.comLig/f.geradas*100):0)+'%','ligacao')
+    +passo(f.tReu,f.comReu,'chegou à reunião','chegaram à reunião',f.pDeReu,'não virou reunião','não viraram reunião',corTaxa(f.tReu))
+    +etapa('Fez reunião','encontro já realizado',f.comReu,'#A66070',(f.geradas?Math.round(f.comReu/f.geradas*100):0)+'%','reuniao')
+    +passo(f.tConv,f.convN,'converteu','converteram',f.pDeConv,'reunião sem fechamento','reuniões sem fechamento',corTaxa(f.tConv))
+    +etapa('Converteram','boletado'+(f.volume?' · '+fmt(f.volume):''),f.convN,'var(--green)',f.pontaAPonta+'%','conv')
+    +'<div class="fnl-nota"><strong>Conversão ponta a ponta: '+f.pontaAPonta+'%</strong>'
+    +' — de cada 100 oportunidades geradas, '+f.pontaAPonta+' viram boleta.'
+    +(f.geradas>3?' A passagem mais fraca é <strong>'+pior.n+' ('+pior.t+'%)</strong>.':'')
+    +(f.reuAgendada?'<span class="fnl-obs">'+f.reuAgendada+(f.reuAgendada===1?' reunião já está agendada para frente e ainda não entrou na conta':' reuniões já estão agendadas para frente e ainda não entraram na conta')+'.</span>':'')
+    +(f.dePlanilha?'<span class="fnl-obs">'+f.dePlanilha+(f.dePlanilha===1?' veio':' vieram')+' de planilha já em estágio adiantado — as etapas anteriores aconteceram fora do sistema.</span>':'')
+    +'</div>'
+    +'</div>';
+}
+
+// ── DETALHE DA ETAPA: quem exatamente está dentro de cada barra ──
+// O clique na barra abre a lista com a PROVA de cada linha: a observação
+// registrada, o movimento de status ou a data da reunião que fez a
+// oportunidade contar naquela etapa. Sem prova visível, o número é fé.
+const dataBR=iso=>{if(!iso)return'';const p=String(iso).slice(0,10).split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:''};
+function dtKey(s){
+  if(!s)return 0;
+  const m=String(s).match(/(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/);
+  if(m)return +new Date(+m[3],+m[2]-1,+m[1],+(m[4]||0),+(m[5]||0));
+  const d=new Date(s);return isNaN(d)?0:+d;
+}
+const aspas=t=>'“'+String(t).trim().replace(/\s+/g,' ').slice(0,90)+(String(t).trim().length>90?'…':'')+'”';
+function provaEtapa(k,r){
+  if(k==='geradas')return{d:dataBR(r.created_at),txt:'criada'+(veioDePlanilha(r)?' · veio de planilha':'')};
+  if(k==='conv')return{d:dataBR(r.data_boleta)||dataBR(r.updated_at),txt:'boleta fechada'};
+  const mi=marcaInfo(r,k==='ligacao'?'lig':k==='reuniao'?'reu':'');
+  if(mi)return{d:mi.data,txt:'✓ confirmado no card',quem:mi.usuario};
+  if(k==='ligacao'){
+    for(const h of (r.historico||[])){
+      if(h.campo==='Observação'&&String(h.para||'').trim())return{d:h.data,txt:'registrou '+aspas(h.para),quem:h.usuario};
+      if(h.campo==='Status comercial'){
+        if(ETAPA_IDX(h.de)===0&&norm(h.para||'')!==norm(h.de||''))return{d:h.data,txt:'moveu de “'+(h.de||'—')+'” para “'+(h.para||'—')+'”',quem:h.usuario};
+        if(ETAPA_IDX(h.para)>=1)return{d:h.data,txt:'avançou para “'+(h.para||'—')+'”',quem:h.usuario};
+      }
+    }
+    if(r.reuniao_data){
+      // a reunião marcada prova que houve contato, mas o contato foi QUANDO ele marcou,
+      // não na data da reunião. Sem esse registro, a data do toque é desconhecida.
+      const hm=[...(r.historico||[])].reverse().find(h=>h.campo==='Reunião marcada');
+      return hm?{d:hm.data,txt:'marcou a reunião de '+dataBR(r.reuniao_data),quem:hm.usuario}
+               :{d:'',txt:'reunião agendada para '+dataBR(r.reuniao_data)+' — data do contato não registrada'};
+    }
+    if(isB(r))return{d:dataBR(r.data_boleta),txt:'⚠ inferido: boletada sem registro de contato'};
+    return{d:'',txt:'status atual: '+(r.sc||'—')};
+  }
+  if(r.reuniao_data&&r.reuniao_data.slice(0,10)<today())return{d:dataBR(r.reuniao_data),txt:'reunião na agenda, data já passou'};
+  const h=(r.historico||[]).find(x=>x.campo==='Status comercial'&&ETAPA_IDX(x.de)>=2);
+  if(h)return{d:h.data,txt:'saiu de “'+h.de+'” para “'+(h.para||'—')+'”',quem:h.usuario};
+  if(ETAPA_IDX(r.sc)>=3)return{d:'',txt:'status atual: '+(r.sc||'—')};
+  return{d:dataBR(r.data_boleta),txt:'⚠ inferido: boletada sem registro de reunião'};
+}
+const ETAPA_DET={
+  geradas:{ico:'📋',t:'Oportunidades geradas',sub:'tudo que entrou no período',cor:'var(--wine)',bg:'var(--wine-l)',fn:()=>true,col:'Criada em'},
+  ligacao:{ico:'📞',t:'Ligações que aconteceram',sub:'oportunidades com atividade registrada pelo time',cor:'#8E4152',bg:'var(--wine-ll)',fn:r=>teveLigacao(r),col:'Primeiro toque'},
+  reuniao:{ico:'🤝',t:'Fez reunião',sub:'encontros já realizados — agendadas para frente não entram',cor:'#A66070',bg:'var(--wine-ll)',fn:r=>teveReuniao(r),col:'Reunião'},
+  conv:{ico:'✅',t:'Converteram em boleta',sub:'pendência de boleta = Boletado',cor:'var(--green)',bg:'var(--green-bg)',fn:r=>isBoletadoFirmado(r),col:'Fechada em'},
+};
+function abrirFunilEtapa(k){
+  const E=ETAPA_DET[k];if(!E)return;
+  const base=window._funilRows||[];
+  const lista=base.filter(E.fn)
+    .map(r=>({r,p:provaEtapa(k,r)}))
+    .sort((a,b)=>dtKey(b.p.d)-dtKey(a.p.d)||((b.r.atual||b.r.pipe||0)-(a.r.atual||a.r.pipe||0)));
+  const vol=r=>k==='conv'?(r.atual||0):(r.atual||r.pipe||0);
+  const tot=lista.reduce((a,x)=>a+vol(x.r),0);
+  const rot={mes:'Este mês',tri:'Trimestre',ano:'Ano',tudo:'Tudo'}[window._funilPer]||'';
+  const rec=(window._funilRec||[]);
+
+  const linhas=lista.map(({r,p})=>'<tr onclick="closeModal(\'area\');openEdit(\''+r.id+'\')" title="Abrir oportunidade">'
+    +'<td style="font-weight:700">'+(r.cliente||'—')
+      +'<div class="fn-ev" style="font-weight:400">'+((AREAS[r.area]||{}).name||r.area||'—')+' · '+(r.produto||'—')+'</div></td>'
+    +'<td style="color:var(--muted)">'+(r.assessor||'—')+'</td>'
+    +'<td class="fn-quando">'+(p.d||'—')+'</td>'
+    +'<td class="fn-ev fn-prova">'+p.txt+(p.quem?' <span style="color:var(--muted-l)">· '+p.quem+'</span>':'')+'</td>'
+    +'<td style="color:var(--muted);font-size:11px">'+(r.sc||'—')+'</td>'
+    +'<td class="r val">'+(fmt(vol(r))||'—')+'</td></tr>').join('');
+
+  document.getElementById('ba-title').innerHTML=E.ico+' '+E.t
+    +' <span style="font-size:11px;font-weight:600;color:var(--muted)">· '+rot.toLowerCase()+(rec.length?' · '+rec.join(' · '):'')+'</span>';
+  document.getElementById('ba-body').innerHTML=
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">'
+    +'<div style="flex:1;min-width:150px;background:'+E.bg+';border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:'+E.cor+';text-transform:uppercase;letter-spacing:.04em">Oportunidades</div>'
+    +'<div style="font-size:20px;font-weight:700;color:'+E.cor+';font-variant-numeric:tabular-nums">'+lista.length+'</div>'
+    +'<div style="font-size:10px;color:var(--muted)">'+E.sub+'</div></div>'
+    +'<div style="flex:1;min-width:150px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">'+(k==='conv'?'Volume fechado':'Volume em jogo')+'</div>'
+    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">'+(fmt(tot)||'R$0')+'</div>'
+    +'<div style="font-size:10px;color:var(--muted)">'+(k==='conv'?'boletado':'pipe ou realizado')+'</div></div>'
+    +'</div>'
+    +(lista.length
+      ? '<div class="ba-sec" style="--bc:'+E.cor+';--bbg:'+E.bg+'"><div style="overflow-x:auto"><table class="ba-tbl">'
+        +'<thead><tr><th>Cliente</th><th>Assessor</th><th>'+E.col+'</th><th>O que comprova</th><th>Status hoje</th><th class="r">Volume</th></tr></thead>'
+        +'<tbody>'+linhas+'</tbody></table></div></div>'
+      : '<div class="ba-vazio">Nenhuma oportunidade nesta etapa.</div>')
+    +'<div style="font-size:10px;color:var(--muted-l);margin-top:6px">Clique em qualquer linha para abrir a oportunidade. A coluna “o que comprova” mostra o registro que fez a oportunidade contar nesta etapa.</div>';
+  document.getElementById('modal-area').style.display='flex';
+}
+
+// ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+// ── BOLETAS DA ÁREA: fechadas + topadas para fechar ──
+// ══════════════════════════════════════════════════════════
+function abrirBoletasArea(ak){
+  const a=AREAS[ak]||{name:ak,color:'var(--wine)'};
+  const rows=OPPS.filter(r=>r.area===ak);
+  const fechadas=rows.filter(isBoletadoFirmado).sort((x,y)=>(y.atual||0)-(x.atual||0));
+  const aBoletar=rows.filter(isABoletar).sort((x,y)=>(y.atual||y.pipe||0)-(x.atual||x.pipe||0));
+  // mesma regra da caixa "Topadas" do card: topou, ainda não fechou e não foi perdida
+  const topadas=rows.filter(r=>!isB(r)&&!isPerdida(r)&&norm(r.sc||'').includes('topou'))
+    .sort((x,y)=>(y.atual||y.pipe||0)-(x.atual||x.pipe||0));
+
+  const tabela=(lista,valorDe)=>{
+    if(!lista.length)return '<div class="ba-vazio">Nenhuma por aqui.</div>';
+    return '<div style="overflow-x:auto"><table class="ba-tbl">'
+      +'<thead><tr><th>Cliente</th><th>Produto</th><th>Assessor</th><th>Responsável</th><th class="r">Volume</th></tr></thead><tbody>'
+      +lista.map(r=>'<tr onclick="closeModal(\'area\');openEdit(\''+r.id+'\')" title="Abrir oportunidade">'
+        +'<td style="font-weight:700">'+(r.cliente||'—')+'</td>'
+        +'<td style="color:var(--muted)">'+(r.produto||'—')+'</td>'
+        +'<td style="color:var(--muted)">'+(r.assessor||'—')+'</td>'
+        +'<td style="color:var(--muted)">'+(r.responsavel||'—')+'</td>'
+        +'<td class="r val">'+(fmt(valorDe(r))||'—')+'</td></tr>').join('')
+      +'</tbody></table></div>';
+  };
+  const secao=(ico,titulo,lista,valorDe,cor,bg)=>{
+    const tot=lista.reduce((s2,r)=>s2+(valorDe(r)||0),0);
+    return '<div class="ba-sec" style="--bc:'+cor+';--bbg:'+bg+'">'
+      +'<div class="ba-hdr"><span class="t">'+ico+' '+titulo+'</span>'
+      +'<span class="n">'+lista.length+'</span>'
+      +'<span class="v">'+(fmt(tot)||'—')+'</span></div>'
+      +tabela(lista,valorDe)+'</div>';
+  };
+
+  const vFechado=r=>r.atual||0;
+  const vAberto=r=>r.atual||r.pipe||0;
+  const totFechado=fechadas.reduce((s2,r)=>s2+vFechado(r),0);
+  const totTopadas=topadas.reduce((s2,r)=>s2+vAberto(r),0);
+
+  document.getElementById('ba-title').innerHTML='📋 '+a.name
+    +' <span style="font-size:11px;font-weight:600;color:var(--muted)">· boletas fechadas e topadas</span>';
+  document.getElementById('ba-body').innerHTML=
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">'
+    +'<div style="flex:1;min-width:150px;background:var(--green-bg);border:1px solid var(--green-b);border-radius:8px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.04em">Já fechado</div>'
+    +'<div style="font-size:20px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums">'+(fmt(totFechado)||'R$0')+'</div>'
+    +'<div style="font-size:10px;color:var(--green)">'+fechadas.length+' boleta'+(fechadas.length!==1?'s':'')+'</div></div>'
+    +'<div style="flex:1;min-width:150px;background:var(--amber-bg);border:1px solid var(--amber-b);border-radius:8px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.04em">Topadas p/ fechar</div>'
+    +'<div style="font-size:20px;font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums">'+(fmt(totTopadas)||'R$0')+'</div>'
+    +'<div style="font-size:10px;color:var(--amber)">'+topadas.length+' oportunidade'+(topadas.length!==1?'s':'')+'</div></div>'
+    +'<div style="flex:1;min-width:150px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Projeção</div>'
+    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">'+(fmt(totFechado+totTopadas)||'R$0')+'</div>'
+    +'<div style="font-size:10px;color:var(--muted)">fechado + topadas</div></div>'
+    +'</div>'
+    +secao('✅','Boletas fechadas',fechadas,vFechado,'var(--green)','var(--green-bg)')
+    +(aBoletar.length?secao('⏳','A boletar — fechou, falta processar',aBoletar,vAberto,'var(--amber)','var(--amber-bg)'):'')
+    +secao('🤝','Topadas — para fechar',topadas,vAberto,'var(--amber)','var(--amber-bg)')
+    +'<div style="font-size:10px;color:var(--muted-l);margin-top:4px">Clique em qualquer linha para abrir a oportunidade.</div>';
+  document.getElementById('modal-area').style.display='flex';
+}
+
+// ══════════════════════════════════════════════════════════
+// ── GERENCIAL DO ASSESSOR: meta acordada × pipe levantado × realizado ──
+// ══════════════════════════════════════════════════════════
+// Meta × levantado × realizado por segmento — usado no card do assessor e no modal gerencial
+function segmentosDoAssessor(nome){
+  const minhas=OPPS.filter(r=>assDe(r)===nome);
+  const segs=SEGMENTOS_ACORDO.map(seg=>{
+    const rows=minhas.filter(r=>segmentoDaOpp(r)===seg);
+    const meta=acordoDe(nome,seg);
+    const levantado=rows.reduce((s,r)=>s+(r.pipe||r.atual||0),0);
+    const realizado=rows.filter(isBoletadoFirmado).reduce((s,r)=>s+(r.atual||0),0);
+    const aBoletar=rows.filter(isABoletar).reduce((s,r)=>s+(r.atual||r.pipe||0),0);
+    const pct=meta>0?Math.round(realizado/meta*100):null;
+    let st;
+    if(meta<=0)st={k:'semacordo',txt:'sem acordo',cor:'var(--muted)',bg:'var(--surf3)'};
+    else if(realizado>=meta)st={k:'batida',txt:'meta batida',cor:'var(--green)',bg:'var(--green-bg)'};
+    else if(levantado<meta)st={k:'semlastro',txt:'pipe não cobre',cor:'var(--amber)',bg:'var(--amber-bg)'};
+    else st={k:'converter',txt:'falta converter',cor:'var(--blue)',bg:'var(--blue-bg)'};
+    return{seg,rows,meta,levantado,realizado,aBoletar,pct,st};
+  }).filter(x=>x.meta>0||x.rows.length);
+  const semSeg=minhas.filter(r=>!segmentoDaOpp(r));
+  return{segs,semSeg,minhas};
+}
+// valor curto pra caber no card: "300k", "1.2M"
+const fmtC=v=>{if(!v||isNaN(v))return'—';if(v>=1e6)return(v/1e6).toFixed(1).replace('.0','')+'M';if(v>=1e3)return Math.round(v/1e3)+'k';return String(Math.round(v))};
+
+// bloco compacto de metas que aparece na cara do card do assessor
+function metasCardHtml(nome){
+  const {segs}=segmentosDoAssessor(nome);
+  const comAcordo=segs.filter(x=>x.meta>0);
+  if(!comAcordo.length){
+    return '<div style="font-size:10px;color:var(--muted-l);padding:6px 0 2px">Sem acordo definido — configure na aba Acordos por AI</div>';
+  }
+  const tMeta=comAcordo.reduce((s,x)=>s+x.meta,0);
+  const tReal=comAcordo.reduce((s,x)=>s+x.realizado,0);
+  const tLev=comAcordo.reduce((s,x)=>s+x.levantado,0);
+  const tPct=tMeta>0?Math.round(tReal/tMeta*100):0;
+  return '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:7px">'
+    +'<span style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Meta × levantado</span>'
+    +'<span style="font-size:10px;color:var(--muted)">🎯'+fmtC(tMeta)+' · 📥'+fmtC(tLev)+' · <strong style="color:'+(tPct>=100?'var(--green)':tPct>=60?'var(--amber)':'var(--red)')+'">'+tPct+'%</strong></span>'
+    +'</div>'
+    +comAcordo.map(x=>{
+      const base=Math.max(x.meta,x.levantado,1);
+      const wLev=Math.min(x.levantado/base*100,100);
+      const wReal=Math.min(x.realizado/base*100,100);
+      const posMeta=Math.min(x.meta/base*100,100);
+      return '<div style="margin-bottom:7px">'
+        +'<div style="display:flex;align-items:baseline;gap:6px">'
+        +'<span style="font-size:10.5px;font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+x.seg+'</span>'
+        +'<span style="font-size:9px;font-weight:700;border-radius:4px;padding:1px 6px;background:'+x.st.bg+';color:'+x.st.cor+';white-space:nowrap">'+x.st.txt+'</span>'
+        +'</div>'
+        +'<div style="position:relative;height:11px;background:var(--border);border-radius:3px;margin-top:3px">'
+        +'<div style="position:absolute;left:0;top:0;height:11px;width:'+wLev.toFixed(1)+'%;background:var(--blue-b);border-radius:3px"></div>'
+        +'<div style="position:absolute;left:0;top:0;height:11px;width:'+wReal.toFixed(1)+'%;background:'+x.st.cor+';border-radius:3px"></div>'
+        +'<div title="meta '+fmt(x.meta)+'" style="position:absolute;top:-2px;left:calc('+posMeta.toFixed(1)+'% - 1px);width:2px;height:15px;background:var(--text);border-radius:1px"></div>'
+        +'</div>'
+        +'<div style="font-size:9px;color:var(--muted);margin-top:2px">🎯'+fmtC(x.meta)+' · 📥'+fmtC(x.levantado)+' · ✅'+fmtC(x.realizado)
+        +(x.aBoletar?' · <span style="color:var(--amber)">⏳'+fmtC(x.aBoletar)+'</span>':'')
+        +' · '+x.rows.length+' opor.</div>'
+        +'</div>';
+    }).join('');
+}
+
+window._gerOpen=window._gerOpen||new Set();
+function toggleGerSeg(i){
+  const el=document.getElementById('gerseg-'+i);
+  if(!el)return;
+  const k=String(i);
+  if(window._gerOpen.has(k)){window._gerOpen.delete(k);el.classList.remove('open');}
+  else{window._gerOpen.add(k);el.classList.add('open');}
+}
+function abrirGerencial(nome){
+  window._gerAss=nome;
+  window._gerOpen=new Set();
+  const {segs,semSeg,minhas}=segmentosDoAssessor(nome);
+  const tMeta=segs.reduce((s,x)=>s+x.meta,0);
+  const tLev=segs.reduce((s,x)=>s+x.levantado,0)+semSeg.reduce((s,r)=>s+(r.pipe||r.atual||0),0);
+  const tReal=segs.reduce((s,x)=>s+x.realizado,0)+semSeg.filter(isBoletadoFirmado).reduce((s,r)=>s+(r.atual||0),0);
+  const tPct=tMeta>0?Math.round(tReal/tMeta*100):0;
+  const cobertura=tMeta>0?Math.round(tLev/tMeta*100):0;
+
+  const kpi=(l,v,s,cor)=>'<div class="ger-kpi" style="--kc:'+cor+'"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div></div>';
+  const falta=Math.max(tMeta-tReal,0);
+
+  const cabecalho='<div class="ger-kpis">'
+    +kpi('Meta acordada',fmt(tMeta)||'—',tMeta?'somando os segmentos':'nenhum acordo definido','var(--wine)')
+    +kpi('Levantado',fmt(tLev)||'—',tMeta?cobertura+'% da meta em pipe':minhas.length+' oportunidades','var(--blue)')
+    +kpi('Realizado',fmt(tReal)||'—',tMeta?tPct+'% da meta':'boletado','var(--green)')
+    +kpi(falta?'Falta':'Meta batida',falta?fmt(falta):'—',falta?'para bater a meta':'parabéns!',falta?'var(--amber)':'var(--green)')
+    +'</div>'
+    +(tMeta&&tLev<tMeta
+      ?'<div style="background:var(--amber-bg);border:1px solid var(--amber-b);border-radius:6px;padding:9px 12px;font-size:11.5px;color:var(--amber);font-weight:600;margin-bottom:16px">'
+        +'⚠️ O pipe levantado ('+fmt(tLev)+') não cobre a meta ('+fmt(tMeta)+'). Antes de cobrar conversão, falta originação: precisa levantar mais '+fmt(tMeta-tLev)+'.</div>'
+      :'');
+
+  const blocos=segs.map((x,i)=>{
+    const base=Math.max(x.meta,x.levantado,1);
+    const wLev=Math.min(x.levantado/base*100,100);
+    const wReal=Math.min(x.realizado/base*100,100);
+    const posMeta=x.meta>0?Math.min(x.meta/base*100,100):null;
+    const pctMeta=x.pct;
+    const cor=x.st.cor;
+    const cobre=x.st.k==='semlastro';
+    const opps=[...x.rows].sort((a,b)=>(b.pipe||b.atual||0)-(a.pipe||a.atual||0));
+    return '<div class="ger-seg" id="gerseg-'+i+'">'
+      +'<div class="ger-seg-h" onclick="toggleGerSeg('+i+')">'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<span class="ger-seg-nm">'+x.seg+'</span>'
+      +'<span class="ger-seg-n">'+x.rows.length+' opor.</span>'
+      +(pctMeta!==null?'<span class="ger-chip" style="background:var(--surf3);color:'+cor+'">'+pctMeta+'% da meta</span>':'<span class="ger-chip" style="background:var(--surf3);color:var(--muted)">sem acordo</span>')
+      +(cobre?'<span class="ger-chip" style="background:var(--amber-bg);color:var(--amber)">pipe não cobre</span>':'')
+      +'<span style="font-size:11px;color:var(--muted)">⌄</span>'
+      +'</div>'
+      +'<div class="ger-barra">'
+      +'<div class="ger-lev" style="width:'+wLev.toFixed(1)+'%"></div>'
+      +'<div class="ger-real" style="width:'+wReal.toFixed(1)+'%;background:'+cor+'"></div>'
+      +(posMeta!==null?'<div class="ger-meta-marca" style="left:calc('+posMeta.toFixed(1)+'% - 1px)" title="meta acordada: '+fmt(x.meta)+'"></div>':'')
+      +'</div>'
+      +'<div class="ger-legenda">'
+      +'<span>🎯 meta <b>'+(fmt(x.meta)||'—')+'</b></span>'
+      +'<span>📥 levantado <b>'+(fmt(x.levantado)||'—')+'</b></span>'
+      +'<span>✅ realizado <b>'+(fmt(x.realizado)||'—')+'</b></span>'
+      +(x.aBoletar?'<span style="color:var(--amber)">⏳ a boletar <b>'+fmt(x.aBoletar)+'</b></span>':'')
+      +'</div>'
+      +'</div></div>'
+      +'<div class="ger-opps">'
+      +(opps.length?opps.map(r=>{
+        const fechada=isBoletadoFirmado(r);
+        const aBol=isABoletar(r);
+        const c=fechada?'var(--green)':aBol?'var(--amber)':'var(--muted)';
+        return '<div class="ger-opp">'
+          +'<span style="color:'+c+'">'+(fechada?'✅':aBol?'⏳':'○')+'</span>'
+          +'<span class="ger-opp-nm" title="'+String(r.cliente||'').replace(/"/g,'&quot;')+'">'+(r.cliente||'—')+'</span>'
+          +'<span class="ger-opp-st">'+(r.produto||'')+(r.sc?' · '+r.sc:'')+'</span>'
+          +'<span class="ger-opp-v" style="color:'+c+'">'+(fmt(fechada?r.atual:(r.pipe||r.atual))||'—')+'</span>'
+          +'<button class="btn sm" style="flex-shrink:0;padding:2px 8px" onclick="event.stopPropagation();closeModal(\'gerencial\');openEdit(\''+r.id+'\')">abrir</button>'
+          +'</div>';
+      }).join(''):'<div class="ger-vazio">Nenhuma oportunidade levantada neste segmento — meta de '+fmt(x.meta)+' sem lastro.</div>')
+      +'</div></div>';
+  }).join('');
+
+  const rodape=semSeg.length
+    ?'<div style="font-size:11px;color:var(--muted);margin-top:10px;padding-top:10px;border-top:1px solid var(--border-l)">'
+      +'ℹ️ '+semSeg.length+' oportunidade'+(semSeg.length>1?'s':'')+' ('+(fmt(semSeg.reduce((s,r)=>s+(r.pipe||r.atual||0),0))||'—')+') fora dos segmentos acordados — entram no total, mas não em nenhuma linha acima.</div>'
+    :'';
+
+  document.getElementById('ger-title').innerHTML='📊 '+nome+' <span style="font-size:11px;font-weight:600;color:var(--muted)">· gerencial da meta</span>';
+  const legendaBarra=segs.length
+    ?'<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:var(--muted);margin-bottom:8px;align-items:center">'
+      +'<span><span style="display:inline-block;width:14px;height:8px;border-radius:2px;background:var(--blue-b);vertical-align:middle;margin-right:4px"></span>levantado (pipe)</span>'
+      +'<span><span style="display:inline-block;width:14px;height:8px;border-radius:2px;background:var(--green);vertical-align:middle;margin-right:4px"></span>realizado (boletado)</span>'
+      +'<span><span style="display:inline-block;width:3px;height:12px;background:var(--text);vertical-align:middle;margin-right:4px"></span>meta acordada</span>'
+      +'</div>'
+    :'';
+  document.getElementById('ger-body').innerHTML=cabecalho+legendaBarra
+    +(segs.length?blocos:'<div class="empty" style="padding:20px"><p>Nenhum acordo definido e nenhuma oportunidade neste assessor.<br>Defina os acordos na aba <strong>Acordos por AI</strong>.</p></div>')
+    +rodape
+    +'<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">'
+    +'<button class="btn sm" onclick="closeModal(\'gerencial\');verDailyDe(\''+String(nome).replace(/'/g,'')+'\')">☀️ Ver dia de atuação</button>'
+    +'</div>';
+  document.getElementById('modal-gerencial').style.display='flex';
+}
+
+// ══════════════════════════════════════════════════════════
+// ── QUADRO DE ACORDOS DO MÊS ──
+// Uma linha por assessor, uma coluna por segmento. Guarda o valor ACORDADO com cada AI.
+// ══════════════════════════════════════════════════════════
+function acordoDe(nome,seg){
+  const a=acordosDoMes().find(m=>norm(m.assessor)===norm(nome)&&norm(m.produto||'')===norm(seg));
+  return a?(a.meta_valor||0):0;
+}
+function renderAcordos(c=document.getElementById('main-content')){
+  const ml=new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  const mesLabel=ml.charAt(0).toUpperCase()+ml.slice(1); // "Agosto de 2026" (capitalize do CSS deixava "Agosto De")
+  const podeEditar=USER.perfil==='diretor';
+  const assessores=todosAssessores();
+  window._acordoAss=assessores;
+
+  const head='<thead><tr>'
+    +'<th class="lft ai">AI</th>'
+    +'<th style="text-align:center">The Investor</th>'
+    +SEGMENTOS_ACORDO.map(s=>'<th>'+s+'</th>').join('')
+    +'<th>Total</th></tr></thead>';
+
+  const body='<tbody>'+assessores.map((nome,i)=>{
+    const inv=acordoDe(nome,SEG_INVESTOR)>0;
+    const cels=SEGMENTOS_ACORDO.map((seg,j)=>{
+      const v=acordoDe(nome,seg);
+      return '<td><input class="ac-in'+(v?' preenchido':'')+'" id="ac-'+i+'-'+j+'" value="'+(v?fmtMoedaBR(v):'')+'" '
+        +(podeEditar?'':'readonly ')+'oninput="recalcAcordos()" onblur="formatarCelulaAcordo(this)"></td>';
+    }).join('');
+    return '<tr>'
+      +'<td class="ai" title="'+nome.replace(/"/g,'&quot;')+'">'+nome+'</td>'
+      +'<td class="inv"><input type="checkbox" id="acinv-'+i+'"'+(inv?' checked':'')+(podeEditar?'':' disabled')+'></td>'
+      +cels
+      +'<td id="actot-'+i+'" style="padding:8px 10px;text-align:right;font-weight:700;color:var(--wine-d);font-variant-numeric:tabular-nums"></td>'
+      +'</tr>';
+  }).join('')+'</tbody>';
+
+  // resumo por segmento (as linhas "Acordos" e "Metas" da planilha), acima da tabela
+  const resumo='<div class="ac-resumo">'
+    +SEGMENTOS_ACORDO.map((seg,j)=>{
+      const v=acordoDe(LINHA_CASA,seg);
+      return '<div class="ac-seg">'
+        +'<div class="ac-seg-t" title="'+seg+'">'+seg+'</div>'
+        +'<div class="ac-seg-v" id="acsum-'+j+'">—</div>'
+        +'<div class="ac-seg-m"><label>Meta</label><input id="acmeta-'+j+'" value="'+(v?fmtMoedaBR(v):'')+'" placeholder="definir" '
+        +(podeEditar?'':'readonly ')+'oninput="recalcAcordos()" onblur="formatarCelulaAcordo(this)"></div>'
+        +'<span class="ac-delta" id="acdelta-'+j+'"></span>'
+        +'</div>';
+    }).join('')
+    +'<div class="ac-seg" style="border-top-color:var(--green)">'
+    +'<div class="ac-seg-t">Σ Todos os segmentos</div>'
+    +'<div class="ac-seg-v" id="acsumtot">—</div>'
+    +'<div class="ac-seg-m"><label>Meta</label><span id="acmetatot" style="flex:1;text-align:right;font-size:11px;font-weight:700;font-variant-numeric:tabular-nums">—</span></div>'
+    +'<span class="ac-delta" id="acdeltatot"></span>'
+    +'</div>'
+    +'<div class="ac-seg" style="border-top-color:var(--amber)">'
+    +'<div class="ac-seg-t">The Investor</div>'
+    +'<div class="ac-seg-v" id="acinvtot">—</div>'
+    +'<div class="ac-seg-m"><label>AIs marcados</label></div>'
+    +'</div>'
+    +'</div>';
+  const foot='';
+
+  c.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">'
+    +'<div><div style="font-size:18px;font-weight:700">Acordos por AI</div>'
+    +'<div style="font-size:12px;color:var(--muted)">'+mesLabel+' · o que foi combinado com cada assessor em cada segmento</div></div>'
+    +(podeEditar?'<button class="btn wine" id="btn-salvar-acordos" onclick="salvarAcordos()">💾 Salvar acordos</button>':'')
+    +'</div>'
+    +(podeEditar?'<div style="font-size:11px;color:var(--muted);margin-bottom:10px">Digite os valores direto na tabela e clique em salvar. Deixe em branco o que não foi acordado. Marque <strong>The Investor</strong> em quem já fez.</div>':'')
+    +resumo
+    +'<div class="acordo-wrap"><table class="acordo-tbl">'+head+body+foot+'</table></div>';
+
+  recalcAcordos();
+}
+
+function formatarCelulaAcordo(el){
+  const v=parseMoeda(el.value);
+  el.value=v?fmtMoedaBR(v):'';
+  el.classList.toggle('preenchido',!!v);
+}
+
+// soma as colunas e compara com a meta da casa, ao vivo enquanto digita
+function recalcAcordos(){
+  const ass=window._acordoAss||[];
+  if(!document.getElementById('acsumtot'))return;
+  const somaCol=SEGMENTOS_ACORDO.map(()=>0);
+  let somaGeral=0,invN=0;
+  ass.forEach((nome,i)=>{
+    let totLinha=0;
+    SEGMENTOS_ACORDO.forEach((seg,j)=>{
+      const el=document.getElementById('ac-'+i+'-'+j);
+      const v=el?parseMoeda(el.value):0;
+      somaCol[j]+=v;totLinha+=v;
+    });
+    somaGeral+=totLinha;
+    const cb=document.getElementById('acinv-'+i);
+    if(cb&&cb.checked)invN++;
+    const td=document.getElementById('actot-'+i);
+    if(td)td.textContent=totLinha?fmtMoedaBR(totLinha):'';
+  });
+  const inv=document.getElementById('acinvtot');
+  if(inv)inv.textContent=invN+' / '+ass.length;
+  let metaGeral=0;
+  SEGMENTOS_ACORDO.forEach((seg,j)=>{
+    const sc=document.getElementById('acsum-'+j);
+    if(sc)sc.textContent=somaCol[j]?fmtMoedaBR(somaCol[j]):'—';
+    const mEl=document.getElementById('acmeta-'+j);
+    const meta=mEl?parseMoeda(mEl.value):0;
+    metaGeral+=meta;
+    const dEl=document.getElementById('acdelta-'+j);
+    if(dEl){
+      if(!meta){dEl.innerHTML='<span style="color:var(--muted-l)">—</span>';}
+      else{
+        const d=somaCol[j]-meta;
+        const cor=d>=0?'var(--green)':'var(--red)';
+        dEl.innerHTML='<span style="color:'+cor+'">'+(d>=0?'+':'−')+fmtMoedaBR(Math.abs(d))+'</span>'
+          +'<span class="ac-delta" style="color:'+cor+'">'+(d>=0?'acima da meta':'falta acordar')+'</span>';
+      }
+    }
+  });
+  const st=document.getElementById('acsumtot');if(st)st.textContent=somaGeral?fmtMoedaBR(somaGeral):'—';
+  const mt=document.getElementById('acmetatot');if(mt)mt.textContent=metaGeral?fmtMoedaBR(metaGeral):'—';
+  const dt=document.getElementById('acdeltatot');
+  if(dt){
+    if(!metaGeral)dt.innerHTML='<span style="color:var(--muted-l)">—</span>';
+    else{const d=somaGeral-metaGeral;const cor=d>=0?'var(--green)':'var(--red)';
+      dt.innerHTML='<span style="color:'+cor+'">'+(d>=0?'+':'−')+fmtMoedaBR(Math.abs(d))+'</span>';}
+  }
+}
+
+async function salvarAcordos(){
+  if(USER.perfil!=='diretor'){showToast('Só o diretor pode alterar os acordos.');return}
+  const btn=document.getElementById('btn-salvar-acordos');
+  if(btn){btn.disabled=true;btn.textContent='Salvando...';}
+  try{
+    const mes=new Date().toISOString().slice(0,7);
+    const existentes=new Map();
+    acordosDoMes().forEach(m=>existentes.set(norm(m.assessor)+'|'+norm(m.produto||''),m));
+
+    // estado desejado a partir do que está na tela
+    const desejado=[];
+    (window._acordoAss||[]).forEach((nome,i)=>{
+      SEGMENTOS_ACORDO.forEach((seg,j)=>{
+        const el=document.getElementById('ac-'+i+'-'+j);
+        desejado.push({assessor:nome,produto:seg,valor:el?parseMoeda(el.value):0});
+      });
+      const cb=document.getElementById('acinv-'+i);
+      desejado.push({assessor:nome,produto:SEG_INVESTOR,valor:(cb&&cb.checked)?1:0});
+    });
+    SEGMENTOS_ACORDO.forEach((seg,j)=>{
+      const el=document.getElementById('acmeta-'+j);
+      desejado.push({assessor:LINHA_CASA,produto:seg,valor:el?parseMoeda(el.value):0});
+    });
+
+    const novos=[],patches=[],apagar=[];
+    desejado.forEach(d=>{
+      const k=norm(d.assessor)+'|'+norm(d.produto);
+      const ex=existentes.get(k);
+      if(ex){
+        if((ex.meta_valor||0)!==d.valor){
+          if(d.valor===0)apagar.push(ex.id);
+          else patches.push({id:ex.id,valor:d.valor});
+        }
+      }else if(d.valor!==0){
+        novos.push({mes,assessor:d.assessor,area:AREA_ACORDO,produto:d.produto,meta_valor:d.valor});
+      }
+    });
+
+    if(novos.length)await db('POST','metas',novos);
+    for(const p of patches)await db('PATCH','metas',{meta_valor:p.valor},'id=eq.'+p.id);
+    for(const id of apagar)await db('DELETE','metas','','id=eq.'+id);
+
+    const mexidos=novos.length+patches.length+apagar.length;
+    showToast(mexidos?'✓ Acordos salvos ('+mexidos+' alteraç'+(mexidos>1?'ões':'ão')+')':'Nada mudou.',true);
+    await loadData();
+    renderCurView();
+  }catch(e){
+    showToast('Erro ao salvar: '+(e.message||e));
+    if(btn){btn.disabled=false;btn.textContent='💾 Salvar acordos';}
+  }
 }
 
 function fillMetaSelects(){
@@ -3877,7 +5155,7 @@ function renderTeamUpload(c=document.getElementById('main-content')){
     +'</div>'
     +'<button class="btn wine" onclick="baixarModelo()">⬇️ Baixar modelo</button>'
     +'</div></div>'
-    +'<div class="section-label">📤 Subir minha basket</div>'
+    +'<div class="section-label">Subir minha basket</div>'
     +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">'
     +subs.map(k=>{
       const [label,cor]=CARD_INFO[k]||[k,'#888'];
