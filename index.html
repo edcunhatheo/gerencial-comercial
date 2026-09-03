@@ -257,6 +257,8 @@ tr.bol td{background:var(--green-bg)}
 .cockpit-sub{font-size:12px;opacity:.85;margin-top:2px}
 .cockpit-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:16px}
 .cockpit-stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:6px;padding:10px 14px;text-align:center}
+.cockpit-stat.clic{cursor:pointer;transition:background .12s,border-color .12s}
+.cockpit-stat.clic:hover{background:rgba(255,255,255,.24);border-color:rgba(255,255,255,.5)}
 .cockpit-stat-v{font-size:22px;font-weight:700}
 .cockpit-stat-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.85;margin-top:2px}
 .prio-item{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:8px;transition:all .15s}
@@ -501,6 +503,32 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
 .ag-mes{font-size:12px;font-weight:700;min-width:132px;text-align:center}
 .ag-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:8px;margin-bottom:13px}
 .ag-real{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:13px;align-items:stretch}
+.ag-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:6px}
+.hs-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.hs-chip{border:1px solid var(--border);background:var(--card);color:var(--muted);border-radius:999px;
+  padding:5px 13px;font-size:11.5px;font-weight:700;cursor:pointer}
+.hs-chip:hover{border-color:var(--wine);color:var(--wine)}
+.hs-chip.on{background:var(--wine);border-color:var(--wine);color:#fff}
+.hs-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:16px}
+.hs-kpi{border:1px solid var(--border);border-left:3px solid var(--kc,var(--border));border-radius:8px;padding:12px 15px;background:var(--card)}
+.hs-kpi.clic{cursor:pointer}
+.hs-kpi.clic:hover{background:var(--hover);border-color:var(--kc)}
+.hs-kpi .k{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.hs-kpi .v{font-size:23px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2;color:var(--kc,var(--text))}
+.hs-kpi .s{font-size:10.5px;color:var(--muted)}
+.hs-areas{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.hs-area{border:1px solid var(--border);border-radius:10px;background:var(--card);overflow:hidden}
+.hs-area-hdr{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border-l);background:var(--surf2)}
+.hs-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.hs-area-nm{font-size:12.5px;font-weight:700}
+.hs-area-n{margin-left:auto;font-size:10px;color:var(--muted);font-weight:700}
+.hs-linha{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border-l)}
+.hs-linha:last-child{border-bottom:0}
+.hs-linha:hover{background:var(--hover)}
+.hs-linha .rot{font-size:11px;font-weight:700}
+.hs-linha .qtd{font-size:10px;color:var(--muted)}
+.hs-linha .val{margin-left:auto;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.hs-vazio{padding:26px;text-align:center;color:var(--muted);font-size:12.5px;border:1px dashed var(--border);border-radius:10px}
 .ag-rt{flex:1;min-width:340px;border-collapse:collapse;font-size:12px}
 .ag-rt th{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);
   text-align:right;padding:0 10px 5px;border-bottom:1px solid var(--border)}
@@ -990,7 +1018,7 @@ function subAreaOf(r){
 const SC_BADGE={'cliente topou':'b-green','cliente confirmar':'b-amber','reunião agendada':'b-purple','agendar reunião':'b-purple','ligar cliente':'b-gray','cliente negou':'b-red','não se aplica':'b-gray'};
 const PB_BADGE={'boletado':'b-green','a boletar':'b-teal','to do comercial':'b-amber','to do operacional':'b-blue','aguardando comercial':'b-amber','email':'b-purple','não se aplica':'b-gray'};
 
-let USER=null,OPPS=[],USUARIOS=[],DAILY={},editId=null,charts={},SELECTED=new Set(),METAS=[];
+let USER=null,OPPS=[],OPPS_ALL=[],USUARIOS=[],DAILY={},editId=null,charts={},SELECTED=new Set(),METAS=[];
 let pin='';
 
 // ── UTILS ──
@@ -1078,7 +1106,12 @@ function parseMoeda(s){
   return isNaN(n)?0:n;
 }
 const fmtMoedaBR=v=>!v?'':v.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
-const fmt=v=>{if(!v||isNaN(v)||v==0)return'—';if(v>=1e6)return'R$'+(v/1e6).toFixed(1)+'M';if(v>=1e3)return'R$'+(v/1e3).toFixed(0)+'k';return'R$'+Math.round(v)};
+// duas casas decimais, separador decimal em pt-BR (R$4,52M · R$888,45k)
+const fmt=v=>{if(!v||isNaN(v)||v==0)return'—';
+  const d2=n=>n.toFixed(2).replace('.',',');
+  if(Math.abs(v)>=1e6)return'R$'+d2(v/1e6)+'M';
+  if(Math.abs(v)>=1e3)return'R$'+d2(v/1e3)+'k';
+  return'R$'+d2(v)};
 const isB=r=>{const k=norm(r.pb||'');return k==='boletado'||k==='a boletar'};
 // "A Boletar" = o cliente fechou mas a boleta ainda não foi processada.
 // Para volume/pipe segue valendo como fechada (isB), mas NÃO pontua no ranking do time —
@@ -1239,7 +1272,7 @@ function getLastMoveDate(r){
 }
 
 function renderTimeline(r){
-  const hist=(r.historico||[]).filter(h=>h.campo==='Status comercial'||h.campo==='Pendência boleta'||h.campo==='Observação'||h.campo==='Criação'||h.campo==='Ligação'||h.campo==='Reunião'||h.campo===CAMPO_LIG_DATA||h.campo==='Reunião marcada');
+  const hist=(r.historico||[]).filter(h=>h.campo==='Status comercial'||h.campo==='Pendência boleta'||h.campo==='Observação'||h.campo==='Criação'||h.campo==='Ligação'||h.campo==='Reunião'||h.campo===CAMPO_LIG_DATA||h.campo==='Reunião marcada'||h.campo===CAMPO_ARQ);
   if(!hist.length)return'<div style="font-size:12px;color:var(--muted);padding:8px 0">Nenhuma movimentação registrada ainda. As mudanças de status e observações vão contar a história desta oportunidade aqui.</div>';
   return '<div style="position:relative;padding-left:20px">'
     +hist.map(function(h,i){
@@ -1422,7 +1455,11 @@ async function loadData(){
     db('GET','daily_selecoes','',`data=eq.${today()}&assessor=eq.${encodeURIComponent(USER.nome)}`),
     db('GET','metas','',`mes=eq.${mesAtual}&order=created_at.asc`).catch(()=>[])
   ]);
-  OPPS=opps||[];USUARIOS=users||[];METAS=metas||[];
+  // OPPS_ALL = tudo que veio do banco. OPPS = só o que está no fluxo do mês:
+  // o que passou pela virada de mês some de TODAS as telas e só existe no Histórico.
+  OPPS_ALL=opps||[];
+  OPPS=OPPS_ALL.filter(r=>!arquivada(r));
+  USUARIOS=users||[];METAS=metas||[];
   DAILY={};(daily||[]).forEach(d=>{DAILY[d.oportunidade_id]={tipo:d.tipo,acao:d.acao,id:d.id}});
 }
 
@@ -1431,10 +1468,10 @@ let curView='';
 function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
-    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Definições do mês'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários'],['d-acordos','📋 Acordos por AI']]
+    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Definições do mês'],['d-historico','📦 Histórico'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários'],['d-acordos','📋 Acordos por AI']]
     :USER.perfil==='gestor'
-    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']]
-    :[['diretor','📊 Dashboard'],['a-opps','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']];
+    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']]
+    :[['diretor','📊 Dashboard'],['a-opps','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>{
     const ico=l.split(' ')[0];
     const lb=l.substring(ico.length+1);
@@ -1467,6 +1504,7 @@ function renderCurView(){
   else if(v==='d-upload')renderUpload(c);
   else if(v==='d-usuarios')renderUsuarios(c);
   else if(v==='d-acordos')renderAcordos(c);
+  else if(v==='d-historico')renderHistorico(c);
   else if(v==='a-opps')renderAssessorOpps(c);
   else if(v==='a-upload')renderTeamUpload(c);
   else if(v==='a-dash')renderAssessorDash(c);
@@ -1920,7 +1958,7 @@ function renderDiretor(c=document.getElementById('main-content')){
 // ── DIA DE ATUAÇÃO: estudo diário por comercial ──
 const brData=iso=>iso?iso.split('-')[2]+'/'+iso.split('-')[1]:'';
 function oppsDoComercial(nome){
-  return OPPS.filter(r=>!isB(r)&&!isPerdida(r)&&(norm(r.responsavel||'')===norm(nome)||norm(r.assessor||'')===norm(nome)));
+  return OPPS.filter(r=>!isB(r)&&!isPerdida(r)&&!arquivada(r)&&(norm(r.responsavel||'')===norm(nome)||norm(r.assessor||'')===norm(nome)));
 }
 function estudoDoDia(nome){
   const hj=localISO(new Date());
@@ -2108,6 +2146,7 @@ function iconCampo(campo){
   if(campo==='Ligação'||campo==='Ligação marcada')return '📞';
   if(campo==='Reunião')return '🤝';
   if(campo==='Reunião marcada')return '📅';
+  if(campo==='Arquivamento')return '📦';
   if(campo==='Escala')return '🚨';
   if(campo==='TODO')return '📋';
   if(campo==='Criação')return '✨';
@@ -2118,6 +2157,7 @@ function descHist(h){
   if(h.campo==='Ligação'||h.campo==='Reunião')return h.para;
   if(h.campo===CAMPO_LIG_DATA)return h.para?'Ligação marcada para '+brData(h.para):'Ligação desmarcada';
   if(h.campo==='Reunião marcada')return h.para?'Reunião marcada para '+brData(h.para):'Reunião desmarcada';
+  if(h.campo===CAMPO_ARQ)return h.para?'Arquivada na competência '+mesExtenso(h.para):'Reaberta — voltou para o fluxo do dia';
   if(h.para&&h.de)return h.campo+': '+h.de+' → '+h.para;
   if(h.para)return h.campo+': '+h.para;
   return h.campo||'atualizado';
@@ -2195,7 +2235,7 @@ function toggleWorkDaily(qKey,id,ev){
 }
 async function concluirRapidoDaily(id,ev){
   if(ev)ev.stopPropagation();
-  const r=OPPS.find(o=>o.id===id);if(!r)return;
+  const r=acharOpp(id);if(!r)return;
   const now=new Date();
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const hist=[...(r.historico||[]),{campo:'Observação',de:'',para:'Marcado como feito na Daily',usuario:USER.nome,data:ds}];
@@ -2209,7 +2249,7 @@ async function registrarNotaDaily(qKey,id){
   const input=document.getElementById('nota-'+qKey+'-'+id);
   const texto=(input?input.value:'').trim();
   if(!texto){if(input)input.focus();return}
-  const r=OPPS.find(o=>o.id===id);if(!r)return;
+  const r=acharOpp(id);if(!r)return;
   const now=new Date();
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const hist=[...(r.historico||[]),{campo:'Observação',de:'',para:texto,usuario:USER.nome,data:ds}];
@@ -2221,7 +2261,7 @@ async function registrarNotaDaily(qKey,id){
   }catch(e){showToast('Erro: '+e.message)}
 }
 async function salvarTrabalhoDaily(qKey,id){
-  const r=OPPS.find(o=>o.id===id);if(!r)return;
+  const r=acharOpp(id);if(!r)return;
   const scSel=document.getElementById('sc-'+qKey+'-'+id),pbSel=document.getElementById('pb-'+qKey+'-'+id),dataInp=document.getElementById('data-'+qKey+'-'+id);
   const ligInp=document.getElementById('lig-'+qKey+'-'+id),reuInp=document.getElementById('reu-'+qKey+'-'+id);
   const scNovo=scSel?scSel.value:'',pbNovo=pbSel?pbSel.value:'',dataNova=dataInp?dataInp.value:'';
@@ -2251,7 +2291,7 @@ async function salvarTrabalhoDaily(qKey,id){
 // funil nunca contam coisas diferentes.
 // ══════════════════════════════════════════════════════════
 function todasDoComercial(nome){
-  return OPPS.filter(r=>norm(r.responsavel||'')===norm(nome)||norm(r.assessor||'')===norm(nome));
+  return OPPS.filter(r=>!arquivada(r)&&(norm(r.responsavel||'')===norm(nome)||norm(r.assessor||'')===norm(nome)));
 }
 const mesISO=iso=>(iso||'').slice(0,7);
 const mesDeData=s=>{const k=dtKey(s);if(!k)return '';const d=new Date(k);
@@ -2340,7 +2380,7 @@ function realizadoHtml(sel,ref,f){
   };
 
   return '<table class="ag-rt">'
-    +'<thead><tr><th>Realizado de fato</th><th>📞 Ligações</th><th>🤝 Reuniões</th><th>✅ Boletas</th></tr></thead><tbody>'
+    +'<thead><tr><th>Período</th><th>📞 Ligações</th><th>🤝 Reuniões</th><th>✅ Boletas</th></tr></thead><tbody>'
     +linha('Hoje',brData(hj),hj,hj,refAtual?'':'fora')
     +linha('Esta semana',brData(sIni)+' a '+brData(sFim),sIni,sFim,refAtual?'':'fora')
     +linha(nomeMes,brData(mIni)+' a '+brData(mFim),mIni,mFim,'mes')
@@ -2419,6 +2459,7 @@ function agendaContatosHtml(sel){
     +'<span class="ag-mes">'+nomeMes+'</span>'
     +'<button onclick="agNav(1)" title="Próximo mês">›</button>'
     +'<button onclick="agHoje()" title="Voltar para o mês atual">hoje</button></div></div>'
+    +'<div class="ag-lbl">Realizado de fato</div>'
     +'<div class="ag-real">'+realizadoHtml(sel,ref,f)+'</div>'
     +'<div class="ag-grid">'+dows+cels+'</div>'
     +lista
@@ -2787,7 +2828,7 @@ async function bulkAplicarTodo(){
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   let okN=0;
   for(const id of ids){
-    const r=OPPS.find(o=>o.id===id);if(!r)continue;
+    const r=acharOpp(id);if(!r)continue;
     const hist=[...(r.historico||[]),{campo:'TODO',de:r.todo||'',para:texto+(data?' ('+data.split('-').reverse().join('/')+')':''),usuario:USER.nome,data:ds}];
     try{
       await db('PATCH','oportunidades',{todo:texto,todo_data:data,historico:hist,updated_at:now.toISOString()},'id=eq.'+id);
@@ -2810,7 +2851,7 @@ async function bulkAplicar(campo){
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   let okN=0;
   for(const id of ids){
-    const r=OPPS.find(o=>o.id===id);if(!r)continue;
+    const r=acharOpp(id);if(!r)continue;
     const hist=[...(r.historico||[]),{campo:campo==='sc'?'Status comercial':'Pendência boleta',de:r[campo]||'',para:v,usuario:USER.nome,data:ds}];
     try{
       await db('PATCH','oportunidades',{[campo]:v,historico:hist,updated_at:now.toISOString()},'id=eq.'+id);
@@ -2917,7 +2958,7 @@ function analisarProximaAcao(r){
 
 async function advanceStatus(id,ev){
   if(ev)ev.stopPropagation();
-  const r=OPPS.find(o=>o.id===id);if(!r)return;
+  const r=acharOpp(id);if(!r)return;
   const cur=SC_CHAIN.findIndex(s=>norm(s)===norm(r.sc||''));
   const next=cur<0?SC_CHAIN[0]:SC_CHAIN[Math.min(cur+1,SC_CHAIN.length-1)];
   if(cur>=SC_CHAIN.length-1){quickBoletar(id);return;}
@@ -2936,7 +2977,7 @@ async function advanceStatus(id,ev){
 function kbCustomCols(){try{return JSON.parse(localStorage.getItem('kb_custom_cols'))||[]}catch(e){return[]}}
 async function setStatusManual(id,novo){
   if(!novo)return;
-  const r=OPPS.find(o=>o.id===id);if(!r)return;
+  const r=acharOpp(id);if(!r)return;
   const now=new Date();
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const hist=[...(r.historico||[]),{campo:'Status comercial',de:r.sc||'',para:novo,usuario:USER.nome,data:ds}];
@@ -3055,7 +3096,7 @@ async function kbDrop(ev,statusKey){
   ev.currentTarget.style.background='';ev.currentTarget.style.transform='';
   const id=_dragId;_dragId=null;
   if(!id)return;
-  const r=OPPS.find(o=>o.id===id);if(!r)return;
+  const r=acharOpp(id);if(!r)return;
   const now=new Date();
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const hist=[...(r.historico||[])];
@@ -3084,28 +3125,296 @@ async function kbDrop(ev,statusKey){
 
 // o que este usuário enxerga — diretor/gestor vê tudo, o resto vê o que é seu
 function oppsDoUsuario(){
-  if(USER.perfil==='diretor'||USER.perfil==='gestor')return [...OPPS];
-  return OPPS.filter(r=>{
+  const base=OPPS.filter(r=>!arquivada(r));      // arquivadas moram no Histórico
+  if(USER.perfil==='diretor'||USER.perfil==='gestor')return base;
+  return base.filter(r=>{
     if(norm(r.assessor)===norm(USER.nome))return true;
     if(!(USER.areas||[]).includes(r.area))return false;
     if(r.responsavel&&norm(r.responsavel)!==norm(USER.nome))return false;
     return true;
   });
 }
-function renderAssessorOpps(c=document.getElementById('main-content')){
-  const isDir=USER.perfil==='diretor'||USER.perfil==='gestor';
-  const myOpps=oppsDoUsuario();
+// ══════════════════════════════════════════════════════════
+// ── HISTÓRICO: o que foi fechado e o que foi perdido, por competência ──
+// Só entra aqui o que passou pela virada de mês. Nada some do banco:
+// metas, ranking e dashboard continuam contando essas oportunidades.
+// ══════════════════════════════════════════════════════════
+function histOpps(){
+  const arq=OPPS_ALL.filter(arquivada);
+  if(USER.perfil==='diretor'||USER.perfil==='gestor')return arq;
+  return arq.filter(r=>norm(r.assessor||'')===norm(USER.nome)
+    ||norm(r.responsavel||'')===norm(USER.nome)
+    ||(USER.areas||[]).includes(r.area));
+}
+const volBoletado=r=>r.atual||0;
+const volPerdido=r=>r.pipe||r.atual||0;
+function competenciasDisponiveis(){
+  return [...new Set(histOpps().map(arquivadaEm))].filter(Boolean).sort().reverse();
+}
+function histDoMes(comp){
+  const rows=histOpps().filter(r=>comp==='tudo'||arquivadaEm(r)===comp);
+  return{rows,
+    bol:rows.filter(isBoletadoFirmado), aBol:rows.filter(isABoletar), perd:rows.filter(isPerdida)};
+}
+function setHistComp(c){window._histComp=c;renderCurView();}
+
+function renderHistorico(c=document.getElementById('main-content')){
+  const comps=competenciasDisponiveis();
+  if(!comps.length){
+    c.innerHTML='<div class="hs-vazio"><div style="font-size:26px;margin-bottom:8px">📦</div>'
+      +'<strong>O histórico ainda está vazio.</strong><br>'
+      +'Ele se enche na <strong>virada de mês</strong>: no Guia do dia, o botão “📦 Virada de mês” '
+      +'tira as boletadas e as perdidas do fluxo do dia e guarda tudo aqui, separado por competência e por área.'
+      +'</div>';
+    return;
+  }
+  const comp=(window._histComp&&(window._histComp==='tudo'||comps.includes(window._histComp)))?window._histComp:comps[0];
+  window._histComp=comp;
+  const h=histDoMes(comp);
+  const vB=h.bol.reduce((a,r)=>a+volBoletado(r),0)+h.aBol.reduce((a,r)=>a+volBoletado(r),0);
+  const vP=h.perd.reduce((a,r)=>a+volPerdido(r),0);
+  const nFech=h.bol.length+h.aBol.length;
+  const aprov=(nFech+h.perd.length)?Math.round(nFech/(nFech+h.perd.length)*100):null;
+
+  const chips='<div class="hs-chips">'
+    +comps.map(x=>'<button class="hs-chip'+(x===comp?' on':'')+'" onclick="setHistComp(\''+x+'\')">'+mesExtenso(x)+'</button>').join('')
+    +'<button class="hs-chip'+(comp==='tudo'?' on':'')+'" onclick="setHistComp(\'tudo\')">Tudo</button></div>';
+
+  const kpi=(k,v,sub,cor,onclick)=>'<div class="hs-kpi'+(onclick?' clic':'')+'" style="--kc:'+cor+'"'
+    +(onclick?' onclick="'+onclick+'"':'')+'><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="s">'+sub+'</div></div>';
+
+  // quebra por área (mesma régua de área do Kanban: RV, RF, Consórcio, Seguro)
+  const chaves=[...new Set(h.rows.map(subAreaOf))].filter(Boolean)
+    .sort((a,b)=>{
+      const va=h.rows.filter(r=>subAreaOf(r)===a).reduce((s2,r)=>s2+(isPerdida(r)?volPerdido(r):volBoletado(r)),0);
+      const vb=h.rows.filter(r=>subAreaOf(r)===b).reduce((s2,r)=>s2+(isPerdida(r)?volPerdido(r):volBoletado(r)),0);
+      return vb-va;
+    });
+  const areasHtml=chaves.map(ak=>{
+    const A=SUBAREAS[ak]||{name:ak,color:'var(--muted)'};
+    const rows=h.rows.filter(r=>subAreaOf(r)===ak);
+    const bol=rows.filter(r=>isBoletadoFirmado(r)||isABoletar(r)), perd=rows.filter(isPerdida);
+    const tb=bol.reduce((a,r)=>a+volBoletado(r),0), tp=perd.reduce((a,r)=>a+volPerdido(r),0);
+    const linha=(tipo,ico,rot,lista,total,cor)=>'<div class="hs-linha" onclick="abrirHistArea(\''+ak+'\',\''+tipo+'\')">'
+      +'<span style="font-size:13px">'+ico+'</span>'
+      +'<span><span class="rot" style="color:'+cor+'">'+rot+'</span>'
+      +'<div class="qtd">'+lista.length+' oportunidade'+(lista.length!==1?'s':'')+'</div></span>'
+      +'<span class="val" style="color:'+cor+'">'+(fmt(total)||'R$0')+'</span></div>';
+    return '<div class="hs-area">'
+      +'<div class="hs-area-hdr"><span class="hs-dot" style="background:'+A.color+'"></span>'
+      +'<span class="hs-area-nm">'+A.name+'</span><span class="hs-area-n">'+rows.length+' no total</span></div>'
+      +linha('bol','✅','Boletado',bol,tb,'var(--green)')
+      +linha('perd','❌','Perdido',perd,tp,'var(--red)')
+      +'</div>';
+  }).join('');
+
+  c.innerHTML=chips
+    +'<div class="hs-kpis">'
+    +kpi('✅ Boletado',(fmt(vB)||'R$0'),nFech+' boleta'+(nFech!==1?'s':'')+(h.aBol.length?' · '+h.aBol.length+' a processar':''),'var(--green)',nFech?"abrirHistArea('','bol')":'')
+    +kpi('❌ Perdido',(fmt(vP)||'R$0'),h.perd.length+' oportunidade'+(h.perd.length!==1?'s':'')+' negada'+(h.perd.length!==1?'s':''),'var(--red)',h.perd.length?"abrirHistArea('','perd')":'')
+    +kpi('🎯 Aproveitamento',aprov===null?'—':aprov+'%',
+         aprov===null?'sem oportunidades fechadas':nFech+' fechadas de '+(nFech+h.perd.length)+' decididas',
+         aprov===null?'var(--border)':aprov>=60?'var(--green)':aprov>=35?'var(--amber)':'var(--red)','')
+    +kpi('📦 Arquivadas',h.rows.length,comp==='tudo'?'em todas as competências':'na competência de '+mesExtenso(comp),'var(--wine)',"abrirHistArea('','tudo')")
+    +'</div>'
+    +'<div class="section-label">Por área <span style="text-transform:none;font-weight:400;letter-spacing:0;color:var(--muted-l)">— clique numa linha para ver as oportunidades</span></div>'
+    +(areasHtml?'<div class="hs-areas">'+areasHtml+'</div>':'<div class="hs-vazio">Nada nesta competência.</div>');
+}
+
+const HIST_TIPO={
+  bol:{ico:'✅',t:'Boletado',cor:'var(--green)',bg:'var(--green-bg)',fn:r=>isBoletadoFirmado(r)||isABoletar(r),vol:volBoletado,col:'Fechada em'},
+  perd:{ico:'❌',t:'Perdido',cor:'var(--red)',bg:'var(--red-bg)',fn:r=>isPerdida(r),vol:volPerdido,col:'Perdida em'},
+  tudo:{ico:'📦',t:'Arquivadas',cor:'var(--wine)',bg:'var(--wine-l)',fn:()=>true,vol:r=>isPerdida(r)?volPerdido(r):volBoletado(r),col:'Fechada em'},
+};
+function abrirHistArea(ak,tipo){
+  const T=HIST_TIPO[tipo];if(!T)return;
+  const comp=window._histComp||'tudo';
+  let lista=histDoMes(comp).rows.filter(T.fn);
+  if(ak)lista=lista.filter(r=>subAreaOf(r)===ak);
+  lista=lista.sort((x,y)=>T.vol(y)-T.vol(x));
+  const tot=lista.reduce((a,r)=>a+T.vol(r),0);
+  const nomeArea=ak?((SUBAREAS[ak]||{}).name||ak):'todas as áreas';
+
+  const quando=r=>{
+    if(isPerdida(r)){
+      const h=[...(r.historico||[])].reverse().find(x=>x.campo==='Status comercial'&&norm(x.para||'')==='cliente negou');
+      return h?h.data:'—';
+    }
+    const d=parseDataBoleta(r.data_boleta);
+    return (d?brData(d):'sem data')+(isABoletar(r)?' <span style="color:var(--amber);font-weight:700">· falta processar</span>':'');
+  };
+
+  const linhas=lista.map(r=>'<tr>'
+    +'<td style="font-weight:700;cursor:pointer" onclick="closeModal(\'area\');openEdit(\''+r.id+'\')" title="Abrir oportunidade">'+(r.cliente||'—')
+      +'<div class="fn-ev" style="font-weight:400">'+((SUBAREAS[subAreaOf(r)]||{}).name||'—')+' · '+(r.produto||'—')+'</div></td>'
+    +'<td style="color:var(--muted)">'+(r.assessor||'—')+'</td>'
+    +'<td class="fn-ev">'+quando(r)+'</td>'
+    +'<td style="color:var(--muted);font-size:11px">'+(r.sc||'—')+(r.pb?' · '+r.pb:'')+'</td>'
+    +'<td class="r val">'+(fmt(T.vol(r))||'—')+'</td>'
+    +'<td class="r"><span class="mk" onclick="event.stopPropagation();reabrirOpp(\''+r.id+'\')" title="Tirar do histórico e devolver ao fluxo do dia">↩ reabrir</span></td>'
+    +'</tr>').join('');
+
+  document.getElementById('ba-title').innerHTML=T.ico+' '+T.t
+    +' <span style="font-size:11px;font-weight:600;color:var(--muted)">· '+nomeArea+' · '
+    +(comp==='tudo'?'todas as competências':mesExtenso(comp))+'</span>';
+  document.getElementById('ba-body').innerHTML=
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">'
+    +'<div style="flex:1;min-width:150px;background:'+T.bg+';border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:'+T.cor+';text-transform:uppercase;letter-spacing:.04em">Oportunidades</div>'
+    +'<div style="font-size:20px;font-weight:700;color:'+T.cor+';font-variant-numeric:tabular-nums">'+lista.length+'</div></div>'
+    +'<div style="flex:1;min-width:150px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Volume</div>'
+    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">'+(fmt(tot)||'R$0')+'</div></div>'
+    +'</div>'
+    +(lista.length
+      ? '<div class="ba-sec" style="--bc:'+T.cor+';--bbg:'+T.bg+'"><div style="overflow-x:auto"><table class="ba-tbl">'
+        +'<thead><tr><th>Cliente</th><th>Assessor</th><th>'+T.col+'</th><th>Situação</th><th class="r">Volume</th><th></th></tr></thead>'
+        +'<tbody>'+linhas+'</tbody></table></div></div>'
+      : '<div class="ba-vazio">Nada por aqui nesta competência.</div>')
+    +'<div style="font-size:10px;color:var(--muted-l);margin-top:6px">Clique no nome do cliente para abrir a oportunidade. “Reabrir” devolve a oportunidade ao Guia do dia e à Daily.</div>';
+  document.getElementById('modal-area').style.display='flex';
+}
+
+// ── VIRADA DE MÊS ──
+// Fecha o ciclo: tudo que já acabou (boletado ou perdido) sai do fluxo do dia
+// e vai para o Histórico, carimbado na competência em que fechou. Nada é
+// apagado, e metas/dashboard seguem contando essas oportunidades.
+function alvoDaVirada(){
+  return OPPS_ALL.filter(r=>!arquivada(r)&&(isB(r)||isPerdida(r)));
+}
+async function viradaDeMes(){
+  const alvo=alvoDaVirada();
+  if(!alvo.length){showToast('Nada para arquivar — nenhuma boletada ou perdida no fluxo');return;}
+  const bol=alvo.filter(isB), perd=alvo.filter(isPerdida);
+  const vol=bol.reduce((a,r)=>a+(r.atual||0),0);
+  const porComp={};
+  alvo.forEach(r=>{const c=competenciaDe(r);porComp[c]=(porComp[c]||0)+1});
+  const resumoComp=Object.keys(porComp).sort().map(c=>'  · '+mesExtenso(c)+': '+porComp[c]).join('\n');
+  if(!confirm('VIRADA DE MÊS\n\n'
+    +bol.length+' boletada'+(bol.length!==1?'s':'')+' — '+(fmt(vol)||'R$0')+'\n'
+    +perd.length+' perdida'+(perd.length!==1?'s':'')+'\n\n'
+    +'Competências:\n'+resumoComp+'\n\n'
+    +'Elas saem do Guia do dia e da Daily e passam para o Histórico.\n'
+    +'Nada é apagado: metas, ranking e dashboard seguem contando.\n\nConfirmar?'))return;
+
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  let ok=0, erro=0;
+  for(const r of alvo){
+    const comp=competenciaDe(r);
+    const hist=[...(r.historico||[]),{campo:CAMPO_ARQ,de:'',para:comp,usuario:USER.nome,data:ds}];
+    try{
+      await db('PATCH','oportunidades',{historico:hist,updated_at:now.toISOString()},'id=eq.'+r.id);
+      r.historico=hist;ok++;
+    }catch(e){erro++}
+  }
+  showToast('📦 '+ok+' oportunidade'+(ok!==1?'s':'')+' arquivada'+(ok!==1?'s':'')+(erro?' · '+erro+' com erro':'')+' — veja na aba Histórico',!erro);
+  await loadData();renderCurView();
+}
+async function reabrirOpp(id){
+  const r=acharOpp(id);if(!r)return;
+  if(!arquivada(r))return;
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const hist=[...(r.historico||[]),{campo:CAMPO_ARQ,de:arquivadaEm(r),para:'',usuario:USER.nome,data:ds}];
+  try{
+    await db('PATCH','oportunidades',{historico:hist,updated_at:now.toISOString()},'id=eq.'+r.id);
+    r.historico=hist;
+    showToast('↩ '+(r.cliente||'Oportunidade')+' voltou para o fluxo do dia',true);
+  }catch(e){showToast('Erro ao reabrir: '+e.message);return}
+  await loadData();renderCurView();
+}
+
+// ── BALDES DO BANNER DO GUIA DO DIA ──
+// Uma função só alimenta o número do quadro E a lista que abre no clique:
+// assim os dois nunca discordam.
+function cockpitBuckets(){
   const hoje=today();
-
-
+  const myOpps=oppsDoUsuario();
   const ativos=myOpps.filter(r=>!isB(r));
-
-  // Priority buckets
   const reunioesHoje=ativos.filter(r=>r.reuniao_data&&r.reuniao_data.startsWith(hoje)).sort((a,b)=>(a.reuniao_data||'').localeCompare(b.reuniao_data||''));
   const atrasados=ativos.filter(r=>!reunioesHoje.includes(r)&&r.todo_data&&r.todo_data<hoje);
   const hojeList=ativos.filter(r=>!reunioesHoje.includes(r)&&r.todo_data===hoje);
   const quaseLa=ativos.filter(r=>!reunioesHoje.includes(r)&&!atrasados.includes(r)&&!hojeList.includes(r)&&(norm(r.sc||'')==='cliente topou'||norm(r.pb||'')==='a boletar'));
   const parados=ativos.filter(r=>!reunioesHoje.includes(r)&&!atrasados.includes(r)&&!hojeList.includes(r)&&!quaseLa.includes(r)&&daysSince(getLastMoveDate(r))>7);
+  return{hoje,myOpps,ativos,reunioesHoje,atrasados,hojeList,quaseLa,parados,boletadas:myOpps.filter(isB)};
+}
+const COCKPIT_DET={
+  acoes:{ico:'🎯',t:'Ações para hoje',sub:'TODOs marcados para hoje e os que já venceram',cor:'var(--wine)',bg:'var(--wine-l)',col:'O que fazer'},
+  reunioes:{ico:'📅',t:'Reuniões de hoje',sub:'com data de reunião marcada para hoje',cor:'var(--blue)',bg:'var(--blue-bg)',col:'Horário'},
+  quase:{ico:'🔥',t:'Prontas para fechar',sub:'cliente topou e a boleta ainda não saiu',cor:'var(--amber)',bg:'var(--amber-bg)',col:'Por que está pronta'},
+  boletado:{ico:'✅',t:'Já boletado',sub:'boletas fechadas e as que faltam processar',cor:'var(--green)',bg:'var(--green-bg)',col:'Fechada em'},
+};
+function abrirCockpit(k){
+  const E=COCKPIT_DET[k];if(!E)return;
+  const b=cockpitBuckets();
+  let lista=[];
+  if(k==='acoes')      lista=[...b.atrasados,...b.hojeList];
+  else if(k==='reunioes') lista=b.reunioesHoje;
+  else if(k==='quase')  lista=b.quaseLa;
+  else                  lista=b.boletadas;
+  const vol=r=>k==='boletado'?(r.atual||0):(r.atual||r.pipe||0);
+  if(k!=='reunioes')lista=[...lista].sort((x,y)=>vol(y)-vol(x));
+  const tot=lista.reduce((a,r)=>a+vol(r),0);
+
+  const porque=r=>{
+    if(k==='acoes'){
+      const d=(r.todo_data||'').slice(0,10), atr=d&&d<b.hoje;
+      return '<span'+(atr?' style="color:var(--red);font-weight:700"':'')+'>'
+        +(r.todo||'TODO sem descrição')+(d?' · '+(atr?'venceu '+brData(d):'para hoje'):'')+'</span>';
+    }
+    if(k==='reunioes')return (r.reuniao_data||'').includes('T')
+      ? 'às '+r.reuniao_data.split('T')[1].substring(0,5) : 'hoje, sem horário definido';
+    if(k==='quase')return norm(r.pb||'')==='a boletar'?'pendência: A Boletar':'status: '+(r.sc||'—');
+    return (parseDataBoleta(r.data_boleta)?brData(parseDataBoleta(r.data_boleta)):'sem data')
+      +(isABoletar(r)?' <span style="color:var(--amber);font-weight:700">· falta processar</span>':'');
+  };
+
+  const linhas=lista.map(r=>'<tr onclick="closeModal(\'area\');openEdit(\''+r.id+'\')" title="Abrir oportunidade">'
+    +'<td style="font-weight:700">'+(r.cliente||'—')
+      +'<div class="fn-ev" style="font-weight:400">'+((AREAS[r.area]||{}).name||r.area||'—')+' · '+(r.produto||'—')+'</div></td>'
+    +'<td style="color:var(--muted)">'+(r.assessor||'—')+'</td>'
+    +'<td class="fn-ev fn-prova">'+porque(r)+'</td>'
+    +'<td style="color:var(--muted);font-size:11px">'+(r.sc||'—')+'</td>'
+    +'<td class="r val">'+(fmt(vol(r))||'—')+'</td></tr>').join('');
+
+  document.getElementById('ba-title').innerHTML=E.ico+' '+E.t
+    +' <span style="font-size:11px;font-weight:600;color:var(--muted)">· '+E.sub+'</span>';
+  document.getElementById('ba-body').innerHTML=
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">'
+    +'<div style="flex:1;min-width:150px;background:'+E.bg+';border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:'+E.cor+';text-transform:uppercase;letter-spacing:.04em">Oportunidades</div>'
+    +'<div style="font-size:20px;font-weight:700;color:'+E.cor+';font-variant-numeric:tabular-nums">'+lista.length+'</div></div>'
+    +'<div style="flex:1;min-width:150px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">'+(k==='boletado'?'Volume boletado':'Volume em jogo')+'</div>'
+    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">'+(fmt(tot)||'R$0')+'</div></div>'
+    +'</div>'
+    +(lista.length
+      ? '<div class="ba-sec" style="--bc:'+E.cor+';--bbg:'+E.bg+'"><div style="overflow-x:auto"><table class="ba-tbl">'
+        +'<thead><tr><th>Cliente</th><th>Assessor</th><th>'+E.col+'</th><th>Status hoje</th><th class="r">Volume</th></tr></thead>'
+        +'<tbody>'+linhas+'</tbody></table></div></div>'
+      : '<div class="ba-vazio">Nada por aqui — nenhuma oportunidade neste grupo.</div>')
+    +'<div style="font-size:10px;color:var(--muted-l);margin-top:6px">Clique em qualquer linha para abrir a oportunidade.</div>';
+  document.getElementById('modal-area').style.display='flex';
+}
+
+function renderAssessorOpps(c=document.getElementById('main-content')){
+  const isDir=USER.perfil==='diretor'||USER.perfil==='gestor';
+  const myOpps=oppsDoUsuario();
+  const hoje=today();
+  const hora=new Date().getHours();
+  const saud=hora<12?'Bom dia':hora<18?'Boa tarde':'Boa noite';
+  const bolVol=myOpps.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+  // cada número do banner abre a lista do que está por trás dele
+  const stat=(k,v,rot,n)=>'<div class="cockpit-stat'+((n===undefined?v:n)?' clic':'')+'"'
+    +((n===undefined?v:n)?' onclick="abrirCockpit(\''+k+'\')" title="Ver quais são"':'')+'>'
+    +'<div class="cockpit-stat-v">'+v+'</div><div class="cockpit-stat-l">'+rot+'</div></div>';
+
+
+  const ativos=myOpps.filter(r=>!isB(r));
+
+  // Priority buckets
+  const {reunioesHoje,atrasados,hojeList,quaseLa,parados}=cockpitBuckets();
 
   function prioLine(r,tipo){
     const cfg={
@@ -3295,11 +3604,22 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   const semStatus=kbOpps.filter(r=>!isB(r)&&![...SC_CHAIN,...kbCustomCols()].some(s=>norm(s)===norm(r.sc||''))&&norm(r.sc||'')!=='cliente negou');
 
   c.innerHTML=''
-    // Efetividade do funil (no lugar do banner de saudação)
+    // Banner de saudação com o resumo do dia
+    +'<div class="cockpit-hero">'
+    +'<div class="cockpit-hello">'+saud+', '+USER.nome.split(' ')[0]+'! 👋</div>'
+    +'<div class="cockpit-sub">'+new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})+' — '+(isDir?'guia do dia do time completo':'aqui está o seu guia de hoje')+'</div>'
+    +'<div class="cockpit-stats">'
+    +stat('acoes',atrasados.length+hojeList.length,'🎯 Ações p/ hoje')
+    +stat('reunioes',reunioesHoje.length,'📅 Reuniões hoje')
+    +stat('quase',quaseLa.length,'🔥 Prontas p/ fechar')
+    +stat('boletado',fmt(bolVol)||'R$0','✓ Já boletado',myOpps.filter(isB).length)
+    +'</div></div>'
+    // Efetividade do funil
     +funilHtml(funilOpps,recorte)
 
-    // Nova oportunidade
-    +'<div style="display:flex;justify-content:flex-end;margin-bottom:14px">'
+    // Nova oportunidade · virada de mês
+    +'<div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">'
+    +(isDir?'<button class="btn" onclick="viradaDeMes()" title="Arquiva as boletadas e as perdidas: elas saem daqui e da Daily e vão para o Histórico">📦 Virada de mês</button>':'')
     +'<button class="btn wine" onclick="openNewOpp()">+ Nova oportunidade</button>'
     +'</div>'
 
@@ -3494,7 +3814,7 @@ function oppCard(r){
 
 // ── QUICK ACTIONS ──
 async function quickBoletar(id){
-  const r=OPPS.find(o=>o.id===id);
+  const r=acharOpp(id);
   if(!r||!confirm(`Marcar "${r.cliente}" como Boletado?`))return;
   const now=new Date();
   const hist=[...(r.historico||[]),{campo:'Pendência boleta',de:r.pb,para:'Boletado',usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}];
@@ -3508,12 +3828,7 @@ async function quickBoletar(id){
 
 // ── ASSESSOR: MEU PAINEL ──
 function renderAssessorDash(c=document.getElementById('main-content')){
-  const myOpps=OPPS.filter(r=>{
-    if(norm(r.assessor)===norm(USER.nome))return true;
-    if(!(USER.areas||[]).includes(r.area))return false;
-    if(r.responsavel&&norm(r.responsavel)!==norm(USER.nome))return false;
-    return true;
-  });
+  const myOpps=oppsDoUsuario();   // arquivadas ficam só no Histórico
   const bolRows=myOpps.filter(isB);
   const bolV=bolRows.reduce((s,r)=>s+(r.atual||0),0);
   const ativos=myOpps.filter(r=>!isB(r));
@@ -3623,12 +3938,7 @@ function renderAssessorDash(c=document.getElementById('main-content')){
 // ── ASSESSOR: MEU DIA ──
 // ══════════════════════════════════════════════════════════
 function renderAssessorDaily(c=document.getElementById('main-content')){
-  const myOpps=OPPS.filter(r=>{
-    if(norm(r.assessor)===norm(USER.nome))return true;
-    if(!(USER.areas||[]).includes(r.area))return false;
-    if(r.responsavel&&norm(r.responsavel)!==norm(USER.nome))return false;
-    return true;
-  });
+  const myOpps=oppsDoUsuario();   // arquivadas ficam só no Histórico
   const selN=Object.keys(DAILY).length;
   const reunN=Object.values(DAILY).filter(v=>v.tipo==='reuniao').length;
   const bolN2=Object.values(DAILY).filter(v=>v.tipo==='boleta').length;
@@ -3716,12 +4026,7 @@ async function updateDaily(oppId,field,value){
 }
 
 function exportDailyPDF(){
-  const myOpps=OPPS.filter(r=>{
-    if(norm(r.assessor)===norm(USER.nome))return true;
-    if(!(USER.areas||[]).includes(r.area))return false;
-    if(r.responsavel&&norm(r.responsavel)!==norm(USER.nome))return false;
-    return true;
-  });
+  const myOpps=oppsDoUsuario();   // arquivadas ficam só no Histórico
   const sel=Object.entries(DAILY).filter(([,v])=>v.tipo);
   if(!sel.length){showToast('Defina o tipo das oportunidades antes de exportar!');return}
   const now=new Date();
@@ -3774,7 +4079,7 @@ function openEdit(id){
   fillStatusDatalists();
   // compara como texto: o id vem de onclick (string) e no banco é uuid — se um dia vier
   // número, a comparação estrita falhava calada e o modal simplesmente não abria
-  const r=OPPS.find(o=>String(o.id)===String(id));if(!r)return;
+  const r=acharOpp(id);if(!r)return;
   editId=r.id;
   document.getElementById('modal-edit-title').textContent=r.cliente+' — '+(r.produto||AREAS[r.area]?.name||r.area);
   fillSelect('e-sc',[...SC_PADRAO,...OPPS.map(x=>x.sc)],r.sc||'');
@@ -3833,7 +4138,7 @@ function openEdit(id){
 }
 
 async function saveEdit(){
-  const r=OPPS.find(o=>o.id===editId);if(!r)return;
+  const r=acharOpp(editId);if(!r)return;
   const btn=document.getElementById('btn-save-edit');
   btn.innerHTML='<span class="spinner"></span>';btn.disabled=true;
   const now=new Date();
@@ -4232,6 +4537,36 @@ function dataLigacao(r){
   (r.historico||[]).forEach(h=>{if(h.campo===CAMPO_LIG_DATA)v=parseDataBoleta(h.para)||''});
   return v;
 }
+// ── ARQUIVAMENTO (virada de mês) ──
+// A oportunidade fechada — boletada ou perdida — sai do fluxo do dia e passa a
+// viver no Histórico, carimbada com a competência em que foi fechada.
+// Guardado no histórico da própria oportunidade: a última marca é a que vale,
+// então reabrir é só gravar uma marca vazia.
+const CAMPO_ARQ='Arquivamento';
+// procura em TUDO: o Histórico precisa abrir e reabrir oportunidade arquivada
+const acharOpp=id=>(OPPS_ALL.length?OPPS_ALL:OPPS).find(o=>String(o.id)===String(id));
+function mesExtenso(ym){
+  if(!/^\d{4}-\d{2}$/.test(ym||''))return ym||'—';
+  const [y,m]=ym.split('-').map(Number);
+  const n=new Date(y,m-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'});
+  return n.charAt(0).toUpperCase()+n.slice(1);
+}
+function arquivadaEm(r){
+  let v='';
+  (r.historico||[]).forEach(h=>{if(h.campo===CAMPO_ARQ)v=(h.para||'').slice(0,7)});
+  return /^\d{4}-\d{2}$/.test(v)?v:'';
+}
+const arquivada=r=>!!arquivadaEm(r);
+// competência natural da oportunidade: quando ela de fato fechou
+function competenciaDe(r){
+  if(isB(r)){const d=parseDataBoleta(r.data_boleta);if(d)return d.slice(0,7);}
+  if(isPerdida(r)){
+    const h=[...(r.historico||[])].reverse().find(x=>x.campo==='Status comercial'&&norm(x.para||'')==='cliente negou');
+    if(h){const k=dtKey(h.data);if(k)return localISO(new Date(k)).slice(0,7);}
+  }
+  if(r.updated_at){const d=new Date(r.updated_at);if(!isNaN(d))return localISO(d).slice(0,7);}
+  return localISO(new Date()).slice(0,7);
+}
 function marcaInfo(r,k){
   const M=MARCAS[k];let e=null;
   (r.historico||[]).forEach(h=>{if(h.campo===M.campo)e=(h.para===M.on)?h:null});
@@ -4240,7 +4575,7 @@ function marcaInfo(r,k){
 const marcado=(r,k)=>!!marcaInfo(r,k);
 async function toggleMarca(id,k,ev){
   if(ev){ev.stopPropagation();ev.preventDefault();}
-  const r=OPPS.find(o=>String(o.id)===String(id));if(!r)return;
+  const r=acharOpp(id);if(!r)return;
   const M=MARCAS[k],liga=!marcado(r,k);
   const now=new Date();
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -4265,7 +4600,7 @@ async function toggleMarca(id,k,ev){
 function pintaMarcas(){
   document.querySelectorAll('[data-mk]').forEach(el=>{
     const [id,k]=el.getAttribute('data-mk').split('|');
-    const r=OPPS.find(o=>String(o.id)===String(id));
+    const r=acharOpp(id);
     el.classList.toggle('on',!!(r&&marcado(r,k)));
   });
 }
@@ -5043,7 +5378,8 @@ async function doUploadMain(input){
       let totalNew=0,totalUpd=0,totalRows=0;
       for(const[area,res]of Object.entries(results)){
         if(!res.rows.length)continue;
-        const existing=OPPS.filter(r=>r.area===area);
+        // casa contra TUDO, arquivadas inclusive: reimportar a planilha não pode duplicar o que já foi para o Histórico
+        const existing=OPPS_ALL.filter(r=>r.area===area);
         const toInsert=[],toUpdate=[];
         let skipped=0;
         res.rows.forEach(nr=>{
@@ -5197,7 +5533,7 @@ async function doUploadArea(cfgKey,input){
       if(USER&&USER.perfil!=='diretor')rows.forEach(r=>{if(!r.responsavel)r.responsavel=USER.nome;});
       st.textContent='⏳ Processando '+rows.length+'...';
 
-      const existing=OPPS.filter(r=>r.area===cfg.area);
+      const existing=OPPS_ALL.filter(r=>r.area===cfg.area);   // inclui arquivadas, para não duplicar
       const toInsert=[],toUpdate=[];let skipped=0;
       rows.forEach(nr=>{
         const ex=existing.find(x=>norm(x.assessor)===norm(nr.assessor)&&norm(x.cliente)===norm(nr.cliente)&&norm(x.produto||'')===norm(nr.produto||''));
