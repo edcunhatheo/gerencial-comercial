@@ -492,6 +492,9 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
 .mk.on{background:var(--green-bg);border:1px solid var(--green-b);color:var(--green)}
 .mk.on::before{content:'✓ '}
 .mk.lg{font-size:11.5px;padding:6px 12px}
+.obrig{border-color:var(--red)!important;background:var(--red-bg)!important}
+.req::after{content:' *';color:var(--red);font-weight:700}
+.dica-todo{font-size:10.5px;color:var(--muted);margin:-6px 0 10px;line-height:1.4}
 .ag{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px}
 .ag-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .ag-tit{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
@@ -762,10 +765,10 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
       </div>
     </div>
     <div class="form-row">
-      <div class="fg" style="grid-column:1"><label>Próximo TODO</label>
+      <div class="fg" style="grid-column:1"><label class="req">Próximo TODO</label>
         <input type="text" id="e-todo" placeholder="O que precisa ser feito...">
       </div>
-      <div class="fg"><label>📅 Data do TODO</label>
+      <div class="fg"><label class="req">📅 Data do TODO</label>
         <input type="date" id="e-todo-data">
       </div>
     </div>
@@ -882,10 +885,10 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
       </div>
     </div>
     <div class="form-row">
-      <div class="fg"><label>TODO</label>
+      <div class="fg"><label class="req">TODO</label>
         <input type="text" id="n-todo" placeholder="Próxima ação...">
       </div>
-      <div class="fg"><label>📅 Data do TODO</label>
+      <div class="fg"><label class="req">📅 Data do TODO</label>
         <input type="date" id="n-todo-data">
       </div>
     </div>
@@ -1272,7 +1275,7 @@ function getLastMoveDate(r){
 }
 
 function renderTimeline(r){
-  const hist=(r.historico||[]).filter(h=>h.campo==='Status comercial'||h.campo==='Pendência boleta'||h.campo==='Observação'||h.campo==='Criação'||h.campo==='Ligação'||h.campo==='Reunião'||h.campo===CAMPO_LIG_DATA||h.campo==='Reunião marcada'||h.campo===CAMPO_ARQ);
+  const hist=(r.historico||[]).filter(h=>h.campo==='Status comercial'||h.campo==='Pendência boleta'||h.campo==='Observação'||h.campo==='Criação'||h.campo==='Ligação'||h.campo==='Reunião'||h.campo===CAMPO_LIG_DATA||h.campo==='Reunião marcada'||h.campo===CAMPO_ARQ||h.campo==='TODO');
   if(!hist.length)return'<div style="font-size:12px;color:var(--muted);padding:8px 0">Nenhuma movimentação registrada ainda. As mudanças de status e observações vão contar a história desta oportunidade aqui.</div>';
   return '<div style="position:relative;padding-left:20px">'
     +hist.map(function(h,i){
@@ -2264,8 +2267,14 @@ async function salvarTrabalhoDaily(qKey,id){
   const r=acharOpp(id);if(!r)return;
   const scSel=document.getElementById('sc-'+qKey+'-'+id),pbSel=document.getElementById('pb-'+qKey+'-'+id),dataInp=document.getElementById('data-'+qKey+'-'+id);
   const ligInp=document.getElementById('lig-'+qKey+'-'+id),reuInp=document.getElementById('reu-'+qKey+'-'+id);
+  const todoInp=document.getElementById('todo-'+qKey+'-'+id),todoDInp=document.getElementById('todod-'+qKey+'-'+id);
   const scNovo=scSel?scSel.value:'',pbNovo=pbSel?pbSel.value:'',dataNova=dataInp?dataInp.value:'';
   const ligNova=ligInp?ligInp.value:null,reuNova=reuInp?reuInp.value:null;
+  const todoNovo=todoInp?todoInp.value:null,todoDNovo=todoDInp?todoDInp.value:null;
+  // mesma regra do modal: viva sem próximo passo com data não salva
+  const faltaD=faltaProximoPasso(scNovo||r.sc,pbNovo||r.pb,
+    todoNovo===null?r.todo:todoNovo, todoDNovo===null?(r.todo_data||'').slice(0,10):todoDNovo);
+  if(faltaD){showToast('📋 '+faltaD.msg);marcaObrig('todo-'+qKey+'-'+id,'todod-'+qKey+'-'+id,faltaD.campo);return;}
   const now=new Date();
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const hist=[...(r.historico||[])];
@@ -2274,13 +2283,17 @@ async function salvarTrabalhoDaily(qKey,id){
   if(scNovo&&norm(scNovo)!==norm(r.sc||'')){hist.push({campo:'Status comercial',de:r.sc||'',para:scNovo,usuario:USER.nome,data:ds});patch.sc=scNovo;mudou=true;}
   if(pbNovo&&norm(pbNovo)!==norm(r.pb||'')){hist.push({campo:'Pendência boleta',de:r.pb||'',para:pbNovo,usuario:USER.nome,data:ds});patch.pb=pbNovo;mudou=true;}
   if(dataNova&&dataNova!==(parseDataBoleta(r.data_boleta)||'')){hist.push({campo:'Pendência boleta',de:'',para:'Boleta marcada p/ '+dataNova.split('-').reverse().join('/'),usuario:USER.nome,data:ds});patch.data_boleta=dataNova;mudou=true;}
+  if(todoNovo!==null&&todoNovo.trim()!==String(r.todo||'').trim()){hist.push({campo:'TODO',de:r.todo||'',para:todoNovo.trim(),usuario:USER.nome,data:ds});patch.todo=todoNovo.trim();mudou=true;}
+  if(todoDNovo!==null&&todoDNovo!==((r.todo_data||'').slice(0,10))){patch.todo_data=todoDNovo||null;mudou=true;}
   if(ligNova!==null&&ligNova!==(dataLigacao(r)||'')){hist.push({campo:CAMPO_LIG_DATA,de:dataLigacao(r)||'',para:ligNova,usuario:USER.nome,data:ds});mudou=true;}
   if(reuNova!==null&&reuNova!==((r.reuniao_data||'').slice(0,10))){hist.push({campo:'Reunião marcada',de:(r.reuniao_data||'').slice(0,10),para:reuNova,usuario:USER.nome,data:ds});patch.reuniao_data=reuNova||null;mudou=true;}
   if(!mudou){showToast('Escolha algo pra mudar antes de salvar');return}
+  const retroD=arquivoRetroativo(r,scNovo||r.sc,pbNovo||r.pb,dataNova||r.data_boleta,ds);
+  if(retroD)hist.push(retroD);
   patch.historico=hist;
   try{
     await db('PATCH','oportunidades',patch,'id=eq.'+id);
-    showToast('💾 '+r.cliente+' atualizado',true);
+    showToast(retroD?'📦 '+r.cliente+' — boleta de '+mesExtenso(retroD.para)+', foi para o Histórico':'💾 '+r.cliente+' atualizado',true);
     await loadData();renderCurView();
   }catch(e){showToast('Erro: '+e.message)}
 }
@@ -2571,6 +2584,8 @@ function diaAtuacaoHtml(){
       +'<div class="oppd-work-field"><label>Data boleta</label><input type="date" id="data-'+key+'" value="'+(parseDataBoleta(r.data_boleta)||'')+'"></div>'
       +'<div class="oppd-work-field"><label>📞 Vou ligar em</label><input type="date" id="lig-'+key+'" value="'+(dataLigacao(r)||'')+'"></div>'
       +'<div class="oppd-work-field"><label>📅 Reunião em</label><input type="date" id="reu-'+key+'" value="'+((r.reuniao_data||'').slice(0,10))+'"></div>'
+      +'<div class="oppd-work-field"><label class="req">Próximo TODO</label><input type="text" id="todo-'+key+'" placeholder="O que precisa ser feito..." value="'+String(r.todo||'').replace(/"/g,'&quot;')+'"></div>'
+      +'<div class="oppd-work-field"><label class="req">📅 Data do TODO</label><input type="date" id="todod-'+key+'" value="'+((r.todo_data||'').slice(0,10))+'"></div>'
       +'</div>'
       +'<div class="oppd-work-ftr"><button class="btn sm" style="background:var(--green);color:#fff;border-color:var(--green)" onclick="salvarTrabalhoDaily(\''+qKey+'\',\''+r.id+'\')">💾 Salvar e concluir</button>'
       +'<span class="oppd-full" onclick="openEdit(\''+r.id+'\')">abrir oportunidade completa</span></div>'
@@ -4139,6 +4154,9 @@ function openEdit(id){
 
 async function saveEdit(){
   const r=acharOpp(editId);if(!r)return;
+  const falta=faltaProximoPasso(lerSel('e-sc'),lerSel('e-pb'),
+    document.getElementById('e-todo').value,document.getElementById('e-todo-data').value);
+  if(falta){showToast('📋 '+falta.msg);marcaObrig('e-todo','e-todo-data',falta.campo);return;}
   const btn=document.getElementById('btn-save-edit');
   btn.innerHTML='<span class="spinner"></span>';btn.disabled=true;
   const now=new Date();
@@ -4152,6 +4170,8 @@ async function saveEdit(){
   if(ligNova!==(dataLigacao(r)||''))hist.push({campo:CAMPO_LIG_DATA,de:dataLigacao(r)||'',para:ligNova,usuario:USER.nome,data:ds});
   const newObs=document.getElementById('e-obs').value.trim();
   if(newObs)hist.push({campo:'Observação',de:'',para:newObs,usuario:USER.nome,data:ds});
+  const retro=arquivoRetroativo(r,newSc,newPb,document.getElementById('e-data').value,ds);
+  if(retro)hist.push(retro);
   const escPara=document.getElementById('e-escala-para')?document.getElementById('e-escala-para').value:'';
   const escMotivoRaw=document.getElementById('e-escala-motivo')?document.getElementById('e-escala-motivo').value.trim():'';
   if((escPara||'')!==(r.escalado_para||'')){
@@ -4161,7 +4181,7 @@ async function saveEdit(){
   try{
     const dadosPatch={sc:newSc,pb:newPb,atual:newAtual,data_boleta:document.getElementById('e-data').value||null,todo:document.getElementById('e-todo').value,todo_data:document.getElementById('e-todo-data').value||null,reuniao_data:document.getElementById('e-reuniao').value||null,responsavel:document.getElementById('e-resp').value||'',escalado_para:escPara||null,escala_motivo:escPara?(escMotivoRaw?escMotivoRaw+' — por '+USER.nome:'Escalada por '+USER.nome):null,obs:newObs||r.obs||'',historico:hist,updated_at:now.toISOString()};
     await patchOppSeguro(dadosPatch,`id=eq.${editId}`);
-    showToast('✅ Salvo com sucesso!',true);
+    showToast(retro?'📦 Boleta de '+mesExtenso(retro.para)+' — foi direto para o Histórico dessa competência':'✅ Salvo com sucesso!',true);
     closeModal('edit');
     await loadData();
     if(curView==='a-opps')renderAssessorOpps();
@@ -4207,6 +4227,9 @@ async function saveNewOpp(){
   const assessor=document.getElementById('n-assessor').value.trim();
   const cliente=document.getElementById('n-cliente').value.trim();
   if(!area||!assessor||!cliente){showToast('Área, assessor e cliente são obrigatórios!');return}
+  const faltaN=faltaProximoPasso(lerSel('n-sc'),lerSel('n-pb'),
+    document.getElementById('n-todo').value,document.getElementById('n-todo-data').value);
+  if(faltaN){showToast('📋 '+faltaN.msg);marcaObrig('n-todo','n-todo-data',faltaN.campo);return;}
   const now=new Date();
   const opp={
     area,assessor,cliente,
@@ -4542,7 +4565,37 @@ function dataLigacao(r){
 // viver no Histórico, carimbada com a competência em que foi fechada.
 // Guardado no histórico da própria oportunidade: a última marca é a que vale,
 // então reabrir é só gravar uma marca vazia.
+// ── PRÓXIMO PASSO OBRIGATÓRIO ──
+// Oportunidade que continua viva não pode ser salva sem TODO e sem data:
+// sem próximo passo com prazo, ninguém cobra e o card apodrece no Kanban.
+// Fechada (boletada, a boletar, negada ou "não se aplica") está dispensada.
+function fechadaPor(sc,pb){
+  const k=norm(pb||''), c=norm(sc||'');
+  return k==='boletado'||k==='a boletar'||c==='cliente negou'||c==='nao se aplica';
+}
+function faltaProximoPasso(sc,pb,todo,todoData){
+  if(fechadaPor(sc,pb))return '';
+  if(!String(todo||'').trim())return {campo:'todo',msg:'Escreva o próximo TODO — toda oportunidade em aberto precisa de um próximo passo.'};
+  if(!todoData)return {campo:'data',msg:'Defina a data do TODO — sem prazo ninguém cobra.'};
+  return '';
+}
+function marcaObrig(idTodo,idData,qual){
+  [idTodo,idData].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('obrig')});
+  const el=document.getElementById(qual==='todo'?idTodo:idData);
+  if(el){el.classList.add('obrig');el.focus();}
+}
 const CAMPO_ARQ='Arquivamento';
+// Boleta fechada com data de mês anterior já nasce arquivada NA COMPETÊNCIA DELA:
+// não suja o mês corrente e cai direto no Histórico do mês certo.
+function arquivoRetroativo(r,sc,pb,dataBoleta,ds){
+  if(!fechadaPor(sc,pb))return null;
+  const d=parseDataBoleta(dataBoleta);
+  if(!d)return null;                                  // sem data não dá pra saber a competência
+  const comp=d.slice(0,7);
+  if(comp>=localISO(new Date()).slice(0,7))return null;   // é do mês corrente: segue no fluxo
+  if(arquivadaEm(r||{})===comp)return null;
+  return{campo:CAMPO_ARQ,de:arquivadaEm(r||{}),para:comp,usuario:USER.nome,data:ds};
+}
 // procura em TUDO: o Histórico precisa abrir e reabrir oportunidade arquivada
 const acharOpp=id=>(OPPS_ALL.length?OPPS_ALL:OPPS).find(o=>String(o.id)===String(id));
 function mesExtenso(ym){
@@ -5396,6 +5449,10 @@ async function doUploadMain(input){
             if(nr.todo&&limpaTraco(nr.todo)&&nr.todo!==ex.todo)upd.todo=nr.todo;else if(!ex.todo&&nr.todo)upd.todo=nr.todo;if('todo' in upd){const hhT=upd.historico||[...(ex.historico||[])];hhT.push({campo:'TODO',de:ex.todo||'',para:upd.todo,usuario:(typeof USER!=='undefined'&&USER?USER.nome:'')+' (planilha)',data:new Date().toLocaleDateString('pt-BR')+' '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});upd.historico=hhT;}
             if(nr.obs&&limpaTraco(nr.obs)&&nr.obs!==ex.obs)upd.obs=nr.obs;else if(!ex.obs&&nr.obs)upd.obs=nr.obs;if('obs' in upd){const hhO=upd.historico||[...(ex.historico||[])];hhO.push({campo:'Observação',de:ex.obs||'',para:upd.obs,usuario:(typeof USER!=='undefined'&&USER?USER.nome:'')+' (planilha)',data:new Date().toLocaleDateString('pt-BR')+' '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});upd.historico=hhO;}
             if((!ex.atual||ex.atual===0)&&nr.atual)upd.atual=nr.atual;
+            // boleta de mês anterior vinda da planilha vai direto pro Histórico da competência dela
+            {const rt=arquivoRetroativo(ex,upd.sc||ex.sc,upd.pb||ex.pb,nr.data_boleta||ex.data_boleta,
+               new Date().toLocaleDateString('pt-BR')+' '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
+             if(rt){rt.usuario=(USER?USER.nome:'')+' (planilha)';upd.historico=[...(upd.historico||ex.historico||[]),rt];}}
             if(nr.responsavel)upd.responsavel=nr.responsavel;
             toUpdate.push(upd);
           }
@@ -5545,6 +5602,10 @@ async function doUploadArea(cfgKey,input){
           if(nr.todo&&limpaTraco(nr.todo)&&nr.todo!==ex.todo)upd.todo=nr.todo;else if(!ex.todo&&nr.todo)upd.todo=nr.todo;if('todo' in upd){const hhT=upd.historico||[...(ex.historico||[])];hhT.push({campo:'TODO',de:ex.todo||'',para:upd.todo,usuario:(typeof USER!=='undefined'&&USER?USER.nome:'')+' (planilha)',data:new Date().toLocaleDateString('pt-BR')+' '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});upd.historico=hhT;}
           if(nr.obs&&limpaTraco(nr.obs)&&nr.obs!==ex.obs)upd.obs=nr.obs;else if(!ex.obs&&nr.obs)upd.obs=nr.obs;if('obs' in upd){const hhO=upd.historico||[...(ex.historico||[])];hhO.push({campo:'Observação',de:ex.obs||'',para:upd.obs,usuario:(typeof USER!=='undefined'&&USER?USER.nome:'')+' (planilha)',data:new Date().toLocaleDateString('pt-BR')+' '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});upd.historico=hhO;}
           if((!ex.atual||ex.atual===0)&&nr.atual)upd.atual=nr.atual;
+          // boleta de mês anterior vinda da planilha vai direto pro Histórico da competência dela
+          {const rt=arquivoRetroativo(ex,upd.sc||ex.sc,upd.pb||ex.pb,nr.data_boleta||ex.data_boleta,
+             new Date().toLocaleDateString('pt-BR')+' '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));
+           if(rt){rt.usuario=(USER?USER.nome:'')+' (planilha)';upd.historico=[...(upd.historico||ex.historico||[]),rt];}}
           if(nr.responsavel)upd.responsavel=nr.responsavel;
           toUpdate.push(upd);
         }else toInsert.push(nr);
