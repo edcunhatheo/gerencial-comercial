@@ -995,9 +995,9 @@ function corTexto(hex){
 }
 function mkArea(name,base){return{name,base,get color(){return corMarca(base)}}}
 const AREAS={inv:mkArea('Investimentos','#8B1C2A'),cons:mkArea('Consórcio','#EF9F27'),seg:mkArea('Seguro de vida','#7F77DD')};
-const SUBAREAS={rv:mkArea('Renda variável','#8B1C2A'),rf:mkArea('Renda fixa','#378ADD'),cons:mkArea('Consórcio','#EF9F27'),seg:mkArea('Seguro de vida','#7F77DD')};
+const SUBAREAS={rv:mkArea('Renda variável','#8B1C2A'),rf:mkArea('Renda fixa','#378ADD'),invg:mkArea('Investimentos','#6B0010'),cons:mkArea('Consórcio','#EF9F27'),seg:mkArea('Seguro de vida','#7F77DD')};
 // ── GESTOR: visão de diretor limitada às áreas do usuário ──
-const SUBS_DA_AREA={inv:['rv','rf'],cons:['cons'],seg:['seg']};
+const SUBS_DA_AREA={inv:['rv','rf','invg'],cons:['cons'],seg:['seg']};
 const isGestor=()=>USER&&USER.perfil==='gestor';
 const temEscopo=()=>USER&&USER.perfil!=='diretor';
 const areasVis=()=>{
@@ -1012,9 +1012,16 @@ const subareasVis=()=>{
 };
 const RF_PRODS_G=['NTN-B','COE','CP','Liquidez','LCI','LCA','CDB','CRA','CRI','Debênture','Debenture','Tesouro'];
 // Regra oficial do diretor: em Investimentos, RV = Collar, Hawk ou Equity; RF = todos os outros produtos
+const PRODUTO_GERAL_INV='Investimentos';   // planilha subida como "Investimentos", sem quebra por produto
+// Planilha de RV/RF sem coluna Produto: o rótulo guarda a classe, senão a origem
+// (RV ou RF) se perderia e os dois virariam a mesma coisa.
+const PRODUTO_GERAL_RV='Renda variável', PRODUTO_GERAL_RF='Renda fixa';
 function subAreaOf(r){
   if(r.area!=='inv')return r.area;
   const p=norm(r.produto||'');
+  if(!p||p===norm(PRODUTO_GERAL_INV))return 'invg';   // "Investimentos" ou sem produto: área própria
+  if(p===norm(PRODUTO_GERAL_RV))return 'rv';
+  if(p===norm(PRODUTO_GERAL_RF))return 'rf';
   if(/collar|hawk|equity/.test(p))return 'rv';
   return 'rf';
 }
@@ -3471,7 +3478,8 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     ['Cliente Topou','🤝','#085041'],
     ..._custOutras.map(c=>[c,'📌','#7A5C8A']),
     ['__BOL__','✅','#085041'],
-    ['__PERD__','❌','#A32D2D']
+    ['__PERD__','❌','#A32D2D'],
+    ['__NSA__','🚫','#6E6A66']      // "Não se Aplica": fora do jogo, mas visível
   ];
 
   function kbCard(r){
@@ -3541,9 +3549,16 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       const mk=(seg+'|'+key).replace(/\\/g,'').replace(/'/g,'');
       window._kbColIds=window._kbColIds||{};
       let rows;
+      // uma oportunidade cai na coluna do seu status exato; se o status não tem
+      // coluna própria (ex.: "Ligar Cliente c AI", "R2 agendada"), o scFunil manda
+      // para a etapa equivalente em vez de jogá-la no balaio "Classificar"
+      const colunasKb=[...SC_CHAIN,...kbCustomCols()];
+      const temColuna=r=>colunasKb.some(x=>norm(x)===norm(r.sc||''));
+      const naColuna=(r,k)=>norm(r.sc||'')===norm(k)||(!temColuna(r)&&scFunil(r.sc)===norm(k));
       if(key==='__BOL__')rows=opps.filter(isB);
       else if(key==='__PERD__')rows=opps.filter(r=>!isB(r)&&isPerdida(r));
-      else rows=opps.filter(r=>!isB(r)&&norm(r.sc||'')===norm(key));
+      else if(key==='__NSA__')rows=opps.filter(r=>!isB(r)&&!isPerdida(r)&&norm(r.sc||'')==='nao se aplica');
+      else rows=opps.filter(r=>!isB(r)&&!isPerdida(r)&&norm(r.sc||'')!=='nao se aplica'&&naColuna(r,key));
       const vol=rows.reduce((s,r)=>s+(key==='__BOL__'?(r.atual||0):(r.atual||r.pipe||0)),0);
       window._kbColIds[mk]=rows.map(r=>r.id);
       const colSel=rows.length>0&&rows.every(r=>SELECTED.has(r.id));
@@ -3551,16 +3566,17 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
         +'<div class="kb-col-hdr" style="color:'+cor+'">'
         +'<span style="display:flex;align-items:center;gap:6px">'
         +(rows.length?'<input type="checkbox" '+(colSel?'checked ':'')+'title="Selecionar a coluna inteira" onclick="event.stopPropagation()" onchange="kbSelCol(\''+mk+'\',this.checked)" style="width:13px;height:13px;cursor:pointer;accent-color:'+cor+'">':'')
-        +emoji+' '+(key==='__BOL__'?'Boletado':key==='__PERD__'?'Perdido':key)+'</span>'
+        +emoji+' '+(key==='__BOL__'?'Boletado':key==='__PERD__'?'Perdido':key==='__NSA__'?'Não se aplica':key)+'</span>'
         +'<span class="kb-count">'+rows.length+'</span>'
         +'</div>'
         +'<div style="font-size:10px;font-weight:700;color:'+cor+';padding:0 8px 8px">'+(fmt(vol)||'—')+'</div>'
         +(()=>{
           const exp=(window._kbMore||{})[mk];
-          const lim=exp?rows.length:15;
+          const INI=40;                       // 15 era pouco quando uma coluna concentra centenas
+          const lim=exp?rows.length:INI;
           return rows.slice(0,lim).map(kbCard).join('')
-            +(rows.length>15
-              ?'<button class="btn sm" style="width:100%;margin-top:4px" onclick="kbVerMais(\''+mk+'\')">'+(exp?'Ver menos ↑':'Ver mais '+(rows.length-15)+' ↓')+'</button>'
+            +(rows.length>INI
+              ?'<button class="btn sm" style="width:100%;margin-top:4px" onclick="kbVerMais(\''+mk+'\')">'+(exp?'Ver menos ↑':'Ver mais '+(rows.length-INI)+' ↓')+'</button>'
               :'');
         })()
         +'</div>';
@@ -3616,7 +3632,13 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   kbHtml=viewMode==='lista'?buildLista(kbOpps):'<div class="kb-board">'+buildKanban(kbOpps)+'</div>';
 
   // Sem status column (só na visão não segmentada)
-  const semStatus=kbOpps.filter(r=>!isB(r)&&![...SC_CHAIN,...kbCustomCols()].some(s=>norm(s)===norm(r.sc||''))&&norm(r.sc||'')!=='cliente negou');
+  const semStatus=kbOpps.filter(r=>{
+    if(isB(r)||isPerdida(r))return false;
+    const k=norm(r.sc||'');
+    if(k==='nao se aplica')return false;                       // tem coluna própria
+    if([...SC_CHAIN,...kbCustomCols()].some(x=>norm(x)===k))return false;
+    return !SC_CHAIN.some(x=>norm(x)===scFunil(r.sc));         // o scFunil não achou etapa
+  });
 
   c.innerHTML=''
     // Banner de saudação com o resumo do dia
@@ -3719,8 +3741,11 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'</div>'
     +'<button class="btn sm" style="font-size:11px" onclick="exportarOpps()" title="Baixa uma planilha com todas as oportunidades e todas as informações">📥 Exportar</button>'
     +'<select class="filter-sel" onchange="window._kbArea=this.value;renderAssessorOpps()">'
-    +'<option value="">Todas as áreas</option>'
-    +subareasVis().map(([k,a])=>'<option value="'+k+'"'+(fArea===k?' selected':'')+'>'+a.name+'</option>').join('')
+    +'<option value="">Todas as áreas ('+myOpps.length+')</option>'
+    +subareasVis().map(([k,a])=>{
+        const n=myOpps.filter(r=>subAreaOf(r)===k).length;      // contagem antes do filtro de área
+        return '<option value="'+k+'"'+(fArea===k?' selected':'')+'>'+a.name+' ('+n+')</option>';
+      }).join('')
     +'</select>'
     +'<select class="filter-sel" onchange="window._kbAss=this.value;renderAssessorOpps()">'
     +'<option value="">Todos assessores</option>'
@@ -4141,7 +4166,7 @@ function openEdit(id){
       <span style="font-size:22px">${isB(r)?'✅':risk.icon}</span>
       <div>
         <div style="font-size:13px;font-weight:700;color:${risk.color}">${isB(r)?'Boletado':risk.label+' — '+days+' dias sem movimentação'}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">Última atualização: ${r.updated_at?new Date(r.updated_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—'}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Entrou no sistema em: ${r.created_at?new Date(r.created_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}):'—'} · Última atualização: ${r.updated_at?new Date(r.updated_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—'}</div>
       </div>
     </div>
     ${hist.length?`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px">📍 Linha do tempo</div>
@@ -5355,22 +5380,23 @@ async function delMeta(id){
 // ── UPLOAD ──
 function renderUpload(c=document.getElementById('main-content')){
   c.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn" onclick="baixarModelo()">⬇️ Baixar planilha modelo</button></div><p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
-    Suba a planilha <strong>uma vez por dia</strong>. O sistema lê as abas <strong>RV, RF, Consórcio e Seguro de Vida</strong> e separa por área automaticamente.<br><br>
+    Suba a planilha <strong>uma vez por dia</strong>. O sistema lê as abas <strong>RV, RF, Investimentos, Consórcio e Seguro de Vida</strong> e separa por área automaticamente.<br><br>
 <strong>✅ Sem duplicatas:</strong> oportunidades já existentes (mesmo assessor + cliente + produto) têm apenas o volume atualizado — o status, pendência, TODO e observações que o time preencheu <strong>no sistema são preservados</strong>. Só as oportunidades novas são adicionadas.
   </p>
   <div class="upload-card" id="uc-main" onclick="document.getElementById('fi-main').click()" style="max-width:480px;margin:0 auto">
     <div class="upload-icon">📊</div>
     <div class="upload-title" style="color:var(--wine)">Campanha_vX_Mês.xlsx</div>
-    <div class="upload-sub">Abas: RV · RF · Consórcio · Seguro de Vida</div>
+    <div class="upload-sub">Abas: RV · RF · Investimentos · Consórcio · Seguro de Vida</div>
     <div class="upload-status" id="us-main" style="margin-top:10px;min-height:20px"></div>
     <input type="file" id="fi-main" accept=".xlsx,.xls" style="display:none" onchange="doUploadMain(this)">
   </div>
   <div id="upload-results" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:20px;display:none"></div>
 
   <div class="section-label" style="margin-top:28px">Ou suba apenas uma área</div>
-  <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Planilha com uma aba só (qualquer nome de aba) — o sistema lê a primeira aba com o formato da área escolhida.</p>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Planilha com uma aba só (qualquer nome de aba) — o sistema lê a primeira aba com o formato da área escolhida.<br>
+  <strong>Investimentos</strong>: use quando a planilha não separa produto. Todas as oportunidades entram com o produto <strong>“Investimentos”</strong> e contam como <strong>Renda variável</strong>.</p>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
-    ${[['rv','📈 Só Renda Variável',corMarca('#8B1C2A')],['rf','💰 Só Renda Fixa',corMarca('#378ADD')],['cons','📋 Só Consórcio',corMarca('#EF9F27')],['seg','🛡️ Só Seguro de Vida',corMarca('#7F77DD')]].map(([k,label,cor])=>`
+    ${[['inv','📊 Investimentos (sem quebra por produto)',corMarca('#8B1C2A')],['rv','📈 Só Renda Variável',corMarca('#8B1C2A')],['rf','💰 Só Renda Fixa',corMarca('#378ADD')],['cons','📋 Só Consórcio',corMarca('#EF9F27')],['seg','🛡️ Só Seguro de Vida',corMarca('#7F77DD')]].map(([k,label,cor])=>`
     <div class="upload-card" id="uca-${k}" onclick="document.getElementById('fia-${k}').click()" style="padding:18px">
       <div class="upload-title" style="color:${cor};font-size:13px">${label}</div>
       <div class="upload-status" id="usa-${k}" style="margin-top:6px;min-height:16px;font-size:11px"></div>
@@ -5394,8 +5420,9 @@ async function doUploadMain(input){
   };
 
   const SHEET_CFG={
-    rv:{area:'inv',aai:['AAI','AI'],pipe:['RV Pipe','Valor'],atual:['RV Atual','Valor'],sc:['Status Comercial','Status Comercial RV'],pb:['Pendencia Boleta','Pendencia Boleta RV'],todo:['ToDo','TO DO'],obs:['Obs']},
-    rf:{area:'inv',aai:['AI','AAI'],pipe:['RF Pipe','Valor'],atual:['RF Atual','Valor'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['Obs']},
+    inv:{area:'inv',produtoFixo:PRODUTO_GERAL_INV,aai:['AI','AAI'],pipe:['Pipe','Valor'],atual:['Atual','Valor'],sc:['Status Comercial','Status'],pb:['Pendencia Boleta','Pendencia'],todo:['ToDo','TO DO'],obs:['Obs','OBS'],resp:['Responsável','Responsavel','Resp']},
+    rv:{area:'inv',produtoPadrao:PRODUTO_GERAL_RV,aai:['AAI','AI'],pipe:['RV Pipe','Valor'],atual:['RV Atual','Valor'],sc:['Status Comercial','Status Comercial RV'],pb:['Pendencia Boleta','Pendencia Boleta RV'],todo:['ToDo','TO DO'],obs:['Obs']},
+    rf:{area:'inv',produtoPadrao:PRODUTO_GERAL_RF,aai:['AI','AAI'],pipe:['RF Pipe','Valor'],atual:['RF Atual','Valor'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['Obs']},
     cons:{area:'cons',aai:['AI','AAI'],pipe:['Pipe Atual','Carta','Valor'],atual:['Pipe Atual','Valor'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo','OBS'],obs:['OBS']},
     seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe','Valor'],atual:['Seg atual','Seg Atual','Valor'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp','Dono']}
   };
@@ -5412,6 +5439,7 @@ async function doUploadMain(input){
         const sl=sname.toLowerCase().trim();
         if(sl==='rv')cfgKey='rv';
         else if(sl==='rf')cfgKey='rf';
+        else if(sl.includes('investimento'))cfgKey='inv';
         else if(sl.includes('cons'))cfgKey='cons';
         else if(sl.includes('seguro')||sl.includes('seg vida')||sl==='seg')cfgKey='seg';
         if(!cfgKey)continue;
@@ -5424,7 +5452,7 @@ async function doUploadMain(input){
 
       const nadaReconhecido=Object.values(results).every(res=>!res.rows.length);
       if(nadaReconhecido){
-        st.textContent='⚠️ Nenhuma aba reconhecida (esperado: RV, RF, Consórcio, Seguro de Vida). A planilha tem: '+wb.SheetNames.join(', ')+'. 👉 Use os cards de área única abaixo!';
+        st.textContent='⚠️ Nenhuma aba reconhecida (esperado: RV, RF, Investimentos, Consórcio, Seguro de Vida). A planilha tem: '+wb.SheetNames.join(', ')+'. 👉 Use os cards de área única abaixo!';
         st.style.color='var(--red)';
         return;
       }
@@ -5573,8 +5601,9 @@ async function doUploadArea(cfgKey,input){
   st.textContent='⏳ Lendo...';st.style.color='var(--muted)';
 
   const SHEET_CFG={
-    rv:{area:'inv',aai:['AAI','AI'],pipe:['RV Pipe','Pipe','Valor'],atual:['RV Atual','Atual','Valor'],sc:['Status Comercial','Status'],pb:['Pendencia Boleta','Pendencia'],todo:['ToDo','TO DO'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
-    rf:{area:'inv',aai:['AI','AAI'],pipe:['RF Pipe','Pipe','Valor'],atual:['RF Atual','Atual','Valor'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
+    inv:{area:'inv',produtoFixo:PRODUTO_GERAL_INV,aai:['AI','AAI'],pipe:['Pipe','Valor','RV Pipe','RF Pipe'],atual:['Atual','Valor','RV Atual','RF Atual'],sc:['Status Comercial','Status'],pb:['Pendencia Boleta','Pendencia'],todo:['ToDo','TO DO'],obs:['Obs','OBS'],resp:['Responsável','Responsavel','Resp']},
+    rv:{area:'inv',produtoPadrao:PRODUTO_GERAL_RV,aai:['AAI','AI'],pipe:['RV Pipe','Pipe','Valor'],atual:['RV Atual','Atual','Valor'],sc:['Status Comercial','Status'],pb:['Pendencia Boleta','Pendencia'],todo:['ToDo','TO DO'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
+    rf:{area:'inv',produtoPadrao:PRODUTO_GERAL_RF,aai:['AI','AAI'],pipe:['RF Pipe','Pipe','Valor'],atual:['RF Atual','Atual','Valor'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
     cons:{area:'cons',aai:['AI','AAI'],pipe:['Pipe Atual','Carta','Pipe','Valor'],atual:['Pipe Atual','Atual','Valor'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo','OBS'],obs:['OBS'],resp:['Responsável','Responsavel','Resp']},
     seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe','Pipe','Valor'],atual:['Seg atual','Seg Atual','Atual','Valor'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp']}
   };
@@ -5623,7 +5652,11 @@ async function doUploadArea(cfgKey,input){
   reader.readAsBinaryString(file);
 }
 
-function limpaTraco(v){return ['-','--','—','.','n/a','na'].includes(String(v).toLowerCase())?'':v}
+function limpaTraco(v){
+  const t=String(v==null?'':v).trim();
+  if(/^#(REF|VALUE|N\/A|NAME\?|DIV\/0!|NULL!|NUM!)/i.test(t))return '';   // erro de fórmula do Excel
+  return ['-','--','—','.','n/a','na','0','00:00:00'].includes(t.toLowerCase())?'':t;
+}
 function parsePipeCfg(raw,area,cfg){
   // Find header row
   let hr=-1;
@@ -5639,7 +5672,7 @@ function parsePipeCfg(raw,area,cfg){
     pipe:fi(cfg.pipe),atual:fi(cfg.atual||cfg.pipe),
     fonte:fi(['Fonte do $','Fonte']),sc:fi(cfg.sc),pb:fi(cfg.pb),
     data:fi(['DATA DA BOLETA','Data Boleta','data_boleta']),
-    todo:fi(cfg.todo),obs:fi(cfg.obs||['Obs']),
+    todo:fi(cfg.todo),todoData:fi(['DATA TO DO','Data do TODO','Data TODO']),obs:fi(cfg.obs||['Obs']),
     resp:fi(cfg.resp||['Responsável','Responsavel','Resp'])
   };
   const pn=v=>{const s=String(v||0).replace(/[^0-9.,]/g,'').replace(',','.');return parseFloat(s)||0};
@@ -5650,7 +5683,7 @@ function parsePipeCfg(raw,area,cfg){
     area,
     assessor:String(r[ci.aai]||'').trim(),
     cliente:String(r[ci.cli]||'').trim(),
-    produto:area==='cons'?'ALAVANCAGEM FINANCEIRA/PAT':String(r[ci.prod]||'').trim(),
+    produto:area==='cons'?'ALAVANCAGEM FINANCEIRA/PAT':(cfg.produtoFixo||String(r[ci.prod]||'').trim()||cfg.produtoPadrao||''),
     pipe:pn(r[ci.pipe]),
     atual:pn(r[ci.atual]),
     fonte:String(r[ci.fonte]||'').trim(),
@@ -5658,14 +5691,22 @@ function parsePipeCfg(raw,area,cfg){
     pb:String(r[ci.pb]||'').trim(),
     data_boleta:ci.data>=0&&r[ci.data]&&String(r[ci.data]).trim()!=='nan'?String(r[ci.data]).trim():null,
     todo:limpaTraco(String(r[ci.todo]||'').trim()),
+    todo_data:ci.todoData>=0?parseDataBoleta(limpaTraco(r[ci.todoData])):null,
     obs:limpaTraco(String(r[ci.obs]||'').trim()),
     responsavel:ci.resp>=0?String(r[ci.resp]||'').trim():'',
     historico:[]
   })).filter(r=>r.assessor&&r.cliente).map(r=>{
+    // carimbo de entrada: quando a oportunidade subiu para o sistema
+    const ag=new Date();
+    const dHoje=ag.toLocaleDateString('pt-BR');
+    const dsHoje=dHoje+' '+ag.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    const quem=(typeof USER!=='undefined'&&USER?USER.nome:'')+' (planilha)';
+    r.created_at=ag.toISOString();
+    r.historico=[{campo:'Criação',de:'',para:'Subida por planilha em '+dHoje,usuario:quem,data:dsHoje}];
     if(pbFechada(r.pb)){
       const iso=parseDataBoleta(r.data_boleta);
-      const dbr=iso?iso.split('-').reverse().join('/'):new Date().toLocaleDateString('pt-BR');
-      r.historico=[{campo:'Pendência boleta',de:'',para:r.pb,usuario:(typeof USER!=='undefined'&&USER?USER.nome:'')+' (planilha)',data:dbr}];
+      const dbr=iso?iso.split('-').reverse().join('/'):dHoje;
+      r.historico.push({campo:'Pendência boleta',de:'',para:r.pb,usuario:quem,data:dbr});
     }
     return r;
   });
