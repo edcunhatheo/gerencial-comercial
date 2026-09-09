@@ -1016,13 +1016,16 @@ const subareasVis=()=>{
 const RF_PRODS_G=['NTN-B','COE','CP','Liquidez','LCI','LCA','CDB','CRA','CRI','Debênture','Debenture','Tesouro'];
 // Regra oficial do diretor: em Investimentos, RV = Collar, Hawk ou Equity; RF = todos os outros produtos
 const PRODUTO_GERAL_INV='Investimentos';   // planilha subida como "Investimentos", sem quebra por produto
+// IA = Asset Allocation. Nao e Collar/Hawk (RV) nem papel de renda fixa: fica na
+// area Investimentos, senao o fallback jogaria tudo em Renda fixa sem avisar.
+const PRODS_INV_GERAL=['ia','asset allocation','investimentos'];
 // Planilha de RV/RF sem coluna Produto: o rótulo guarda a classe, senão a origem
 // (RV ou RF) se perderia e os dois virariam a mesma coisa.
 const PRODUTO_GERAL_RV='Renda variável', PRODUTO_GERAL_RF='Renda fixa';
 function subAreaOf(r){
   if(r.area!=='inv')return r.area;
   const p=norm(r.produto||'');
-  if(!p||p===norm(PRODUTO_GERAL_INV))return 'invg';   // "Investimentos" ou sem produto: área própria
+  if(!p||PRODS_INV_GERAL.includes(p))return 'invg';   // IA/Asset Allocation, "Investimentos" ou sem produto
   if(p===norm(PRODUTO_GERAL_RV))return 'rv';
   if(p===norm(PRODUTO_GERAL_RF))return 'rf';
   if(/collar|hawk|equity/.test(p))return 'rv';
@@ -4327,7 +4330,7 @@ async function saveEdit(){
 
 // ── NOVA OPORTUNIDADE MANUAL ──
 // Produtos por área no modal: padrão da casa + o que já existe naquela área
-const PRODUTOS_PADRAO={inv:['Collar','Hawk','Equity','COE','NTN-B 50','CP','Liquidez'],cons:['ALAVANCAGEM FINANCEIRA/PAT'],seg:['SEGURO DE VIDA'],saude:['PLANO DE SAÚDE']};
+const PRODUTOS_PADRAO={inv:['IA','Collar','Hawk','Equity','COE','NTN-B 50','CP','Liquidez'],cons:['ALAVANCAGEM FINANCEIRA/PAT'],seg:['SEGURO DE VIDA'],saude:['PLANO DE SAÚDE']};
 function updateNovoProdutos(){
   const area=document.getElementById('n-area').value;
   const m=new Map();
