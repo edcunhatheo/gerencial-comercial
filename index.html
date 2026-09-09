@@ -3182,6 +3182,82 @@ function oppsDoUsuario(){
     return (USER.areas||[]).includes(r.area);
   });
 }
+
+// ══════════════════════════════════════════════════════════
+// ── COMERCIAL DE SEGUROS POR ASSESSOR (Cris / Vovo) ──
+// A divisão vem da lista do diretor. O card guarda o AI dono do cliente;
+// o responsável é o comercial de seguros que trabalha aquela oportunidade.
+// ══════════════════════════════════════════════════════════
+const RESP_SEGURO=[
+  ['André Alves da Silva','Cris'],['Felipe Novaes de Souza','Cris'],
+  ['Lizandra de Souza Pinto Ambold','Cris'],['Paulo Rogério Minehira','Cris'],
+  ['Robson Macedo Santana','Cris'],['Thaís Espindola Martins','Cris'],
+  ['Letícia Veras Batista','Cris'],['Alexandra do Nascimento','Cris'],
+  ['Sandra','Cris'],['Gabriel Xavier','Cris'],['Cintia Gomes Braga','Cris'],
+  ['Aline Cassiele da Cruz Bachi','Cris'],['Cristiane Moraes da Silva Aramizo','Cris'],
+  ['Edvaldo Frazão Serrote','Cris'],['Fábio Henrique de Carvalho','Cris'],
+  ['Renan Idalgo de Souza','Cris'],['Rosania Silvino Lo Schiavo','Cris'],
+  ['Sheila Belarmino','Cris'],['Thaise Morais Moura Entz','Cris'],
+  ['Adriane Aparecida Possatto','Cris'],['Giovani Tomé Carioca','Cris'],
+  ['Roger Pereira Medina','Cris'],
+  ['Oswaldo Coelho dos Santos','Vovo'],['Ricardo José da Silva','Vovo'],
+  ['Rogério Aparecido Tassi','Vovo'],['Davi Romeu El Khoury Gazzani','Vovo'],
+  ['Bred de Souza Kutz','Vovo'],['João Gabriel Prieto','Vovo'],
+  ['Jorge Danthi Soares Carreiro','Vovo'],['Lorenzo Portillo Capelasso','Vovo'],
+  ['Luís Gustavo Baptistella de Lima','Vovo'],['Luis Henrique Araujo da Silva','Vovo'],
+  ['Mateus Castro Silva','Vovo'],['Rafael Ferreira Padilha Campos Lopes','Vovo'],
+  ['Tiago Vieira de Alcantara Copit','Vovo'],['Alexandre Boldrini Mourão','Vovo'],
+  ['Kevin Kenji Alves','Vovo'],['Lidiane Zanotto','Vovo'],
+  ['Paola Bitencourt Fabricio Soares','Vovo'],['Rodrigo Laurenzano','Vovo'],
+  ['Vanessa Cristina Barros Machado Figueiro','Vovo'],
+  ['Lucca Melo','Vovo'],['Fabricio Pinto','Vovo'],
+];
+const _pal=t=>norm(t).replace(/\bluiz\b/g,'luis').split(' ').filter(x=>!['da','de','do','das','dos','el'].includes(x));
+// casa o nome curto do card com o nome completo da lista: todas as palavras do
+// card têm de existir no nome completo; se não achar, tenta pelo primeiro nome
+function respSeguroDe(assessor){
+  const a=_pal(assessor); if(!a.length)return null;
+  const exatos=RESP_SEGURO.filter(([n])=>a.every(t=>_pal(n).includes(t)));
+  if(exatos.length===1)return{quem:exatos[0][1],como:'nome completo',alvo:exatos[0][0]};
+  if(exatos.length>1)return null;
+  const prim=RESP_SEGURO.filter(([n])=>_pal(n)[0]===a[0]);
+  if(prim.length===1)return{quem:prim[0][1],como:'primeiro nome',alvo:prim[0][0]};
+  return null;
+}
+async function aplicarRespSeguro(){
+  const alvo=OPPS.filter(r=>r.area==='seg'&&!arquivada(r));
+  if(!alvo.length){showToast('Nenhuma oportunidade de Seguro de vida no fluxo');return}
+  const plano=[],semRegra={},jaOk={};
+  alvo.forEach(r=>{
+    const m=respSeguroDe(r.assessor||'');
+    if(!m){semRegra[r.assessor||'(sem assessor)']=(semRegra[r.assessor||'(sem assessor)']||0)+1;return}
+    if(norm(r.responsavel||'')===norm(m.quem)){jaOk[m.quem]=(jaOk[m.quem]||0)+1;return}
+    plano.push({r,quem:m.quem});
+  });
+  const cont={};plano.forEach(x=>cont[x.quem]=(cont[x.quem]||0)+1);
+  const faltam=Object.entries(semRegra).map(([k,v])=>'  · '+k+': '+v).join('\n');
+  if(!plano.length){
+    alert('Nada a mudar.\n\nJá corretas: '+Object.entries(jaOk).map(([k,v])=>k+' '+v).join(' · ')
+      +(faltam?'\n\nSem regra na lista (seguem sem responsável):\n'+faltam:''));
+    return;
+  }
+  if(!confirm('Atribuir o comercial de seguros pelo assessor?\n\n'
+    +Object.entries(cont).map(([k,v])=>'  '+k+': '+v+' oportunidade'+(v>1?'s':'')).join('\n')
+    +(Object.keys(jaOk).length?'\n\nJá corretas: '+Object.entries(jaOk).map(([k,v])=>k+' '+v).join(' · '):'')
+    +(faltam?'\n\nFicam de fora (assessor não está na lista):\n'+faltam:'')
+    +'\n\nCom responsável definido, a oportunidade passa a aparecer no CRM dele.'))return;
+  const ag=new Date();
+  const ds=ag.toLocaleDateString('pt-BR')+' '+ag.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  let ok=0,err=0;
+  for(const x of plano){
+    const hist=[...(x.r.historico||[]),{campo:'Responsável',de:x.r.responsavel||'',para:x.quem,usuario:USER.nome,data:ds}];
+    try{await db('PATCH','oportunidades',{responsavel:x.quem,historico:hist,updated_at:ag.toISOString()},'id=eq.'+x.r.id);ok++;}
+    catch(e){err++}
+  }
+  showToast('🛡️ '+ok+' oportunidade'+(ok!==1?'s':'')+' de seguro atribuída'+(ok!==1?'s':'')+(err?' · '+err+' com erro':''),!err);
+  await loadData();renderCurView();
+}
+
 // ══════════════════════════════════════════════════════════
 // ── HISTÓRICO: o que foi fechado e o que foi perdido, por competência ──
 // Só entra aqui o que passou pela virada de mês. Nada some do banco:
@@ -5433,6 +5509,9 @@ function renderUpload(c=document.getElementById('main-content')){
       <input type="file" id="fia-${k}" accept=".xlsx,.xls" style="display:none" onchange="doUploadArea('${k}',this)">
     </div>`).join('')}
   </div>
+  <div class="section-label" style="margin-top:28px">Comercial de seguros</div>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Distribui as oportunidades de <strong>Seguro de vida</strong> entre <strong>Cris</strong> e <strong>Vovo</strong> pela regra de quem cuida de cada assessor. Só grava o que estiver diferente, e mostra antes o que vai mudar.</p>
+  <button class="btn wine" onclick="aplicarRespSeguro()">🛡️ Atribuir Cris / Vovo pelas oportunidades de seguro</button>
   <div id="upload-log" style="margin-top:20px"></div>`;
 }
 
