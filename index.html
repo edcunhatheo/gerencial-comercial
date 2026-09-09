@@ -831,6 +831,7 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;font-weight:normal;cursor:pointer"><input type="checkbox" id="ua-inv" value="inv"> Investimentos</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;font-weight:normal;cursor:pointer"><input type="checkbox" id="ua-cons" value="cons"> Consórcio</label>
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;font-weight:normal;cursor:pointer"><input type="checkbox" id="ua-seg" value="seg"> Seguro de vida</label>
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;font-weight:normal;cursor:pointer"><input type="checkbox" id="ua-saude" value="saude"> Plano de saúde</label>
       </div>
     </div>
     <div class="modal-ftr">
@@ -850,6 +851,7 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
           <option value="inv">Investimentos</option>
           <option value="cons">Consórcio</option>
           <option value="seg">Seguro de vida</option>
+          <option value="saude">Plano de saúde</option>
         </select>
       </div>
       <div class="fg"><label>Assessor * <span style="font-weight:400;text-transform:none;font-size:9px">(escolha ou digite um novo para incluí-lo)</span></label>
@@ -925,6 +927,7 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
           <option value="inv">Investimentos (geral)</option>
           <option value="cons">Consórcio</option>
           <option value="seg">Seguro de vida</option>
+          <option value="saude">Plano de saúde</option>
         </select>
       </div>
       <div class="fg"><label>Produto (opcional)</label>
@@ -982,9 +985,9 @@ const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6
 
 // Cores de marca. No modo escuro elas clareiam, senão vinho sobre fundo escuro fica ilegível.
 // `color` é um getter: quem lê AREAS[x].color já recebe a cor certa do tema atual, sem mudar nada nas chamadas.
-const CORES_DARK={'#8B1C2A':'#E0697D','#6B0010':'#EE93A2','#EF9F27':'#F2B45A','#7F77DD':'#A9A2F5','#378ADD':'#6FB2F0','#185FA5':'#6FB2F0'};
+const CORES_DARK={'#8B1C2A':'#E0697D','#6B0010':'#EE93A2','#EF9F27':'#F2B45A','#7F77DD':'#A9A2F5','#378ADD':'#6FB2F0','#185FA5':'#6FB2F0','#0F8A7E':'#5FCBBD'};
 // no claro as cores de área também são dessaturadas — a cor vira assinatura, não preenchimento
-const CORES_LIGHT={'#8B1C2A':'#7A2233','#6B0010':'#5E1A27','#EF9F27':'#B07A2B','#7F77DD':'#5E5896','#378ADD':'#2F6795','#185FA5':'#2F6795'};
+const CORES_LIGHT={'#8B1C2A':'#7A2233','#6B0010':'#5E1A27','#EF9F27':'#B07A2B','#7F77DD':'#5E5896','#378ADD':'#2F6795','#185FA5':'#2F6795','#0F8A7E':'#116E64'};
 function corMarca(hex){return temaAtual()==='dark'?(CORES_DARK[hex]||hex):(CORES_LIGHT[hex]||hex)}
 // preto ou branco sobre um fundo colorido, conforme a luminância — evita branco em cima de âmbar claro
 function corTexto(hex){
@@ -994,10 +997,10 @@ function corTexto(hex){
   return (0.2126*L[0]+0.7152*L[1]+0.0722*L[2])>0.45?'#241417':'#fff';
 }
 function mkArea(name,base){return{name,base,get color(){return corMarca(base)}}}
-const AREAS={inv:mkArea('Investimentos','#8B1C2A'),cons:mkArea('Consórcio','#EF9F27'),seg:mkArea('Seguro de vida','#7F77DD')};
-const SUBAREAS={rv:mkArea('Renda variável','#8B1C2A'),rf:mkArea('Renda fixa','#378ADD'),invg:mkArea('Investimentos','#6B0010'),cons:mkArea('Consórcio','#EF9F27'),seg:mkArea('Seguro de vida','#7F77DD')};
+const AREAS={inv:mkArea('Investimentos','#8B1C2A'),cons:mkArea('Consórcio','#EF9F27'),seg:mkArea('Seguro de vida','#7F77DD'),saude:mkArea('Plano de saúde','#0F8A7E')};
+const SUBAREAS={rv:mkArea('Renda variável','#8B1C2A'),rf:mkArea('Renda fixa','#378ADD'),invg:mkArea('Investimentos','#6B0010'),cons:mkArea('Consórcio','#EF9F27'),seg:mkArea('Seguro de vida','#7F77DD'),saude:mkArea('Plano de saúde','#0F8A7E')};
 // ── GESTOR: visão de diretor limitada às áreas do usuário ──
-const SUBS_DA_AREA={inv:['rv','rf','invg'],cons:['cons'],seg:['seg']};
+const SUBS_DA_AREA={inv:['rv','rf','invg'],cons:['cons'],seg:['seg'],saude:['saude']};
 const isGestor=()=>USER&&USER.perfil==='gestor';
 const temEscopo=()=>USER&&USER.perfil!=='diretor';
 const areasVis=()=>{
@@ -1456,7 +1459,7 @@ async function initApp(){
 }
 
 async function loadData(){
-  const areas=USER.perfil==='diretor'?['inv','cons','seg']:(USER.areas||[]);
+  const areas=USER.perfil==='diretor'?Object.keys(AREAS):(USER.areas||[]);
   const af=areas.map(a=>`area.eq.${a}`).join(',');
   const mesAtual=new Date().toISOString().slice(0,7);
   const[opps,users,daily,metas]=await Promise.all([
@@ -4324,7 +4327,7 @@ async function saveEdit(){
 
 // ── NOVA OPORTUNIDADE MANUAL ──
 // Produtos por área no modal: padrão da casa + o que já existe naquela área
-const PRODUTOS_PADRAO={inv:['Collar','Hawk','Equity','COE','NTN-B 50','CP','Liquidez'],cons:['ALAVANCAGEM FINANCEIRA/PAT'],seg:['SEGURO DE VIDA']};
+const PRODUTOS_PADRAO={inv:['Collar','Hawk','Equity','COE','NTN-B 50','CP','Liquidez'],cons:['ALAVANCAGEM FINANCEIRA/PAT'],seg:['SEGURO DE VIDA'],saude:['PLANO DE SAÚDE']};
 function updateNovoProdutos(){
   const area=document.getElementById('n-area').value;
   const m=new Map();
@@ -4336,6 +4339,7 @@ function updateNovoProdutos(){
   const np=document.getElementById('n-produto');
   if(area==='cons')np.value='ALAVANCAGEM FINANCEIRA/PAT';
   else if(area==='seg'&&!np.value)np.value='SEGURO DE VIDA';
+  else if(area==='saude'&&!np.value)np.value='PLANO DE SAÚDE';
 }
 function openNewOpp(){
   // Fill datalists
@@ -5486,13 +5490,13 @@ async function delMeta(id){
 // ── UPLOAD ──
 function renderUpload(c=document.getElementById('main-content')){
   c.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn" onclick="baixarModelo()">⬇️ Baixar planilha modelo</button></div><p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
-    Suba a planilha <strong>uma vez por dia</strong>. O sistema lê as abas <strong>RV, RF, Investimentos, Consórcio e Seguro de Vida</strong> e separa por área automaticamente.<br><br>
+    Suba a planilha <strong>uma vez por dia</strong>. O sistema lê as abas <strong>RV, RF, Investimentos, Consórcio, Seguro de Vida e Plano de Saúde</strong> e separa por área automaticamente.<br><br>
 <strong>✅ Sem duplicatas:</strong> oportunidades já existentes (mesmo assessor + cliente + produto) têm apenas o volume atualizado — o status, pendência, TODO e observações que o time preencheu <strong>no sistema são preservados</strong>. Só as oportunidades novas são adicionadas.
   </p>
   <div class="upload-card" id="uc-main" onclick="document.getElementById('fi-main').click()" style="max-width:480px;margin:0 auto">
     <div class="upload-icon">📊</div>
     <div class="upload-title" style="color:var(--wine)">Campanha_vX_Mês.xlsx</div>
-    <div class="upload-sub">Abas: RV · RF · Investimentos · Consórcio · Seguro de Vida</div>
+    <div class="upload-sub">Abas: RV · RF · Investimentos · Consórcio · Seguro de Vida · Plano de Saúde</div>
     <div class="upload-status" id="us-main" style="margin-top:10px;min-height:20px"></div>
     <input type="file" id="fi-main" accept=".xlsx,.xls" style="display:none" onchange="doUploadMain(this)">
   </div>
@@ -5502,7 +5506,7 @@ function renderUpload(c=document.getElementById('main-content')){
   <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Planilha com uma aba só (qualquer nome de aba) — o sistema lê a primeira aba com o formato da área escolhida.<br>
   <strong>Investimentos</strong>: use quando a planilha não separa produto. Todas as oportunidades entram com o produto <strong>“Investimentos”</strong> e contam como <strong>Renda variável</strong>.</p>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px">
-    ${[['inv','📊 Investimentos (sem quebra por produto)',corMarca('#8B1C2A')],['rv','📈 Só Renda Variável',corMarca('#8B1C2A')],['rf','💰 Só Renda Fixa',corMarca('#378ADD')],['cons','📋 Só Consórcio',corMarca('#EF9F27')],['seg','🛡️ Só Seguro de Vida',corMarca('#7F77DD')]].map(([k,label,cor])=>`
+    ${[['inv','📊 Investimentos (sem quebra por produto)',corMarca('#8B1C2A')],['rv','📈 Só Renda Variável',corMarca('#8B1C2A')],['rf','💰 Só Renda Fixa',corMarca('#378ADD')],['cons','📋 Só Consórcio',corMarca('#EF9F27')],['seg','🛡️ Só Seguro de Vida',corMarca('#7F77DD')],['saude','🏥 Só Plano de Saúde',corMarca('#0F8A7E')]].map(([k,label,cor])=>`
     <div class="upload-card" id="uca-${k}" onclick="document.getElementById('fia-${k}').click()" style="padding:18px">
       <div class="upload-title" style="color:${cor};font-size:13px">${label}</div>
       <div class="upload-status" id="usa-${k}" style="margin-top:6px;min-height:16px;font-size:11px"></div>
@@ -5533,14 +5537,15 @@ async function doUploadMain(input){
     rv:{area:'inv',produtoPadrao:PRODUTO_GERAL_RV,aai:['AAI','AI'],pipe:['RV Pipe','Valor'],atual:['RV Atual','Valor'],sc:['Status Comercial','Status Comercial RV'],pb:['Pendencia Boleta','Pendencia Boleta RV'],todo:['ToDo','TO DO'],obs:['Obs']},
     rf:{area:'inv',produtoPadrao:PRODUTO_GERAL_RF,aai:['AI','AAI'],pipe:['RF Pipe','Valor'],atual:['RF Atual','Valor'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['Obs']},
     cons:{area:'cons',aai:['AI','AAI'],pipe:['Pipe Atual','Carta','Valor'],atual:['Pipe Atual','Valor'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo','OBS'],obs:['OBS']},
-    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe','Valor'],atual:['Seg atual','Seg Atual','Valor'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp','Dono']}
+    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe','Valor'],atual:['Seg atual','Seg Atual','Valor'],sc:['Status Comercial RF','Status Comercial'],pb:['Pendencia Boleta RF','Pendencia Boleta'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp','Dono']},
+    saude:{area:'saude',produtoPadrao:'PLANO DE SAÚDE',aai:['AI','AAI'],pipe:['Saude Pipe','Saúde Pipe','Pipe','Valor'],atual:['Saude Atual','Saúde Atual','Atual','Valor'],sc:['Status Comercial','Status'],pb:['Pendencia Boleta','Pendencia'],todo:['ToDo','TO DO'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp','Dono']}
   };
 
   const reader=new FileReader();
   reader.onload=async function(e){
     try{
       const wb=XLSX.read(e.target.result,{type:'binary'});
-      const results={inv:{rows:[],new:0,upd:0},cons:{rows:[],new:0,upd:0},seg:{rows:[],new:0,upd:0}};
+      const results={inv:{rows:[],new:0,upd:0},cons:{rows:[],new:0,upd:0},seg:{rows:[],new:0,upd:0},saude:{rows:[],new:0,upd:0}};
 
       // Process each relevant sheet
       for(const sname of wb.SheetNames){
@@ -5550,6 +5555,7 @@ async function doUploadMain(input){
         else if(sl==='rf')cfgKey='rf';
         else if(sl.includes('investimento'))cfgKey='inv';
         else if(sl.includes('cons'))cfgKey='cons';
+        else if(sl.includes('saude')||sl.includes('saúde'))cfgKey='saude';
         else if(sl.includes('seguro')||sl.includes('seg vida')||sl==='seg')cfgKey='seg';
         if(!cfgKey)continue;
 
@@ -5561,7 +5567,7 @@ async function doUploadMain(input){
 
       const nadaReconhecido=Object.values(results).every(res=>!res.rows.length);
       if(nadaReconhecido){
-        st.textContent='⚠️ Nenhuma aba reconhecida (esperado: RV, RF, Investimentos, Consórcio, Seguro de Vida). A planilha tem: '+wb.SheetNames.join(', ')+'. 👉 Use os cards de área única abaixo!';
+        st.textContent='⚠️ Nenhuma aba reconhecida (esperado: RV, RF, Investimentos, Consórcio, Seguro de Vida, Plano de Saúde). A planilha tem: '+wb.SheetNames.join(', ')+'. 👉 Use os cards de área única abaixo!';
         st.style.color='var(--red)';
         return;
       }
@@ -5675,7 +5681,7 @@ function baixarModelo(){
 // ── ABA DO TIME: baixar modelo e subir basket da própria área ──
 function renderTeamUpload(c=document.getElementById('main-content')){
   const subs=(USER.areas||[]).flatMap(a=>SUBS_DA_AREA[a]||[]);
-  const CARD_INFO={rv:['📈 Renda Variável',corMarca('#8B1C2A')],rf:['💰 Renda Fixa',corMarca('#378ADD')],cons:['📋 Consórcio',corMarca('#EF9F27')],seg:['🛡️ Seguro de Vida',corMarca('#7F77DD')]};
+  const CARD_INFO={rv:['📈 Renda Variável',corMarca('#8B1C2A')],rf:['💰 Renda Fixa',corMarca('#378ADD')],invg:['📊 Investimentos',corMarca('#6B0010')],cons:['📋 Consórcio',corMarca('#EF9F27')],seg:['🛡️ Seguro de Vida',corMarca('#7F77DD')],saude:['🏥 Plano de Saúde',corMarca('#0F8A7E')]};
   c.innerHTML=''
     +'<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--wine);border-radius:6px;padding:16px 18px;margin-bottom:16px">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">'
@@ -5714,7 +5720,8 @@ async function doUploadArea(cfgKey,input){
     rv:{area:'inv',produtoPadrao:PRODUTO_GERAL_RV,aai:['AAI','AI'],pipe:['RV Pipe','Pipe','Valor'],atual:['RV Atual','Atual','Valor'],sc:['Status Comercial','Status'],pb:['Pendencia Boleta','Pendencia'],todo:['ToDo','TO DO'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
     rf:{area:'inv',produtoPadrao:PRODUTO_GERAL_RF,aai:['AI','AAI'],pipe:['RF Pipe','Pipe','Valor'],atual:['RF Atual','Atual','Valor'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['Obs'],resp:['Responsável','Responsavel','Resp']},
     cons:{area:'cons',aai:['AI','AAI'],pipe:['Pipe Atual','Carta','Pipe','Valor'],atual:['Pipe Atual','Atual','Valor'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo','OBS'],obs:['OBS'],resp:['Responsável','Responsavel','Resp']},
-    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe','Pipe','Valor'],atual:['Seg atual','Seg Atual','Atual','Valor'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp']}
+    seg:{area:'seg',aai:['AI','AAI'],pipe:['Seg Pipe','Pipe','Valor'],atual:['Seg atual','Seg Atual','Atual','Valor'],sc:['Status Comercial RF','Status Comercial','Status'],pb:['Pendencia Boleta RF','Pendencia Boleta','Pendencia'],todo:['ToDo'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp']},
+    saude:{area:'saude',produtoPadrao:'PLANO DE SAÚDE',aai:['AI','AAI'],pipe:['Saude Pipe','Saúde Pipe','Pipe','Valor'],atual:['Saude Atual','Saúde Atual','Atual','Valor'],sc:['Status Comercial','Status'],pb:['Pendencia Boleta','Pendencia'],todo:['ToDo','TO DO'],obs:['OBS','Obs'],resp:['Responsável','Responsavel','Resp']}
   };
   const cfg=SHEET_CFG[cfgKey];
 
@@ -5887,7 +5894,7 @@ async function saveUser(){
   const pin2=document.getElementById('u-pin').value.trim();
   const perfil=document.getElementById('u-perfil').value;
   if(!nome||!pin2||pin2.length!==4||isNaN(pin2)){showToast('Nome e PIN de 4 dígitos obrigatórios!');return}
-  const areas=perfil==='diretor'?['inv','cons','seg']:['inv','cons','seg'].filter(a=>document.getElementById('ua-'+a)?.checked);
+  const areas=perfil==='diretor'?Object.keys(AREAS):Object.keys(AREAS).filter(a=>document.getElementById('ua-'+a)?.checked);
   try{
     await db('POST','usuarios',{nome,pin:pin2,perfil,areas,ativo:true});
     showToast('✅ Usuário criado!',true);
