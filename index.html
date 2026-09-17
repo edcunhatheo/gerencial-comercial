@@ -1533,6 +1533,8 @@ setInterval(async()=>{
   if(curView==='d-upload')return; // não interromper upload
   const modalOpen=[...document.querySelectorAll('.modal-bg')].some(m=>m.style.display==='flex');
   if(modalOpen)return; // não interromper edição
+  if(_dragId||window._arrastando)return;            // não redesenhar no meio de um arrasto
+  if(SELECTED.size)return;                          // nem no meio de uma seleção em massa
   try{
     await loadData();
     renderCurView();
@@ -3129,23 +3131,33 @@ function kbVerMais(k){
   renderAssessorOpps();
 }
 let _dragId=null;
-function kbDragStart(ev,id){_dragId=id;ev.dataTransfer.effectAllowed='move';try{ev.dataTransfer.setData('text/plain',id)}catch(e){}}
+function kbDragStart(ev,id){
+  _dragId=id;window._arrastando=true;
+  ev.dataTransfer.effectAllowed='move';
+  try{ev.dataTransfer.setData('text/plain',id)}catch(e){}
+}
+// solta a trava mesmo se o arrasto for cancelado (ESC, soltar fora, arquivo do sistema)
+document.addEventListener('dragend',()=>{window._arrastando=false;_dragId=null;
+  document.querySelectorAll('.kb-col').forEach(c=>{c.style.background='';c.style.transform=''});});
 function kbDragOver(ev){ev.preventDefault();ev.dataTransfer.dropEffect='move';ev.currentTarget.style.background='#E4D2C6';ev.currentTarget.style.transform='scale(1.01)';}
 // Auto-rolagem enquanto arrasta: perto das bordas do board rola horizontal; perto do topo/rodapé rola a página
 document.addEventListener('dragover',ev=>{
-  const M=90,S=30;
+  if(!window._arrastando)return;                    // só quando é card do Kanban
+  const M=90,S=24;
   const el=ev.target&&ev.target.closest?ev.target.closest('.kb-board'):null;
   if(el){
     const r=el.getBoundingClientRect();
     if(ev.clientX-r.left<M)el.scrollLeft-=S;
     else if(r.right-ev.clientX<M)el.scrollLeft+=S;
   }
-  if(ev.clientY<110)window.scrollBy(0,-S);
-  else if(window.innerHeight-ev.clientY<110)window.scrollBy(0,S);
-});
+  if(ev.clientY<80)window.scrollBy(0,-S);
+  else if(window.innerHeight-ev.clientY<80)window.scrollBy(0,S);
+},{passive:true});
 function kbDragLeave(ev){ev.currentTarget.style.background='';ev.currentTarget.style.transform='';}
 async function kbDrop(ev,statusKey){
+  window._arrastando=false;
   if(statusKey==='__PERD__')statusKey='Cliente Negou';
+  if(statusKey==='__NSA__')statusKey='Não se Aplica';
   ev.preventDefault();
   ev.currentTarget.style.background='';ev.currentTarget.style.transform='';
   const id=_dragId;_dragId=null;
