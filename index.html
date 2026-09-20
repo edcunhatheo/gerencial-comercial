@@ -660,6 +660,292 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
   .tab-lb{opacity:1}
   .main{margin-left:0}
 }
+/* ── FOLLOW-UP ── */
+.fu-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.fu-limpar{border:1px solid var(--border);background:var(--card);color:var(--muted);border-radius:6px;padding:3px 9px;font-size:10.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.fu-limpar:hover{border-color:var(--wine);color:var(--wine)}
+.fu-head-t{font-size:19px;font-weight:700;letter-spacing:-.01em}
+.fu-head-s{font-size:11.5px;color:var(--muted);text-transform:capitalize}
+.fu-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:9px 12px;margin-bottom:16px}
+.fu-grp{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.fu-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-l);margin-right:2px}
+/* segmentado: três opções numa peça só, sem três caixas soltas */
+.fu-seg{display:inline-flex;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:2px}
+.fu-seg button{border:0;background:transparent;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;
+  padding:5px 13px;border-radius:6px;cursor:pointer;transition:.12s;white-space:nowrap}
+.fu-seg button:hover{color:var(--text)}
+.fu-seg button.on{background:var(--card);color:var(--wine);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+html[data-theme="dark"] .fu-seg button.on{background:var(--wine);color:#fff;box-shadow:none}
+.fu-sel{display:inline-flex;align-items:center;gap:7px}
+.fu-sel>span{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-l)}
+.fu-sel select{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:8px;
+  padding:6px 26px 6px 10px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;
+  appearance:none;-webkit-appearance:none;max-width:210px;
+  background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%2387837E' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;background-size:12px}
+.fu-sel select:hover{border-color:var(--wine)}
+.fu-sel select:focus{outline:none;border-color:var(--wine)}
+.fu-pill{border:1px solid var(--border);background:var(--card);color:var(--muted);border-radius:6px;padding:4px 10px;
+  font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:.12s}
+.fu-pill b{font-weight:700;color:var(--muted-l);margin-left:4px}
+.fu-pill:hover{border-color:var(--wine);color:var(--wine)}
+.fu-pill.on{background:var(--wine);border-color:var(--wine);color:#fff}
+.fu-pill.on b{color:rgba(255,255,255,.75)}
+.fu-quads{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:12px;margin-bottom:18px}
+.fu-q{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--fc);border-radius:10px;padding:12px 13px}
+.fu-q-hdr{display:flex;gap:8px;align-items:flex-start;margin-bottom:9px}
+.fu-q-hdr>span{font-size:16px;line-height:1.1}
+.fu-q-hdr .t{font-size:12.5px;font-weight:700;color:var(--fc)}
+.fu-q-hdr .s{font-size:10px;color:var(--muted-l);line-height:1.3}
+.fu-line{display:flex;align-items:center;gap:7px;padding:6px 7px;border-radius:6px;font-size:11.5px;transition:.12s}
+.fu-line:hover{background:var(--surf2)}
+.fu-line .i{font-size:12px;width:15px;flex-shrink:0}
+.fu-line .r{flex:1;min-width:0;color:var(--muted);line-height:1.25}
+.fu-line .v{font-size:10px;font-weight:700;color:var(--muted-l);font-variant-numeric:tabular-nums}
+.fu-line .n{font-size:15px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;min-width:22px;text-align:right}
+.fu-line.zero .n{color:var(--muted-l);font-weight:500}
+.fu-line.zero .r{color:var(--muted-l)}
+.fu-line.alerta .n{color:var(--red)}
+.fu-q-gap .fu-gap-diag{background:var(--red-bg);border:1px solid var(--red-b);border-radius:6px;padding:7px 9px;
+  font-size:10.5px;color:var(--red);line-height:1.45;margin-bottom:6px}
+.fu-sec{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.fu-sec-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.fu-sec-t{font-size:13px;font-weight:700}
+.fu-sec-s{font-size:10.5px;color:var(--muted)}
+.fu-rel{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:12px}
+.fu-rel-card.full{grid-column:1/-1}
+.fu-rel-card{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.fu-rel-card .fu-tb td:first-child{white-space:nowrap;font-size:11.5px}
+.fu-rel-hdr{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--rc);padding:9px 12px;background:var(--surf2);border-bottom:1px solid var(--border)}
+.fu-rel-hdr .dot{width:7px;height:7px;border-radius:50%;background:var(--rc);flex-shrink:0}
+.fu-rel-hdr small{font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted-l)}
+.fu-tb{width:100%;border-collapse:collapse;font-size:12px}
+.fu-tb th{white-space:nowrap;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-l);
+  padding:6px 12px;text-align:left;border-bottom:1px solid var(--border-l)}
+.fu-tb th.q,.fu-tb th.tx,.fu-tb th.c{text-align:right}
+.fu-tb td{padding:7px 10px;border-bottom:1px solid var(--border-l);font-variant-numeric:tabular-nums}
+.fu-tb tbody tr[onclick]{cursor:pointer}
+.fu-tb tbody tr[onclick]:hover{background:var(--surf2)}
+.fu-tb td.q{text-align:right;font-size:17px;font-weight:700;width:1%;white-space:nowrap}
+.fu-tb td.q.zero{color:var(--muted-l);font-weight:500}
+.fu-tb td.q .vv{display:block;font-size:10px;font-weight:600;color:var(--muted)}
+.fu-tb td.tx{text-align:right;font-size:11.5px;font-weight:700;color:var(--muted)}
+.fu-tb td.tx .dq{display:block;font-weight:500;font-size:9.5px;color:var(--muted-l);line-height:1.2}
+.fu-tb .dq{font-weight:500;font-size:10px;color:var(--muted-l)}
+.fu-tb tr.fim td{background:var(--green-bg)}
+.fu-tb tr.fim td:first-child{font-weight:700}
+.fu-nota{font-size:10px;color:var(--muted-l);line-height:1.5;margin-top:10px}
+.fu-tb-obj td.ind{font-weight:600}
+.fu-tb-obj td{text-align:right}
+.fu-tb-obj td.ind{text-align:left}
+.fu-tb-obj input{width:64px;padding:5px 7px;border:1px solid var(--border);border-radius:6px;background:var(--card);
+  color:var(--text);font-family:inherit;font-size:13px;font-weight:700;text-align:right}
+.fu-tb-obj input:focus{outline:none;border-color:var(--wine)}
+.fu-tb-obj .num{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.fu-tb-obj .num.zero{color:var(--muted-l);font-weight:500}
+.fu-tb-obj td.fz .bar{height:4px;background:var(--border-l);border-radius:2px;overflow:hidden;margin-top:4px}
+.fu-tb-obj td.fz .bar i{display:block;height:4px;background:var(--wine);border-radius:2px}
+.fu-tb-obj .cmb{font-size:11px;color:var(--muted-l);font-weight:600}
+.fu-tb-obj .ok{color:var(--green);font-weight:700}
+.fu-tb-obj .no{color:var(--red);font-weight:700}
+.fu-obj-ftr{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+.fu-obj-ftr span{font-size:10.5px;color:var(--muted-l)}
+.fu-tb-time td{text-align:right}
+.fu-tb-time td.nm{text-align:left;font-weight:600;cursor:pointer}
+.fu-tb-time td.nm:hover{color:var(--wine);text-decoration:underline}
+.fu-tb-time td.zero{color:var(--muted-l)}
+.fu-mets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.fu-met{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:var(--surf2)}
+.fu-met[onclick]{cursor:pointer}
+.fu-met[onclick]:hover{border-color:var(--wine)}
+.fu-met .k{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.fu-met .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.fu-met .v small{font-size:10px;font-weight:600;color:var(--muted-l);margin-left:2px}
+.fu-met .s{font-size:10px;color:var(--muted-l)}
+.fu-meta-faixa{border:1px solid var(--border);border-radius:8px;padding:11px 13px;background:var(--surf2)}
+.fu-meta-faixa .lin{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:11.5px;color:var(--muted);margin-bottom:6px}
+.fu-meta-faixa .lin b{font-size:14px;font-variant-numeric:tabular-nums}
+.fu-meta-faixa .bar{height:7px;background:var(--border-l);border-radius:4px;overflow:hidden}
+.fu-meta-faixa .bar i{display:block;height:7px;border-radius:4px;min-width:3px}
+.fu-meta-faixa .sub{font-size:10.5px;color:var(--muted-l);margin-top:6px}
+.fu-oper{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;overflow:hidden}
+.fu-oper-hdr{padding:12px 16px;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);display:flex;gap:8px;align-items:center}
+.fu-oper-hdr:hover{background:var(--surf2);color:var(--wine)}
+.fu-oper-body{padding:4px 14px 14px;border-top:1px solid var(--border-l)}
+@media(max-width:768px){
+  .fu-bar{gap:10px}
+  .fu-quads{grid-template-columns:1fr}
+  .fu-rel{grid-template-columns:1fr}
+}
+
+/* ── FOLLOW-UP · caixinha do responsável, gráficos e envio ── */
+.fu-sec-acoes{display:flex;gap:6px;flex-wrap:wrap}
+.fu-pessoa{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--wine);border-radius:10px;
+  padding:14px 16px;margin-bottom:16px}
+.fu-p-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.fu-p-av{width:42px;height:42px;border-radius:50%;background:var(--wine);color:#fff;font-size:14px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fu-p-id{flex:1;min-width:0}
+.fu-p-id .nm{font-size:16px;font-weight:700;letter-spacing:-.01em}
+.fu-p-id .sb{font-size:11px;color:var(--muted)}
+.fu-p-per{text-align:right;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+.fu-p-per small{display:block;font-size:10px;font-weight:500;color:var(--muted-l)}
+.fu-p-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:9px}
+.fu-p-tile{border:1px solid var(--border);border-radius:8px;padding:9px 11px;background:var(--surf2)}
+.fu-p-tile[onclick]{cursor:pointer}
+.fu-p-tile[onclick]:hover{border-color:var(--wine)}
+.fu-p-tile .k{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fu-p-tile .v{font-size:23px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.fu-p-tile.destaque{background:var(--green-bg);border-color:var(--green-b)}
+.fu-p-tile.destaque .v{font-size:19px;color:var(--green)}
+.fu-p-meta{margin-top:12px}
+.fu-p-meta .lbl{font-size:11px;color:var(--muted);margin-bottom:5px}
+.fu-p-meta .bar{height:6px;background:var(--border-l);border-radius:3px;overflow:hidden}
+.fu-p-meta .bar i{display:block;height:6px;background:var(--wine);border-radius:3px;min-width:3px}
+.fu-chs{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:12px}
+.fu-ch{border:1px solid var(--border);border-radius:8px;padding:11px 13px}
+.fu-ch-hdr{display:flex;align-items:center;gap:7px}
+.fu-ch-hdr .ico{font-size:14px}
+.fu-ch-hdr .tt{flex:1;min-width:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fu-ch-hdr .nn{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.fu-ch-sub{font-size:10px;color:var(--muted-l);margin:2px 0 8px}
+.fu-ch-box{height:132px}
+.fu-env-pre{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;
+  font-size:12.5px;line-height:1.6;white-space:pre-wrap;margin-bottom:14px;font-variant-numeric:tabular-nums}
+.fu-env-btns{display:flex;gap:8px;flex-wrap:wrap}
+.fu-env-btns .btn{text-decoration:none;display:inline-flex;align-items:center}
+.fu-env-nota{font-size:10.5px;color:var(--muted-l);line-height:1.5;margin-top:12px}
+@media(max-width:768px){.fu-chs{grid-template-columns:1fr}}
+
+/* números em dinheiro: mais largos que contagem, então pedem corpo menor */
+.fu-line .n.dinheiro{font-size:12.5px}
+.fu-line .n{white-space:nowrap}
+.fu-tb td.q.dinheiro{font-size:15px}
+.fu-tb-obj .num.dinheiro{font-size:13px}
+.fu-tb-obj td.fz .dq{font-size:10px;color:var(--muted-l);margin-top:1px}
+.fu-tb-time td.dinheiro{font-size:11.5px;font-weight:600;white-space:nowrap}
+.fu-ch-hdr .nn.dinheiro{font-size:15px;white-space:nowrap}
+.fu-p-tile .v.dinheiro{font-size:17px;white-space:nowrap}
+.fu-p-tile .s{font-size:10px;color:var(--muted-l)}
+.fu-met .v.dinheiro{font-size:16px;white-space:nowrap}
+.fu-tb-obj .ind .dq{font-weight:500;font-size:9.5px;color:var(--muted-l)}
+
+/* ── RESUMO DO FOLLOW-UP ── */
+.rf{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;margin-bottom:24px}
+.rf-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.rf-lbl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.rf-sub{font-size:10.5px;color:var(--muted-l)}
+.rf-pills{display:inline-flex;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:2px}
+.rf-pill{border:0;background:transparent;color:var(--muted);font-family:inherit;font-size:11.5px;font-weight:600;
+  padding:4px 11px;border-radius:6px;cursor:pointer;white-space:nowrap}
+.rf-pill:hover{color:var(--text)}
+.rf-pill.on{background:var(--card);color:var(--wine);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow:none}
+.rf-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:10px;margin-bottom:14px}
+.rf-tile{border:1px solid var(--border);border-radius:9px;padding:11px 13px;background:var(--surf2)}
+.rf-tile[onclick]{cursor:pointer;transition:.12s}
+.rf-tile[onclick]:hover{border-color:var(--wine);background:var(--card)}
+.rf-tile .k{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rf-tile .v{font-size:25px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rf-tile .s{font-size:10px;color:var(--muted-l);line-height:1.35}
+.rf-tile.alerta{background:var(--red-bg);border-color:var(--red-b)}
+.rf-tile.alerta .v{color:var(--red)}
+.rf-tb{width:100%;border-collapse:collapse;font-size:12.5px}
+.rf-tb th{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-l);
+  padding:7px 10px;text-align:left;border-bottom:1px solid var(--border-l);white-space:nowrap}
+.rf-tb th.c{text-align:right}
+.rf-tb td{padding:8px 10px;border-bottom:1px solid var(--border-l);text-align:right;
+  font-variant-numeric:tabular-nums;font-weight:600}
+.rf-tb td.nm{text-align:left;font-weight:600;white-space:nowrap}
+.rf-tb td.nm .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px}
+.rf-tb td[onclick]{cursor:pointer}
+.rf-tb td[onclick]:hover{background:var(--surf2);color:var(--wine)}
+.rf-tb td.zero{color:var(--muted-l);font-weight:400}
+.rf-tb td.alerta{color:var(--red)}
+.rf-tb td.dinheiro{font-size:11.5px;white-space:nowrap}
+@media(max-width:768px){.rf-tiles{grid-template-columns:repeat(2,1fr)}}
+
+.fu-conta{background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 13px;margin-bottom:12px}
+.fu-conta .c1{font-size:12px;color:var(--muted);line-height:1.5}
+.fu-conta .c1 b{color:var(--text)}
+.fu-conta .c2{display:flex;gap:16px;flex-wrap:wrap;margin-top:7px}
+.fu-conta .c2 span{font-size:11px;color:var(--muted-l);white-space:nowrap}
+.fu-conta .c2 b{color:var(--wine);font-size:12.5px}
+.fu-conta .c3{font-size:10.5px;color:var(--muted-l);line-height:1.5;margin-top:5px}
+.fu-conta.neutra .c3{margin-top:0}
+
+.fu-tb-area td{text-align:right}
+.fu-tb-area td.nm{text-align:left;font-weight:600;white-space:nowrap}
+.fu-tb-area td.nm .dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px}
+.fu-tb-area td[onclick]{cursor:pointer}
+.fu-tb-area td[onclick]:hover{background:var(--surf2);color:var(--wine)}
+.fu-tb-area td.zero{color:var(--muted-l);font-weight:400}
+.fu-tb-area tr.tot td{background:var(--surf2);font-weight:700;border-bottom:none}
+.fu-tb-time td.nm .exp{display:inline-block;width:14px;color:var(--muted-l);cursor:pointer;font-size:10px;user-select:none}
+.fu-tb-time td.nm .exp.vazio{cursor:default}
+.fu-tb-time td.nm .exp:hover{color:var(--wine)}
+.fu-tb-time td.nm .lnk{cursor:pointer}
+.fu-tb-time td.nm .lnk:hover{color:var(--wine);text-decoration:underline}
+.fu-tb-time td.nm .qt{margin-left:7px;font-size:9.5px;font-weight:600;color:var(--muted-l);
+  background:var(--surf2);border-radius:4px;padding:1px 6px}
+.fu-tb-time tr.sub td{background:var(--surf2);font-size:11.5px;font-weight:500;padding-top:5px;padding-bottom:5px}
+.fu-tb-time tr.sub td.nm{padding-left:26px;color:var(--muted)}
+.fu-tb-time tr.sub td.nm .dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px}
+
+.fu-p-id .sb.aviso{color:var(--amber);font-weight:600;margin-top:2px}
+
+.fu-p-id .sb .rot{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--muted-l);margin-right:5px}
+.fu-p-id .sb .fora{color:var(--amber);cursor:pointer;font-weight:700}
+.fu-p-id .sb .fora:hover{text-decoration:underline}
+
+.fu-vend{border-top:1px solid var(--border-l);padding:10px 0 2px}
+.fu-vend .t{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-l);padding:0 10px 4px}
+.fu-tb-vend td{text-align:right;padding:6px 10px;font-weight:600}
+.fu-tb-vend td.nm{text-align:left;white-space:nowrap}
+.fu-tb-vend td.zero{color:var(--muted-l);font-weight:400}
+.fu-tb-vend td[onclick]{cursor:pointer}
+.fu-tb-vend td[onclick]:hover{background:var(--surf2);color:var(--wine)}
+.fu-tb-vend tr.zerado td{color:var(--muted-l);font-weight:400}
+.fu-tb-vend td.dinheiro{font-size:11px;white-space:nowrap}
+
+/* ── seletor de empresa ── */
+.emp-sel{display:inline-flex;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:2px;margin-right:4px}
+.emp-bt{border:0;background:transparent;color:var(--muted);font-family:inherit;font-size:11.5px;font-weight:700;
+  padding:5px 11px;border-radius:6px;cursor:pointer;white-space:nowrap;letter-spacing:.02em}
+.emp-bt:hover{color:var(--text)}
+.emp-bt.on{background:var(--ec,var(--wine));color:#fff}
+.emp-chip{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.04em;padding:1px 6px;border-radius:4px;
+  background:var(--surf2);color:var(--ec);border:1px solid var(--border);margin-left:6px;vertical-align:middle}
+.emp-chip.mini{font-size:8px;padding:0 4px}
+@media(max-width:768px){.emp-bt{padding:4px 8px;font-size:10.5px}}
+
+.up-emp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.up-emp>span{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-l)}
+.up-emp>b{font-size:11px;font-weight:600;color:var(--muted);margin-left:auto}
+.up-emp .emp-bt{border:1px solid var(--border);background:var(--card);color:var(--muted)}
+.up-emp .emp-bt.on{border-color:var(--ec);background:var(--surf2);color:var(--ec)}
+
+.fu-perd .t{color:var(--red)}
+
+.fu-perd-vazio{font-size:11.5px;color:var(--muted);padding:2px 10px 6px}
+.fu-perd-vazio[onclick]{cursor:pointer}
+.fu-perd-vazio[onclick]:hover{color:var(--wine)}
+.fu-perd-vazio b{color:var(--red)}
+
+.fu-perd .t{display:flex;align-items:center;gap:6px}
+.fu-perd .t[onclick]{cursor:pointer}
+.fu-perd .t[onclick]:hover{color:var(--red)}
+.fu-perd .t .chev{margin-left:auto;font-size:12px;color:var(--muted-l);transition:transform .15s}
+.fu-perd.open .t .chev{transform:rotate(180deg)}
+.fu-perd .corpo{display:none}
+.fu-perd.open .corpo{display:block}
 </style>
 </head>
 <body>
@@ -727,6 +1013,7 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
         </div>
       </div>
       <div class="topbar-right">
+        <div id="emp-wrap"></div>
         <div class="user-pill">
           <div class="user-avatar" id="user-av"></div>
           <span class="user-name" id="user-nm"></span>
@@ -826,6 +1113,12 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
         </select>
       </div>
     </div>
+    <div class="fg"><label>Empresas</label>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;font-weight:normal;cursor:pointer"><input type="checkbox" id="ue-quark" value="quark" checked> Quark</label>
+        <label style="font-size:13px;display:flex;align-items:center;gap:5px;font-weight:normal;cursor:pointer"><input type="checkbox" id="ue-qrk" value="qrk"> QRK</label>
+      </div>
+    </div>
     <div id="u-areas-wrap" class="fg"><label>Áreas com acesso</label>
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
         <label style="font-size:13px;display:flex;align-items:center;gap:5px;font-weight:normal;cursor:pointer"><input type="checkbox" id="ua-inv" value="inv"> Investimentos</label>
@@ -845,6 +1138,9 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
 <div id="modal-newopp" class="modal-bg" style="display:none">
   <div class="modal" style="max-width:520px">
     <div class="modal-hdr"><h2>+ Nova oportunidade</h2><button class="modal-x" onclick="closeModal('newopp')">×</button></div>
+    <div class="form-row" id="n-empresa-wrap" style="display:none">
+      <div class="fg"><label>Empresa *</label><select id="n-empresa"></select></div>
+    </div>
     <div class="form-row">
       <div class="fg"><label>Área *</label>
         <select id="n-area" onchange="updateNovoProdutos()">
@@ -1035,6 +1331,7 @@ const SC_BADGE={'cliente topou':'b-green','cliente confirmar':'b-amber','reuniã
 const PB_BADGE={'boletado':'b-green','a boletar':'b-teal','to do comercial':'b-amber','to do operacional':'b-blue','aguardando comercial':'b-amber','email':'b-purple','não se aplica':'b-gray'};
 
 let USER=null,OPPS=[],OPPS_ALL=[],USUARIOS=[],DAILY={},editId=null,charts={},SELECTED=new Set(),METAS=[];
+let OPPS_RAW=[],METAS_RAW=[];
 let pin='';
 
 // ── UTILS ──
@@ -1108,7 +1405,7 @@ function segmentoDaOpp(r){
   for(const s of SEGMENTOS_ACORDO){if(SEG_MATCH[s]&&SEG_MATCH[s](r))return s;}
   return null;
 }
-const metasDoMes=()=>METAS.filter(m=>m.area!==AREA_ACORDO);
+const metasDoMes=()=>METAS.filter(m=>m.area!==AREA_ACORDO&&m.area!==AREA_COMPROMISSO);
 const acordosDoMes=()=>METAS.filter(m=>m.area===AREA_ACORDO);
 // aceita "150000", "150.000,00", "R$ 150.000" e devolve número
 function parseMoeda(s){
@@ -1128,6 +1425,115 @@ const fmt=v=>{if(!v||isNaN(v)||v==0)return'—';
   if(Math.abs(v)>=1e6)return'R$'+d2(v/1e6)+'M';
   if(Math.abs(v)>=1e3)return'R$'+d2(v/1e3)+'k';
   return'R$'+d2(v)};
+// ══════════════════════════════════════════════════════════
+// ── EMPRESAS: Quark e QRK no mesmo sistema ──
+// Sem coluna nova no banco: a empresa da oportunidade mora no histórico
+// (mesma técnica dos checks e da virada de mês) e a do usuário mora na
+// lista de áreas, com prefixo. Tudo é normalizado no carregamento, então o
+// resto do sistema continua lendo r.empresa e u.empresas como se fossem
+// colunas de verdade. Nada marcado = Quark, que é tudo que existe hoje.
+// ══════════════════════════════════════════════════════════
+const EMPRESAS={
+  quark:{nome:'Quark Investimentos',curto:'Quark',cor:'#7A2233'},
+  qrk:  {nome:'QRK',                curto:'QRK',  cor:'#185FA5'},
+};
+const EMP_PADRAO='quark';
+const CAMPO_EMP='Empresa';
+const PREF_EMP='emp:';
+const empOk=e=>EMPRESAS[e]?e:EMP_PADRAO;
+const empNome=e=>(EMPRESAS[empOk(e)]||{}).curto||e;
+const empCor=e=>(EMPRESAS[empOk(e)]||{}).cor||'var(--wine)';
+
+// empresa de uma oportunidade: último carimbo no histórico, senão Quark
+function empresaDe(r){
+  if(r.__emp)return r.__emp;
+  let e=EMP_PADRAO;
+  (r.historico||[]).forEach(h=>{if(h.campo===CAMPO_EMP&&EMPRESAS[norm(h.para||'')])e=norm(h.para)});
+  try{Object.defineProperty(r,'__emp',{value:e,enumerable:false,configurable:true})}catch(x){r.__emp=e}
+  return e;
+}
+const marcaEmpresa=(emp,ds)=>({campo:CAMPO_EMP,de:'',para:empOk(emp),usuario:(USER&&USER.nome)||'sistema',data:ds});
+
+// usuário: separa as empresas das áreas de verdade
+function normalizaUsuario(u){
+  const todas=Array.isArray(u.areas)?u.areas:(u.areas?[].concat(u.areas):[]);
+  if(u.perfil==='diretor')return Object.assign({},u,{
+    areas:todas.filter(a=>!String(a).startsWith(PREF_EMP)),empresas:Object.keys(EMPRESAS)});
+  const emp=todas.filter(a=>String(a).startsWith(PREF_EMP)).map(a=>empOk(String(a).slice(PREF_EMP.length)));
+  return Object.assign({},u,{
+    areas:todas.filter(a=>!String(a).startsWith(PREF_EMP)),
+    empresas:emp.length?[...new Set(emp)]:[EMP_PADRAO],
+  });
+}
+const normalizaUsuarios=l=>(l||[]).map(normalizaUsuario);
+// volta para o formato que o banco guarda
+const areasComEmpresas=(areas,empresas)=>[...(areas||[]),...((empresas&&empresas.length?empresas:[EMP_PADRAO]).map(e=>PREF_EMP+e))];
+
+function empresasDoUsuario(){
+  if(!USER)return [EMP_PADRAO];
+  if(USER.perfil==='diretor')return Object.keys(EMPRESAS);   // diretor está acima da divisão
+  const u=USUARIOS.find(x=>norm(x.nome)===norm(USER.nome));
+  const l=(u&&u.empresas)||USER.empresas||[EMP_PADRAO];
+  return l.length?l:[EMP_PADRAO];
+}
+const temDuasEmpresas=()=>empresasDoUsuario().length>1;
+// recorte atual: '' = todas as empresas do usuário
+function empAtual(){
+  const minhas=empresasDoUsuario();
+  const e=window._emp||'';
+  if(e&&minhas.includes(e))return e;
+  if(!e&&minhas.length>1)return '';
+  return minhas[0]||EMP_PADRAO;
+}
+function setEmp(e){
+  window._emp=e||'';
+  try{localStorage.setItem('gc_emp',window._emp)}catch(x){}
+  aplicaEmpresa();
+  pintaSeletorEmpresa();
+  renderCurView();
+  showToast('🏢 Vendo '+(empAtual()?empNome(empAtual()):'as duas empresas'),true);
+}
+function restauraEmp(){
+  try{const v=localStorage.getItem('gc_emp');if(v!==null)window._emp=v}catch(x){}
+}
+// as oportunidades e metas visíveis obedecem ao recorte
+function aplicaEmpresa(){
+  const minhas=empresasDoUsuario(), rec=empAtual();
+  const passa=e=>minhas.includes(e)&&(!rec||e===rec);
+  OPPS_ALL=(OPPS_RAW||[]).filter(r=>passa(empresaDe(r)));
+  OPPS=OPPS_ALL.filter(r=>!arquivada(r));
+  METAS=(METAS_RAW||[]).filter(m=>passa(m.empresa||EMP_PADRAO));
+}
+// metas guardam a empresa junto da área: "inv#qrk". Quark fica sem sufixo.
+function normalizaMeta(m){
+  const p=String(m.area||'').split('#');
+  return Object.assign({},m,{area:p[0],empresa:empOk(p[1]||EMP_PADRAO)});
+}
+const areaComEmpresa=(area,emp)=>empOk(emp)===EMP_PADRAO?area:area+'#'+empOk(emp);
+// empresa em que uma meta nova deve nascer
+const empParaGravar=()=>empAtual()||empresasDoUsuario()[0]||EMP_PADRAO;
+
+// seletor no topo — só aparece para quem tem as duas
+function seletorEmpresaHtml(){
+  if(!temDuasEmpresas())return '';
+  const rec=empAtual();
+  const bt=(v,l)=>'<button class="emp-bt'+(rec===v?' on':'')+'" onclick="setEmp(\''+v+'\')"'
+    +(v?' style="--ec:'+empCor(v)+'"':'')+'>'+l+'</button>';
+  return '<div class="emp-sel" title="Escolha a empresa que você quer enxergar">'
+    +empresasDoUsuario().map(e=>bt(e,empNome(e))).join('')
+    +bt('','Todas')+'</div>';
+}
+function pintaSeletorEmpresa(){
+  const el=document.getElementById('emp-wrap');
+  if(el)el.innerHTML=seletorEmpresaHtml();
+  document.body.setAttribute('data-emp',empAtual()||'todas');
+}
+// etiqueta da empresa, para quando a tela mistura as duas
+function chipEmpresa(e,mini){
+  if(!temDuasEmpresas()||empAtual())return '';
+  return '<span class="emp-chip'+(mini?' mini':'')+'" style="--ec:'+empCor(e)+'">'+empNome(e)+'</span>';
+}
+
 const isB=r=>{const k=norm(r.pb||'');return k==='boletado'||k==='a boletar'};
 // "A Boletar" = o cliente fechou mas a boleta ainda não foi processada.
 // Para volume/pipe segue valendo como fechada (isB), mas NÃO pontua no ranking do time —
@@ -1447,10 +1853,24 @@ function logout(){clearInterval(_hbTimer);USER=null;pin='';updateDots();document
 
 // ── INIT ──
 async function initApp(){
+  try{await initAppInterno()}
+  catch(e){
+    const c=document.getElementById('main-content');
+    if(c)c.innerHTML='<div style="background:var(--red-bg);border:1px solid var(--red-b);border-radius:10px;padding:18px 20px;max-width:640px">'
+      +'<div style="font-weight:700;color:var(--red);margin-bottom:6px">O sistema não conseguiu abrir</div>'
+      +'<div style="font-size:12.5px;color:var(--muted);line-height:1.6">'+String(e&&e.message||e)+'</div>'
+      +'<div style="font-size:11px;color:var(--muted-l);margin-top:10px">Tire um print desta mensagem e me mande. '
+      +'Recarregar com Ctrl+Shift+R costuma resolver quando é versão antiga em cache.</div></div>';
+    console.error('initApp',e);
+  }
+}
+async function initAppInterno(){
   document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
   document.getElementById('user-av').textContent=initials(USER.nome);
   document.getElementById('user-nm').textContent=USER.nome;
+  restauraEmp();
   await loadData();
+  pintaSeletorEmpresa();
   startHeartbeat();
   startVersaoCheck();
   buildNav();
@@ -1473,9 +1893,12 @@ async function loadData(){
   ]);
   // OPPS_ALL = tudo que veio do banco. OPPS = só o que está no fluxo do mês:
   // o que passou pela virada de mês some de TODAS as telas e só existe no Histórico.
-  OPPS_ALL=opps||[];
-  OPPS=OPPS_ALL.filter(r=>!arquivada(r));
-  USUARIOS=users||[];METAS=metas||[];
+  OPPS_RAW=opps||[];
+  USUARIOS=normalizaUsuarios(users);
+  METAS_RAW=(metas||[]).map(normalizaMeta);
+  const eu=USUARIOS.find(x=>norm(x.nome)===norm(USER.nome));
+  if(eu)USER.empresas=eu.empresas;
+  aplicaEmpresa();
   DAILY={};(daily||[]).forEach(d=>{DAILY[d.oportunidade_id]={tipo:d.tipo,acao:d.acao,id:d.id}});
 }
 
@@ -1484,10 +1907,10 @@ let curView='';
 function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
-    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Definições do mês'],['d-historico','📦 Histórico'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários'],['d-acordos','📋 Acordos por AI']]
+    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-metas','🏆 Definições do mês'],['d-historico','📦 Histórico'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários'],['d-acordos','📋 Acordos por AI']]
     :USER.perfil==='gestor'
-    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']]
-    :[['diretor','📊 Dashboard'],['a-opps','🎯 Guia do dia'],['d-pipeline','☀️ Daily'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']];
+    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']]
+    :[['diretor','📊 Dashboard'],['a-opps','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>{
     const ico=l.split(' ')[0];
     const lb=l.substring(ico.length+1);
@@ -1535,6 +1958,8 @@ setInterval(async()=>{
   if(modalOpen)return; // não interromper edição
   if(_dragId||window._arrastando)return;            // não redesenhar no meio de um arrasto
   if(SELECTED.size)return;                          // nem no meio de uma seleção em massa
+  const foco=document.activeElement;                // nem enquanto alguém digita (objetivos do dia, notas, filtros)
+  if(foco&&/^(INPUT|TEXTAREA|SELECT)$/.test(foco.tagName))return;
   try{
     await loadData();
     renderCurView();
@@ -1709,9 +2134,8 @@ function renderDiretor(c=document.getElementById('main-content')){
   </div>
   </div>
 
-  ${funilPipelineHtml()}
+  ${resumoFollowUpHtml()}
 
-  ${timeGerencialHtml()}
 
   <!-- Boletado hoje - destaque -->
   ${(()=>{
@@ -1981,7 +2405,7 @@ function eDono(r,nome){
   return r.responsavel ? norm(r.responsavel)===norm(nome) : norm(r.assessor||'')===norm(nome);
 }
 function oppsDoComercial(nome){
-  return OPPS.filter(r=>!isB(r)&&!isPerdida(r)&&!arquivada(r)&&eDono(r,nome));
+  return OPPS.filter(r=>!isB(r)&&!isPerdida(r)&&!arquivada(r)&&eDono(r,nome)&&noEscopoDe(r,nome));
 }
 function estudoDoDia(nome){
   const hj=localISO(new Date());
@@ -2032,7 +2456,7 @@ function boletasDoPeriodo(nome,filtro){
 }
 // ── GESTÃO DO TIME (dashboard do gestor): um quadro por comercial ──
 function verDailyDe(nome){
-  window._paCom=nome;
+  window._paCom=nome;window._fuCom=nome;
   const b=[...document.querySelectorAll('.nav-tab')].find(t=>(t.getAttribute('onclick')||'').includes("'d-pipeline'"));
   setView('d-pipeline',b||null);
 }
@@ -2049,6 +2473,105 @@ function atividadeHojeDe(nome){
 }
 // ── FUNIL DO PIPELINE — visão executiva por área ──
 const FUNIL_ETAPAS=[['Ligar Cliente','Ligar'],['Agendar Reunião','Agendar reunião'],['Reunião Agendada','Reunião agendada'],['Cliente Confirmar','Confirmar'],['Cliente Topou','Topou'],['__BOL__','Boletado'],['__PERD__','❌ Perdido']];
+// ══ RESUMO DO FOLLOW-UP (dashboard) ══
+// Responde as duas perguntas que o diretor faz toda manhã: quantas reuniões
+// o time tem essa semana e quanto tem pra fechar hoje. Tudo clicável.
+function resumoFollowUpHtml(){
+  fuReset();
+  const hj=localISO(new Date()),[sIni,sFim]=semanaDe(new Date());
+  const base=fuBase().filter(r=>!arquivada(r));
+  const vivas=base.filter(r=>!isB(r)&&!isPerdida(r));
+
+  const reuSemana=r=>{const d=isoDia(r.reuniao_data);return d&&d>=sIni&&d<=sFim};
+  const quente=r=>{const s=norm(r.sc||'');return /topou|confirmar/.test(s)||norm(r.pb||'')==='a boletar'};
+
+  const grupos=nome=>{
+    const rs=nome?vivas.filter(r=>eDono(r,nome)&&noEscopoDe(r,nome)):vivas;
+    const sem=rs.filter(reuSemana);
+    return{
+      semana:sem.map(r=>({r,quando:isoDia(r.reuniao_data),txt:'reunião na semana · '+(r.sc||'—')})),
+      feitas:sem.filter(r=>isoDia(r.reuniao_data)<hj||marcado(r,'reu')).map(r=>({r,quando:isoDia(r.reuniao_data),txt:'reunião já aconteceu'})),
+      frente:sem.filter(r=>isoDia(r.reuniao_data)>=hj&&!marcado(r,'reu')).map(r=>({r,quando:isoDia(r.reuniao_data),txt:'reunião pela frente'})),
+      hoje:sem.filter(r=>isoDia(r.reuniao_data)===hj).map(r=>({r,quando:hj,txt:'reunião hoje · '+(r.sc||'—')})),
+      fechar:rs.filter(r=>parseDataBoleta(r.data_boleta)===hj).map(r=>({r,quando:hj,txt:'boleta marcada para hoje'})),
+      lig:rs.filter(r=>dataLigacao(r)===hj).map(r=>({r,quando:hj,txt:'ligação marcada para hoje'})),
+      todo:rs.filter(r=>isoDia(r.todo_data)===hj).map(r=>({r,quando:hj,txt:r.todo||'TODO de hoje'})),
+      atras:rs.filter(r=>{const d=isoDia(r.todo_data);return d&&d<hj}).map(r=>({r,quando:isoDia(r.todo_data),txt:(r.todo||'TODO')+' — venceu'})),
+      quente:rs.filter(r=>quente(r)&&parseDataBoleta(r.data_boleta)).map(r=>({r,quando:parseDataBoleta(r.data_boleta),txt:'quente com data · '+(r.sc||'—')})),
+    };
+  };
+  const G=grupos('');
+
+  const tile=(ico,rot,valor,sub,itens,tit,cor,alerta)=>'<div class="rf-tile'+(alerta?' alerta':'')+'"'
+    +fuClick(itens,tit,'')+'>'
+    +'<div class="k"><span style="color:'+cor+'">'+ico+'</span> '+rot+'</div>'
+    +'<div class="v">'+valor+'</div><div class="s">'+sub+'</div></div>';
+
+  const tiles=''
+    +tile('🤝','Reuniões esta semana',G.semana.length,
+      G.feitas.length+' já feitas · '+G.frente.length+' pela frente',
+      G.semana,'🤝 Reuniões de '+brData(sIni)+' a '+brData(sFim),'#5E5896')
+    +tile('✅','Pra fechar hoje',fmtR(somaVal(G.fechar)),
+      G.fechar.length?nBoletas(G.fechar.length)+' com data de hoje':'nenhuma boleta marcada para hoje',
+      G.fechar,'✅ Boletas marcadas para hoje','var(--green)')
+    +tile('📅','Reuniões hoje',G.hoje.length,
+      G.hoje.length?'acontecem hoje':'nenhuma na agenda de hoje',
+      G.hoje,'📅 Reuniões de hoje','#2F6795')
+    +tile('🔥','Quente com data',fmtR(somaVal(G.quente)),
+      G.quente.length+' oportunidade'+(G.quente.length!==1?'s':'')+' prevista'+(G.quente.length!==1?'s':''),
+      G.quente,'🔥 Quente com data de boleta','var(--amber)')
+    +tile('🔴','TODOs atrasados',G.atras.length,
+      G.todo.length+(G.todo.length===1?' vence hoje':' vencem hoje'),
+      G.atras,'🔴 TODOs vencidos','var(--red)',G.atras.length>0);
+
+  // tabela: por área ou por comercial, o que o usuário escolher
+  const dim=window._rfDim==='com'?'com':'area';
+  const linhas=(dim==='area'
+      ? areasVis().map(([k,a])=>({rot:a.name,cor:a.color,filtro:r=>r.area===k}))
+      : fuComerciais().map(n=>({rot:n,cor:'var(--wine)',filtro:r=>eDono(r,n)&&noEscopoDe(r,n)})))
+    .map(x=>{
+      const rs=vivas.filter(x.filtro);
+      const sem=rs.filter(reuSemana);
+      const feitas=sem.filter(r=>isoDia(r.reuniao_data)<hj||marcado(r,'reu'));
+      const hoje=sem.filter(r=>isoDia(r.reuniao_data)===hj);
+      const fechar=rs.filter(r=>parseDataBoleta(r.data_boleta)===hj);
+      const qt=rs.filter(r=>quente(r)&&parseDataBoleta(r.data_boleta));
+      const atr=rs.filter(r=>{const d=isoDia(r.todo_data);return d&&d<hj});
+      const mk=(arr,txt,tit)=>arr.map(r=>({r,txt}));
+      const cel=(arr,txt,tit,cls)=>'<td class="'+(arr.length?(cls||''):'zero')+'"'
+        +fuClick(mk(arr,txt),tit+' · '+x.rot,'')+'>'+arr.length+'</td>';
+      const celR=(arr,txt,tit)=>'<td class="dinheiro'+(arr.length?'':' zero')+'"'
+        +fuClick(mk(arr,txt),tit+' · '+x.rot,'')+'>'+fmtR(somaVal(mk(arr)))+'</td>';
+      if(!rs.length)return '';
+      return '<tr><td class="nm"><span class="dot" style="background:'+x.cor+'"></span>'+x.rot+'</td>'
+        +cel(sem,'reunião na semana','🤝 Reuniões da semana')
+        +cel(feitas,'reunião já aconteceu','✓ Reuniões feitas')
+        +cel(hoje,'reunião hoje','📅 Reuniões de hoje')
+        +celR(fechar,'boleta marcada para hoje','✅ Pra fechar hoje')
+        +celR(qt,'quente com data','🔥 Quente com data')
+        +cel(atr,'TODO vencido','🔴 TODOs vencidos','alerta')
+        +'</tr>';
+    }).filter(Boolean).join('');
+
+  const pill=(v,l)=>'<button class="rf-pill'+(dim===v?' on':'')+'" onclick="window._rfDim=\''+v+'\';renderCurView()">'+l+'</button>';
+
+  return '<div class="rf">'
+    +'<div class="rf-top"><div><div class="rf-lbl">Resumo do follow-up</div>'
+    +'<div class="rf-sub">semana de '+brData(sIni)+' a '+brData(sFim)+' · clique em qualquer número para ver as oportunidades</div></div>'
+    +'<div class="rf-pills">'+pill('area','Por área')+pill('com','Por comercial')+'</div></div>'
+    +'<div class="rf-tiles">'+tiles+'</div>'
+    +(linhas?'<div style="overflow-x:auto"><table class="rf-tb"><thead><tr>'
+      +'<th>'+(dim==='area'?'Área':'Comercial')+'</th>'
+      +'<th class="c" title="reuniões marcadas para esta semana">🤝 semana</th>'
+      +'<th class="c" title="reuniões da semana que já aconteceram">✓ feitas</th>'
+      +'<th class="c" title="reuniões de hoje">📅 hoje</th>'
+      +'<th class="c" title="boletas com data de hoje">✅ fechar hoje</th>'
+      +'<th class="c" title="cliente quente com data de boleta">🔥 quente</th>'
+      +'<th class="c" title="TODOs vencidos">🔴 atrasados</th>'
+      +'</tr></thead><tbody>'+linhas+'</tbody></table></div>':'')
+    +'</div>';
+}
+
 function funilPipelineHtml(){
   return '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:20px;margin-bottom:24px">'
     +'<h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:16px">Funil do pipeline — visão executiva por área</h3>'
@@ -2138,7 +2661,7 @@ function timeGerencialHtml(){
       +'<div style="font-size:10px;font-weight:700;color:'+(d.ativHoje?'#0F6E56':'#A32D2D')+';margin-bottom:10px">'+(d.ativHoje?'📝 '+d.ativHoje+' registro'+(d.ativHoje!==1?'s':'')+' hoje':'😴 nenhum registro hoje')+'</div>'
       +'<div style="display:flex;gap:6px">'
       +'<button class="btn sm" style="flex:1" onclick="abrirGerencial(\''+nomeSafe+'\')">📊 Meta</button>'
-      +'<button class="btn sm" style="flex:1" onclick="verDailyDe(\''+nomeSafe+'\')">☀️ Dia</button>'
+      +'<button class="btn sm" style="flex:1" onclick="verDailyDe(\''+nomeSafe+'\')">📈 Follow-up</button>'
       +'</div>'
       +'</div>';
   }).join('');
@@ -2324,7 +2847,7 @@ async function salvarTrabalhoDaily(qKey,id){
 // funil nunca contam coisas diferentes.
 // ══════════════════════════════════════════════════════════
 function todasDoComercial(nome){
-  return OPPS.filter(r=>!arquivada(r)&&eDono(r,nome));
+  return OPPS.filter(r=>!arquivada(r)&&eDono(r,nome)&&noEscopoDe(r,nome));
 }
 const mesISO=iso=>(iso||'').slice(0,7);
 const mesDeData=s=>{const k=dtKey(s);if(!k)return '';const d=new Date(k);
@@ -2639,14 +3162,1569 @@ function diaAtuacaoHtml(){
     +'<div class="dquads">'+quadHtml+'</div>';
 }
 
-function renderDPipeline(c=document.getElementById('main-content')){
-  c.innerHTML=`
-    <div style="display:flex;justify-content:flex-end;margin-bottom:12px">
-      <button class="btn wine" onclick="openNewOpp()">+ Nova oportunidade</button>
-    </div>
-    ${diaAtuacaoHtml()}
-  `;
+// ══════════════════════════════════════════════════════════
+// ── FOLLOW-UP: a aba de dados do dia ──
+// Tudo aqui nasce de EVENTOS COM DATA extraídos do histórico de cada
+// oportunidade. Nada de "status atual": o relatório precisa saber o DIA em
+// que a ligação aconteceu, em que a reunião foi marcada, em que ela foi
+// feita e em que a boleta fechou — senão não existe corte diário/semanal.
+// O que não tem registro entra marcado como ⚠ inferido e aparece assim na lista.
+// ══════════════════════════════════════════════════════════
+const AREA_COMPROMISSO='compromisso';   // objetivos do dia moram na tabela metas, sem coluna nova
+const EVTS={
+  lig:{ico:'📞',rot:'Ligações feitas',cor:'var(--wine)',base:'',baseRot:''},
+  mar:{ico:'📅',rot:'Reuniões marcadas',cor:'#2F6795',base:'lig',baseRot:'das ligações'},
+  reu:{ico:'🤝',rot:'Reuniões feitas',cor:'#5E5896',base:'mar',baseRot:'das marcadas'},
+  bol:{ico:'✅',rot:'Fechados',cor:'var(--green)',base:'reu',baseRot:'das reuniões feitas'},
+};
+const EVT_ORDEM=['lig','mar','reu','bol'];
+// Boleta se mede em dinheiro. "3 fechados" não diz nada; R$1,2M diz.
+// A contagem vira o detalhe, nunca o número principal.
+const evDinheiro=t=>t==='bol';
+const evValor=(ap,t)=>evDinheiro(t)?ap.vol:ap.n[t];
+const evTexto=(ap,t)=>evDinheiro(t)?fmtR(ap.vol):String(ap.n[t]);
+const nBoletas=n=>n+' boleta'+(n===1?'':'s');
+const fmtR=v=>{const s=fmt(v);return s==='—'?'R$0':s};
+const evDetalhe=(ap,t)=>(evDinheiro(t)&&ap.n.bol)?nBoletas(ap.n.bol):'';
+const somaVal=itens=>itens.reduce((s,x)=>s+(x.r.atual||x.r.pipe||0),0);
+const isoHist=s=>{const k=dtKey(s);return k?localISO(new Date(k)):''};
+const isoDia=s=>/^\d{4}-\d{2}-\d{2}$/.test(String(s||'').slice(0,10))?String(s).slice(0,10):'';
+
+// Cada oportunidade vira uma lista de eventos datados. Cacheado no próprio
+// objeto — o loadData recria os objetos, então o cache nunca fica velho.
+function eventosDe(r){
+  if(r.__ev)return r.__ev;
+  const ev=[];
+  const add=(t,data,txt,quem,inf)=>{
+    const iso=isoDia(data)||isoHist(data);
+    if(iso)ev.push({t,iso,txt,quem:quem||'',inf:!!inf});
+  };
+  (r.historico||[]).forEach(h=>{
+    const q=h.usuario;
+    if(h.campo===MARCAS.lig.campo&&h.para===MARCAS.lig.on)add('lig',h.data,'✓ marcou “ligou” no card',q);
+    if(h.campo===MARCAS.reu.campo&&h.para===MARCAS.reu.on)add('reu',h.data,'✓ marcou “fez reunião” no card',q);
+    if(h.campo==='Reunião marcada'&&h.para)add('mar',h.data,'marcou reunião para '+brData(isoDia(h.para)),q);
+    if(h.campo==='Status comercial'){
+      const di=ETAPA_IDX(h.de),pi=ETAPA_IDX(h.para);
+      if(di===0&&pi>di)add('lig',h.data,'saiu de “'+(h.de||'—')+'” para “'+(h.para||'—')+'”',q);
+      if(pi>=2&&di<2)add('mar',h.data,'entrou em “'+(h.para||'—')+'”',q);
+      if(di>=2&&pi>di)add('reu',h.data,'avançou de “'+(h.de||'—')+'” para “'+(h.para||'—')+'”',q);
+    }
+    if(h.campo==='Pendência boleta'&&pbFechada(h.para))add('bol',h.data,'boleta → '+h.para,q);
+  });
+  const rd=isoDia(r.reuniao_data);
+  if(rd){
+    if(!ev.some(e=>e.t==='mar'))add('mar',rd,'⚠ inferido: reunião na agenda, sem registro de quando foi marcada','',1);
+    if(rd<today()&&!ev.some(e=>e.t==='reu'))add('reu',rd,'⚠ inferido: data da reunião já passou','',1);
+  }
+  if(isBoletadoFirmado(r)&&!ev.some(e=>e.t==='bol')){
+    const d=parseDataBoleta(r.data_boleta);
+    if(d)add('bol',d,'⚠ inferido: boletada sem registro na linha do tempo','',1);
+  }
+  ev.sort((a,b)=>a.iso.localeCompare(b.iso));
+  try{Object.defineProperty(r,'__ev',{value:ev,enumerable:false,configurable:true})}catch(e){r.__ev=ev}
+  return ev;
 }
+// Conta OPORTUNIDADES DISTINTAS por etapa dentro do intervalo. Duas ligações
+// para o mesmo cliente na semana contam uma vez — senão a taxa de conversão
+// mentiria (16 reuniões sobre 62 toques não é o mesmo que sobre 62 clientes).
+// Atividade é de quem REGISTRA, não de quem é dono do card: se o Jackson
+// marca a ligação num card de seguro da Cris, a ligação é dele e o seguro é a
+// área dela. Registro sem autor (evento inferido) fica com o dono do card.
+let _apQuem='';
+function comQuem(nome,fn){
+  const ant=_apQuem;_apQuem=nome||'';
+  try{return fn()}finally{_apQuem=ant}
+}
+const tocouAlgumDia=(r,nome)=>(r.historico||[]).some(h=>normUsuario(h.usuario)===norm(nome));
+// o que uma pessoa mexe: o que é dela e o que ela trabalhou, dentro das áreas dela
+function rowsDoComercial(nome,base){
+  return (base||fuBase()).filter(r=>noEscopoDe(r,nome)&&(eDono(r,nome)||tocouAlgumDia(r,nome)));
+}
+function apurar(rows,de,ate){
+  const quem=_apQuem?norm(_apQuem):'';
+  const S={lig:[],mar:[],reu:[],bol:[]},vis={lig:new Set(),mar:new Set(),reu:new Set(),bol:new Set()};
+  rows.forEach(r=>eventosDe(r).forEach(e=>{
+    if(e.iso<de||e.iso>ate)return;
+    if(quem){
+      const autor=e.quem?normUsuario(e.quem):'';
+      if(autor?autor!==quem:!eDono(r,_apQuem))return;
+    }
+    if(vis[e.t].has(r.id))return;
+    vis[e.t].add(r.id);S[e.t].push({r,e});
+  }));
+  const vol=S.bol.reduce((s,x)=>s+(x.r.atual||0),0);
+  return{...S,vol,n:{lig:S.lig.length,mar:S.mar.length,reu:S.reu.length,bol:S.bol.length}};
+}
+// ── escopo da aba ──
+function fuBase(){
+  const base=OPPS_ALL.length?OPPS_ALL:OPPS;   // inclui arquivadas: a virada de mês não pode apagar o histórico de eventos
+  if(USER.perfil==='diretor'||USER.perfil==='gestor')return base;
+  return base.filter(r=>r.responsavel?norm(r.responsavel)===norm(USER.nome)
+    :(norm(r.assessor||'')===norm(USER.nome)||(USER.areas||[]).includes(r.area)));
+}
+function fuRows(){
+  let rows=fuBase();
+  if(window._fuArea)rows=rows.filter(r=>r.area===window._fuArea);
+  if(window._fuCom)rows=rowsDoComercial(window._fuCom,rows);
+  return rows;
+}
+// As áreas de uma pessoa são as do CADASTRO dela. Card em área que não é
+// dela não entra na conta dela — se o card está errado, quem se corrige é o
+// card, não o número. O desencontro vira aviso, nunca linha na tabela.
+function areasDoCadastro(nome){
+  const u=USUARIOS.find(x=>norm(x.nome)===norm(nome));
+  if(!u)return null;                                  // nome fora da lista: não filtra nada
+  if(u.perfil==='diretor')return Object.keys(AREAS);
+  return u.areas||[];
+}
+function noEscopoDe(r,nome){
+  const a=areasDoCadastro(nome);
+  return !a||!a.length||a.includes(r.area);
+}
+function trabalhaArea(nome,ak){
+  if(!ak)return true;
+  const a=areasDoCadastro(nome);
+  return !a||!a.length||a.includes(ak);
+}
+// quem olha só a Quark não pode aparecer na lista da QRK
+function trabalhaEmpresa(nome,ek){
+  if(!ek)return true;
+  const u=USUARIOS.find(x=>norm(x.nome)===norm(nome));
+  if(!u)return true;
+  if(u.perfil==='diretor')return true;
+  return (u.empresas||[EMP_PADRAO]).includes(ek);
+}
+function fuComerciais(){
+  if(USER.perfil==='diretor'||USER.perfil==='gestor')
+    return USUARIOS.filter(u=>u.ativo&&u.perfil!=='diretor'&&(USER.perfil==='diretor'||(u.areas||[]).some(a=>(USER.areas||[]).includes(a))))
+      .filter(u=>trabalhaArea(u.nome,window._fuArea)&&trabalhaEmpresa(u.nome,empAtual())).map(u=>u.nome);
+  return [USER.nome];
+}
+// as áreas da pessoa, na ordem do sistema
+function areasDeFato(nome){
+  const a=areasDoCadastro(nome);
+  return a?areasVis().filter(([k])=>a.includes(k)):[];
+}
+// áreas em que a pessoa tem oportunidade e que NÃO estão no cadastro dela
+function areasForaDoPerfil(nome){
+  const u=USUARIOS.find(x=>norm(x.nome)===norm(nome))||{};
+  if(u.perfil==='diretor')return [];
+  const perfil=new Set(u.areas||[]);
+  const set=new Set();
+  (OPPS_ALL.length?OPPS_ALL:OPPS).forEach(r=>{if(!arquivada(r)&&eDono(r,nome)&&!perfil.has(r.area))set.add(r.area)});
+  return [...set];
+}
+function fuPer(){return window._fuPer||'dia'}
+function fuRange(p){
+  const hj=localISO(new Date());
+  if(p==='dia')return[hj,hj,'Hoje',brData(hj)];
+  if(p==='semana'){const[a,b]=semanaDe(new Date());return[a,b,'Esta semana',brData(a)+' a '+brData(b)]}
+  const d=new Date(),y=d.getFullYear(),m=d.getMonth();
+  const a=localISO(new Date(y,m,1)),b=localISO(new Date(y,m+1,0));
+  const nm=d.toLocaleDateString('pt-BR',{month:'long'});
+  return[a,b,nm.charAt(0).toUpperCase()+nm.slice(1),brData(a)+' a '+brData(b)];
+}
+function setFuPer(p){window._fuPer=p;renderDPipeline()}
+function escolherFuArea(a){
+  window._fuArea=a||'';
+  if(window._fuCom&&!fuComerciais().some(n=>norm(n)===norm(window._fuCom)))window._fuCom='';
+  renderDPipeline();
+}
+function escolherFuCom(n){window._fuCom=n||'';renderDPipeline()}
+function setFuArea(a){
+  window._fuArea=(window._fuArea===a)?'':a;
+  // só solta o comercial escolhido se ele não trabalhar na área nova
+  if(window._fuCom&&!fuComerciais().some(n=>norm(n)===norm(window._fuCom)))window._fuCom='';
+  renderDPipeline();
+}
+function setFuCom(n){window._fuCom=(window._fuCom===n)?'':n;renderDPipeline()}
+function toggleFuOper(){window._fuOper=!window._fuOper;renderDPipeline()}
+
+// ── listas clicáveis: tudo que mostra um número abre quem está por trás ──
+function fuReset(){window._fuReg={};window._fuSeq=0}
+function fuKey(itens,tit,sub){
+  const k='fu'+(++window._fuSeq);
+  (window._fuReg=window._fuReg||{})[k]={itens,tit,sub};
+  return k;
+}
+function fuClick(itens,tit,sub){
+  if(!itens||!itens.length)return '';
+  return ' onclick="fuAbrir(\''+fuKey(itens,tit,sub)+'\')" style="cursor:pointer" title="Ver as '+itens.length+' oportunidades"';
+}
+function fuAbrir(k){
+  const d=(window._fuReg||{})[k];if(!d)return;
+  const itens=d.itens;
+  const tot=itens.reduce((s,x)=>s+(x.r.atual||x.r.pipe||0),0);
+  const linhas=itens.map(x=>{
+    const r=x.r;
+    return '<tr onclick="closeModal(\'area\');openEdit(\''+r.id+'\')" title="Abrir oportunidade">'
+      +'<td style="font-weight:700">'+(r.cliente||'—')
+        +'<div class="fn-ev" style="font-weight:400">'+((AREAS[r.area]||{}).name||r.area||'—')+' · '+(r.produto||'—')+'</div></td>'
+      +'<td style="color:var(--muted)">'+(r.responsavel||r.assessor||'—')+'</td>'
+      +'<td class="fn-quando">'+(x.quando?brData(x.quando):'—')+'</td>'
+      +'<td class="fn-ev fn-prova">'+(x.txt||'—')+(x.quem?' <span style="color:var(--muted-l)">· '+x.quem+'</span>':'')+'</td>'
+      +'<td style="color:var(--muted);font-size:11px">'+(r.sc||'—')+'</td>'
+      +'<td class="r val">'+(fmt(r.atual||r.pipe)||'—')+'</td></tr>';
+  }).join('');
+  document.getElementById('ba-title').innerHTML=d.tit
+    +(d.sub?' <span style="font-size:11px;font-weight:600;color:var(--muted)">· '+d.sub+'</span>':'');
+  document.getElementById('ba-body').innerHTML=
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">'
+    +'<div style="flex:1;min-width:150px;background:var(--wine-l);border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:var(--wine);text-transform:uppercase;letter-spacing:.04em">Oportunidades</div>'
+    +'<div style="font-size:20px;font-weight:700;color:var(--wine);font-variant-numeric:tabular-nums">'+itens.length+'</div></div>'
+    +'<div style="flex:1;min-width:150px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Volume</div>'
+    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">'+fmtR(tot)+'</div></div>'
+    +'</div>'
+    +(itens.length
+      ? '<div class="ba-sec" style="--bc:var(--wine);--bbg:var(--wine-l)"><div style="overflow-x:auto"><table class="ba-tbl">'
+        +'<thead><tr><th>Cliente</th><th>Responsável</th><th>Quando</th><th>O que comprova</th><th>Status hoje</th><th class="r">Volume</th></tr></thead>'
+        +'<tbody>'+linhas+'</tbody></table></div></div>'
+      : '<div class="ba-vazio">Nada aqui.</div>')
+    +'<div style="font-size:10px;color:var(--muted-l);margin-top:6px">Clique em qualquer linha para abrir a oportunidade.</div>';
+  document.getElementById('modal-area').style.display='flex';
+}
+const fuItens=(lista)=>lista.map(x=>({r:x.r,quando:x.e.iso,txt:x.e.txt,quem:x.e.quem}));
+
+// ══ OBJETIVOS DO DIA ══
+// Guardados na tabela metas: area='compromisso', produto='AAAA-MM-DD|tipo'.
+// É o que fecha o ciclo que o diretor pediu — o que prometi ontem vira a
+// cobrança de hoje, sem ninguém precisar lembrar de cabeça.
+const compKey=(iso,t)=>iso+'|'+t;
+function compromissoDe(nome,iso,t){
+  const m=METAS.find(x=>x.area===AREA_COMPROMISSO&&norm(x.assessor||'')===norm(nome)&&x.produto===compKey(iso,t));
+  return m?{id:m.id,v:m.meta_valor||0}:null;
+}
+function temCompromisso(nome,iso){return EVT_ORDEM.some(t=>compromissoDe(nome,iso,t))}
+async function salvarObjetivos(nome,iso){
+  const ops=[];let algum=0;
+  for(const t of EVT_ORDEM){
+    const el=document.getElementById('fu-obj-'+t);if(!el)continue;
+    const v=evDinheiro(t)?Math.max(0,Math.round(parseMoeda(el.value))):Math.max(0,parseInt(el.value||'0',10)||0);
+    if(v)algum=1;
+    const ex=compromissoDe(nome,iso,t);
+    if(ex&&ex.v===v)continue;
+    if(ex)ops.push(db('PATCH','metas',{meta_valor:v},'id=eq.'+ex.id));
+    else if(v>0)ops.push(db('POST','metas',{mes:iso.slice(0,7),assessor:nome,
+      area:areaComEmpresa(AREA_COMPROMISSO,empParaGravar()),produto:compKey(iso,t),meta_valor:v}));
+  }
+  if(!ops.length){showToast(algum?'Os objetivos já estavam salvos assim':'Escreva quantos você vai fazer hoje');return}
+  try{
+    await Promise.all(ops);
+    showToast('🎯 Objetivos de '+brData(iso)+' registrados — amanhã eu cobro',true);
+    await loadData();renderCurView();
+  }catch(e){showToast('Erro ao salvar objetivos: '+e.message)}
+}
+// dia útil anterior: na segunda, "ontem" é a sexta
+function diaUtilAnterior(){
+  const d=new Date();
+  do{d.setDate(d.getDate()-1)}while(d.getDay()===0||d.getDay()===6);
+  return localISO(d);
+}
+// ══ PERDAS: onde o negócio morreu ══
+// Quando alguém arrasta o card para "Cliente Negou", o histórico guarda de
+// qual coluna ele saiu. É esse "de" que responde a pergunta que importa:
+// perdemos antes de conseguir a reunião, ou depois de tê-la feito?
+function perdaDe(r){
+  let ev=null;
+  (r.historico||[]).forEach(h=>{
+    if(h.campo==='Status comercial'&&norm(h.para||'')==='cliente negou')ev=h;
+  });
+  if(ev)return{etapa:(ev.de||'').trim(),quando:isoHist(ev.data),quem:ev.usuario||'',inf:false};
+  return{etapa:'',quando:isoDia(r.updated_at)||isoDia(r.created_at),quem:'',inf:true};
+}
+const ETAPA_PERDA_SEM='⚠ sem registro da etapa';
+function perdidasDoPeriodo(rows,de,ate){
+  const quem=_apQuem?norm(_apQuem):'';
+  const out=[];
+  rows.forEach(r=>{
+    if(!isPerdida(r))return;
+    const p=perdaDe(r);
+    if(!p.quando||p.quando<de||p.quando>ate)return;
+    if(quem){
+      const autor=p.quem?normUsuario(p.quem):'';
+      if(autor?autor!==quem:!eDono(r,_apQuem))return;
+    }
+    out.push({r,quando:p.quando,etapa:p.etapa||ETAPA_PERDA_SEM,inf:p.inf,
+      txt:'perdida'+(p.etapa?' em "'+p.etapa+'"':' — sem registro da etapa')+(p.quem?' · '+p.quem:'')});
+  });
+  return out.sort((a,b)=>String(b.quando).localeCompare(String(a.quando)));
+}
+function perdasPorEtapa(lista){
+  const m=new Map();
+  lista.forEach(x=>{if(!m.has(x.etapa))m.set(x.etapa,[]);m.get(x.etapa).push(x)});
+  return [...m.entries()]
+    .map(([rot,itens])=>({rot,n:itens.length,vol:itens.reduce((s,x)=>s+(x.r.pipe||x.r.atual||0),0),itens}))
+    .sort((a,b)=>b.n-a.n||b.vol-a.vol);
+}
+const volPerdas=l=>l.reduce((s,x)=>s+(x.r.pipe||x.r.atual||0),0);
+const perasN=l=>perdasPorEtapa(l).length;
+
+// ══ QUADRANTES DO TOPO ══
+// Uma linha do quadrante. Quando a linha é de boleta, o número principal
+// é o valor e a quantidade fica como detalhe ao lado.
+function linhaQuad(l){
+  const emDinheiro=l.dinheiro!==undefined;
+  const principal=emDinheiro?fmtR(l.dinheiro):String(l.n);
+  const detalhe=(emDinheiro&&l.n)?nBoletas(l.n):'';
+  return '<div class="fu-line'+(l.alerta&&l.n?' alerta':'')+(l.n?'':' zero')+'"'+fuClick(l.itens,l.tit,l.sub)+'>'
+    +'<span class="i">'+l.ico+'</span><span class="r">'+l.rot+'</span>'
+    +(detalhe?'<span class="v">'+detalhe+'</span>':'')
+    +'<span class="n'+(emDinheiro?' dinheiro':'')+'">'+principal+'</span></div>';
+}
+function fuQuadsHtml(rows){
+  const hj=localISO(new Date()),ont=diaUtilAnterior();
+  const ativas=rows.filter(r=>!arquivada(r)&&!isB(r)&&!isPerdida(r));
+  const ap=apurar(rows,ont,ont);
+
+  // 1) FEITO ONTEM
+  const q1=EVT_ORDEM.map(t=>({
+    ico:EVTS[t].ico,rot:EVTS[t].rot,n:ap.n[t],
+    itens:fuItens(ap[t]),tit:EVTS[t].ico+' '+EVTS[t].rot,sub:brData(ont),
+    dinheiro:evDinheiro(t)?ap.vol:undefined}));
+
+  // 2) BOLETAS HOJE — o que precisa fechar hoje
+  const bolHoje=ativas.filter(r=>parseDataBoleta(r.data_boleta)===hj).map(r=>({r,txt:'boleta marcada para hoje'}));
+  const reuHoje=ativas.filter(r=>isoDia(r.reuniao_data)===hj).map(r=>({r,txt:(r.sc||'reunião hoje')}));
+  const ligHoje=ativas.filter(r=>dataLigacao(r)===hj).map(r=>({r,txt:'ligação marcada para hoje'}));
+  const operar=ativas.filter(r=>norm(r.pb||'')==='a boletar').map(r=>({r,txt:'cliente fechou, boleta ainda não processada'}));
+  const q2=[
+    {ico:'✅',rot:'Boletas a fechar hoje',n:bolHoje.length,itens:bolHoje,tit:'✅ Boletas de hoje',sub:brData(hj),dinheiro:somaVal(bolHoje)},
+    {ico:'🤝',rot:'Reuniões de hoje',n:reuHoje.length,itens:reuHoje,tit:'🤝 Reuniões de hoje',sub:brData(hj)},
+    {ico:'📞',rot:'Ligações de hoje',n:ligHoje.length,itens:ligHoje,tit:'📞 Ligações de hoje',sub:brData(hj)},
+    {ico:'⏳',rot:'Operacional p/ boletar',n:operar.length,itens:operar,tit:'⏳ A boletar — operacional',sub:'cliente já topou',dinheiro:somaVal(operar)},
+  ];
+
+  // 3) TO DOS HOJE
+  const todoHoje=ativas.filter(r=>isoDia(r.todo_data)===hj).map(r=>({r,txt:r.todo||'TODO de hoje'}));
+  const todoAtr=ativas.filter(r=>{const d=isoDia(r.todo_data);return d&&d<hj}).map(r=>({r,quando:isoDia(r.todo_data),txt:(r.todo||'TODO')+' — venceu'}));
+  const todoSem=ativas.filter(r=>!String(r.todo||'').trim()).map(r=>({r,txt:'sem próximo passo escrito'}));
+  const todoFut=ativas.filter(r=>{const d=isoDia(r.todo_data);return d&&d>hj}).map(r=>({r,quando:isoDia(r.todo_data),txt:r.todo||'TODO'}));
+  const q3=[
+    {ico:'📋',rot:'TODOs para hoje',n:todoHoje.length,itens:todoHoje,tit:'📋 TODOs de hoje',sub:brData(hj)},
+    {ico:'🔴',rot:'TODOs atrasados',n:todoAtr.length,itens:todoAtr,tit:'🔴 TODOs vencidos',sub:'precisam de nova data',alerta:todoAtr.length>0},
+    {ico:'📅',rot:'Agendados p/ frente',n:todoFut.length,itens:todoFut,tit:'📅 TODOs futuros',sub:'já têm data'},
+    {ico:'🕳️',rot:'Sem próximo passo',n:todoSem.length,itens:todoSem,tit:'🕳️ Sem TODO escrito',sub:'ninguém sabe o que fazer',alerta:todoSem.length>0},
+  ];
+
+  // 4) QUENTE COM DATA — o que dá pra prever
+  const quente=r=>{const s=norm(r.sc||'');return /topou|confirmar/.test(s)||norm(r.pb||'')==='a boletar'};
+  const qts=ativas.filter(quente);
+  const qComData=qts.filter(r=>{const d=parseDataBoleta(r.data_boleta);return d&&d>=hj}).map(r=>({r,quando:parseDataBoleta(r.data_boleta),txt:'boleta prevista · '+(r.sc||'—')}));
+  const qSemData=qts.filter(r=>!parseDataBoleta(r.data_boleta)).map(r=>({r,txt:'cliente quente e sem data de boleta'}));
+  const qVenc=qts.filter(r=>{const d=parseDataBoleta(r.data_boleta);return d&&d<hj}).map(r=>({r,quando:parseDataBoleta(r.data_boleta),txt:'data da boleta já passou'}));
+  const qSemTodo=qts.filter(r=>!String(r.todo||'').trim()).map(r=>({r,txt:'quente e sem próximo passo'}));
+  const q4=[
+    {ico:'🔥',rot:'Boletas c/ data certa',n:qComData.length,itens:qComData,tit:'🔥 Quente com data',sub:'previsão de fechamento',dinheiro:somaVal(qComData)},
+    {ico:'❓',rot:'Quente sem data',n:qSemData.length,itens:qSemData,tit:'❓ Quente sem data de boleta',sub:'marque a data',alerta:qSemData.length>0},
+    {ico:'⌛',rot:'Data vencida',n:qVenc.length,itens:qVenc,tit:'⌛ Boleta quente vencida',sub:'reagende hoje',alerta:qVenc.length>0,dinheiro:somaVal(qVenc)},
+    {ico:'📝',rot:'Quente sem TODO',n:qSemTodo.length,itens:qSemTodo,tit:'📝 Quente sem próximo passo',sub:'',alerta:qSemTodo.length>0},
+  ];
+
+  const bloco=(ico,tit,sub,linhas,cor)=>'<div class="fu-q" style="--fc:'+cor+'">'
+    +'<div class="fu-q-hdr"><span>'+ico+'</span><div><div class="t">'+tit+'</div><div class="s">'+sub+'</div></div></div>'
+    +linhas.map(l=>linhaQuad(l)).join('')
+    +'</div>';
+
+  return '<div class="fu-quads">'
+    +bloco('🕐','Feito ontem','registros de '+brData(ont),q1,'var(--wine)')
+    +bloco('✅','Boletas hoje','o que precisa sair hoje',q2,'var(--green)')
+    +bloco('📋','TO DOs','afazeres para fechar negócio',q3,'var(--blue)')
+    +bloco('🔥','Quente com data','previsível para os próximos dias',q4,'var(--amber)')
+    +fuGapsHtml(rows,ativas)
+    +'</div>';
+}
+
+// ── GAPS: onde a área está perdendo ──
+function fuGapsHtml(rows,ativas){
+  const hj=localISO(new Date());
+  const [de,ate]=fuRange('mes');
+  const ap=apurar(rows,de,ate);
+  const tx=(n,d)=>d?n/d*100:null;
+  const passos=[
+    {k:'mar',rot:'marcar reunião',t:tx(ap.n.mar,ap.n.lig),de:'ligações',n:ap.n.lig,p:ap.n.mar},
+    {k:'reu',rot:'realizar a reunião',t:tx(ap.n.reu,ap.n.mar),de:'reuniões marcadas',n:ap.n.mar,p:ap.n.reu},
+    {k:'bol',rot:'fechar a boleta',t:tx(ap.n.bol,ap.n.reu),de:'reuniões feitas',n:ap.n.reu,p:ap.n.bol},
+  ].filter(x=>x.t!==null&&x.n>0);
+  const pior=passos.length?passos.reduce((a,b)=>b.t<a.t?b:a):null;
+
+  const parado=ativas.filter(r=>daysSince(getLastMoveDate(r))>=7).map(r=>({r,txt:daysSince(getLastMoveDate(r))+' dias sem nenhum registro'}));
+  const semNada=ativas.filter(r=>!parseDataBoleta(r.data_boleta)&&!isoDia(r.reuniao_data)&&!isoDia(r.todo_data)&&!dataLigacao(r)).map(r=>({r,txt:'nenhuma data em nada'}));
+  const reuFuro=ativas.filter(r=>{const d=isoDia(r.reuniao_data);return d&&d<hj&&!cumpriu(r,d,'reu')}).map(r=>({r,quando:isoDia(r.reuniao_data),txt:'reunião passou sem nenhum registro depois'}));
+  const perdidas=rows.filter(r=>isPerdida(r)&&eventosDe(r).some(e=>e.iso>=de&&e.iso<=ate)).map(r=>({r,txt:'cliente negou'}));
+
+  const diag=pior
+    ? '<div class="fu-gap-diag"><b>Gargalo do mês: '+pior.rot+'</b><br>'
+      +'de '+pior.n+' '+pior.de+', só '+pior.p+' avançaram ('+pior.t.toFixed(1).replace('.',',')+'%).</div>'
+    : '<div class="fu-gap-diag">Sem eventos suficientes no mês para apontar o gargalo.</div>';
+
+  const linhas=[
+    {ico:'💤',rot:'Paradas há 7 dias ou mais',n:parado.length,itens:parado,tit:'💤 Oportunidades paradas',sub:'sem registro há uma semana',alerta:parado.length>0},
+    {ico:'🕳️',rot:'Sem data nenhuma',n:semNada.length,itens:semNada,tit:'🕳️ Sem data nenhuma',sub:'não entram em nenhuma agenda',alerta:semNada.length>0},
+    {ico:'👻',rot:'Reunião passou sem registro',n:reuFuro.length,itens:reuFuro,tit:'👻 Reuniões sem confirmação',sub:'aconteceu? marque no card',alerta:reuFuro.length>0},
+    {ico:'❌',rot:'Perdidas no mês',n:perdidas.length,itens:perdidas,tit:'❌ Perdidas no mês',sub:'cliente negou'},
+  ];
+  return '<div class="fu-q fu-q-gap" style="--fc:var(--red)">'
+    +'<div class="fu-q-hdr"><span>🔎</span><div><div class="t">Gaps da área</div><div class="s">por que a gente não está boletando</div></div></div>'
+    +diag
+    +linhas.map(l=>linhaQuad(l)).join('')
+    +'</div>';
+}
+
+// ══ RELATÓRIO DE DESEMPENHO — o formato que o diretor pediu ══
+window._perdOpen=window._perdOpen||new Set();
+function togglePerd(el){
+  const bl=el.closest('.fu-perd');if(!bl)return;
+  const k=bl.getAttribute('data-perd')||'';
+  if(bl.classList.contains('open')){bl.classList.remove('open');window._perdOpen.delete(k)}
+  else{bl.classList.add('open');window._perdOpen.add(k)}
+}
+function fuRelatorioHtml(rows,foco){
+  const p=fuPer(),[de,ate,rot,intervalo]=fuRange(p);
+  const areas=window._fuArea?areasVis().filter(([k])=>k===window._fuArea):areasVis();
+  const bloco=(titulo,cor,sub,rs,ak)=>{
+    const ap=apurar(rs,de,ate);
+    const perd=perdidasDoPeriodo(rs,de,ate);
+    const grupos=perdasPorEtapa(perd);
+    const [mI,mF]=fuRange('mes');
+    const perdMes=perd.length?[]:perdidasDoPeriodo(rs,mI,mF);
+    const chavePerd=(ak||titulo);
+    const aberto=(window._perdOpen||new Set()).has(chavePerd);
+    const tabPerd='<div class="fu-vend fu-perd'+(aberto?' open':'')+'" data-perd="'+String(chavePerd).replace(/"/g,'')+'">'
+      +'<div class="t"'+(perd.length?' onclick="togglePerd(this)" title="Ver em que etapa cada uma morreu"':'')+'>'
+        +'<span>❌ Perdidas — '
+        +(perd.length?perd.length+' · '+fmtR(volPerdas(perd))
+          :'nenhuma '+(p==='dia'?'hoje':p==='semana'?'nesta semana':'neste mês'))+'</span>'
+        +(perd.length?'<span class="chev">⌄</span>':'')+'</div>'
+      +(perd.length
+        ? '<div class="corpo"><table class="fu-tb fu-tb-vend"><thead><tr><th>Status quando foi perdida</th>'
+          +'<th class="c">qtd</th><th class="c">volume</th></tr></thead><tbody>'
+          +grupos.map(g=>'<tr'+fuClick(g.itens,'❌ Perdidas em "'+g.rot+'"',titulo)+'>'
+            +'<td class="nm">'+g.rot+'</td><td>'+g.n+'</td>'
+            +'<td class="dinheiro">'+fmtR(g.vol)+'</td></tr>').join('')
+          +'</tbody></table></div>'
+        : '<div class="fu-perd-vazio"'+fuClick(perdMes,'❌ Perdidas no mês',titulo)+'>'
+          +(perdMes.length?'no mês são <b>'+perdMes.length+' · '+fmtR(volPerdas(perdMes))
+              +'</b> — clique para ver, ou mude o período aí em cima'
+            :'nenhuma perdida registrada no mês')+'</div>')
+      +'</div>';
+    const vend=(!window._fuCom&&ak)?porVendedor(ak,rs,de,ate):[];
+    const tabVend=vend.length>1
+      ? '<div class="fu-vend"><div class="t">Por vendedor</div>'
+        +'<table class="fu-tb fu-tb-vend"><thead><tr><th>Vendedor</th>'
+        +EVT_ORDEM.map(t=>'<th class="c" title="'+EVTS[t].rot+'">'+EVTS[t].ico+'</th>').join('')
+        +'<th class="c">conv.</th></tr></thead><tbody>'
+        +vend.map(v=>'<tr'+(EVT_ORDEM.some(t=>v.ap.n[t])?'':' class="zerado"')+'>'
+          +'<td class="nm">'+v.nome+'</td>'
+          +EVT_ORDEM.map(t=>'<td class="'+(evValor(v.ap,t)?'':'zero')+(evDinheiro(t)?' dinheiro':'')+'"'
+            +fuClick(fuItens(v.ap[t]),EVTS[t].ico+' '+EVTS[t].rot+' · '+v.nome,titulo)+'>'+evTexto(v.ap,t)+'</td>').join('')
+          +'<td class="'+(v.ap.n.bol?'':'zero')+'">'+fuPc(v.ap.n.bol,v.ap.n.lig)+'</td></tr>').join('')
+        +'</tbody></table></div>'
+      : '';
+    const linhas=EVT_ORDEM.map(t=>{
+      const E=EVTS[t],n=ap.n[t];
+      const base=E.base?ap.n[E.base]:0;
+      const taxa=E.base?(base?(n/base*100):null):null;
+      const corT=taxa===null?'':(taxa>=50?'var(--green)':taxa>=25?'var(--amber)':'var(--red)');
+      return '<tr class="'+(t==='bol'?'fim':'')+'"'+fuClick(fuItens(ap[t]),E.ico+' '+E.rot,titulo+' · '+intervalo)+'>'
+        +'<td>'+E.ico+' '+E.rot+'</td>'
+        +'<td class="q'+(evValor(ap,t)?'':' zero')+(evDinheiro(t)?' dinheiro':'')+'">'+evTexto(ap,t)
+          +(evDetalhe(ap,t)?'<span class="vv">'+evDetalhe(ap,t)+'</span>':'')+'</td>'
+        +'<td class="tx"'+(corT?' style="color:'+corT+'"':'')+'>'
+        +(E.base?(taxa===null?'—':taxa.toFixed(1).replace('.',',')+'% <span class="dq">'+E.baseRot+'</span>'):'—')
+        +'</td></tr>';
+    }).join('');
+    return '<div class="fu-rel-card'+(sub?' full':'')+'" style="--rc:'+cor+'">'
+      +'<div class="fu-rel-hdr"><span class="dot"></span>'+titulo+(sub?'<small>'+sub+'</small>':'')+'</div>'
+      +'<table class="fu-tb"><thead><tr><th>Indicador</th><th class="q">Qtd</th><th class="tx">Conversão</th></tr></thead>'
+      +'<tbody>'+linhas+'</tbody></table>'+tabVend+tabPerd+'</div>';
+  };
+  // com um responsável escolhido a tela é dele: um quadro só, sem os outros
+  const cards=foco?bloco(foco,'var(--wine)','',rows)
+    :areas.map(([ak,a])=>bloco(a.name,a.color,'',rows.filter(r=>r.area===ak),ak)).join('');
+  const total=(!foco&&areas.length>1)?bloco('Todas as áreas','var(--text)','· consolidado',rows):'';
+  return '<div class="fu-sec">'
+    +'<div class="fu-sec-hdr"><div><div class="fu-sec-t">Relatório de desempenho</div>'
+    +'<div class="fu-sec-s">'+rot+' · '+intervalo+(window._fuCom?' · '+window._fuCom:'')+'</div></div>'
+    +'<div class="fu-sec-acoes">'
+    +'<button class="btn sm wine" onclick="fuBaixarPDF()">📄 Baixar PDF</button>'
+    +'<button class="btn sm" onclick="fuEnviarRelatorio()">📤 Enviar</button>'
+    +'<button class="btn sm" onclick="fuImprimir()" title="Abre a versão em página, para imprimir ou ajustar">🖨️ Imprimir</button></div></div>'
+    +'<div class="fu-rel">'+cards+total+'</div>'
+    +'<div class="fu-nota">Cada indicador conta <b>oportunidades distintas</b> com registro no período. A taxa é a razão entre os totais do período — não é coorte: uma reunião feita hoje pode ter vindo de uma ligação do mês passado.</div>'
+    +'</div>';
+}
+// ══ COMBINADO × REALIZADO ══
+// O ciclo que o diretor pediu: o que o cara disse que ia fazer ontem vira a
+// primeira coisa que ele vê hoje, lado a lado com o que de fato aconteceu.
+function fuAgendadoHoje(rows,t){
+  const hj=localISO(new Date());
+  const a=rows.filter(r=>!arquivada(r)&&!isB(r));
+  if(t==='lig')return a.filter(r=>dataLigacao(r)===hj).map(r=>({r,txt:'ligação marcada para hoje'}));
+  if(t==='reu')return a.filter(r=>isoDia(r.reuniao_data)===hj).map(r=>({r,txt:'reunião marcada para hoje'}));
+  if(t==='bol')return rows.filter(r=>!arquivada(r)&&parseDataBoleta(r.data_boleta)===hj).map(r=>({r,txt:'boleta marcada para hoje'}));
+  return null;   // "reuniões a marcar" não tem data em card nenhum: só existe como promessa
+}
+function fuObjetivosHtml(rows,nome){
+  const hj=localISO(new Date()),ont=diaUtilAnterior();
+  const hoje=apurar(rows,hj,hj),ontem=apurar(rows,ont,ont);
+  const podeEditar=!!nome&&(norm(nome)===norm(USER.nome)||USER.perfil==='diretor'||USER.perfil==='gestor');
+  const linhas=EVT_ORDEM.map(t=>{
+    const E=EVTS[t],money=evDinheiro(t);
+    const obj=nome?compromissoDe(nome,hj,t):null;
+    const objOnt=nome?compromissoDe(nome,ont,t):null;
+    const ag=fuAgendadoHoje(rows,t);
+    // boleta se combina e se cobra em dinheiro
+    const mostra=v=>money?fmtR(v):String(v);
+    const feito=money?hoje.vol:hoje.n[t], feitoOnt=money?ontem.vol:ontem.n[t];
+    const alvo=obj?obj.v:0;
+    const pct=alvo?Math.min(Math.round(feito/alvo*100),100):0;
+    const okOnt=objOnt?(feitoOnt>=objOnt.v):null;
+    const agTxt=ag===null?null:(money?fmtR(somaVal(ag)):String(ag.length));
+    return '<tr>'
+      +'<td class="ind">'+E.ico+' '+E.rot+(money?' <span class="dq">em R$</span>':'')+'</td>'
+      +'<td class="obj">'+(podeEditar&&nome
+          ?(money?'<input type="text" inputmode="decimal" id="fu-obj-'+t+'" value="'+(obj&&obj.v?fmtMoedaBR(obj.v):'')+'" placeholder="R$ 0">'
+                 :'<input type="number" min="0" id="fu-obj-'+t+'" value="'+(obj?obj.v:'')+'" placeholder="0">')
+          :'<span class="num">'+(obj?mostra(obj.v):'—')+'</span>')+'</td>'
+      +'<td class="ag">'+(agTxt===null?'<span class="dq">sem data em card</span>'
+          :'<span class="num'+(money?' dinheiro':'')+'"'+fuClick(ag,E.ico+' Agendado para hoje',brData(hj))+'>'+agTxt+'</span>')+'</td>'
+      +'<td class="fz"'+fuClick(fuItens(hoje[t]),E.ico+' '+E.rot+' hoje',brData(hj))+'>'
+        +'<span class="num'+(feito?'':' zero')+(money?' dinheiro':'')+'">'+mostra(feito)+'</span>'
+        +(money&&hoje.n.bol?'<div class="dq">'+nBoletas(hoje.n.bol)+'</div>':'')
+        +(alvo?'<div class="bar"><i style="width:'+pct+'%"></i></div>':'')+'</td>'
+      +'<td class="ont"'+fuClick(fuItens(ontem[t]),E.ico+' '+E.rot+' em '+brData(ont),'')+'>'
+        +(objOnt?'<span class="cmb">'+mostra(objOnt.v)+' →</span> ':'')
+        +'<span class="num'+(feitoOnt?'':' zero')+(money?' dinheiro':'')+'">'+mostra(feitoOnt)+'</span>'
+        +(okOnt===null?'':okOnt?' <span class="ok">✓</span>':' <span class="no">✗</span>')
+      +'</td></tr>';
+  }).join('');
+
+  const semOntem=nome&&!temCompromisso(nome,ont);
+  return '<div class="fu-sec">'
+    +'<div class="fu-sec-hdr"><div><div class="fu-sec-t">Combinado × realizado</div>'
+    +'<div class="fu-sec-s">'+(nome||'time')+' · o que foi prometido e o que aconteceu</div></div></div>'
+    +'<div class="fu-obj">'
+    +'<table class="fu-tb fu-tb-obj"><thead><tr>'
+    +'<th>Indicador</th><th class="c">🎯 Vou fazer hoje</th><th class="c">📌 Agendado nos cards</th>'
+    +'<th class="c">✔️ Feito hoje</th><th class="c">🕐 '+brData(ont)+' (combinado → feito)</th>'
+    +'</tr></thead><tbody>'+linhas+'</tbody></table>'
+    +(!nome?'<div class="fu-obj-ftr"><span>Números do time inteiro. Escolha um comercial na barra de cima para definir e cobrar os objetivos dele.</span></div>':'')
+    +(podeEditar&&nome?'<div class="fu-obj-ftr">'
+      +'<button class="btn sm wine" onclick="salvarObjetivos(\''+String(nome).replace(/'/g,"\\'")+'\',\''+hj+'\')">🎯 Salvar objetivos de hoje</button>'
+      +'<span>'+(semOntem?'Ninguém registrou objetivo em '+brData(ont)+' — por isso a última coluna só mostra o realizado.'
+                         :'Os objetivos de '+brData(ont)+' viraram a cobrança da última coluna.')+'</span></div>':'')
+    +'</div></div>';
+}
+// visão de time: uma linha por comercial, para o gestor bater o olho na daily
+function toggleTimeArea(nome,ev){
+  if(ev){ev.stopPropagation();ev.preventDefault();}
+  const s=window._fuTimeOpen=window._fuTimeOpen||new Set();
+  if(s.has(nome))s.delete(nome);else s.add(nome);
+  renderDPipeline();
+}
+function fuTimeHtml(rowsBase){
+  const nomes=fuComerciais();
+  if(nomes.length<2)return '';
+  const hj=localISO(new Date()),ont=diaUtilAnterior();
+  const linhas=nomes.map(nm=>{
+    const rs=rowsDoComercial(nm,rowsBase);
+    const h=comQuem(nm,()=>apurar(rs,hj,hj)),o=comQuem(nm,()=>apurar(rs,ont,ont));
+    // atividade se soma; boleta não entra na conta porque é dinheiro, não unidade
+    const ATIV=EVT_ORDEM.filter(t=>!evDinheiro(t));
+    const alvo=ATIV.reduce((s,t)=>{const c=compromissoDe(nm,hj,t);return s+(c?c.v:0)},0);
+    const objOnt=ATIV.reduce((s,t)=>{const c=compromissoDe(nm,ont,t);return s+(c?c.v:0)},0);
+    const feitoOnt=ATIV.reduce((s,t)=>s+o.n[t],0);
+    const ader=objOnt?Math.round(feitoOnt/objOnt*100):null;
+    const cel=(t,ap)=>'<td'+fuClick(fuItens(ap[t]),EVTS[t].ico+' '+EVTS[t].rot,nm)+' class="'
+      +(evValor(ap,t)?'':'zero')+(evDinheiro(t)?' dinheiro':'')+'">'+evTexto(ap,t)+'</td>';
+    const ars=areasDoComercial(nm);
+    const aberto=(window._fuTimeOpen||new Set()).has(nm);
+    const esc=nm.replace(/'/g,"\\'");
+    const sub=(ars.length>1&&aberto)?ars.map(([k,a])=>'<tr class="sub">'
+        +'<td class="nm"><span class="dot" style="background:'+a.color+'"></span>'+a.name+'</td>'
+        +EVT_ORDEM.map(t=>{const ax=comQuem(nm,()=>apurar(rs.filter(r=>r.area===k),hj,hj));
+          return '<td class="'+(evValor(ax,t)?'':'zero')+(evDinheiro(t)?' dinheiro':'')+'"'
+            +fuClick(fuItens(ax[t]),EVTS[t].ico+' '+EVTS[t].rot+' · '+a.name,nm)+'>'+evTexto(ax,t)+'</td>'}).join('')
+        +'<td colspan="3" class="zero"></td></tr>').join(''):'';
+    return '<tr'+(ars.length>1?' class="tem-sub"':'')+'>'
+      +'<td class="nm">'
+      +(ars.length>1?'<span class="exp'+(aberto?' on':'')+'" onclick="toggleTimeArea(\''+esc+'\',event)" title="'
+        +(aberto?'Recolher':'Abrir por área: '+ars.map(x=>x[1].name).join(', '))+'">'+(aberto?'▾':'▸')+'</span>':'<span class="exp vazio"></span>')
+      +'<span class="lnk" onclick="setFuCom(\''+esc+'\')" title="Abrir o follow-up de '+nm+'">'+nm+'</span>'
+      +(ars.length>1?'<span class="qt">'+ars.length+' áreas</span>':'')+'</td>'
+      +EVT_ORDEM.map(t=>cel(t,h)).join('')
+      +'<td class="'+(alvo?'':'zero')+'">'+(alvo||'—')+'</td>'
+      +'<td class="'+(feitoOnt?'':'zero')+'">'+feitoOnt+(objOnt?' <span class="dq">/ '+objOnt+'</span>':'')+'</td>'
+      +'<td'+(ader===null?'':' style="color:'+(ader>=100?'var(--green)':ader>=60?'var(--amber)':'var(--red)')+';font-weight:700"')+'>'
+      +(ader===null?'—':ader+'%')+'</td></tr>'+sub;
+  }).join('');
+  return '<div class="fu-sec"><div class="fu-sec-hdr"><div><div class="fu-sec-t">O time hoje</div>'
+    +'<div class="fu-sec-s">'+(empAtual()?empNome(empAtual())+' · ':'')
+    +(window._fuArea?((AREAS[window._fuArea]||{}).name||'')+' · ':'')
+    +'clique no nome para abrir o follow-up · na seta, para separar por área</div></div></div>'
+    +'<div style="overflow-x:auto"><table class="fu-tb fu-tb-time"><thead><tr><th>Comercial</th>'
+    +EVT_ORDEM.map(t=>'<th class="c" title="'+EVTS[t].rot+' hoje">'+EVTS[t].ico+'</th>').join('')
+    +'<th class="c" title="ligações + reuniões prometidas para hoje">🎯 prometeu hoje</th>'
+    +'<th class="c" title="ligações + reuniões feitas no último dia útil">🕐 fez ontem</th><th class="c">aderência</th>'
+    +'</tr></thead><tbody>'+linhas+'</tbody></table></div></div>';
+}
+
+// ══ MÉTRICAS: médias e a curva meta × realizado ══
+function fuMetaValor(){
+  let ms=metasDoMes();
+  if(window._fuArea)ms=ms.filter(m=>m.area===window._fuArea);
+  if(window._fuCom)ms=ms.filter(m=>norm(m.assessor||'')===norm(window._fuCom));
+  else if(USER.perfil!=='diretor'&&USER.perfil!=='gestor')ms=ms.filter(m=>norm(m.assessor||'')===norm(USER.nome));
+  return ms.reduce((s,m)=>s+(m.meta_valor||0),0);
+}
+function fuMetricasHtml(rows){
+  const [mIni,mFim]=fuRange('mes');
+  const ap=apurar(rows,mIni,mFim);
+  const du=diasUteis();
+  const semanas=Math.max(Math.ceil(du.ate/5),1);
+  const med=(n,d)=>d?(n/d).toFixed(1).replace('.',','):'0';
+  const medM=(v,d)=>d?fmtR(v/d):'R$0';
+  const tiles=EVT_ORDEM.map(t=>{
+    const money=evDinheiro(t),tot=money?ap.vol:ap.n[t];
+    return '<div class="fu-met"'+fuClick(fuItens(ap[t]),EVTS[t].ico+' '+EVTS[t].rot,'mês')+'>'
+      +'<div class="k">'+EVTS[t].ico+' '+EVTS[t].rot+'</div>'
+      +'<div class="v'+(money?' dinheiro':'')+'">'+(money?medM(tot,du.ate):med(tot,du.ate))+'<small>/dia</small></div>'
+      +'<div class="s">'+(money?medM(tot,semanas):med(tot,semanas))+' por semana · '
+      +(money?fmtR(tot)+' no mês':tot+' no mês')+'</div></div>';
+  }).join('');
+  const meta=fuMetaValor();
+  const pct=meta?Math.round(ap.vol/meta*100):0;
+  // ritmo necessário para o que falta: é a pergunta que a curva respondia
+  const falta=Math.max(meta-ap.vol,0);
+  const porDia=du.rest?falta/du.rest:0;
+  const faixa=meta
+    ? '<div class="fu-meta-faixa">'
+      +'<div class="lin"><span>Meta do mês · '+fmt(meta)+'</span>'
+      +'<b style="color:'+(pct>=100?'var(--green)':pct>=70?'var(--amber)':'var(--muted)')+'">'+fmtR(ap.vol)+' · '+pct+'%</b></div>'
+      +'<div class="bar"><i style="width:'+Math.min(pct,100)+'%;background:'+(pct>=100?'var(--green)':'var(--wine)')+'"></i></div>'
+      +'<div class="sub">'+(falta?'faltam '+fmt(falta)+' em '+du.rest+' dias úteis — '+fmtR(porDia)+' por dia'
+                                  :'✅ meta batida')+'</div></div>'
+    : '<div class="fu-meta-faixa"><div class="sub">Sem meta definida para este recorte.</div></div>';
+  return '<div class="fu-sec">'
+    +'<div class="fu-sec-hdr"><div><div class="fu-sec-t">Métricas do mês</div>'
+    +'<div class="fu-sec-s">média por dia útil · '+du.ate+' até hoje, '+du.rest+' restando</div></div></div>'
+    +'<div class="fu-mets">'+tiles+'</div>'
+    +faixa
+    +'</div>';
+}
+// ══ RITMO PARA A META ══
+// A conta é de trás para frente: a meta é volume, então divide pelo ticket
+// médio para saber quantas boletas faltam; sobe o funil pelas taxas de
+// conversão do próprio time para saber quantas reuniões e ligações isso exige;
+// e divide pelo número de dias úteis (ou semanas) para virar ritmo.
+// A base histórica são os últimos 90 dias — o mês corrente sozinho é curto
+// demais e faria a taxa pular todo dia.
+const FU_BASE_DIAS=90;
+function fuRitmo(rows){
+  const hoje=new Date();
+  const ini=new Date(hoje);ini.setDate(ini.getDate()-FU_BASE_DIAS);
+  const h=apurar(rows,localISO(ini),localISO(hoje));
+  const ticket=h.n.bol?h.vol/h.n.bol:0;
+  const meta=fuMetaValor();
+  const taxa=(n,b)=>b?n/b:0;
+  const tMar=taxa(h.n.mar,h.n.lig), tReu=taxa(h.n.reu,h.n.mar), tBol=taxa(h.n.bol,h.n.reu);
+  const alvo={bol:0,reu:0,mar:0,lig:0};
+  if(meta&&ticket){
+    alvo.bol=meta/ticket;
+    if(tBol)alvo.reu=alvo.bol/tBol;
+    if(tBol&&tReu)alvo.mar=alvo.reu/tReu;
+    if(tBol&&tReu&&tMar)alvo.lig=alvo.mar/tMar;
+  }
+  return{meta,ticket,tMar,tReu,tBol,alvo,hist:h};
+}
+// alvo do mês distribuído no eixo do gráfico, acumulado
+function fuAlvoSerie(serie,t,rt,p){
+  const alvoMes=evDinheiro(t)?rt.meta:rt.alvo[t];
+  if(!alvoMes)return null;
+  const du=diasUteis();
+  const porBucket=p==='dia'?alvoMes/Math.max(du.tot,1)
+                 :p==='semana'?alvoMes/Math.max(du.tot/5,1)
+                 :alvoMes;
+  let a=0;
+  return serie.map(b=>{
+    if(p==='dia'){const d=new Date(b.de+'T00:00:00').getDay();if(d!==0&&d!==6)a+=porBucket;}
+    else a+=porBucket;
+    return evDinheiro(t)?Math.round(a):Math.round(a*10)/10;
+  });
+}
+// quanto precisa por dia e por semana, em número redondo
+function fuRitmoTexto(rt){
+  if(!rt.meta)return{ok:false,txt:'Sem meta definida para este recorte — a tracejada mostra a janela anterior.'};
+  if(!rt.ticket)return{ok:false,txt:'Nenhuma boleta nos últimos '+FU_BASE_DIAS+' dias: sem ticket médio não dá para calcular o ritmo. A tracejada mostra a janela anterior.'};
+  const du=diasUteis();
+  const nSem=Math.max(du.tot/5,1);
+  const ar=n=>n>=10?Math.round(n):Math.round(n*10)/10;
+  const pd=n=>String(ar(n/Math.max(du.tot,1))).replace('.',',');
+  const ps=n=>String(ar(n/nSem)).replace('.',',');
+  const etapa=(t,rot)=>rt.alvo[t]?rot+': <b>'+Math.ceil(rt.alvo[t])+'</b> no mês · '+pd(rt.alvo[t])+'/dia · '+ps(rt.alvo[t])+'/semana':'';
+  const partes=[etapa('lig','📞 ligações'),etapa('mar','📅 reuniões marcadas'),etapa('reu','🤝 reuniões feitas')].filter(Boolean);
+  const pct=n=>(n*100).toFixed(0)+'%';
+  return{ok:true,
+    cab:'Ticket médio <b>'+fmtR(rt.ticket)+'</b> · meta <b>'+fmtR(rt.meta)+'</b> = <b>'+Math.ceil(rt.alvo.bol)+' boletas</b>'
+        +(rt.alvo.reu?'. Pelas conversões do time ('+pct(rt.tMar)+' → '+pct(rt.tReu)+' → '+pct(rt.tBol)+'), isso pede:':'.'),
+    linhas:partes,
+    falta:partes.length?'':'Faltam conversões registradas nos últimos '+FU_BASE_DIAS+' dias para transformar a meta em número de reuniões e ligações.'};
+}
+
+// ══ GRÁFICOS DE EVOLUÇÃO — um painel por indicador ══
+// São small multiples: cada painel tem ícone, título e o próprio número, então
+// a identidade nunca depende só da cor. A paleta foi validada para daltonismo
+// nos dois temas (pares vizinhos ΔE ≥ 8).
+const EV_COR_LIGHT={lig:'#B32D3F',mar:'#1C7FD0',reu:'#B8791A',bol:'#0F8A66'};
+const EV_COR_DARK ={lig:'#D05063',mar:'#3F92D4',reu:'#BC8526',bol:'#189672'};
+const evCor=t=>(document.documentElement.getAttribute('data-theme')==='dark'?EV_COR_DARK:EV_COR_LIGHT)[t];
+// buckets do período: 14 dias, 8 semanas ou 6 meses
+const FU_JANELA={dia:14,semana:8,mes:6};
+function fuBuckets(p,off){
+  const N=FU_JANELA[p]||FU_JANELA.dia, o=(off||0)*N, out=[], hoje=new Date();
+  for(let i=N-1;i>=0;i--){
+    const k=i+o;
+    if(p==='dia'){const d=new Date(hoje);d.setDate(d.getDate()-k);const iso=localISO(d);
+      out.push({rot:brData(iso),de:iso,ate:iso,atual:!off&&i===0,futuro:false});}
+    else if(p==='semana'){const d=new Date(hoje);d.setDate(d.getDate()-k*7);const[a,b]=semanaDe(d);
+      out.push({rot:brData(a),de:a,ate:b,atual:!off&&i===0,futuro:false});}
+    else{const d=new Date(hoje.getFullYear(),hoje.getMonth()-k,1);
+      const a=localISO(d),b=localISO(new Date(d.getFullYear(),d.getMonth()+1,0));
+      const nm=d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
+      out.push({rot:nm.charAt(0).toUpperCase()+nm.slice(1),de:a,ate:b,atual:!off&&i===0,futuro:false});}
+  }
+  return out;
+}
+function fuSerie(rows,p,off){
+  return fuBuckets(p,off).map(b=>{const ap=apurar(rows,b.de,b.ate);
+    return Object.assign({},b,{n:ap.n,vol:ap.vol,ap})});
+}
+// soma corrida: é assim que a curva da meta lê, e é assim que o diretor
+// enxerga "estou à frente ou atrás do que eu já fui"
+function fuAcumula(serie,t){let a=0;return serie.map(b=>{a+=b.n[t];return a})}
+function fuAcumulaVol(serie){let a=0;return serie.map(b=>{a+=b.vol;return a})}
+function fuGraficosHtml(rows){
+  const p=fuPer();
+  const serie=fuSerie(rows,p,0), ant=fuSerie(rows,p,1);
+  window._fuSerie=serie;window._fuSerieAnt=ant;
+  const N=FU_JANELA[p];
+  const unidade=p==='dia'?'últimos '+N+' dias':p==='semana'?'últimas '+N+' semanas':'últimos '+N+' meses';
+  const soma=(s,t)=>s.reduce((a,b)=>a+b.n[t],0);
+  const pills=[['dia','Dia'],['semana','Semana'],['mes','Mês']].map(([v,l])=>
+    '<button class="'+(v===p?'on':'')+'" onclick="setFuPer(\''+v+'\')">'+l+'</button>').join('');
+
+  const somaVol=s=>s.reduce((a,b)=>a+b.vol,0);
+  const rt=fuRitmo(rows), rtx=fuRitmoTexto(rt);
+  window._fuAlvo={};
+  const paineis=EVT_ORDEM.map(t=>{
+    const E=EVTS[t],money=evDinheiro(t);
+    const tot=money?somaVol(serie):soma(serie,t), totAnt=money?somaVol(ant):soma(ant,t);
+    const txt=v=>money?fmtR(v):(Math.round(v*10)/10).toString().replace('.',',');
+    const serieAlvo=fuAlvoSerie(serie,t,rt,p);
+    window._fuAlvo[t]=serieAlvo;
+    // o alvo do painel é o do último balde: é onde a tracejada está agora
+    const alvoJanela=serieAlvo?serieAlvo[serieAlvo.length-1]:null;
+    const dif=alvoJanela?Math.round((tot-alvoJanela)/alvoJanela*100):(totAnt?Math.round((tot-totAnt)/totAnt*100):null);
+    const ref=alvoJanela?'ritmo pede '+txt(alvoJanela):'anterior '+txt(totAnt);
+    return '<div class="fu-ch">'
+      +'<div class="fu-ch-hdr"><span class="ico">'+E.ico+'</span>'
+      +'<div class="tt">'+E.rot+'</div>'
+      +'<div class="nn'+(money?' dinheiro':'')+'">'+txt(tot)+'</div></div>'
+      +'<div class="fu-ch-sub">'+(money&&soma(serie,t)?nBoletas(soma(serie,t))+' · ':'')
+      +ref
+      +(dif===null?'':' · <b style="color:'+(dif>=0?'var(--green)':'var(--red)')+'">'+(dif>=0?'+':'')+dif+'%</b>')
+      +'</div>'
+      +'<div class="fu-ch-box"><canvas id="fu-ch-'+t+'"></canvas></div>'
+      +'</div>';
+  }).join('');
+  const conta=rtx.ok
+    ? '<div class="fu-conta"><div class="c1">'+rtx.cab+'</div>'
+      +(rtx.linhas.length?'<div class="c2">'+rtx.linhas.map(x=>'<span>'+x+'</span>').join('')+'</div>':'')
+      +(rtx.falta?'<div class="c3">'+rtx.falta+'</div>':'')+'</div>'
+    : '<div class="fu-conta neutra"><div class="c3">'+rtx.txt+'</div></div>';
+
+  return '<div class="fu-sec">'
+    +'<div class="fu-sec-hdr"><div><div class="fu-sec-t">Evolução dos indicadores</div>'
+    +'<div class="fu-sec-s">acumulado nos '+unidade+' · a tracejada é o ritmo necessário para bater a meta</div></div>'
+    +'<div class="fu-seg">'+pills+'</div></div>'
+    +conta+'<div class="fu-chs">'+paineis+'</div>'
+    +'<div class="fu-nota">Clique num ponto para abrir as oportunidades daquele '
+    +(p==='dia'?'dia':p==='semana'?'semana':'mês')+'.</div>'
+    +'</div>';
+}
+function fuDesenhaGraficos(){
+  const serie=window._fuSerie||[],ant=window._fuSerieAnt||[];
+  if(!serie.length||typeof Chart==='undefined')return;
+  const css=v=>(getComputedStyle(document.body).getPropertyValue(v)||'').trim();
+  const grid=css('--border-l')||'#eee', ink=css('--muted-l')||'#999', comp=css('--muted')||'#888';
+  EVT_ORDEM.forEach(t=>{
+    const el=document.getElementById('fu-ch-'+t);if(!el)return;
+    const k='fuCh'+t;
+    if(charts[k]){try{charts[k].destroy()}catch(e){}}
+    const cor=evCor(t);
+    const money=evDinheiro(t);
+    const alvo=(window._fuAlvo||{})[t];
+    const acum=money?fuAcumulaVol(serie):fuAcumula(serie,t);
+    const acumAnt=money?fuAcumulaVol(ant):fuAcumula(ant,t);
+    const rotV=v=>money?fmtR(v):v;
+    charts[k]=new Chart(el,{type:'line',data:{labels:serie.map(b=>b.rot),datasets:[
+      {label:'Acumulado',data:acum,borderColor:cor,backgroundColor:cor+'26',borderWidth:2,
+       fill:true,tension:.25,pointRadius:0,pointHoverRadius:5,pointHoverBackgroundColor:cor,
+       pointHoverBorderColor:css('--card')||'#fff',pointHoverBorderWidth:2,order:1},
+      {label:alvo?'Ritmo para a meta':'Janela anterior',data:alvo||acumAnt,borderColor:comp,borderWidth:2,
+       borderDash:[5,4],fill:false,tension:alvo?0:.25,pointRadius:0,pointHoverRadius:0,order:2}
+    ]},options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      onClick:(e,els)=>{if(!els.length)return;const b=serie[els[0].index];if(!b)return;
+        const lista=fuItens(b.ap[t]);
+        if(lista.length)fuAbrir(fuKey(lista,EVTS[t].ico+' '+EVTS[t].rot,b.rot));},
+      plugins:{legend:{display:true,position:'bottom',align:'start',
+          labels:{boxWidth:9,boxHeight:9,font:{size:9},color:ink,padding:8,usePointStyle:false}},
+        tooltip:{callbacks:{title:c=>c[0].label,
+          label:c=>c.dataset.label+': '+rotV(c.parsed.y)+' acum.',
+          afterBody:c=>{const i=c[0].dataIndex,b=serie[i];
+            return b?['no '+(b.rot)+': '+(money?fmtR(b.vol)+' · '+nBoletas(b.n[t]):b.n[t])]:[]}}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:9},color:ink,maxRotation:0,autoSkip:true,maxTicksLimit:7}},
+        y:{beginAtZero:true,grid:{color:grid},border:{display:false},
+           ticks:{font:{size:9},color:ink,precision:money?undefined:0,maxTicksLimit:4,
+                  callback:v=>money?(fmt(v)||'0'):v}}}}});
+  });
+}
+
+// ══ QUEBRA POR ÁREA ══
+// Quem atende duas áreas não pode ser lido por um número só: "ligou para 50"
+// não diz se o seguro andou ou se foi tudo consórcio.
+// Quais oportunidades amarram essa pessoa a essa área — e por qual campo.
+// É o que responde "por que o Jackson está aparecendo em Investimentos?".
+function oppsQuePrendem(nome,ak){
+  return (OPPS_ALL.length?OPPS_ALL:OPPS)
+    .filter(r=>r.area===ak&&!arquivada(r)&&eDono(r,nome))
+    .map(r=>({r,quando:isoDia(r.updated_at)||isoDia(r.created_at),
+      txt:r.responsavel?('responsável: '+r.responsavel):('sem responsável — entrou pelo assessor: '+(r.assessor||'—'))}));
+}
+function fuAbrirVinculo(nome,ak){
+  const itens=oppsQuePrendem(nome,ak);
+  const a=AREAS[ak]||{name:ak};
+  fuAbrir(fuKey(itens,'⚠ '+nome+' em '+a.name,
+    itens.length+' oportunidade'+(itens.length!==1?'s':'')+' — corrija o responsável no card ou inclua a área no cadastro'));
+}
+// as áreas que a pessoa cuida, direto do cadastro — mesmo as que ainda estão zeradas
+function areasDoComercial(nome){return areasDeFato(nome);}
+function linhaPorArea(rot,cor,rs,de,ate,quem){
+  const ap=apurar(rs,de,ate);
+  const cel=t=>'<td class="'+(evValor(ap,t)?'':'zero')+(evDinheiro(t)?' dinheiro':'')+'"'
+    +fuClick(fuItens(ap[t]),EVTS[t].ico+' '+EVTS[t].rot+' · '+rot,quem||'')+'>'+evTexto(ap,t)+'</td>';
+  const ponta=ap.n.lig?(ap.n.bol/ap.n.lig*100):null;
+  return{ap,html:'<td class="nm"><span class="dot" style="background:'+cor+'"></span>'+rot+'</td>'
+    +EVT_ORDEM.map(cel).join('')
+    +'<td class="'+(ponta?'':'zero')+'">'+(ponta===null?'—':ponta.toFixed(0)+'%')+'</td>'};
+}
+function fuPorAreaHtml(nome,rows){
+  const areas=areasDoComercial(nome);
+  if(areas.length<2)return '';          // uma área só: o número de cima já basta
+  const p=fuPer(),[de,ate,rot,intervalo]=fuRange(p);
+  const linhas=areas.map(([k,a])=>'<tr>'+linhaPorArea(a.name,a.color,rows.filter(r=>r.area===k),de,ate,nome).html+'</tr>').join('');
+  void 0;
+  const tot=linhaPorArea('Total','var(--text)',rows,de,ate,nome);
+  return '<div class="fu-sec">'
+    +'<div class="fu-sec-hdr"><div><div class="fu-sec-t">'+nome.split(' ')[0]+' por área</div>'
+    +'<div class="fu-sec-s">'+rot+' · '+intervalo+' — cuida de '+areas.length+' áreas, '
+    +'então o número só faz sentido separado</div></div></div>'
+    +'<div style="overflow-x:auto"><table class="fu-tb fu-tb-area"><thead><tr><th>Área</th>'
+    +EVT_ORDEM.map(t=>'<th class="c" title="'+EVTS[t].rot+'">'+EVTS[t].ico+' '+EVTS[t].rot+'</th>').join('')
+    +'<th class="c" title="de cada 100 ligações, quantas viraram boleta">ponta a ponta</th>'
+    +'</tr></thead><tbody>'+linhas
+    +'<tr class="tot">'+tot.html+'</tr>'
+    +'</tbody></table></div></div>';
+}
+
+// ══ A CAIXINHA DO RESPONSÁVEL ══
+function fuPessoaHtml(nome,rows){
+  const p=fuPer(),[de,ate,rot,intervalo]=fuRange(p);
+  const ap=apurar(rows,de,ate);
+  const fora=areasForaDoPerfil(nome);
+  const esc=String(nome).replace(/'/g,"\\'");
+  const ars=areasDeFato(nome).map(([k,a])=>a.name).join(' · ');
+  const abertas=rows.filter(r=>!arquivada(r)&&!isB(r)&&!isPerdida(r));
+  const pipe=abertas.reduce((s,r)=>s+(r.pipe||0),0);
+  const meta=fuMetaValor();
+  const [mIni,mFim]=fuRange('mes');
+  const mes=apurar(rows,mIni,mFim);
+  const pct=meta?Math.min(Math.round(mes.vol/meta*100),999):null;
+  const tile=(t)=>'<div class="fu-p-tile'+(evDinheiro(t)?' destaque':'')+'"'
+    +fuClick(fuItens(ap[t]),EVTS[t].ico+' '+EVTS[t].rot,nome+' · '+intervalo)+'>'
+    +'<div class="k"><span style="color:'+evCor(t)+'">'+EVTS[t].ico+'</span> '+EVTS[t].rot+'</div>'
+    +'<div class="v'+(evDinheiro(t)?' dinheiro':'')+'">'+evTexto(ap,t)+'</div>'
+    +(evDetalhe(ap,t)?'<div class="s">'+evDetalhe(ap,t)+'</div>':'')+'</div>';
+  return '<div class="fu-pessoa">'
+    +'<div class="fu-p-top">'
+    +'<div class="fu-p-av">'+initials(nome)+'</div>'
+    +'<div class="fu-p-id"><div class="nm">'+nome+'</div>'
+    +'<div class="sb">'+(ars||'sem área no cadastro')+' · '+abertas.length+' oportunidades abertas · pipe '+fmtR(pipe)+'</div>'
+    +(fora.length?'<div class="sb aviso">⚠ há cards de '
+      +fora.map(k=>'<b class="fora" onclick="fuAbrirVinculo(\''+esc+'\',\''+k+'\')" title="Ver esses cards">'
+        +((AREAS[k]||{}).name||k)+'</b>').join(' e ')
+      +' com o nome dele, fora das áreas que ele atende — não entram nas contas acima</div>':'')+'</div>'
+    +'<div class="fu-p-per">'+rot+'<small>'+intervalo+'</small></div>'
+    +'</div>'
+    +'<div class="fu-p-tiles">'+EVT_ORDEM.map(tile).join('')
+    +'<div class="fu-p-tile"><div class="k">📈 Pipe em aberto</div><div class="v dinheiro">'+fmtR(pipe)+'</div>'
+    +'<div class="s">'+abertas.length+' oportunidades</div></div>'
+    +'</div>'
+    +(meta?'<div class="fu-p-meta"><div class="lbl">Meta do mês · '+fmt(meta)
+      +' <b>'+fmtR(mes.vol)+' realizados ('+pct+'%)</b></div>'
+      +'<div class="bar"><i style="width:'+Math.min(pct,100)+'%"></i></div></div>':'')
+    +'</div>';
+}
+// ══ RELATÓRIO: baixar, enviar, imprimir ══
+function fuEscopo(){
+  return [window._fuCom,window._fuArea?(AREAS[window._fuArea]||{}).name:''].filter(Boolean).join(' · ')||'Time todo';
+}
+// ══ RELATÓRIO: um documento por área, com tabela e gráficos ══
+// Os gráficos do documento são desenhados à parte, fora da tela, com a
+// paleta clara — o papel é branco mesmo quando o sistema está no escuro.
+function fuRelGraficos(rows,p){
+  const out={img:{},tot:{}};
+  if(typeof Chart==='undefined')return out;
+  const serie=fuSerie(rows,p,0),ant=fuSerie(rows,p,1),rt=fuRitmo(rows);
+  EVT_ORDEM.forEach(t=>{out.tot[t]=serie.reduce((s,b)=>s+(evDinheiro(t)?b.vol:b.n[t]),0)});
+  const box=document.createElement('div');
+  box.style.cssText='position:fixed;left:-10000px;top:0;width:560px;height:240px';
+  document.body.appendChild(box);
+  EVT_ORDEM.forEach(t=>{
+    const cv=document.createElement('canvas');
+    // 404px é a largura real do gráfico no documento. Com responsive:false o Chart.js
+    // trata width/height como medida lógica e infla o bitmap pelo devicePixelRatio.
+    cv.width=404;cv.height=170;
+    box.appendChild(cv);
+    const cor=EV_COR_LIGHT[t];
+    let ch=null;
+    try{
+      ch=new Chart(cv,{type:'line',data:{labels:serie.map(b=>b.rot),datasets:[
+        {label:'Acumulado',data:evDinheiro(t)?fuAcumulaVol(serie):fuAcumula(serie,t),
+         borderColor:cor,backgroundColor:cor+'26',borderWidth:2.5,fill:true,tension:.25,pointRadius:0},
+        {label:'Ritmo para a meta',data:fuAlvoSerie(serie,t,rt,p)||(evDinheiro(t)?fuAcumulaVol(ant):fuAcumula(ant,t)),
+         borderColor:'#9A9490',borderWidth:2,borderDash:[5,4],fill:false,
+         tension:fuAlvoSerie(serie,t,rt,p)?0:.25,pointRadius:0}]},
+        options:{responsive:false,animation:false,devicePixelRatio:2,
+          layout:{padding:{top:4,right:4}},
+          plugins:{legend:{display:false}},
+          scales:{x:{grid:{display:false},ticks:{font:{size:10},color:'#B3AFAA',maxRotation:0,autoSkip:true,maxTicksLimit:6}},
+            y:{beginAtZero:true,grid:{color:'#E7E4E0'},border:{display:false},
+               ticks:{font:{size:10},color:'#B3AFAA',precision:evDinheiro(t)?undefined:0,maxTicksLimit:4,
+                      callback:v=>evDinheiro(t)?(fmt(v)||'0'):v}}}}});
+      out.img[t]=cv.toDataURL('image/png');
+    }catch(e){out.img[t]=''}
+    if(ch)try{ch.destroy()}catch(e){}
+  });
+  box.remove();
+  return out;
+}
+const fuPc=(n,b)=>b?(n/b*100).toFixed(1).replace('.',',')+'%':'—';
+// Numa área, cada vendedor com o seu próprio número. Em seguro, o que a Cris
+// fez e o que o Vovo fez — somar os dois esconde quem está parado.
+function comerciaisDaArea(ak){
+  return USUARIOS.filter(u=>u.ativo&&u.perfil!=='diretor'&&(u.areas||[]).includes(ak))
+    .filter(u=>USER.perfil==='diretor'||USER.perfil==='gestor'||norm(u.nome)===norm(USER.nome))
+    .filter(u=>trabalhaEmpresa(u.nome,empAtual()))
+    .map(u=>u.nome);
+}
+function porVendedor(ak,rowsArea,de,ate){
+  return comerciaisDaArea(ak).map(nome=>{
+    const rs=rowsDoComercial(nome,rowsArea);
+    return{nome,ap:comQuem(nome,()=>apurar(rs,de,ate))};
+  }).sort((a,b)=>(b.ap.vol-a.ap.vol)||(b.ap.n.lig-a.ap.n.lig)||a.nome.localeCompare(b.nome));
+}
+function fuGargalo(ap){
+  const ps=[['marcar a reunião','ligações',ap.n.lig,ap.n.mar],
+            ['realizar a reunião','reuniões marcadas',ap.n.mar,ap.n.reu],
+            ['fechar a boleta','reuniões feitas',ap.n.reu,ap.n.bol]]
+    .filter(x=>x[2]>0).map(x=>({rot:x[0],base:x[1],t:x[3]/x[2]*100,de:x[2],p:x[3]}));
+  return ps.length?ps.reduce((a,b)=>b.t<a.t?b:a):null;
+}
+// uma seção completa: números, tabela de conversão, gargalo e os 4 gráficos
+function fuRelSecao(titulo,cor,rows,de,ate,p,comGraficos,ak){
+  const ap=apurar(rows,de,ate);
+  const nOpp=rows.filter(r=>!arquivada(r)).length;
+  const g=fuGargalo(ap);
+  const tile=(t)=>'<div class="kp'+(evDinheiro(t)?' destaque':'')+'"><div class="k">'+EVTS[t].rot+'</div>'
+    +'<div class="v" style="color:'+(evDinheiro(t)?'#1F5741':EV_COR_LIGHT[t])+'">'+evTexto(ap,t)+'</div>'
+    +(evDetalhe(ap,t)?'<div class="d">'+evDetalhe(ap,t)+'</div>':'')+'</div>';
+  const janela=p==='dia'?'14 dias':p==='semana'?'8 semanas':'6 meses';
+  const perd=perdidasDoPeriodo(rows,de,ate);
+  const grupos=perdasPorEtapa(perd);
+  const tabPerd=!perd.length
+    ? '<div class="vend perd"><div class="vend-t">Perdidas no período — nenhuma</div></div>'
+    : '<div class="vend perd"><div class="vend-t">❌ Perdidas no período — '+perd.length+' · '+fmtR(volPerdas(perd))+'</div>'
+      +'<table class="tv"><thead><tr><th>Status quando foi perdida</th><th>Qtd</th><th>Volume</th></tr></thead><tbody>'
+      +grupos.map(g=>'<tr><td class="nm">'+g.rot+'</td><td>'+g.n+'</td><td>'+fmtR(g.vol)+'</td></tr>').join('')
+      +'</tbody></table>'
+      +'<div class="perd-lista">'+perd.slice(0,12).map(x=>'<div><b>'+(x.r.cliente||'—')+'</b> · '
+        +fmtR(x.r.pipe||x.r.atual||0)+' · saiu de <i>'+x.etapa+'</i> em '+brData(x.quando)+'</div>').join('')
+      +(perd.length>12?'<div class="mais">+'+(perd.length-12)+' outras</div>':'')+'</div></div>';
+  const vend=(!window._fuCom&&ak)?porVendedor(ak,rows,de,ate):[];
+  const tabVend=vend.length>1
+    ? '<div class="vend"><div class="vend-t">Por vendedor</div><table class="tv"><thead><tr><th>Vendedor</th>'
+      +EVT_ORDEM.map(t=>'<th>'+EVTS[t].rot+'</th>').join('')+'<th>Conversão</th></tr></thead><tbody>'
+      +vend.map(v=>'<tr'+(EVT_ORDEM.some(t=>v.ap.n[t])?'':' class="zerado"')+'><td class="nm">'+v.nome+'</td>'
+        +EVT_ORDEM.map(t=>'<td>'+evTexto(v.ap,t)+(evDetalhe(v.ap,t)?' <span class="d">'+evDetalhe(v.ap,t)+'</span>':'')+'</td>').join('')
+        +'<td>'+fuPc(v.ap.n.bol,v.ap.n.lig)+'</td></tr>').join('')
+      +'</tbody></table></div>'
+    : '';
+  const gr=comGraficos?fuRelGraficos(rows,p):null;
+  const temCurva=gr&&EVT_ORDEM.some(t=>gr.tot[t]>0);
+  const imgs=(gr&&temCurva)?(()=>{
+    const cel=EVT_ORDEM.filter(t=>gr.img[t]).map(t=>'<div class="ch"><div class="ch-t">'+EVTS[t].rot
+      +' <b>'+(evDinheiro(t)?fmtR(gr.tot[t]):gr.tot[t])+'</b></div>'
+      +'<img src="'+gr.img[t]+'" alt="'+EVTS[t].rot+'"></div>').join('');
+    const temRitmo=!!fuAlvoSerie(fuSerie(rows,p,0),'bol',fuRitmo(rows),p);
+    return cel?'<div class="leg"><b>Evolução · últimos '+janela+'</b>'
+      +'<span class="l1"></span>acumulado<span class="l2"></span>'+(temRitmo?'ritmo para a meta':'janela anterior')+'</div>'
+      +'<div class="chs">'+cel+'</div>':'';
+  })():'';
+  return '<section class="sec" style="--ac:'+cor+'">'
+    +'<div class="sec-h"><span class="dot"></span><h2>'+titulo+'</h2>'
+    +'<span class="tag">'+nOpp+' oportunidade'+(nOpp!==1?'s':'')+' no funil</span></div>'
+    +'<div class="kps">'+EVT_ORDEM.map(tile).join('')
+    +'<div class="kp"><div class="k">Oportunidades</div><div class="v">'+nOpp+'</div>'
+    +'<div class="d">no funil da área</div></div></div>'
+    +'<table><thead><tr><th>Indicador</th><th>Quantidade</th><th>Taxa de conversão</th></tr></thead><tbody>'
+    +'<tr><td>Ligações feitas</td><td>'+ap.n.lig+'</td><td class="d">—</td></tr>'
+    +'<tr><td>Reuniões marcadas</td><td>'+ap.n.mar+'</td><td>'+fuPc(ap.n.mar,ap.n.lig)+' <span class="d">das ligações</span></td></tr>'
+    +'<tr><td>Reuniões feitas</td><td>'+ap.n.reu+'</td><td>'+fuPc(ap.n.reu,ap.n.mar)+' <span class="d">das marcadas</span></td></tr>'
+    +'<tr class="fim"><td><b>Fechados</b></td><td><b>'+fmtR(ap.vol)+'</b> <span class="d">'+nBoletas(ap.n.bol)+'</span></td>'
+    +'<td><b>'+fuPc(ap.n.bol,ap.n.reu)+'</b> <span class="d">das reuniões feitas</span></td></tr></tbody></table>'
+    +(g?'<div class="gap"><b>Gargalo: '+g.rot+'</b> — de '+g.de+' '+g.base+', '+g.p+' avançaram ('
+       +g.t.toFixed(1).replace('.',',')+'%).</div>'
+      :'<div class="gap neutro">Sem etapas suficientes no período para apontar um gargalo.</div>')
+    +tabVend+tabPerd
+    +(imgs||(comGraficos?'<div class="vazio">Sem movimento registrado nos últimos '+janela+'.</div>':''))
+    +'</section>';
+}
+function fuDocRelatorio(){return comQuem(window._fuCom||'',()=>fuDocRelatorioInterno())}
+function fuDocRelatorioInterno(){
+  const rows=fuRows(),p=fuPer(),[de,ate,rot,intervalo]=fuRange(p);
+  const foco=window._fuCom||'';
+  const areas=(window._fuArea?areasVis().filter(([k])=>k===window._fuArea):areasVis())
+    .map(([ak,a])=>[ak,a,rows.filter(r=>r.area===ak)])
+    .filter(([ak,a,rs])=>rs.length>0);
+  const geral=apurar(rows,de,ate);
+  const gg=fuGargalo(geral);
+  const janela=p==='dia'?'14 dias':p==='semana'?'8 semanas':'6 meses';
+  const per=p==='dia'?'Diário':p==='semana'?'Semanal':'Mensal';
+  const resumo='<div class="resumo">'
+    +EVT_ORDEM.map(t=>'<div class="rk'+(evDinheiro(t)?' destaque':'')+'"><div class="k">'+EVTS[t].ico+' '+EVTS[t].rot+'</div>'
+      +'<div class="v" style="color:'+(evDinheiro(t)?'#1F5741':EV_COR_LIGHT[t])+'">'+evTexto(geral,t)+'</div>'
+      +'<div class="s">'+(evDinheiro(t)?nBoletas(geral.n.bol)+' · ':'')
+      +(EVTS[t].base?fuPc(geral.n[t],geral.n[EVTS[t].base])+' '+EVTS[t].baseRot:'ponto de partida')+'</div></div>').join('')
+    +'<div class="rk"><div class="k">📈 Pipe em aberto</div><div class="v">'
+    +fmtR(rows.filter(r=>!arquivada(r)&&!isB(r)&&!isPerdida(r)).reduce((s,r)=>s+(r.pipe||0),0))+'</div>'
+    +'<div class="s">ainda em jogo</div></div></div>'
+    +(gg?'<div class="gap topo"><b>Gargalo geral: '+gg.rot+'</b> — de '+gg.de+' '+gg.base+', '+gg.p
+        +' avançaram ('+gg.t.toFixed(1).replace('.',',')+'%). É onde a área está perdendo negócio.</div>':'');
+  const secoes=areas.length
+    ? areas.map(([ak,a,rs])=>fuRelSecao((foco?foco.split(' ')[0]+' · ':'')+a.name,a.color,rs,de,ate,p,true,ak)).join('')
+    : '<div class="vazio">Nenhuma oportunidade neste recorte.</div>';
+  const consolidado=areas.length>1
+    ?fuRelSecao(foco?'Consolidado — '+foco:'Consolidado — todas as áreas','#7A2233',rows,de,ate,p,true):'';
+  return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">'
+    +'<meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<title>Relatório '+per+' — '+fuEscopo()+'</title><style>'
+    +'*{box-sizing:border-box;margin:0;padding:0}'
+    +'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#1C1B1A;background:#EFEEEC;'
+    +'padding:30px 20px;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}'
+    +'.doc{max-width:980px;margin:0 auto;background:#fff;border-radius:14px;overflow:hidden;'
+    +'box-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 28px rgba(0,0,0,.05)}'
+    +'.capa{background:#7A2233;color:#fff;padding:30px 36px}'
+    +'.capa .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.16em;opacity:.7}'
+    +'.capa h1{font-size:26px;font-weight:700;letter-spacing:-.02em;margin:6px 0 10px}'
+    +'.capa .meta{display:flex;gap:26px;flex-wrap:wrap;font-size:12px}'
+    +'.capa .meta div{opacity:.88}.capa .meta b{display:block;font-size:14px;opacity:1;margin-top:1px}'
+    +'.corpo{padding:26px 36px 34px}'
+    +'.resumo{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}'
+    +'.rk{border:1px solid #DCD9D5;border-radius:10px;padding:11px 13px}'
+    +'.rk .k{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#87837E;'
+    +'white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
+    +'.rk .v{font-size:27px;font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums}'
+    +'.rk .s{font-size:10px;color:#B3AFAA}'
+    +'.rk.destaque{background:#F1F6F3;border-color:#BCD2C8}'
+    +'.sec{border:1px solid #DCD9D5;border-left:4px solid var(--ac);border-radius:10px;padding:18px 20px;margin-top:16px;'
+    +'page-break-inside:avoid;break-inside:avoid}'
+    +'.sec-h{display:flex;align-items:center;gap:9px;margin-bottom:13px}'
+    +'.sec-h .dot{width:9px;height:9px;border-radius:50%;background:var(--ac);flex-shrink:0}'
+    +'.sec-h h2{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ac)}'
+    +'.sec-h .tag{margin-left:auto;font-size:10.5px;color:#B3AFAA}'
+    +'.kps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px}'
+    +'.kp{background:#F7F6F4;border-radius:8px;padding:8px 10px}'
+    +'.kp .k{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#87837E;'
+    +'white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
+    +'.kp .v{font-size:21px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums}'
+    +'.kp.destaque{background:#F1F6F3}.kp .d{font-size:9.5px;color:#B3AFAA;margin-top:1px}'
+    +'table{width:100%;border-collapse:collapse;font-size:12.5px}'
+    +'th{background:#F7F6F4;padding:8px 11px;text-align:left;font-size:9.5px;text-transform:uppercase;'
+    +'letter-spacing:.05em;color:#87837E;border-bottom:1px solid #DCD9D5}'
+    +'th:nth-child(2),td:nth-child(2){text-align:right;width:120px}'
+    +'th:nth-child(3),td:nth-child(3){text-align:right;width:230px}'
+    +'td{padding:8px 11px;border-bottom:1px solid #E7E4E0;font-variant-numeric:tabular-nums}'
+    +'td .d{color:#B3AFAA;font-size:11px}'
+    +'tr.fim td{background:#F1F6F3;border-bottom:none}'
+    +'.gap{background:#F9F2F2;border:1px solid #D9BDBD;border-radius:8px;padding:10px 12px;color:#8C2F2F;'
+    +'font-size:12px;margin-top:12px}'
+    +'.gap.neutro{background:#F7F6F4;border-color:#DCD9D5;color:#87837E}'
+    +'.gap.topo{margin-top:0}'
+    +'.chs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}'
+    +'.ch{border:1px solid #E7E4E0;border-radius:8px;padding:10px 12px}'
+    +'.ch-t{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#87837E;margin-bottom:6px}'
+    +'.ch-t b{font-size:15px;color:#1C1B1A;margin-left:4px;letter-spacing:0}'
+    +'.ch img{width:100%;height:auto;display:block}'
+    +'.leg{display:flex;align-items:center;gap:7px;font-size:10.5px;color:#B3AFAA;margin-top:16px;margin-bottom:2px}'
+    +'.leg b{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#87837E;margin-right:6px}'
+    +'.leg .l1,.leg .l2{width:18px;height:0;border-top:2px solid #87837E;display:inline-block}'
+    +'.leg .l2{border-top-style:dashed;margin-left:12px}'
+    +'.vazio{font-size:12px;color:#B3AFAA;padding:14px;text-align:center;background:#F7F6F4;border-radius:8px;margin-top:12px}'
+    +'.vend{margin-top:14px}'
+    +'.vend-t{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#87837E;margin-bottom:6px}'
+    +'.tv{width:100%;border-collapse:collapse;font-size:12px}'
+    +'.tv th{background:#F7F6F4;padding:6px 10px;font-size:8.5px;text-transform:uppercase;letter-spacing:.04em;'
+    +'color:#87837E;border-bottom:1px solid #DCD9D5;text-align:right;white-space:nowrap}'
+    +'.tv th:first-child{text-align:left}'
+    +'.tv td{padding:7px 10px;border-bottom:1px solid #E7E4E0;text-align:right;font-variant-numeric:tabular-nums;font-weight:600}'
+    +'.tv td.nm{text-align:left;font-weight:700}'
+    +'.tv td .d{font-weight:400;font-size:10px;color:#B3AFAA}'
+    +'.tv tr.zerado td{color:#B3AFAA;font-weight:400}'
+    +'.perd .vend-t{color:#8C2F2F}'
+    +'.perd-lista{margin-top:8px;font-size:11px;color:#87837E;line-height:1.7}'
+    +'.perd-lista i{color:#8C2F2F;font-style:normal;font-weight:600}'
+    +'.perd-lista .mais{color:#B3AFAA}'
+    +'.ftr{margin-top:22px;padding-top:13px;border-top:1px solid #E7E4E0;font-size:10.5px;color:#B3AFAA;line-height:1.6}'
+    +'@media print{body{background:#fff;padding:0}.doc{box-shadow:none;border-radius:0}'
+    +'.capa{border-radius:0}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}'
+    +'@media(max-width:760px){body{padding:10px}.corpo{padding:18px 16px 24px}.capa{padding:22px 18px}'
+    +'.resumo,.kps{grid-template-columns:repeat(2,1fr)}.chs{grid-template-columns:1fr}'
+    +'th:nth-child(3),td:nth-child(3){width:auto}}'
+    +'</style></head><body><div class="doc">'
+    +'<div class="capa"><div class="eyebrow">Gerencial Comercial · Quark Investimentos</div>'
+    +'<h1>Relatório de Desempenho '+per+'</h1>'
+    +'<div class="meta">'
+    +'<div>Período<b>'+intervalo+'</b></div>'
+    +'<div>Recorte<b>'+fuEscopo()+'</b></div>'
+    +'<div>Evolução<b>últimos '+janela+'</b></div>'
+    +'<div>Emitido em<b>'+new Date().toLocaleString('pt-BR')+'</b></div>'
+    +'</div></div>'
+    +'<div class="corpo">'+resumo+secoes+consolidado
+    +'<div class="ftr">Cada indicador conta <b>oportunidades distintas</b> com registro no período. '
+    +'A taxa de conversão é a razão entre os totais do período, não uma coorte: uma reunião feita hoje pode ter vindo '
+    +'de uma ligação do mês passado. Nos gráficos, a linha cheia é o acumulado do período e a tracejada é a mesma janela anterior.'
+    +'</div></div></div></body></html>';
+}
+// ══ RELATÓRIO EM PDF ══
+// Desenhado à mão no jsPDF em vez de fotografar a tela: o texto sai vetorial,
+// a quebra de página é controlada e cada área começa inteira numa página.
+const PDF_CDN='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+let _pdfLib=null;
+function carregarJsPDF(){
+  if(window.jspdf&&window.jspdf.jsPDF)return Promise.resolve(window.jspdf.jsPDF);
+  if(_pdfLib)return _pdfLib;
+  _pdfLib=new Promise((ok,err)=>{
+    const s=document.createElement('script');
+    s.src=PDF_CDN;
+    s.onload=()=>window.jspdf&&window.jspdf.jsPDF?ok(window.jspdf.jsPDF):err(new Error('jsPDF não carregou'));
+    s.onerror=()=>err(new Error('não consegui baixar a biblioteca de PDF'));
+    document.head.appendChild(s);
+  });
+  return _pdfLib;
+}
+const PDF={W:595.28,H:841.89,m:40,get w(){return this.W-this.m*2}};
+const PDF_COR={vinho:'#7A2233',texto:'#1C1B1A',muted:'#87837E',fraco:'#B3AFAA',
+  linha:'#E7E4E0',borda:'#DCD9D5',surf:'#F7F6F4',verde:'#1F5741',verdeBg:'#F1F6F3',
+  vermBg:'#F9F2F2',vermB:'#D9BDBD',verm:'#8C2F2F'};
+function pdfNovo(doc){
+  doc.__y=PDF.m;doc.__pag=1;
+  return doc;
+}
+function pdfEspaco(doc,h){
+  if(doc.__y+h<=PDF.H-52)return;
+  doc.addPage();doc.__pag++;doc.__y=PDF.m;
+}
+const semEmoji=s=>String(s==null?'':s)
+  .replace(/[\u{1F300}-\u{1FAFF}\u{2190}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{2600}-\u{26FF}]/gu,'')
+  .replace(/\s{2,}/g,' ').trim();
+function pdfTxt(doc,txt,x,y,o){
+  o=o||{};
+  doc.setFont('helvetica',o.bold?'bold':'normal');
+  doc.setFontSize(o.size||9);
+  doc.setTextColor(o.cor||PDF_COR.texto);
+  doc.text(semEmoji(txt),x,y,{align:o.align||'left',baseline:o.baseline||'alphabetic'});
+}
+function pdfCaixa(doc,x,y,w,h,fill,stroke,r){
+  if(fill){doc.setFillColor(fill)}
+  if(stroke){doc.setDrawColor(stroke);doc.setLineWidth(.6)}
+  const est=fill&&stroke?'FD':fill?'F':'S';
+  if(r)doc.roundedRect(x,y,w,h,r,r,est); else doc.rect(x,y,w,h,est);
+}
+// corta o texto na largura disponível, com reticências
+function pdfCurto(doc,txt,size,bold,max){
+  doc.setFont('helvetica',bold?'bold':'normal');doc.setFontSize(size);
+  let t=semEmoji(txt);
+  if(doc.getTextWidth(t)<=max)return t;
+  while(t.length>1&&doc.getTextWidth(t+'…')>max)t=t.slice(0,-1);
+  return t+'…';
+}
+function pdfCapa(doc,dados){
+  const h=104;
+  doc.setFillColor(PDF_COR.vinho);doc.rect(0,0,PDF.W,h,'F');
+  pdfTxt(doc,'GERENCIAL COMERCIAL · QUARK INVESTIMENTOS',PDF.m,32,{size:7,bold:true,cor:'#E8CDD3'});
+  pdfTxt(doc,dados.titulo,PDF.m,56,{size:19,bold:true,cor:'#FFFFFF'});
+  const cols=[['Período',dados.intervalo],['Recorte',dados.escopo],
+              ['Evolução','últimos '+dados.janela],['Emitido em',dados.quando]];
+  let x=PDF.m;
+  cols.forEach(([k,v])=>{
+    pdfTxt(doc,k,x,76,{size:6.5,bold:true,cor:'#D8AEB7'});
+    pdfTxt(doc,pdfCurto(doc,v,8.5,true,120),x,88,{size:8.5,bold:true,cor:'#FFFFFF'});
+    x+=130;
+  });
+  doc.__y=h+22;
+}
+// fileira de números: usada no resumo e em cada área
+function pdfKpis(doc,itens,alt){
+  const n=itens.length,gap=7,w=(PDF.w-gap*(n-1))/n,h=alt||46;
+  pdfEspaco(doc,h+6);
+  const y=doc.__y;
+  itens.forEach((it,i)=>{
+    const x=PDF.m+i*(w+gap);
+    pdfCaixa(doc,x,y,w,h,it.bg||PDF_COR.surf,it.borda||null,4);
+    pdfTxt(doc,pdfCurto(doc,it.k.toUpperCase(),6.2,true,w-14),x+7,y+13,{size:6.2,bold:true,cor:PDF_COR.muted});
+    pdfTxt(doc,pdfCurto(doc,it.v,it.big||14,true,w-14),x+7,y+30,{size:it.big||14,bold:true,cor:it.cor||PDF_COR.texto});
+    if(it.s)pdfTxt(doc,pdfCurto(doc,it.s,6,false,w-14),x+7,y+40,{size:6,cor:PDF_COR.fraco});
+  });
+  doc.__y=y+h+10;
+}
+function pdfTabela(doc,linhas){
+  const hL=19,hH=16,w=PDF.w,c1=PDF.m+8,c2=PDF.m+w*.56,c3=PDF.m+w-8;
+  pdfEspaco(doc,hH+hL*linhas.length+8);
+  let y=doc.__y;
+  pdfCaixa(doc,PDF.m,y,w,hH,PDF_COR.surf,null,0);
+  pdfTxt(doc,'INDICADOR',c1,y+11,{size:6.2,bold:true,cor:PDF_COR.muted});
+  pdfTxt(doc,'QUANTIDADE',c2+70,y+11,{size:6.2,bold:true,cor:PDF_COR.muted,align:'right'});
+  pdfTxt(doc,'TAXA DE CONVERSÃO',c3,y+11,{size:6.2,bold:true,cor:PDF_COR.muted,align:'right'});
+  y+=hH;
+  linhas.forEach((l,i)=>{
+    const fim=i===linhas.length-1;
+    if(fim)pdfCaixa(doc,PDF.m,y,w,hL,PDF_COR.verdeBg,null,0);
+    pdfTxt(doc,l.rot,c1,y+12.5,{size:9,bold:fim});
+    pdfTxt(doc,l.qtd,c2+70,y+12.5,{size:fim?10:9,bold:fim,align:'right'});
+    if(l.det)pdfTxt(doc,l.det,c2+74,y+12.5,{size:7,cor:PDF_COR.fraco});
+    if(l.taxa)pdfTxt(doc,l.taxa,c3,y+9.5,{size:8.5,bold:fim,align:'right'});
+    if(l.base)pdfTxt(doc,l.base,c3,y+16.5,{size:6.2,cor:PDF_COR.fraco,align:'right'});
+    if(!fim){doc.setDrawColor(PDF_COR.linha);doc.setLineWidth(.5);doc.line(PDF.m,y+hL,PDF.m+w,y+hL);}
+    y+=hL;
+  });
+  doc.__y=y+10;
+}
+function pdfPerdas(doc,perd){
+  if(!perd.length)return;
+  const grupos=perdasPorEtapa(perd);
+  const hH=15,hL=17,w=PDF.w;
+  pdfEspaco(doc,18+hH+hL*grupos.length+8);
+  pdfTxt(doc,'PERDIDAS NO PERÍODO — '+perd.length+' · '+fmtR(volPerdas(perd)),PDF.m,doc.__y+8,
+    {size:6.2,bold:true,cor:PDF_COR.verm});
+  let y=doc.__y+14;
+  const colN=PDF.m+8,cQ=PDF.m+w-150,cV=PDF.m+w-8;
+  pdfCaixa(doc,PDF.m,y,w,hH,PDF_COR.vermBg,null,0);
+  pdfTxt(doc,'STATUS QUANDO FOI PERDIDA',colN,y+10,{size:6,bold:true,cor:PDF_COR.muted});
+  pdfTxt(doc,'QTD',cQ,y+10,{size:6,bold:true,cor:PDF_COR.muted,align:'right'});
+  pdfTxt(doc,'VOLUME',cV,y+10,{size:6,bold:true,cor:PDF_COR.muted,align:'right'});
+  y+=hH;
+  grupos.forEach((g,i)=>{
+    pdfTxt(doc,pdfCurto(doc,g.rot===ETAPA_PERDA_SEM?'Sem registro da etapa':g.rot,8.5,true,PDF.w-190),
+      colN,y+11.5,{size:8.5,bold:true,cor:g.rot===ETAPA_PERDA_SEM?PDF_COR.fraco:PDF_COR.texto});
+    pdfTxt(doc,String(g.n),cQ,y+11.5,{size:9,bold:true,align:'right'});
+    pdfTxt(doc,fmtR(g.vol),cV,y+11.5,{size:8,align:'right',cor:PDF_COR.muted});
+    if(i<grupos.length-1){doc.setDrawColor(PDF_COR.linha);doc.setLineWidth(.5);doc.line(PDF.m,y+hL,PDF.m+w,y+hL);}
+    y+=hL;
+  });
+  doc.__y=y+10;
+}
+function pdfVendedores(doc,vend){
+  if(vend.length<2)return;
+  const hH=15,hL=17,w=PDF.w;
+  pdfEspaco(doc,18+hH+hL*vend.length+8);
+  pdfTxt(doc,'POR VENDEDOR',PDF.m,doc.__y+8,{size:6.2,bold:true,cor:PDF_COR.muted});
+  let y=doc.__y+14;
+  const colN=PDF.m+8, larg=(w-150)/4;
+  const cx=i=>PDF.m+150+larg*i+larg-8;
+  pdfCaixa(doc,PDF.m,y,w,hH,PDF_COR.surf,null,0);
+  pdfTxt(doc,'VENDEDOR',colN,y+10,{size:6,bold:true,cor:PDF_COR.muted});
+  EVT_ORDEM.forEach((t,i)=>pdfTxt(doc,pdfCurto(doc,EVTS[t].rot.toUpperCase(),6,true,larg-6),cx(i),y+10,
+    {size:6,bold:true,cor:PDF_COR.muted,align:'right'}));
+  y+=hH;
+  vend.forEach((v,i)=>{
+    const zerado=!EVT_ORDEM.some(t=>v.ap.n[t]);
+    pdfTxt(doc,pdfCurto(doc,v.nome,8.5,!zerado,138),colN,y+11.5,
+      {size:8.5,bold:!zerado,cor:zerado?PDF_COR.fraco:PDF_COR.texto});
+    EVT_ORDEM.forEach((t,j)=>pdfTxt(doc,evTexto(v.ap,t),cx(j),y+11.5,
+      {size:evDinheiro(t)?8:9,bold:!zerado,align:'right',cor:zerado?PDF_COR.fraco:PDF_COR.texto}));
+    if(i<vend.length-1){doc.setDrawColor(PDF_COR.linha);doc.setLineWidth(.5);doc.line(PDF.m,y+hL,PDF.m+w,y+hL);}
+    y+=hL;
+  });
+  doc.__y=y+10;
+}
+function pdfAviso(doc,titulo,texto,neutro){
+  doc.setFont('helvetica','normal');doc.setFontSize(8);
+  const larg=PDF.w-20;
+  const linhas=doc.splitTextToSize((titulo?titulo+' — ':'')+texto,larg-(titulo?doc.getTextWidth(titulo+' — ')*0:0));
+  const h=12+linhas.length*10;
+  pdfEspaco(doc,h+8);
+  const y=doc.__y;
+  pdfCaixa(doc,PDF.m,y,PDF.w,h,neutro?PDF_COR.surf:PDF_COR.vermBg,neutro?PDF_COR.borda:PDF_COR.vermB,4);
+  let yy=y+13;
+  linhas.forEach((ln,i)=>{
+    pdfTxt(doc,ln,PDF.m+10,yy,{size:8,bold:i===0&&!!titulo,cor:neutro?PDF_COR.muted:PDF_COR.verm});
+    yy+=10;
+  });
+  doc.__y=y+h+10;
+}
+function pdfGraficos(doc,gr,tot,janela){
+  const cels=EVT_ORDEM.filter(t=>gr.img[t]);
+  if(!cels.length)return;
+  const gap=10,w=(PDF.w-gap)/2,hImg=w*170/404,hCel=hImg+20;
+  pdfEspaco(doc,18+hCel*Math.ceil(cels.length/2));
+  pdfTxt(doc,'EVOLUÇÃO · ÚLTIMOS '+janela.toUpperCase(),PDF.m,doc.__y+8,{size:6.2,bold:true,cor:PDF_COR.muted});
+  // legenda: cheia x tracejada
+  const lx=PDF.m+120;
+  doc.setDrawColor(PDF_COR.muted);doc.setLineWidth(1.2);
+  doc.line(lx,doc.__y+5.5,lx+16,doc.__y+5.5);
+  pdfTxt(doc,'acumulado',lx+20,doc.__y+8,{size:6.5,cor:PDF_COR.fraco});
+  doc.setLineDashPattern([2.5,2],0);
+  doc.line(lx+68,doc.__y+5.5,lx+84,doc.__y+5.5);
+  doc.setLineDashPattern([],0);
+  pdfTxt(doc,'ritmo para a meta',lx+88,doc.__y+8,{size:6.5,cor:PDF_COR.fraco});
+  doc.__y+=16;
+  cels.forEach((t,i)=>{
+    const col=i%2, lin=Math.floor(i/2);
+    const x=PDF.m+col*(w+gap), y=doc.__y+lin*hCel;
+    pdfCaixa(doc,x,y,w,hCel-4,null,PDF_COR.linha,4);
+    pdfTxt(doc,EVTS[t].rot.toUpperCase(),x+8,y+13,{size:6.2,bold:true,cor:PDF_COR.muted});
+    pdfTxt(doc,evDinheiro(t)?fmtR(tot[t]):String(tot[t]),x+w-8,y+14,{size:10,bold:true,align:'right'});
+    try{doc.addImage(gr.img[t],'PNG',x+6,y+18,w-12,hImg-6)}catch(e){}
+  });
+  doc.__y+=Math.ceil(cels.length/2)*hCel+4;
+}
+function pdfSecao(doc,titulo,cor,rows,de,ate,p,janela,ak){
+  const ap=apurar(rows,de,ate);
+  const nOpp=rows.filter(r=>!arquivada(r)).length;
+  const gr=fuRelGraficos(rows,p);
+  const temCurva=EVT_ORDEM.some(t=>gr.tot[t]>0);
+  // reserva a seção inteira: cabeçalho, números, tabela, gargalo e gráficos.
+  // Meia seção no pé da página com os gráficos órfãos na seguinte fica feio.
+  const nCels=EVT_ORDEM.filter(t=>gr.img[t]).length;
+  const hImg=((PDF.w-10)/2)*170/404;
+  const hGraf=temCurva?(16+Math.ceil(nCels/2)*(hImg+20)):34;
+  const vend=(!window._fuCom&&ak)?porVendedor(ak,rows,de,ate):[];
+  const hVend=vend.length>1?(18+15+17*vend.length+8):0;
+  const perd=perdidasDoPeriodo(rows,de,ate);
+  const hPerd=perd.length?(18+15+17*perasN(perd)+8):0;
+  pdfEspaco(doc,22+56+(16+4*19+10)+34+hVend+hPerd+hGraf+6);
+  const y=doc.__y;
+  doc.setFillColor(cor);doc.rect(PDF.m,y,3,14,'F');
+  pdfTxt(doc,titulo.toUpperCase(),PDF.m+10,y+11,{size:10.5,bold:true,cor:cor});
+  pdfTxt(doc,nOpp+' oportunidade'+(nOpp!==1?'s':'')+' no funil',PDF.m+PDF.w,y+11,{size:7.5,cor:PDF_COR.fraco,align:'right'});
+  doc.__y=y+22;
+  pdfKpis(doc,EVT_ORDEM.map(t=>({k:EVTS[t].rot,v:evTexto(ap,t),cor:evDinheiro(t)?PDF_COR.verde:EV_COR_LIGHT[t],
+      bg:evDinheiro(t)?PDF_COR.verdeBg:PDF_COR.surf,s:evDetalhe(ap,t),big:evDinheiro(t)?12:14}))
+    .concat([{k:'Oportunidades',v:String(nOpp),s:'no funil da área'}]));
+  pdfTabela(doc,[
+    {rot:'Ligações feitas',qtd:String(ap.n.lig),taxa:'—'},
+    {rot:'Reuniões marcadas',qtd:String(ap.n.mar),taxa:fuPc(ap.n.mar,ap.n.lig),base:'das ligações'},
+    {rot:'Reuniões feitas',qtd:String(ap.n.reu),taxa:fuPc(ap.n.reu,ap.n.mar),base:'das marcadas'},
+    {rot:'Fechados',qtd:fmtR(ap.vol),det:ap.n.bol?nBoletas(ap.n.bol):'',taxa:fuPc(ap.n.bol,ap.n.reu),base:'das reuniões feitas'},
+  ]);
+  const g=fuGargalo(ap);
+  if(g)pdfAviso(doc,'Gargalo: '+g.rot,'de '+g.de+' '+g.base+', '+g.p+' avançaram ('+g.t.toFixed(1).replace('.',',')+'%).');
+  else pdfAviso(doc,'','Sem etapas suficientes no período para apontar um gargalo.',true);
+  pdfVendedores(doc,vend);
+  pdfPerdas(doc,perd);
+  if(temCurva)pdfGraficos(doc,gr,gr.tot,janela);
+  else pdfAviso(doc,'','Sem movimento registrado nos últimos '+janela+'.',true);
+  doc.__y+=6;
+}
+function pdfRodape(doc,quando){
+  const n=doc.internal.getNumberOfPages();
+  for(let i=1;i<=n;i++){
+    doc.setPage(i);
+    doc.setDrawColor(PDF_COR.linha);doc.setLineWidth(.5);
+    doc.line(PDF.m,PDF.H-40,PDF.W-PDF.m,PDF.H-40);
+    pdfTxt(doc,'Gerencial Comercial · '+quando,PDF.m,PDF.H-28,{size:6.8,cor:PDF_COR.fraco});
+    pdfTxt(doc,'página '+i+' de '+n,PDF.W-PDF.m,PDF.H-28,{size:6.8,cor:PDF_COR.fraco,align:'right'});
+  }
+}
+function pdfMontar(jsPDF){
+  return comQuem(window._fuCom||'',()=>{
+    const rows=fuRows(),p=fuPer(),[de,ate,rot,intervalo]=fuRange(p);
+    const foco=window._fuCom||'';
+    const janela=p==='dia'?'14 dias':p==='semana'?'8 semanas':'6 meses';
+    const per=p==='dia'?'Diário':p==='semana'?'Semanal':'Mensal';
+    const quando=new Date().toLocaleString('pt-BR');
+    const areas=(window._fuArea?areasVis().filter(([k])=>k===window._fuArea):areasVis())
+      .map(([ak,a])=>[ak,a,rows.filter(r=>r.area===ak)])
+      .filter(([ak,a,rs])=>rs.length>0);
+    const geral=apurar(rows,de,ate);
+    const doc=pdfNovo(new jsPDF({unit:'pt',format:'a4',compress:true}));
+    doc.setProperties({title:'Relatório de Desempenho '+per+' — '+fuEscopo()});
+    pdfCapa(doc,{titulo:'Relatório de Desempenho '+per,intervalo,escopo:fuEscopo(),janela,quando});
+    pdfKpis(doc,EVT_ORDEM.map(t=>({k:EVTS[t].ico?EVTS[t].rot:EVTS[t].rot,v:evTexto(geral,t),
+        cor:evDinheiro(t)?PDF_COR.verde:EV_COR_LIGHT[t],bg:evDinheiro(t)?PDF_COR.verdeBg:PDF_COR.surf,
+        big:evDinheiro(t)?13:16,
+        s:evDinheiro(t)?(geral.n.bol?nBoletas(geral.n.bol)+' fechadas':'nenhuma boleta')
+          :(EVTS[t].base?fuPc(geral.n[t],geral.n[EVTS[t].base])+' '+EVTS[t].baseRot:'ponto de partida')}))
+      .concat([{k:'Pipe em aberto',v:fmtR(rows.filter(r=>!arquivada(r)&&!isB(r)&&!isPerdida(r)).reduce((s,r)=>s+(r.pipe||0),0)),
+        s:'ainda em jogo',big:13}]),56);
+    const gg=fuGargalo(geral);
+    if(gg)pdfAviso(doc,'Gargalo geral: '+gg.rot,
+      'de '+gg.de+' '+gg.base+', '+gg.p+' avançaram ('+gg.t.toFixed(1).replace('.',',')+'%). É onde a área está perdendo negócio.');
+    if(!areas.length)pdfAviso(doc,'','Nenhuma oportunidade neste recorte.',true);
+    areas.forEach(([ak,a,rs])=>pdfSecao(doc,(foco?foco.split(' ')[0]+' · ':'')+a.name,a.color,rs,de,ate,p,janela,ak));
+    if(areas.length>1)pdfSecao(doc,foco?'Consolidado — '+foco:'Consolidado — todas as áreas',PDF_COR.vinho,rows,de,ate,p,janela);
+    pdfEspaco(doc,40);
+    doc.setFont('helvetica','normal');doc.setFontSize(6.8);doc.setTextColor(PDF_COR.fraco);
+    doc.text(doc.splitTextToSize('Cada indicador conta oportunidades distintas com registro no período. A taxa de conversão é a razão entre os totais do período, não uma coorte: uma reunião feita hoje pode ter vindo de uma ligação do mês passado. Nos gráficos, a linha cheia é o acumulado e a tracejada é o ritmo necessário para bater a meta.',PDF.w),PDF.m,doc.__y+8);
+    pdfRodape(doc,quando);
+    return doc;
+  });
+}
+async function fuBaixarPDF(){
+  showToast('📄 Montando o relatório…');
+  try{
+    const jsPDF=await carregarJsPDF();
+    const doc=pdfMontar(jsPDF);
+    doc.save(fuNomeArquivo().replace(/\.html$/,'.pdf'));
+    showToast('📄 PDF baixado',true);
+  }catch(e){
+    showToast('Não consegui gerar o PDF ('+e.message+') — baixando a versão em HTML');
+    fuBaixarRelatorio();
+  }
+}
+
+function fuNomeArquivo(){
+  const p=fuPer(),e=fuEscopo().replace(/[^\wÀ-ú ]+/g,'').replace(/\s+/g,'-').toLowerCase();
+  return 'relatorio-'+(p==='dia'?'diario':p==='semana'?'semanal':'mensal')+'-'+e+'-'+localISO(new Date())+'.html';
+}
+function fuBaixarRelatorio(){
+  try{
+    const blob=new Blob([fuDocRelatorio()],{type:'text/html;charset=utf-8'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);a.download=fuNomeArquivo();
+    document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+    showToast('⬇️ Relatório baixado — abre no navegador e imprime em PDF',true);
+  }catch(e){showToast('Não consegui gerar o arquivo: '+e.message)}
+}
+function fuImprimir(){
+  const w=window.open('','_blank');
+  if(!w){showToast('O navegador bloqueou a janela do relatório — libere o pop-up ou use o botão Baixar');return}
+  w.document.write(fuDocRelatorio());
+  w.document.close();w.focus();
+  setTimeout(()=>{try{w.print()}catch(e){}},600);
+}
+function fuTextoRelatorio(){return comQuem(window._fuCom||'',()=>fuTextoRelatorioInterno())}
+function fuTextoRelatorioInterno(){
+  const rows=fuRows(),p=fuPer(),[de,ate,rot,intervalo]=fuRange(p);
+  const ap=apurar(rows,de,ate);
+  const tx=(n,b)=>b?(n/b*100).toFixed(1).replace('.',',')+'%':'—';
+  const L=['*Relatório '+(p==='dia'?'diário':p==='semana'?'semanal':'mensal')+' — '+fuEscopo()+'*',
+    intervalo,'',
+    '📞 Ligações feitas: '+ap.n.lig,
+    '📅 Reuniões marcadas: '+ap.n.mar+'  ('+tx(ap.n.mar,ap.n.lig)+' das ligações)',
+    '🤝 Reuniões feitas: '+ap.n.reu+'  ('+tx(ap.n.reu,ap.n.mar)+' das marcadas)',
+    '✅ Fechados: '+fmtR(ap.vol)+' em '+nBoletas(ap.n.bol)+'  ('+tx(ap.n.bol,ap.n.reu)+' das reuniões feitas)'];
+  const passos=[['marcar reunião',ap.n.lig,ap.n.mar],['realizar a reunião',ap.n.mar,ap.n.reu],['fechar a boleta',ap.n.reu,ap.n.bol]]
+    .filter(x=>x[1]>0).map(x=>({rot:x[0],t:x[2]/x[1]*100}));
+  if(passos.length){const pior=passos.reduce((a,b)=>b.t<a.t?b:a);
+    L.push('','⚠️ Gargalo: '+pior.rot+' ('+pior.t.toFixed(1).replace('.',',')+'%)');}
+  return L.join('\n');
+}
+function fuEnviarRelatorio(){
+  const txt=fuTextoRelatorio();
+  const enc=encodeURIComponent(txt);
+  const assunto=encodeURIComponent('Relatório de desempenho — '+fuEscopo()+' · '+fuRange(fuPer())[3]);
+  document.getElementById('ba-title').innerHTML='📤 Enviar relatório <span style="font-size:11px;font-weight:600;color:var(--muted)">· '+fuEscopo()+'</span>';
+  document.getElementById('ba-body').innerHTML=
+    '<div class="fu-env">'
+    +'<div class="fu-env-pre">'+txt.replace(/[<>]/g,'').replace(/\*/g,'')+'</div>'
+    +'<div class="fu-env-btns">'
+    +'<a class="btn wine" target="_blank" rel="noopener" href="https://wa.me/?text='+enc+'">💬 WhatsApp</a>'
+    +'<a class="btn" href="mailto:?subject='+assunto+'&body='+enc+'">✉️ E-mail</a>'
+    +'<button class="btn" onclick="fuCopiar()">📋 Copiar texto</button>'
+    +'<button class="btn" onclick="fuBaixarPDF()">📄 Baixar o PDF</button>'
+    +'</div>'
+    +'<div class="fu-env-nota">O texto acima vai no WhatsApp ou no e-mail. Para mandar o relatório completo, com os gráficos por área, baixe o PDF e anexe.</div>'
+    +'</div>';
+  document.getElementById('modal-area').style.display='flex';
+}
+function fuCopiar(){
+  const t=fuTextoRelatorio();
+  const ok=()=>showToast('📋 Relatório copiado — é só colar',true);
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok).catch(()=>fuCopiarFallback(t,ok));
+  else fuCopiarFallback(t,ok);
+}
+function fuCopiarFallback(t,ok){
+  const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');ok()}catch(e){showToast('Não consegui copiar — selecione o texto na tela')}
+  ta.remove();
+}
+
+// ══ A ABA ══
+function renderDPipeline(c=document.getElementById('main-content')){
+  fuReset();
+  const rows=fuRows(),base=fuBase();
+  const nomes=fuComerciais();
+  const sel=window._fuCom||(nomes.length===1?nomes[0]:'');
+  const p=fuPer();
+
+  const seg=[['dia','Diário'],['semana','Semanal'],['mes','Mensal']].map(([v,l])=>
+    '<button class="'+(v===p?'on':'')+'" onclick="setFuPer(\''+v+'\')">'+l+'</button>').join('');
+
+  const optArea='<option value="">Todas as áreas</option>'
+    +areasVis().map(([k,a])=>{
+      const n=base.filter(r=>r.area===k&&!arquivada(r)).length;
+      return '<option value="'+k+'"'+(k===window._fuArea?' selected':'')+'>'+a.name+' · '+n+'</option>';
+    }).join('');
+  const optCom='<option value="">Time todo</option>'
+    +nomes.map(n=>'<option value="'+n.replace(/"/g,'&quot;')+'"'+(n===window._fuCom?' selected':'')+'>'+n+'</option>').join('');
+
+  const barra='<div class="fu-bar">'
+    +'<div class="fu-seg">'+seg+'</div>'
+    +'<label class="fu-sel"><span>Área</span><select onchange="escolherFuArea(this.value)">'+optArea+'</select></label>'
+    +(nomes.length>1?'<label class="fu-sel"><span>Comercial</span><select onchange="escolherFuCom(this.value)">'+optCom+'</select></label>':'')
+    +'<button class="btn sm wine" style="margin-left:auto" onclick="openNewOpp()">+ Nova oportunidade</button>'
+    +'</div>';
+
+  const recorte=[window._fuCom,window._fuArea?(AREAS[window._fuArea]||{}).name:''].filter(Boolean).join(' · ');
+  const cab=recorte?'<div class="fu-head"><div class="fu-head-t">Follow-up · '+recorte+'</div>'
+    +'<button class="fu-limpar" onclick="window._fuCom=\'\';window._fuArea=\'\';renderDPipeline()">limpar recorte ✕</button></div>':'';
+
+  const foco=!!window._fuCom;      // responsável escolhido: a tela fica só dele
+  c.innerHTML=comQuem(foco?sel:'',()=>cab+barra
+    +(foco?fuPessoaHtml(sel,rows)+fuPorAreaHtml(sel,rows):'')
+    +fuQuadsHtml(rows)
+    +fuObjetivosHtml(rows,sel)
+    +(!foco&&nomes.length>1?fuTimeHtml(rows):'')
+    +fuRelatorioHtml(rows,foco?sel:'')
+    +fuGraficosHtml(rows)
+    +fuMetricasHtml(rows)
+    +'<div class="fu-oper">'
+    +'<div class="fu-oper-hdr" onclick="toggleFuOper()">'
+    +'<span>'+(window._fuOper?'▾':'▸')+'</span> 🗂️ Trabalhar as oportunidades — quadrantes do dia, agenda de contatos e log'
+    +'</div>'
+    +(window._fuOper?'<div class="fu-oper-body">'+diaAtuacaoHtml()+'</div>':'')
+    +'</div>');
+  comQuem(foco?sel:'',()=>fuDesenhaGraficos());
+}
+
 function applyFilter(){
   let rows=[...OPPS];
   const fA=document.getElementById('f-area')?.value;
@@ -3406,7 +5484,7 @@ function abrirHistArea(ak,tipo){
     +'<div style="font-size:20px;font-weight:700;color:'+T.cor+';font-variant-numeric:tabular-nums">'+lista.length+'</div></div>'
     +'<div style="flex:1;min-width:150px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
     +'<div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Volume</div>'
-    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">'+(fmt(tot)||'R$0')+'</div></div>'
+    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">'+fmtR(tot)+'</div></div>'
     +'</div>'
     +(lista.length
       ? '<div class="ba-sec" style="--bc:'+T.cor+';--bbg:'+T.bg+'"><div style="overflow-x:auto"><table class="ba-tbl">'
@@ -3529,7 +5607,7 @@ function abrirCockpit(k){
     +'<div style="font-size:20px;font-weight:700;color:'+E.cor+';font-variant-numeric:tabular-nums">'+lista.length+'</div></div>'
     +'<div style="flex:1;min-width:150px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
     +'<div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">'+(k==='boletado'?'Volume boletado':'Volume em jogo')+'</div>'
-    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">'+(fmt(tot)||'R$0')+'</div></div>'
+    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">'+fmtR(tot)+'</div></div>'
     +'</div>'
     +(lista.length
       ? '<div class="ba-sec" style="--bc:'+E.cor+';--bbg:'+E.bg+'"><div style="overflow-x:auto"><table class="ba-tbl">'
@@ -3771,8 +5849,6 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +stat('quase',quaseLa.length,'🔥 Prontas p/ fechar')
     +stat('boletado',fmt(bolVol)||'R$0','✓ Já boletado',myOpps.filter(isB).length)
     +'</div></div>'
-    // Efetividade do funil
-    +funilHtml(funilOpps,recorte)
 
     // Nova oportunidade · virada de mês
     +'<div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">'
@@ -4369,6 +6445,13 @@ function openNewOpp(){
   const nResp=document.getElementById('n-resp');
   const timeU=USUARIOS.filter(u=>u.ativo&&u.perfil!=='diretor').map(u=>u.nome);
   nResp.innerHTML='<option value="">Sem responsável</option>'+timeU.map(n=>'<option'+(norm(n)===norm(USER.nome)?' selected':'')+'>'+n+'</option>').join('');
+  // empresa: só pergunta para quem tem as duas
+  const wrapE=document.getElementById('n-empresa-wrap'),selE=document.getElementById('n-empresa');
+  const minhas=empresasDoUsuario(), padrao=empParaGravar();
+  if(minhas.length>1){
+    selE.innerHTML=minhas.map(e=>'<option value="'+e+'"'+(e===padrao?' selected':'')+'>'+EMPRESAS[e].nome+'</option>').join('');
+    wrapE.style.display='flex';
+  }else{selE.innerHTML='<option value="'+padrao+'" selected>'+EMPRESAS[padrao].nome+'</option>';wrapE.style.display='none';}
   document.getElementById('modal-newopp').style.display='flex';
 }
 
@@ -4394,7 +6477,8 @@ async function saveNewOpp(){
     responsavel:document.getElementById('n-resp').value||'',
     obs:document.getElementById('n-obs').value.trim(),
     fonte:'Manual',
-    historico:[{campo:'Criação',de:'',para:'Oportunidade criada manualmente',usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}]
+    historico:[{campo:'Criação',de:'',para:'Oportunidade criada manualmente',usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})},
+      marcaEmpresa(lerSel('n-empresa')||empParaGravar(),now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}))]
   };
   try{
     await db('POST','oportunidades',[opp]);
@@ -5012,7 +7096,7 @@ function abrirFunilEtapa(k){
     +'<div style="font-size:10px;color:var(--muted)">'+E.sub+'</div></div>'
     +'<div style="flex:1;min-width:150px;background:var(--surf2);border:1px solid var(--border);border-radius:8px;padding:10px 13px">'
     +'<div style="font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">'+(k==='conv'?'Volume fechado':'Volume em jogo')+'</div>'
-    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">'+(fmt(tot)||'R$0')+'</div>'
+    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums">'+fmtR(tot)+'</div>'
     +'<div style="font-size:10px;color:var(--muted)">'+(k==='conv'?'boletado':'pipe ou realizado')+'</div></div>'
     +'</div>'
     +(lista.length
@@ -5414,7 +7498,7 @@ async function salvarAcordos(){
           else patches.push({id:ex.id,valor:d.valor});
         }
       }else if(d.valor!==0){
-        novos.push({mes,assessor:d.assessor,area:AREA_ACORDO,produto:d.produto,meta_valor:d.valor});
+        novos.push({mes,assessor:d.assessor,area:areaComEmpresa(AREA_ACORDO,empParaGravar()),produto:d.produto,meta_valor:d.valor});
       }
     });
 
@@ -5478,10 +7562,11 @@ async function saveMeta(){
   const mes=new Date().toISOString().slice(0,7);
   try{
     if(_metaEditId){
-      await db('PATCH','metas',{assessor,area,produto,meta_valor:valor},'id=eq.'+_metaEditId);
+      {const ex=METAS.find(x=>x.id===_metaEditId);
+       await db('PATCH','metas',{assessor,area:areaComEmpresa(area,(ex&&ex.empresa)||empParaGravar()),produto,meta_valor:valor},'id=eq.'+_metaEditId);}
       showToast('✅ Meta atualizada!',true);
     }else{
-      await db('POST','metas',{mes,assessor,area,produto,meta_valor:valor});
+      await db('POST','metas',{mes,assessor,area:areaComEmpresa(area,empParaGravar()),produto,meta_valor:valor});
       showToast('✅ Meta criada!',true);
     }
     _metaEditId=null;
@@ -5504,7 +7589,12 @@ async function delMeta(id){
 
 // ── UPLOAD ──
 function renderUpload(c=document.getElementById('main-content')){
-  c.innerHTML=`<div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn" onclick="baixarModelo()">⬇️ Baixar planilha modelo</button></div><p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
+  if(!window._upEmp||!empresasDoUsuario().includes(window._upEmp))window._upEmp=empParaGravar();
+  const barraEmp=temDuasEmpresas()
+    ? `<div class="up-emp"><span>Esta planilha é da</span>`
+      +empresasDoUsuario().map(e=>`<button class="emp-bt${window._upEmp===e?' on':''}" style="--ec:${empCor(e)}" onclick="window._upEmp='${e}';renderUpload()">${EMPRESAS[e].nome}</button>`).join('')
+      +`<b>tudo que subir agora entra como ${EMPRESAS[window._upEmp].nome}</b></div>` : '';
+  c.innerHTML=barraEmp+`<div style="display:flex;justify-content:flex-end;margin-bottom:12px"><button class="btn" onclick="baixarModelo()">⬇️ Baixar planilha modelo</button></div><p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6">
     Suba a planilha <strong>uma vez por dia</strong>. O sistema lê as abas <strong>RV, RF, Investimentos, Consórcio, Seguro de Vida e Plano de Saúde</strong> e separa por área automaticamente.<br><br>
 <strong>✅ Sem duplicatas:</strong> oportunidades já existentes (mesmo assessor + cliente + produto) têm apenas o volume atualizado — o status, pendência, TODO e observações que o time preencheu <strong>no sistema são preservados</strong>. Só as oportunidades novas são adicionadas.
   </p>
@@ -5833,7 +7923,8 @@ function parsePipeCfg(raw,area,cfg){
     const dsHoje=dHoje+' '+ag.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     const quem=(typeof USER!=='undefined'&&USER?USER.nome:'')+' (planilha)';
     r.created_at=ag.toISOString();
-    r.historico=[{campo:'Criação',de:'',para:'Subida por planilha em '+dHoje,usuario:quem,data:dsHoje}];
+    r.historico=[{campo:'Criação',de:'',para:'Subida por planilha em '+dHoje,usuario:quem,data:dsHoje},
+      marcaEmpresa((cfg&&cfg.empresa)||window._upEmp||empParaGravar(),dsHoje)];
     if(pbFechada(r.pb)){
       const iso=parseDataBoleta(r.data_boleta);
       const dbr=iso?iso.split('-').reverse().join('/'):dHoje;
@@ -5854,11 +7945,15 @@ function renderUsuarios(c=document.getElementById('main-content')){
     <div style="font-size:14px;font-weight:700">${USUARIOS.length} usuários cadastrados</div>
     <button class="btn wine" onclick="document.getElementById('modal-user').style.display='flex'">+ Novo usuário</button>
   </div>
-  <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Áreas</th><th>PIN</th><th>Status</th><th>Último acesso</th><th></th></tr></thead>
+  <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Empresa</th><th>Áreas</th><th>PIN</th><th>Status</th><th>Último acesso</th><th></th></tr></thead>
   <tbody>${USUARIOS.map(u=>`<tr>
     <td style="font-weight:700">${u.nome}</td>
     <td><span class="badge ${u.perfil==='diretor'?'b-wine':u.perfil==='gestor'?'b-purple':'b-gray'}">${u.perfil}</span></td>
-    <td>${u.perfil==='diretor'?'<span class="badge b-wine">Todas</span>':(u.areas||[]).map(a=>`<span class="badge b-gray" style="margin-right:3px">${AREAS[a]?.name||a}</span>`).join('')||'—'}</td>
+    <td>${(u.empresas||[EMP_PADRAO]).map(e=>`<span class="emp-chip" style="--ec:${empCor(e)};margin:0 3px 0 0">${empNome(e)}</span>`).join('')}</td>
+    <td>${u.perfil==='diretor'?'<span class="badge b-wine">Todas</span>':
+      ((u.areas||[]).map(a=>`<span class="badge b-gray" style="margin-right:3px">${AREAS[a]?.name||a}</span>`).join('')||'—')
+      +(()=>{const f=areasForaDoPerfil(u.nome);return f.length
+        ?`<span class="badge b-amber" style="margin-right:3px" title="Tem oportunidade nessa área mas ela não está no cadastro — clique em ✎ Áreas para incluir">⚠ ${f.map(k=>AREAS[k]?.name||k).join(' · ')}</span>`:''})()}</td>
     <td><code style="background:var(--cream);padding:2px 8px;border-radius:4px;font-size:12px;border:1px solid var(--border)">${u.pin}</code></td>
     <td><span class="badge ${u.ativo?'b-green':'b-red'}">${u.ativo?'Ativo':'Inativo'}</span></td>
     <td>${(()=>{const t=tempoAtras(u.ultimo_acesso);return t.on
@@ -5880,9 +7975,12 @@ async function editAreas(id){
   ov.id='modal-areas';
   ov.style.cssText='position:fixed;inset:0;background:rgba(30,15,18,.45);display:flex;align-items:center;justify-content:center;z-index:9000';
   ov.innerHTML='<div style="background:var(--card);border-radius:8px;padding:22px 24px;min-width:280px;box-shadow:0 12px 40px rgba(0,0,0,.25)">'
-    +'<div style="font-weight:700;font-size:15px;margin-bottom:4px">✎ Áreas de '+u.nome+'</div>'
+    +'<div style="font-weight:700;font-size:15px;margin-bottom:4px">✎ Acesso de '+u.nome+'</div>'
     +'<div style="font-size:11px;color:var(--muted);margin-bottom:14px">Define o que '+(u.perfil==='gestor'?'a gestão enxerga (Daily do time, dashboard, metas)':'o comercial acessa')+'</div>'
-    +Object.entries(AREAS).map(([k,a])=>'<label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:13px"><input type="checkbox" id="ma-'+k+'" '+(atuais.includes(k)?'checked':'')+' style="width:15px;height:15px;accent-color:var(--wine)"> '+a.name+'</label>').join('')
+    +'<div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-l);margin:4px 0 2px">Empresas</div>'
+    +Object.entries(EMPRESAS).map(([k,e])=>'<label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;font-size:13px"><input type="checkbox" id="me-'+k+'" '+((u.empresas||[EMP_PADRAO]).includes(k)?'checked':'')+' style="width:15px;height:15px;accent-color:var(--wine)"> '+e.nome+'</label>').join('')
+    +'<div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-l);margin:12px 0 2px">Áreas</div>'
+    +Object.entries(AREAS).map(([k,a])=>'<label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;font-size:13px"><input type="checkbox" id="ma-'+k+'" '+(atuais.includes(k)?'checked':'')+' style="width:15px;height:15px;accent-color:var(--wine)"> '+a.name+'</label>').join('')
     +'<div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">'
     +'<button class="btn sm" onclick="document.getElementById(\'modal-areas\').remove()">Cancelar</button>'
     +'<button class="btn wine sm" onclick="saveAreas(\''+id+'\')">Salvar</button>'
@@ -5892,10 +7990,12 @@ async function editAreas(id){
 }
 async function saveAreas(id){
   const areas=Object.keys(AREAS).filter(k=>document.getElementById('ma-'+k)?.checked);
+  const emps=Object.keys(EMPRESAS).filter(k=>document.getElementById('me-'+k)?.checked);
+  if(!emps.length){showToast('Escolha pelo menos uma empresa');return}
   try{
-    await db('PATCH','usuarios',{areas},'id=eq.'+id);
+    await db('PATCH','usuarios',{areas:areasComEmpresas(areas,emps)},'id=eq.'+id);
     document.getElementById('modal-areas')?.remove();
-    USUARIOS=await db('GET','usuarios','','order=nome.asc');
+    USUARIOS=normalizaUsuarios(await db('GET','usuarios','','order=nome.asc'));
     renderUsuarios();
     showToast('✅ Áreas atualizadas!',true);
   }catch(e){showToast('Erro: '+e.message)}
@@ -5910,17 +8010,19 @@ async function saveUser(){
   const perfil=document.getElementById('u-perfil').value;
   if(!nome||!pin2||pin2.length!==4||isNaN(pin2)){showToast('Nome e PIN de 4 dígitos obrigatórios!');return}
   const areas=perfil==='diretor'?Object.keys(AREAS):Object.keys(AREAS).filter(a=>document.getElementById('ua-'+a)?.checked);
+  const emps=Object.keys(EMPRESAS).filter(e=>document.getElementById('ue-'+e)?.checked);
+  if(!emps.length){showToast('Escolha pelo menos uma empresa');return}
   try{
-    await db('POST','usuarios',{nome,pin:pin2,perfil,areas,ativo:true});
+    await db('POST','usuarios',{nome,pin:pin2,perfil,areas:areasComEmpresas(areas,emps),ativo:true});
     showToast('✅ Usuário criado!',true);
     closeModal('user');
-    USUARIOS=await db('GET','usuarios','','order=nome.asc');
+    USUARIOS=normalizaUsuarios(await db('GET','usuarios','','order=nome.asc'));
     renderUsuarios();
   }catch(e){showToast('Erro: '+e.message)}
 }
 
 async function toggleUser(id,ativo){
-  try{await db('PATCH','usuarios',{ativo},`id=eq.${id}`);USUARIOS=await db('GET','usuarios','','order=nome.asc');renderUsuarios()}catch(e){showToast('Erro: '+e.message)}
+  try{await db('PATCH','usuarios',{ativo},`id=eq.${id}`);USUARIOS=normalizaUsuarios(await db('GET','usuarios','','order=nome.asc'));renderUsuarios()}catch(e){showToast('Erro: '+e.message)}
 }
 async function setPerfil(id,perfil){
   const u=USUARIOS.find(x=>x.id===id);
@@ -5928,12 +8030,12 @@ async function setPerfil(id,perfil){
   try{
     await db('PATCH','usuarios',{perfil},`id=eq.${id}`);
     showToast('✅ '+(u?u.nome:'Usuário')+' agora é '+(perfil==='gestor'?'gestor de área':'assessor'),true);
-    USUARIOS=await db('GET','usuarios','','order=nome.asc');renderUsuarios();
+    USUARIOS=normalizaUsuarios(await db('GET','usuarios','','order=nome.asc'));renderUsuarios();
   }catch(e){showToast('Erro: '+e.message)}
 }
 async function delUser(id){
   if(!confirm('Remover este usuário?'))return;
-  try{await db('DELETE','usuarios','',`id=eq.${id}`);USUARIOS=await db('GET','usuarios','','order=nome.asc');renderUsuarios()}catch(e){showToast('Erro: '+e.message)}
+  try{await db('DELETE','usuarios','',`id=eq.${id}`);USUARIOS=normalizaUsuarios(await db('GET','usuarios','','order=nome.asc'));renderUsuarios()}catch(e){showToast('Erro: '+e.message)}
 }
 </script>
 </body>
