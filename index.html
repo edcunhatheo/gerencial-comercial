@@ -946,6 +946,25 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
 .fu-perd.open .t .chev{transform:rotate(180deg)}
 .fu-perd .corpo{display:none}
 .fu-perd.open .corpo{display:block}
+
+.op-link{font-size:10px;font-weight:700;color:var(--wine);cursor:pointer;margin-top:4px;text-align:right;white-space:nowrap}
+.op-link:hover{text-decoration:underline}
+.op-wrap{max-width:560px}
+.op-tb{width:100%;border-collapse:collapse;font-size:13px}
+.op-tb th{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted-l);
+  padding:7px 10px;text-align:right;border-bottom:1px solid var(--border-l);white-space:nowrap}
+.op-tb th:first-child{text-align:left}
+.op-tb td{padding:8px 10px;border-bottom:1px solid var(--border-l);text-align:right;font-variant-numeric:tabular-nums}
+.op-tb td.nm{text-align:left;font-weight:700}
+.op-tb td.fz{color:var(--muted);font-weight:600}
+.op-tb input{width:130px;padding:6px 9px;border:1px solid var(--border);border-radius:6px;background:var(--card);
+  color:var(--text);font-family:inherit;font-size:13px;font-weight:700;text-align:right}
+.op-tb input:focus{outline:none;border-color:var(--wine)}
+.op-tb tr.tot td{background:var(--surf2);font-weight:700;border-bottom:none;font-size:15px}
+.op-tb tr.outros td{color:var(--muted-l)}
+.op-tb .dq{font-size:10.5px;color:var(--muted-l);font-weight:400}
+.op-ftr{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px}
+.op-ftr span{font-size:10.5px;color:var(--muted-l);flex:1;min-width:200px}
 </style>
 </head>
 <body>
@@ -3397,11 +3416,115 @@ function compromissoDe(nome,iso,t){
   const m=METAS.find(x=>x.area===AREA_COMPROMISSO&&norm(x.assessor||'')===norm(nome)&&x.produto===compKey(iso,t));
   return m?{id:m.id,v:m.meta_valor||0}:null;
 }
-function temCompromisso(nome,iso){return EVT_ORDEM.some(t=>compromissoDe(nome,iso,t))}
+// ══ OBJETIVO DE BOLETA POR PRODUTO (Investimentos) ══
+// "Vou fechar R$300k" não diz o que vai ser fechado. Em Investimentos o
+// objetivo abre nos três produtos que o diretor cobra, e o total é a soma.
+const PRODUTOS_OBJ_INV=['Hawk','Collar','Asset Allocation'];
+// a qual dos três uma oportunidade pertence ('' = fora deles)
+function prodObjDe(r){
+  if(r.area!=='inv')return '';
+  const p=norm(r.produto||'');
+  if(p==='hawk')return 'Hawk';
+  if(p==='collar')return 'Collar';
+  if(subAreaOf(r)==='invg')return 'Asset Allocation';
+  return '';
+}
+const compKeyProd=(iso,t,prod)=>iso+'|'+t+'|'+prod;
+function compromissosProd(nome,iso,t){
+  const out={};
+  METAS.forEach(m=>{
+    if(m.area!==AREA_COMPROMISSO||norm(m.assessor||'')!==norm(nome))return;
+    const p=String(m.produto||'').split('|');
+    if(p[0]===iso&&p[1]===t&&p[2])out[p[2]]={id:m.id,v:m.meta_valor||0};
+  });
+  return out;
+}
+// objetivo do dia: a quebra por produto manda; sem quebra, vale o número cheio
+function objetivoDe(nome,iso,t){
+  const porProd=compromissosProd(nome,iso,t);
+  const chaves=Object.keys(porProd).filter(k=>porProd[k].v>0);
+  if(chaves.length)return{v:chaves.reduce((s,k)=>s+porProd[k].v,0),porProd,quebrado:true};
+  const pl=compromissoDe(nome,iso,t);
+  return{v:pl?pl.v:0,porProd,quebrado:false};
+}
+const podeQuebrarProduto=nome=>{
+  const a=areasDoCadastro(nome);
+  return !!a&&a.includes('inv');
+};
+// realizado de hoje por produto, para o painel fechar a conta
+function feitoPorProduto(rows,de,ate,nome){
+  const ap=comQuem(nome||'',()=>apurar(rows,de,ate));
+  const m={};PRODUTOS_OBJ_INV.forEach(p=>m[p]=0);m.__outros=0;
+  ap.bol.forEach(x=>{
+    const k=prodObjDe(x.r);
+    if(k)m[k]+=(x.r.atual||0); else m.__outros+=(x.r.atual||0);
+  });
+  return m;
+}
+function abrirObjProduto(nome,iso){
+  const rows=fuRows().filter(r=>r.area==='inv');
+  const feito=feitoPorProduto(rows,iso,iso,nome);
+  const o=objetivoDe(nome,iso,'bol');
+  const linha=p=>'<tr><td class="nm">'+p+'</td>'
+    +'<td><input type="text" inputmode="decimal" id="op-'+p.replace(/\s/g,'_')+'" '
+    +'value="'+(o.porProd[p]&&o.porProd[p].v?fmtMoedaBR(o.porProd[p].v):'')+'" placeholder="R$ 0" oninput="somaObjProduto()"></td>'
+    +'<td class="fz">'+fmtR(feito[p]||0)+'</td></tr>';
+  document.getElementById('ba-title').innerHTML='🎯 Quanto '+nome.split(' ')[0]+' vai fechar hoje '
+    +'<span style="font-size:11px;font-weight:600;color:var(--muted)">· por produto · '+brData(iso)+'</span>';
+  document.getElementById('ba-body').innerHTML=
+    '<div class="op-wrap"><table class="op-tb"><thead><tr><th>Produto</th><th>🎯 Vou fechar hoje</th><th>✔️ Já fechado hoje</th></tr></thead><tbody>'
+    +PRODUTOS_OBJ_INV.map(linha).join('')
+    +(feito.__outros?'<tr class="outros"><td class="nm">Outros produtos</td><td><span class="dq">sem objetivo separado</span></td>'
+      +'<td class="fz">'+fmtR(feito.__outros)+'</td></tr>':'')
+    +'<tr class="tot"><td class="nm">Total</td><td id="op-total">'+fmtR(o.v)+'</td>'
+    +'<td class="fz">'+fmtR(PRODUTOS_OBJ_INV.reduce((s,p)=>s+(feito[p]||0),0)+(feito.__outros||0))+'</td></tr>'
+    +'</tbody></table>'
+    +'<div class="op-ftr"><button class="btn wine" onclick="salvarObjProduto(\''+String(nome).replace(/'/g,"\\'")+'\',\''+iso+'\')">Salvar</button>'
+    +'<button class="btn" onclick="closeModal(\'area\')">Cancelar</button>'
+    +'<span>O total vira o objetivo de boleta do dia. Deixe um produto em branco se não for fechar nada nele.</span></div>'
+    +'</div>';
+  document.getElementById('modal-area').style.display='flex';
+  somaObjProduto();
+}
+function somaObjProduto(){
+  let s=0;
+  PRODUTOS_OBJ_INV.forEach(p=>{const el=document.getElementById('op-'+p.replace(/\s/g,'_'));
+    if(el)s+=Math.max(0,Math.round(parseMoeda(el.value)))});
+  const t=document.getElementById('op-total');
+  if(t)t.textContent=fmtR(s);
+}
+async function salvarObjProduto(nome,iso){
+  const atuais=compromissosProd(nome,iso,'bol');
+  const ops=[];
+  PRODUTOS_OBJ_INV.forEach(p=>{
+    const el=document.getElementById('op-'+p.replace(/\s/g,'_'));
+    const v=el?Math.max(0,Math.round(parseMoeda(el.value))):0;
+    const ex=atuais[p];
+    if(ex&&ex.v===v)return;
+    if(ex)ops.push(db('PATCH','metas',{meta_valor:v},'id=eq.'+ex.id));
+    else if(v>0)ops.push(db('POST','metas',{mes:iso.slice(0,7),assessor:nome,
+      area:areaComEmpresa(AREA_COMPROMISSO,empParaGravar()),produto:compKeyProd(iso,'bol',p),meta_valor:v}));
+  });
+  // com a quebra valendo, o número cheio antigo sai de cena para não somar duas vezes
+  const pl=compromissoDe(nome,iso,'bol');
+  const total=PRODUTOS_OBJ_INV.reduce((s,p)=>{const el=document.getElementById('op-'+p.replace(/\s/g,'_'));
+    return s+(el?Math.max(0,Math.round(parseMoeda(el.value))):0)},0);
+  if(pl&&total>0&&pl.v!==0)ops.push(db('PATCH','metas',{meta_valor:0},'id=eq.'+pl.id));
+  if(!ops.length){showToast('Nada mudou nos objetivos por produto');return}
+  try{
+    await Promise.all(ops);
+    closeModal('area');
+    showToast('🎯 Objetivo por produto salvo — total '+fmtR(total),true);
+    await loadData();renderCurView();
+  }catch(e){showToast('Erro ao salvar: '+e.message)}
+}
+
+function temCompromisso(nome,iso){return EVT_ORDEM.some(t=>objetivoDe(nome,iso,t).v>0)}
 async function salvarObjetivos(nome,iso){
   const ops=[];let algum=0;
   for(const t of EVT_ORDEM){
     const el=document.getElementById('fu-obj-'+t);if(!el)continue;
+    if(el.readOnly)continue;                       // o total veio da quebra por produto
     const v=evDinheiro(t)?Math.max(0,Math.round(parseMoeda(el.value))):Math.max(0,parseInt(el.value||'0',10)||0);
     if(v)algum=1;
     const ex=compromissoDe(nome,iso,t);
@@ -3673,7 +3796,9 @@ function fuObjetivosHtml(rows,nome){
   const podeEditar=!!nome&&(norm(nome)===norm(USER.nome)||USER.perfil==='diretor'||USER.perfil==='gestor');
   const linhas=EVT_ORDEM.map(t=>{
     const E=EVTS[t],money=evDinheiro(t);
-    const obj=nome?compromissoDe(nome,hj,t):null;
+    const objP=nome?objetivoDe(nome,hj,t):{v:0,quebrado:false};
+    const obj=nome?(objP.quebrado?{v:objP.v}:compromissoDe(nome,hj,t)):null;
+    const quebravel=money&&nome&&podeQuebrarProduto(nome);
     const objOnt=nome?compromissoDe(nome,ont,t):null;
     const ag=fuAgendadoHoje(rows,t);
     // boleta se combina e se cobra em dinheiro
@@ -3686,9 +3811,13 @@ function fuObjetivosHtml(rows,nome){
     return '<tr>'
       +'<td class="ind">'+E.ico+' '+E.rot+(money?' <span class="dq">em R$</span>':'')+'</td>'
       +'<td class="obj">'+(podeEditar&&nome
-          ?(money?'<input type="text" inputmode="decimal" id="fu-obj-'+t+'" value="'+(obj&&obj.v?fmtMoedaBR(obj.v):'')+'" placeholder="R$ 0">'
+          ?(money?'<input type="text" inputmode="decimal" id="fu-obj-'+t+'" value="'+(obj&&obj.v?fmtMoedaBR(obj.v):'')
+                  +'" placeholder="R$ 0"'+(objP.quebrado?' readonly title="O total vem da quebra por produto"':'')+'>'
                  :'<input type="number" min="0" id="fu-obj-'+t+'" value="'+(obj?obj.v:'')+'" placeholder="0">')
-          :'<span class="num">'+(obj?mostra(obj.v):'—')+'</span>')+'</td>'
+          :'<span class="num">'+(obj?mostra(obj.v):'—')+'</span>')
+        +(quebravel?'<div class="op-link" onclick="abrirObjProduto(\''+String(nome).replace(/'/g,"\\'")+'\',\''+hj+'\')" '
+          +'title="Abrir Hawk, Collar e Asset Allocation">'+(objP.quebrado?'✎ por produto':'+ por produto')+'</div>':'')
+        +'</td>'
       +'<td class="ag">'+(agTxt===null?'<span class="dq">sem data em card</span>'
           :'<span class="num'+(money?' dinheiro':'')+'"'+fuClick(ag,E.ico+' Agendado para hoje',brData(hj))+'>'+agTxt+'</span>')+'</td>'
       +'<td class="fz"'+fuClick(fuItens(hoje[t]),E.ico+' '+E.rot+' hoje',brData(hj))+'>'
