@@ -3204,7 +3204,7 @@ const AREA_COMPROMISSO='compromisso';   // objetivos do dia moram na tabela meta
 const EVTS={
   lig:{ico:'📞',rot:'Ligações feitas',cor:'var(--wine)',base:'',baseRot:''},
   mar:{ico:'📅',rot:'Reuniões marcadas',cor:'#2F6795',base:'lig',baseRot:'das ligações',
-    dica:'Conta no dia em que a data foi posta no card pela primeira vez e só enquanto a data não venceu. Reunião com data vencida sai da conta; remarcar para frente traz de volta. Mudar o status não marca reunião.'},
+    dica:'Conta o ato: a ligação estava marcada para aquele dia, nesse dia a pessoa pôs a data da reunião no card e o status foi para Reunião Agendada. Só mudar o status, só agendar a ligação ou arrastar o card não conta.'},
   reu:{ico:'🤝',rot:'Reuniões feitas',cor:'#5E5896',base:'mar',baseRot:'das marcadas'},
   bol:{ico:'✅',rot:'Fechados',cor:'var(--green)',base:'reu',baseRot:'das reuniões feitas'},
 };
@@ -3213,7 +3213,7 @@ const evDica=t=>EVTS[t].dica?' title="'+EVTS[t].dica.replace(/"/g,'&quot;')+'"':
 // reunião feita cuja marcação venceu some das marcadas, então a conversão pode
 // passar de 100%. Melhor dizer por que do que esconder o número.
 const taxaAviso=(t,n,base)=>(t==='reu'&&base&&n>base)
-  ?'Reuniões feitas cuja data marcada já venceu saem da conta de marcadas — por isso passa de 100%.':'';
+  ?'Reunião feita sem o registro da marcação (ligação do dia + data da reunião no card) não entra em marcadas — por isso passa de 100%.':'';
 // Boleta se mede em dinheiro. "3 fechados" não diz nada; R$1,2M diz.
 // A contagem vira o detalhe, nunca o número principal.
 const evDinheiro=t=>t==='bol';
@@ -3246,9 +3246,6 @@ function eventosDe(r){
     }
     if(h.campo==='Pendência boleta'&&pbFechada(h.para))add('bol',h.data,'boleta → '+h.para,q);
   });
-  // ── REUNIÃO MARCADA ──
-  // Vale o PRIMEIRO dia em que alguém pôs a data no card, e só ele: remarcar
-  // depois não é reunião nova, e mudar o status também não marca reunião.
   marcacaoDeReuniao(r,add);
   const rd=isoDia(r.reuniao_data);
   if(rd&&rd<today()&&!ev.some(e=>e.t==='reu'))add('reu',rd,'⚠ inferido: data da reunião já passou','',1);
@@ -3260,35 +3257,57 @@ function eventosDe(r){
   try{Object.defineProperty(r,'__ev',{value:ev,enumerable:false,configurable:true})}catch(e){r.__ev=ev}
   return ev;
 }
-// Só conta como reunião marcada o preenchimento da data no card — a primeira
-// vez, no dia em que foi registrada. O campo oficial é "📞 Ligação marcada";
-// quem nunca o preencheu entra pelo "📅 Reunião marcada", marcado como inferido.
-// a data que vale é a que está no card agora — a mais à frente entre as duas
-function dataCombinada(r){
-  const a=dataLigacao(r),b=isoDia(r.reuniao_data);
-  return (a&&b)?(a>b?a:b):(a||b||'');
+// ══ REUNIÃO MARCADA ══
+// É o ATO, no dia em que aconteceu: a ligação estava marcada para aquele dia,
+// nesse dia a pessoa pôs a data da reunião no card e o status foi para
+// "Reunião Agendada" (ou adiante). Só mexer no status, só agendar a ligação,
+// arrastar o card ou ter uma data velha na agenda NÃO é reunião marcada.
+// Guarda também o que NÃO passou, com o motivo: número baixo tem que ser auditável.
+function analiseMarcacoes(r){
+  if(r.__mk)return r.__mk;
+  const hist=(r.historico||[]),ok=[],nao=[];
+  const prim=hist.find(h=>h.campo==='Status comercial');
+  let st=prim?(prim.de||''):(r.sc||'');   // status vigente, reconstruído da linha do tempo
+  let lig='';                              // data da "Ligação marcada" vigente
+  let i=0;
+  while(i<hist.length){
+    // o mesmo salvamento grava várias linhas com o mesmo carimbo de data/hora
+    const carimbo=hist[i].data;
+    let marcou=null;
+    while(i<hist.length&&hist[i].data===carimbo){
+      const h=hist[i++];
+      if(h.campo===CAMPO_LIG_DATA)lig=isoDia(h.para)||'';
+      if(h.campo==='Status comercial'&&h.para)st=h.para;
+      if(h.campo==='Reunião marcada'&&h.para)marcou=h;
+    }
+    if(!marcou)continue;
+    const dia=isoHist(carimbo);
+    if(!dia)continue;
+    const alvo=isoDia(marcou.para);
+    const motivo=lig!==dia
+        ?(lig?'a ligação marcada era de '+brData(lig)+', não de '+brData(dia):'sem ligação marcada para '+brData(dia))
+      :ETAPA_IDX(st)<2?'o card ficou em “'+(st||'—')+'”, não foi para Reunião Agendada'
+      :'';
+    const reg={carimbo,dia,alvo,quem:marcou.usuario||'',motivo};
+    (motivo?nao:ok).push(reg);
+  }
+  const res={ok,nao};
+  try{Object.defineProperty(r,'__mk',{value:res,enumerable:false,configurable:true})}catch(e){r.__mk=res}
+  return res;
 }
 function marcacaoDeReuniao(r,add){
-  // data vencida (ou apagada) não é mais reunião marcada, mesmo que já tenha sido
-  const combinada=dataCombinada(r);
-  if(!combinada||combinada<today())return;
-  const hist=(r.historico||[]);
-  const primeira=campo=>{
-    let melhor=null;
-    hist.forEach(h=>{
-      if(h.campo!==campo||!h.para)return;
-      const iso=isoHist(h.data);
-      if(!iso)return;
-      if(!melhor||iso<melhor.iso)melhor={iso,h};
-    });
-    return melhor;
-  };
-  const lg=primeira(CAMPO_LIG_DATA);
-  if(lg)return add('mar',lg.h.data,'marcou a data no card — reunião em '+brData(combinada),lg.h.usuario);
-  const rm=primeira('Reunião marcada');
-  if(rm)return add('mar',rm.h.data,'⚠ sem a data de ligação: contou pela reunião marcada para '+brData(combinada),rm.h.usuario,1);
-  const rd=isoDia(r.reuniao_data);
-  if(rd)add('mar',rd,'⚠ inferido: reunião na agenda, sem registro de quando foi marcada','',1);
+  analiseMarcacoes(r).ok.forEach(m=>
+    add('mar',m.carimbo,'ligação de '+brData(m.dia)+' virou reunião em '+brData(m.alvo),m.quem));
+}
+// data da reunião preenchida que NÃO virou reunião marcada, com o porquê
+function marcacoesRecusadas(rows,de,ate){
+  const out=[];
+  rows.forEach(r=>analiseMarcacoes(r).nao.forEach(m=>{
+    if(m.dia<de||m.dia>ate)return;
+    if(_apQuem&&(m.quem?normUsuario(m.quem)!==norm(_apQuem):!eDono(r,_apQuem)))return;
+    out.push({r,quando:m.dia,txt:'pôs a reunião de '+brData(m.alvo)+' — '+m.motivo});
+  }));
+  return out;
 }
 // Conta OPORTUNIDADES DISTINTAS por etapa dentro do intervalo. Duas ligações
 // para o mesmo cliente na semana contam uma vez — senão a taxa de conversão
@@ -3970,6 +3989,7 @@ function fuGapsHtml(rows,ativas){
   const semNada=ativas.filter(r=>!parseDataBoleta(r.data_boleta)&&!isoDia(r.reuniao_data)&&!isoDia(r.todo_data)&&!dataLigacao(r)).map(r=>({r,txt:'nenhuma data em nada'}));
   const reuFuro=ativas.filter(r=>{const d=isoDia(r.reuniao_data);return d&&d<hj&&!cumpriu(r,d,'reu')}).map(r=>({r,quando:isoDia(r.reuniao_data),txt:'reunião passou sem nenhum registro depois'}));
   const perdidas=rows.filter(r=>isPerdida(r)&&eventosDe(r).some(e=>e.iso>=de&&e.iso<=ate)).map(r=>({r,txt:'cliente negou'}));
+  const foraRegra=marcacoesRecusadas(rows,de,ate);
 
   const diag=pior
     ? '<div class="fu-gap-diag"><b>Gargalo do mês: '+pior.rot+'</b><br>'
@@ -3980,6 +4000,8 @@ function fuGapsHtml(rows,ativas){
     {ico:'💤',rot:'Paradas há 7 dias ou mais',n:parado.length,itens:parado,tit:'💤 Oportunidades paradas',sub:'sem registro há uma semana',alerta:parado.length>0},
     {ico:'🕳️',rot:'Sem data nenhuma',n:semNada.length,itens:semNada,tit:'🕳️ Sem data nenhuma',sub:'não entram em nenhuma agenda',alerta:semNada.length>0},
     {ico:'👻',rot:'Reunião passou sem registro',n:reuFuro.length,itens:reuFuro,tit:'👻 Reuniões sem confirmação',sub:'aconteceu? marque no card',alerta:reuFuro.length>0},
+    {ico:'📅',rot:'Data de reunião que não virou marcação',n:foraRegra.length,itens:foraRegra,
+      tit:'📅 Ficaram de fora das reuniões marcadas',sub:'faltou a ligação do dia ou o status',alerta:foraRegra.length>0},
     {ico:'❌',rot:'Perdidas no mês',n:perdidas.length,itens:perdidas,tit:'❌ Perdidas no mês',sub:'cliente negou'},
   ];
   return '<div class="fu-q fu-q-gap" style="--fc:var(--red)">'
