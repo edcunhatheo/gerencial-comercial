@@ -965,6 +965,12 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
 .op-tb .dq{font-size:10.5px;color:var(--muted-l);font-weight:400}
 .op-ftr{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px}
 .op-ftr span{font-size:10.5px;color:var(--muted-l);flex:1;min-width:200px}
+
+.ic-wrap{max-width:560px}
+.ic-img{width:100%;height:auto;display:block;border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 2px 12px rgba(0,0,0,.08)}
+.ic-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.ic-nota{font-size:10.5px;color:var(--muted-l);line-height:1.5;margin-top:10px}
 </style>
 </head>
 <body>
@@ -1407,6 +1413,10 @@ const assDe=r=>canonAssessor(r.assessor)||stripAcc(String(r.assessor||'').trim()
 // Ficam na MESMA tabela `metas` (uma vez por mês, sem histórico), marcados com area='acordo'
 // pra não se misturarem com as metas de Definições do mês.
 const AREA_ACORDO='acordo';
+// Colunas do Kanban também moram na tabela metas (sem coluna nova no banco):
+// area='coluna', produto='<area>|<Nome da coluna>', mes=MES_COLUNA para não morrer na virada.
+const AREA_COLUNA='coluna';
+const MES_COLUNA='9999-12';
 const SEG_INVESTOR='The Investor';
 const LINHA_CASA='__CASA__'; // guarda a meta da casa por segmento (linha "Metas" da planilha)
 const SEGMENTOS_ACORDO=['Asset Allocation','Collar','Hawk','ES','Seg vida','Consórcio'];
@@ -1424,7 +1434,7 @@ function segmentoDaOpp(r){
   for(const s of SEGMENTOS_ACORDO){if(SEG_MATCH[s]&&SEG_MATCH[s](r))return s;}
   return null;
 }
-const metasDoMes=()=>METAS.filter(m=>m.area!==AREA_ACORDO&&m.area!==AREA_COMPROMISSO);
+const metasDoMes=()=>METAS.filter(m=>m.area!==AREA_ACORDO&&m.area!==AREA_COMPROMISSO&&m.area!==AREA_COLUNA);
 const acordosDoMes=()=>METAS.filter(m=>m.area===AREA_ACORDO);
 // aceita "150000", "150.000,00", "R$ 150.000" e devolve número
 function parseMoeda(s){
@@ -1808,7 +1818,7 @@ async function doLogin(){
     if(!res.ok)throw new Error('Erro '+res.status);
     const data=await res.json();
     if(!data||!data.length){err.textContent='PIN incorreto.';pin='';updateDots();return;}
-    USER=data[0];
+    USER=normalizaUsuario(data[0]);   // areas limpas: 'emp:qrk' é empresa, não área
     err.textContent='';
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app').style.display='block';
@@ -1889,6 +1899,7 @@ async function initAppInterno(){
   document.getElementById('user-nm').textContent=USER.nome;
   restauraEmp();
   await loadData();
+  await migraColunasLocais();
   pintaSeletorEmpresa();
   startHeartbeat();
   startVersaoCheck();
@@ -1908,7 +1919,7 @@ async function loadData(){
     db('GET','oportunidades','',`or=(${af})&order=created_at.desc`),
     db('GET','usuarios','','order=nome.asc'),
     db('GET','daily_selecoes','',`data=eq.${today()}&assessor=eq.${encodeURIComponent(USER.nome)}`),
-    db('GET','metas','',`mes=eq.${mesAtual}&order=created_at.asc`).catch(()=>[])
+    db('GET','metas','',`mes=in.(${mesAtual},${MES_COLUNA})&order=created_at.asc`).catch(()=>[])
   ]);
   // OPPS_ALL = tudo que veio do banco. OPPS = só o que está no fluxo do mês:
   // o que passou pela virada de mês some de TODAS as telas e só existe no Histórico.
@@ -3192,11 +3203,17 @@ function diaAtuacaoHtml(){
 const AREA_COMPROMISSO='compromisso';   // objetivos do dia moram na tabela metas, sem coluna nova
 const EVTS={
   lig:{ico:'📞',rot:'Ligações feitas',cor:'var(--wine)',base:'',baseRot:''},
-  mar:{ico:'📅',rot:'Reuniões marcadas',cor:'#2F6795',base:'lig',baseRot:'das ligações'},
+  mar:{ico:'📅',rot:'Reuniões marcadas',cor:'#2F6795',base:'lig',baseRot:'das ligações',
+    dica:'Conta no dia em que a data foi posta no card pela primeira vez e só enquanto a data não venceu. Reunião com data vencida sai da conta; remarcar para frente traz de volta. Mudar o status não marca reunião.'},
   reu:{ico:'🤝',rot:'Reuniões feitas',cor:'#5E5896',base:'mar',baseRot:'das marcadas'},
   bol:{ico:'✅',rot:'Fechados',cor:'var(--green)',base:'reu',baseRot:'das reuniões feitas'},
 };
 const EVT_ORDEM=['lig','mar','reu','bol'];
+const evDica=t=>EVTS[t].dica?' title="'+EVTS[t].dica.replace(/"/g,'&quot;')+'"':'';
+// reunião feita cuja marcação venceu some das marcadas, então a conversão pode
+// passar de 100%. Melhor dizer por que do que esconder o número.
+const taxaAviso=(t,n,base)=>(t==='reu'&&base&&n>base)
+  ?'Reuniões feitas cuja data marcada já venceu saem da conta de marcadas — por isso passa de 100%.':'';
 // Boleta se mede em dinheiro. "3 fechados" não diz nada; R$1,2M diz.
 // A contagem vira o detalhe, nunca o número principal.
 const evDinheiro=t=>t==='bol';
@@ -3222,20 +3239,19 @@ function eventosDe(r){
     const q=h.usuario;
     if(h.campo===MARCAS.lig.campo&&h.para===MARCAS.lig.on)add('lig',h.data,'✓ marcou “ligou” no card',q);
     if(h.campo===MARCAS.reu.campo&&h.para===MARCAS.reu.on)add('reu',h.data,'✓ marcou “fez reunião” no card',q);
-    if(h.campo==='Reunião marcada'&&h.para)add('mar',h.data,'marcou reunião para '+brData(isoDia(h.para)),q);
     if(h.campo==='Status comercial'){
       const di=ETAPA_IDX(h.de),pi=ETAPA_IDX(h.para);
       if(di===0&&pi>di)add('lig',h.data,'saiu de “'+(h.de||'—')+'” para “'+(h.para||'—')+'”',q);
-      if(pi>=2&&di<2)add('mar',h.data,'entrou em “'+(h.para||'—')+'”',q);
       if(di>=2&&pi>di)add('reu',h.data,'avançou de “'+(h.de||'—')+'” para “'+(h.para||'—')+'”',q);
     }
     if(h.campo==='Pendência boleta'&&pbFechada(h.para))add('bol',h.data,'boleta → '+h.para,q);
   });
+  // ── REUNIÃO MARCADA ──
+  // Vale o PRIMEIRO dia em que alguém pôs a data no card, e só ele: remarcar
+  // depois não é reunião nova, e mudar o status também não marca reunião.
+  marcacaoDeReuniao(r,add);
   const rd=isoDia(r.reuniao_data);
-  if(rd){
-    if(!ev.some(e=>e.t==='mar'))add('mar',rd,'⚠ inferido: reunião na agenda, sem registro de quando foi marcada','',1);
-    if(rd<today()&&!ev.some(e=>e.t==='reu'))add('reu',rd,'⚠ inferido: data da reunião já passou','',1);
-  }
+  if(rd&&rd<today()&&!ev.some(e=>e.t==='reu'))add('reu',rd,'⚠ inferido: data da reunião já passou','',1);
   if(isBoletadoFirmado(r)&&!ev.some(e=>e.t==='bol')){
     const d=parseDataBoleta(r.data_boleta);
     if(d)add('bol',d,'⚠ inferido: boletada sem registro na linha do tempo','',1);
@@ -3243,6 +3259,36 @@ function eventosDe(r){
   ev.sort((a,b)=>a.iso.localeCompare(b.iso));
   try{Object.defineProperty(r,'__ev',{value:ev,enumerable:false,configurable:true})}catch(e){r.__ev=ev}
   return ev;
+}
+// Só conta como reunião marcada o preenchimento da data no card — a primeira
+// vez, no dia em que foi registrada. O campo oficial é "📞 Ligação marcada";
+// quem nunca o preencheu entra pelo "📅 Reunião marcada", marcado como inferido.
+// a data que vale é a que está no card agora — a mais à frente entre as duas
+function dataCombinada(r){
+  const a=dataLigacao(r),b=isoDia(r.reuniao_data);
+  return (a&&b)?(a>b?a:b):(a||b||'');
+}
+function marcacaoDeReuniao(r,add){
+  // data vencida (ou apagada) não é mais reunião marcada, mesmo que já tenha sido
+  const combinada=dataCombinada(r);
+  if(!combinada||combinada<today())return;
+  const hist=(r.historico||[]);
+  const primeira=campo=>{
+    let melhor=null;
+    hist.forEach(h=>{
+      if(h.campo!==campo||!h.para)return;
+      const iso=isoHist(h.data);
+      if(!iso)return;
+      if(!melhor||iso<melhor.iso)melhor={iso,h};
+    });
+    return melhor;
+  };
+  const lg=primeira(CAMPO_LIG_DATA);
+  if(lg)return add('mar',lg.h.data,'marcou a data no card — reunião em '+brData(combinada),lg.h.usuario);
+  const rm=primeira('Reunião marcada');
+  if(rm)return add('mar',rm.h.data,'⚠ sem a data de ligação: contou pela reunião marcada para '+brData(combinada),rm.h.usuario,1);
+  const rd=isoDia(r.reuniao_data);
+  if(rd)add('mar',rd,'⚠ inferido: reunião na agenda, sem registro de quando foi marcada','',1);
 }
 // Conta OPORTUNIDADES DISTINTAS por etapa dentro do intervalo. Duas ligações
 // para o mesmo cliente na semana contam uma vez — senão a taxa de conversão
@@ -3412,8 +3458,9 @@ const fuItens=(lista)=>lista.map(x=>({r:x.r,quando:x.e.iso,txt:x.e.txt,quem:x.e.
 // É o que fecha o ciclo que o diretor pediu — o que prometi ontem vira a
 // cobrança de hoje, sem ninguém precisar lembrar de cabeça.
 const compKey=(iso,t)=>iso+'|'+t;
-function compromissoDe(nome,iso,t){
-  const m=METAS.find(x=>x.area===AREA_COMPROMISSO&&norm(x.assessor||'')===norm(nome)&&x.produto===compKey(iso,t));
+function compromissoDe(nome,iso,t,emp){
+  const m=METAS.find(x=>x.area===AREA_COMPROMISSO&&norm(x.assessor||'')===norm(nome)
+    &&x.produto===compKey(iso,t)&&(!emp||(x.empresa||EMP_PADRAO)===emp));
   return m?{id:m.id,v:m.meta_valor||0}:null;
 }
 // ══ OBJETIVO DE BOLETA POR PRODUTO (Investimentos) ══
@@ -3430,21 +3477,22 @@ function prodObjDe(r){
   return '';
 }
 const compKeyProd=(iso,t,prod)=>iso+'|'+t+'|'+prod;
-function compromissosProd(nome,iso,t){
+function compromissosProd(nome,iso,t,emp){
   const out={};
   METAS.forEach(m=>{
     if(m.area!==AREA_COMPROMISSO||norm(m.assessor||'')!==norm(nome))return;
+    if(emp&&(m.empresa||EMP_PADRAO)!==emp)return;
     const p=String(m.produto||'').split('|');
     if(p[0]===iso&&p[1]===t&&p[2])out[p[2]]={id:m.id,v:m.meta_valor||0};
   });
   return out;
 }
 // objetivo do dia: a quebra por produto manda; sem quebra, vale o número cheio
-function objetivoDe(nome,iso,t){
-  const porProd=compromissosProd(nome,iso,t);
+function objetivoDe(nome,iso,t,emp){
+  const porProd=compromissosProd(nome,iso,t,emp);
   const chaves=Object.keys(porProd).filter(k=>porProd[k].v>0);
   if(chaves.length)return{v:chaves.reduce((s,k)=>s+porProd[k].v,0),porProd,quebrado:true};
-  const pl=compromissoDe(nome,iso,t);
+  const pl=compromissoDe(nome,iso,t,emp);
   return{v:pl?pl.v:0,porProd,quebrado:false};
 }
 const podeQuebrarProduto=nome=>{
@@ -3516,7 +3564,251 @@ async function salvarObjProduto(nome,iso){
     closeModal('area');
     showToast('🎯 Objetivo por produto salvo — total '+fmtR(total),true);
     await loadData();renderCurView();
+    abrirImagemCombinado(nome,iso);
   }catch(e){showToast('Erro ao salvar: '+e.message)}
+}
+
+// ══ CARTÃO DO COMBINADO ══
+// Depois de salvar, o comercial tem um PNG do que prometeu. É o que o
+// diretor manda para o CEO: um compromisso com nome, data e hora, não um
+// print de tela cortado.
+const IMG_W=1080;
+function icRound(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+function icTxt(ctx,t,x,y,{size=32,bold=false,cor='#1C1B1A',align='left',fam='-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif'}={}){
+  ctx.font=(bold?'700 ':'400 ')+size+'px '+fam;
+  ctx.fillStyle=cor;ctx.textAlign=align;ctx.textBaseline='alphabetic';
+  ctx.fillText(String(t==null?'':t),x,y);
+}
+function dadosCombinado(nome,iso){
+  const rows=fuRows();
+  const linhas=EVT_ORDEM.map(t=>{
+    const o=objetivoDe(nome,iso,t);
+    return{t,rot:EVTS[t].rot,ico:EVTS[t].ico,money:evDinheiro(t),v:o.v,
+      texto:evDinheiro(t)?fmtR(o.v):String(o.v),quebra:o.quebrado?o.porProd:null};
+  });
+  const ont=diaUtilAnterior();
+  const oOnt=EVT_ORDEM.map(t=>objetivoDe(nome,ont,t).v).reduce((a,b)=>a+b,0);
+  const fOnt=comQuem(nome,()=>apurar(rows,ont,ont));
+  return{linhas,ontem:oOnt?{prometeu:oOnt,
+    fez:EVT_ORDEM.filter(t=>!evDinheiro(t)).reduce((s,t)=>s+fOnt.n[t],0),vol:fOnt.vol}:null};
+}
+function desenhaCombinado(nome,iso){
+  const d=dadosCombinado(nome,iso);
+  const quebra=(d.linhas.find(l=>l.t==='bol')||{}).quebra;
+  const nQ=quebra?Object.keys(quebra).filter(k=>quebra[k].v>0).length:0;
+  const hCard=148,gap=16;
+  const alt=250+120+d.linhas.length*(hCard+gap)+(nQ?nQ*54+48:0)+(d.ontem?96:0)+118;
+  const cv=document.createElement('canvas');
+  cv.width=IMG_W;cv.height=alt;
+  const ctx=cv.getContext('2d');
+  const emp=empAtual()||empresasDoUsuario()[0];
+  const corEmp=EMPRESAS[emp]?EMPRESAS[emp].cor:'#7A2233';
+
+  ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,IMG_W,alt);
+  // faixa da empresa
+  ctx.fillStyle=corEmp;ctx.fillRect(0,0,IMG_W,250);
+  icTxt(ctx,'COMPROMISSO DO DIA',60,92,{size:26,bold:true,cor:'rgba(255,255,255,.72)'});
+  icTxt(ctx,nome,60,160,{size:56,bold:true,cor:'#FFFFFF'});
+  const dt=new Date(iso+'T12:00:00');
+  icTxt(ctx,dt.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}),60,208,
+    {size:28,cor:'rgba(255,255,255,.85)'});
+  icTxt(ctx,(EMPRESAS[emp]||{}).curto||'',IMG_W-60,92,{size:28,bold:true,cor:'rgba(255,255,255,.9)',align:'right'});
+
+  let y=250+56;
+  icTxt(ctx,'O QUE EU ME COMPROMETO A FAZER HOJE',60,y,{size:24,bold:true,cor:'#87837E'});
+  y+=44;
+  d.linhas.forEach(l=>{
+    ctx.fillStyle=l.v?'#F7F6F4':'#FCFCFB';
+    icRound(ctx,60,y,IMG_W-120,hCard,18);ctx.fill();
+    ctx.strokeStyle=l.v?'#DCD9D5':'#E7E4E0';ctx.lineWidth=2;
+    icRound(ctx,60,y,IMG_W-120,hCard,18);ctx.stroke();
+    icTxt(ctx,l.ico,96,y+92,{size:52});
+    icTxt(ctx,l.rot,176,y+68,{size:30,bold:true,cor:'#1C1B1A'});
+    icTxt(ctx,l.v?'combinado para hoje':'sem compromisso hoje',176,y+108,{size:22,cor:'#B3AFAA'});
+    icTxt(ctx,l.texto,IMG_W-96,y+96,{size:l.money?50:62,bold:true,
+      cor:l.v?(l.money?'#1F5741':corEmp):'#B3AFAA',align:'right'});
+    y+=hCard+gap;
+  });
+  if(nQ){
+    y+=10;
+    icTxt(ctx,'FECHAMENTO POR PRODUTO',60,y+14,{size:22,bold:true,cor:'#87837E'});
+    y+=44;
+    Object.keys(quebra).filter(k=>quebra[k].v>0).forEach(k=>{
+      ctx.fillStyle='#F1F6F3';icRound(ctx,60,y,IMG_W-120,44,10);ctx.fill();
+      icTxt(ctx,k,84,y+31,{size:26,bold:true,cor:'#1F5741'});
+      icTxt(ctx,fmtR(quebra[k].v),IMG_W-84,y+31,{size:26,bold:true,cor:'#1F5741',align:'right'});
+      y+=54;
+    });
+    y-=10;
+  }
+  if(d.ontem){
+    y+=26;
+    ctx.fillStyle='#F7F6F4';icRound(ctx,60,y,IMG_W-120,62,12);ctx.fill();
+    icTxt(ctx,'Ontem: prometeu '+d.ontem.prometeu+' atividades e fez '+d.ontem.fez
+      +(d.ontem.vol?' · fechou '+fmtR(d.ontem.vol):''),84,y+40,{size:24,cor:'#87837E'});
+    y+=62;
+  }
+  y+=54;
+  ctx.strokeStyle='#E7E4E0';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(60,y-28);ctx.lineTo(IMG_W-60,y-28);ctx.stroke();
+  icTxt(ctx,'Gerencial Comercial · registrado em '+new Date().toLocaleString('pt-BR'),60,y,{size:22,cor:'#B3AFAA'});
+  return cv;
+}
+function abrirImagemCombinado(nome,iso){
+  let cv;
+  try{cv=desenhaCombinado(nome,iso)}
+  catch(e){showToast('Não consegui montar a imagem: '+e.message);return}
+  window._icCanvas=cv;window._icNome=nome;window._icIso=iso;
+  const url=cv.toDataURL('image/png');
+  document.getElementById('ba-title').innerHTML='🖼️ Compromisso de '+nome.split(' ')[0]
+    +' <span style="font-size:11px;font-weight:600;color:var(--muted)">· '+brData(iso)+'</span>';
+  document.getElementById('ba-body').innerHTML=
+    '<div class="ic-wrap"><img class="ic-img" src="'+url+'" alt="Compromisso do dia">'
+    +'<div class="ic-btns">'
+    +'<button class="btn wine" onclick="baixarImagemCombinado()">⬇️ Baixar imagem</button>'
+    +'<button class="btn" onclick="compartilharImagemCombinado()">📤 Enviar</button>'
+    +'<button class="btn" onclick="copiarImagemCombinado()">📋 Copiar</button>'
+    +'</div>'
+    +'<div class="ic-nota">Baixe e mande no WhatsApp ou no e-mail. No celular, o “Enviar” abre direto o compartilhamento do aparelho.</div>'
+    +'</div>';
+  document.getElementById('modal-area').style.display='flex';
+}
+const icNomeArq=()=>'compromisso-'+String(window._icNome||'').replace(/[^\wÀ-ú]+/g,'-').toLowerCase()+'-'+(window._icIso||'')+'.png';
+function baixarImagemCombinado(){
+  const cv=window._icCanvas;if(!cv)return;
+  const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download=icNomeArq();
+  document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),800);
+  showToast('⬇️ Imagem baixada',true);
+}
+function icBlob(){return new Promise(ok=>window._icCanvas.toBlob(b=>ok(b),'image/png'))}
+async function compartilharImagemCombinado(){
+  try{
+    const b=await icBlob();
+    const f=new File([b],icNomeArq(),{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[f]})){
+      await navigator.share({files:[f],title:'Compromisso do dia',
+        text:'Compromisso de '+window._icNome+' · '+brData(window._icIso)});
+      return;
+    }
+  }catch(e){}
+  baixarImagemCombinado();
+  showToast('Este navegador não compartilha direto — a imagem foi baixada');
+}
+async function copiarImagemCombinado(){
+  try{
+    const b=await icBlob();
+    await navigator.clipboard.write([new ClipboardItem({'image/png':b})]);
+    showToast('📋 Imagem copiada — cole no WhatsApp',true);
+  }catch(e){showToast('Não consegui copiar aqui; use o Baixar')}
+}
+
+// ══ CARTÃO DA ÁREA ══
+// O mesmo compromisso, mas do time inteiro de uma área: uma linha por
+// responsável e por empresa, porque a mesma pessoa pode ter combinado
+// coisas diferentes na Quark e na QRK.
+function linhasCombinadoArea(iso){
+  const recEmp=empAtual();
+  const emps=recEmp?[recEmp]:empresasDoUsuario();
+  const linhas=[];
+  fuComerciais().forEach(nome=>{
+    const u=USUARIOS.find(x=>norm(x.nome)===norm(nome))||{};
+    const minhas=(u.perfil==='diretor')?emps:(u.empresas||[EMP_PADRAO]);
+    emps.filter(e=>minhas.includes(e)).forEach(emp=>{
+      const vals={};let soma=0;
+      EVT_ORDEM.forEach(t=>{const v=objetivoDe(nome,iso,t,emp).v;vals[t]=v;if(!evDinheiro(t))soma+=v});
+      linhas.push({nome,emp,vals,soma,vol:vals.bol||0});
+    });
+  });
+  return linhas.sort((a,b)=>(b.vol-a.vol)||(b.soma-a.soma)||a.nome.localeCompare(b.nome));
+}
+function desenhaCombinadoArea(iso){
+  const linhas=linhasCombinadoArea(iso);
+  const recEmp=empAtual();
+  const ak=window._fuArea;
+  const area=ak?(AREAS[ak]||{}):{name:'Todas as áreas',color:'#7A2233'};
+  const cor=area.color||'#7A2233';
+  const hRow=84,hHdr=252,hCols=52;
+  const alt=hHdr+64+hCols+linhas.length*hRow+96+104;
+  const cv=document.createElement('canvas');
+  cv.width=IMG_W;cv.height=alt;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle='#FFFFFF';ctx.fillRect(0,0,IMG_W,alt);
+  ctx.fillStyle=cor;ctx.fillRect(0,0,IMG_W,hHdr);
+  icTxt(ctx,'COMPROMISSO DO DIA · POR RESPONSÁVEL',60,92,{size:26,bold:true,cor:'rgba(255,255,255,.72)'});
+  icTxt(ctx,area.name,60,160,{size:54,bold:true,cor:'#FFFFFF'});
+  const dt=new Date(iso+'T12:00:00');
+  icTxt(ctx,dt.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}),60,210,
+    {size:28,cor:'rgba(255,255,255,.85)'});
+  icTxt(ctx,recEmp?empNome(recEmp):'Quark + QRK',IMG_W-60,92,{size:28,bold:true,cor:'rgba(255,255,255,.9)',align:'right'});
+
+  const cx={lig:600,mar:690,reu:780,bol:IMG_W-60};
+  let y=hHdr+58;
+  icTxt(ctx,'RESPONSÁVEL',60,y,{size:22,bold:true,cor:'#87837E'});
+  icTxt(ctx,'📞',cx.lig,y,{size:26,align:'right'});
+  icTxt(ctx,'📅',cx.mar,y,{size:26,align:'right'});
+  icTxt(ctx,'🤝',cx.reu,y,{size:26,align:'right'});
+  icTxt(ctx,'✅ FECHAR',cx.bol,y,{size:22,bold:true,cor:'#87837E',align:'right'});
+  y+=18;
+  ctx.strokeStyle='#DCD9D5';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(60,y);ctx.lineTo(IMG_W-60,y);ctx.stroke();
+  y+=hCols-18;
+
+  const tot={lig:0,mar:0,reu:0,bol:0};
+  linhas.forEach((l,i)=>{
+    EVT_ORDEM.forEach(t=>tot[t]+=l.vals[t]||0);
+    const vazio=!l.soma&&!l.vals.bol;
+    if(i%2===1){ctx.fillStyle='#FAFAF9';ctx.fillRect(60,y-52,IMG_W-120,hRow);}
+    icTxt(ctx,l.nome,60,y,{size:30,bold:!vazio,cor:vazio?'#B3AFAA':'#1C1B1A'});
+    if(!recEmp){
+      const w=ctx.measureText(l.nome).width;
+      const et=empNome(l.emp);
+      ctx.font='700 19px -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif';
+      const ew=ctx.measureText(et).width+22;
+      ctx.fillStyle=empCor(l.emp);icRound(ctx,60+w+16,y-24,ew,30,8);ctx.fill();
+      icTxt(ctx,et,60+w+16+ew/2,y-3,{size:19,bold:true,cor:'#FFFFFF',align:'center'});
+    }
+    ['lig','mar','reu'].forEach(t=>icTxt(ctx,l.vals[t]||0,cx[t],y,
+      {size:32,bold:!!l.vals[t],cor:l.vals[t]?'#1C1B1A':'#D6D3CF',align:'right'}));
+    icTxt(ctx,l.vals.bol?fmtR(l.vals.bol):'—',cx.bol,y,
+      {size:32,bold:!!l.vals.bol,cor:l.vals.bol?'#1F5741':'#D6D3CF',align:'right'});
+    y+=hRow;
+  });
+
+  y+=6;
+  ctx.fillStyle='#F1F6F3';icRound(ctx,48,y-56,IMG_W-96,80,14);ctx.fill();
+  icTxt(ctx,'Total do time',72,y,{size:30,bold:true,cor:'#1C1B1A'});
+  ['lig','mar','reu'].forEach(t=>icTxt(ctx,tot[t],cx[t],y,{size:32,bold:true,align:'right'}));
+  icTxt(ctx,fmtR(tot.bol),cx.bol,y,{size:32,bold:true,cor:'#1F5741',align:'right'});
+  y+=76;
+  ctx.strokeStyle='#E7E4E0';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(60,y);ctx.lineTo(IMG_W-60,y);ctx.stroke();
+  icTxt(ctx,'Gerencial Comercial · registrado em '+new Date().toLocaleString('pt-BR'),60,y+36,{size:22,cor:'#B3AFAA'});
+  return cv;
+}
+function abrirImagemArea(iso){
+  let cv;
+  try{cv=desenhaCombinadoArea(iso)}
+  catch(e){showToast('Não consegui montar a imagem: '+e.message);return}
+  const ak=window._fuArea;
+  const nomeArea=ak?((AREAS[ak]||{}).name||ak):'todas-as-areas';
+  window._icCanvas=cv;window._icNome=nomeArea;window._icIso=iso;
+  document.getElementById('ba-title').innerHTML='🖼️ Compromisso do time · '+nomeArea
+    +' <span style="font-size:11px;font-weight:600;color:var(--muted)">· '+brData(iso)+'</span>';
+  document.getElementById('ba-body').innerHTML=
+    '<div class="ic-wrap"><img class="ic-img" src="'+cv.toDataURL('image/png')+'" alt="Compromisso da área">'
+    +'<div class="ic-btns">'
+    +'<button class="btn wine" onclick="baixarImagemCombinado()">⬇️ Baixar imagem</button>'
+    +'<button class="btn" onclick="compartilharImagemCombinado()">📤 Enviar</button>'
+    +'<button class="btn" onclick="copiarImagemCombinado()">📋 Copiar</button>'
+    +'</div>'
+    +'<div class="ic-nota">Uma linha por responsável'+(empAtual()?'':' e por empresa')
+    +'. Quem não combinou nada aparece zerado de propósito.</div>'
+    +'</div>';
+  document.getElementById('modal-area').style.display='flex';
 }
 
 function temCompromisso(nome,iso){return EVT_ORDEM.some(t=>objetivoDe(nome,iso,t).v>0)}
@@ -3538,6 +3830,7 @@ async function salvarObjetivos(nome,iso){
     await Promise.all(ops);
     showToast('🎯 Objetivos de '+brData(iso)+' registrados — amanhã eu cobro',true);
     await loadData();renderCurView();
+    abrirImagemCombinado(nome,iso);
   }catch(e){showToast('Erro ao salvar objetivos: '+e.message)}
 }
 // dia útil anterior: na segunda, "ontem" é a sexta
@@ -3755,8 +4048,8 @@ function fuRelatorioHtml(rows,foco){
         +'<td>'+E.ico+' '+E.rot+'</td>'
         +'<td class="q'+(evValor(ap,t)?'':' zero')+(evDinheiro(t)?' dinheiro':'')+'">'+evTexto(ap,t)
           +(evDetalhe(ap,t)?'<span class="vv">'+evDetalhe(ap,t)+'</span>':'')+'</td>'
-        +'<td class="tx"'+(corT?' style="color:'+corT+'"':'')+'>'
-        +(E.base?(taxa===null?'—':taxa.toFixed(1).replace('.',',')+'% <span class="dq">'+E.baseRot+'</span>'):'—')
+        +'<td class="tx"'+(corT?' style="color:'+corT+'"':'')+(taxaAviso(t,n,base)?' title="'+taxaAviso(t,n,base)+'"':'')+'>'
+        +(E.base?(taxa===null?'—':taxa.toFixed(1).replace('.',',')+'%'+(taxaAviso(t,n,base)?' ⚠':'')+' <span class="dq">'+E.baseRot+'</span>'):'—')
         +'</td></tr>';
     }).join('');
     return '<div class="fu-rel-card'+(sub?' full':'')+'" style="--rc:'+cor+'">'
@@ -3840,9 +4133,13 @@ function fuObjetivosHtml(rows,nome){
     +'<th>Indicador</th><th class="c">🎯 Vou fazer hoje</th><th class="c">📌 Agendado nos cards</th>'
     +'<th class="c">✔️ Feito hoje</th><th class="c">🕐 '+brData(ont)+' (combinado → feito)</th>'
     +'</tr></thead><tbody>'+linhas+'</tbody></table>'
-    +(!nome?'<div class="fu-obj-ftr"><span>Números do time inteiro. Escolha um comercial na barra de cima para definir e cobrar os objetivos dele.</span></div>':'')
+    +(!nome?'<div class="fu-obj-ftr">'
+      +'<button class="btn sm wine" onclick="abrirImagemArea(\''+hj+'\')" title="Uma imagem com o que cada responsável combinou">🖼️ Imagem do combinado da área</button>'
+      +'<span>Números do time inteiro. Escolha um comercial na barra de cima para definir e cobrar os objetivos dele.</span></div>':'')
     +(podeEditar&&nome?'<div class="fu-obj-ftr">'
       +'<button class="btn sm wine" onclick="salvarObjetivos(\''+String(nome).replace(/'/g,"\\'")+'\',\''+hj+'\')">🎯 Salvar objetivos de hoje</button>'
+      +'<button class="btn sm" onclick="abrirImagemCombinado(\''+String(nome).replace(/'/g,"\\'")+'\',\''+hj+'\')" title="Gera a imagem do compromisso para mandar">🖼️ Imagem do combinado</button>'
+      +'<button class="btn sm" onclick="abrirImagemArea(\''+hj+'\')" title="A imagem com o time todo da área">👥 Imagem da área</button>'
       +'<span>'+(semOntem?'Ninguém registrou objetivo em '+brData(ont)+' — por isso a última coluna só mostra o realizado.'
                          :'Os objetivos de '+brData(ont)+' viraram a cobrança da última coluna.')+'</span></div>':'')
     +'</div></div>';
@@ -3919,7 +4216,7 @@ function fuMetricasHtml(rows){
   const tiles=EVT_ORDEM.map(t=>{
     const money=evDinheiro(t),tot=money?ap.vol:ap.n[t];
     return '<div class="fu-met"'+fuClick(fuItens(ap[t]),EVTS[t].ico+' '+EVTS[t].rot,'mês')+'>'
-      +'<div class="k">'+EVTS[t].ico+' '+EVTS[t].rot+'</div>'
+      +'<div class="k"'+evDica(t)+'>'+EVTS[t].ico+' '+EVTS[t].rot+(EVTS[t].dica?' <span style="opacity:.5">ⓘ</span>':'')+'</div>'
       +'<div class="v'+(money?' dinheiro':'')+'">'+(money?medM(tot,du.ate):med(tot,du.ate))+'<small>/dia</small></div>'
       +'<div class="s">'+(money?medM(tot,semanas):med(tot,semanas))+' por semana · '
       +(money?fmtR(tot)+' no mês':tot+' no mês')+'</div></div>';
@@ -4185,7 +4482,7 @@ function fuPessoaHtml(nome,rows){
   const pct=meta?Math.min(Math.round(mes.vol/meta*100),999):null;
   const tile=(t)=>'<div class="fu-p-tile'+(evDinheiro(t)?' destaque':'')+'"'
     +fuClick(fuItens(ap[t]),EVTS[t].ico+' '+EVTS[t].rot,nome+' · '+intervalo)+'>'
-    +'<div class="k"><span style="color:'+evCor(t)+'">'+EVTS[t].ico+'</span> '+EVTS[t].rot+'</div>'
+    +'<div class="k"'+evDica(t)+'><span style="color:'+evCor(t)+'">'+EVTS[t].ico+'</span> '+EVTS[t].rot+(EVTS[t].dica?' <span style="opacity:.5">ⓘ</span>':'')+'</div>'
     +'<div class="v'+(evDinheiro(t)?' dinheiro':'')+'">'+evTexto(ap,t)+'</div>'
     +(evDetalhe(ap,t)?'<div class="s">'+evDetalhe(ap,t)+'</div>':'')+'</div>';
   return '<div class="fu-pessoa">'
@@ -5237,7 +5534,51 @@ async function advanceStatus(id,ev){
 }
 
 // ── CLASSIFICAR: status fora do funil ──
-function kbCustomCols(){try{return JSON.parse(localStorage.getItem('kb_custom_cols'))||[]}catch(e){return[]}}
+// ── COLUNAS DO KANBAN: quem cria, cria para a área inteira ──
+// A coluna nasce na área de quem a criou (ou na área do card que a originou) e
+// aparece para todo mundo que atende aquela área — em qualquer empresa.
+const areaDaSub=sk=>Object.keys(SUBS_DA_AREA).find(a=>(SUBS_DA_AREA[a]||[]).includes(sk))||sk;
+function minhasAreasCol(){
+  if(!USER||USER.perfil==='diretor')return Object.keys(AREAS);
+  return (USER.areas||[]).length?USER.areas.slice():Object.keys(AREAS);
+}
+// as colunas ignoram o recorte de empresa de propósito: o funil da área é o mesmo nas duas
+function colunasDoBanco(){
+  return (METAS_RAW||[]).filter(m=>m.area===AREA_COLUNA&&Number(m.meta_valor)>0)
+    .map(m=>{const p=String(m.produto||'').split('|');
+      return {id:m.id,area:p[0]||'',nome:p.slice(1).join('|').trim(),quem:m.assessor||''}})
+    .filter(c=>c.nome&&c.area);
+}
+// ak vazio = todas as áreas de quem está olhando; ak pode ser área ou subárea
+function colunasDaArea(ak){
+  const alvo=alvoColunas(ak);
+  const out=[],vistos=new Set();
+  colunasDoBanco().filter(c=>alvo.includes(c.area)).forEach(c=>{
+    if(vistos.has(norm(c.nome)))return;
+    vistos.add(norm(c.nome));out.push(c.nome);
+  });
+  return out;
+}
+function alvoColunas(ak){return ak?[areaDaSub(ak)]:minhasAreasCol()}
+function kbCustomCols(){return colunasDaArea('')}
+// as colunas antigas viviam só no navegador de quem criou — sobem uma vez para a área
+async function migraColunasLocais(){
+  let antigas=[];
+  try{antigas=JSON.parse(localStorage.getItem('kb_custom_cols'))||[]}catch(e){return}
+  if(!antigas.length){try{localStorage.removeItem('kb_custom_cols')}catch(e){}return}
+  const alvo=minhasAreasCol(), novos=[];
+  antigas.map(c=>String(c||'').trim()).filter(Boolean).forEach(nome=>{
+    if(SC_CHAIN.some(s=>norm(s)===norm(nome)))return;
+    alvo.forEach(a=>{
+      if(colunasDaArea(a).some(s=>norm(s)===norm(nome)))return;
+      novos.push({mes:MES_COLUNA,assessor:USER.nome,area:AREA_COLUNA,produto:a+'|'+nome,meta_valor:1});
+    });
+  });
+  try{
+    if(novos.length){await db('POST','metas',novos);await loadData()}
+    localStorage.removeItem('kb_custom_cols');
+  }catch(e){console.warn('migração de colunas',e)}
+}
 async function setStatusManual(id,novo){
   if(!novo)return;
   const r=acharOpp(id);if(!r)return;
@@ -5250,24 +5591,35 @@ async function setStatusManual(id,novo){
     await loadData();renderCurView();
   }catch(e){showToast('Erro: '+e.message)}
 }
+function nomesAreas(ks){return ks.map(a=>(AREAS[a]||{}).name||a).join(', ')}
 function kbAddEtapa(){
-  const nome=prompt('Nome da nova etapa do funil:\n(os cards entram nela arrastando ou pelo status de mesmo nome)');
-  if(nome&&nome.trim())promoteStatus(nome.trim());
+  const alvo=alvoColunas(window._kbArea||'');
+  const nome=prompt('Nome da nova etapa do funil:\n(ela vai aparecer para todo mundo de '+nomesAreas(alvo)+')');
+  if(nome&&nome.trim())promoteStatus(nome.trim(),window._kbArea||'');
 }
-function promoteStatus(sc){
+async function promoteStatus(sc,ak){
   const nome=String(sc||'').trim();
   if(!nome)return;
-  const existentes=[...SC_CHAIN,...kbCustomCols()];
-  if(existentes.some(s=>norm(s)===norm(nome))){showToast('Já existe uma coluna para esse status');return;}
-  const cols=kbCustomCols();cols.push(nome);
-  localStorage.setItem('kb_custom_cols',JSON.stringify(cols));
-  showToast('✅ Coluna "'+nome+'" criada no Kanban',true);
-  renderCurView();
+  const alvo=alvoColunas(ak||'');
+  const repetida=SC_CHAIN.some(s=>norm(s)===norm(nome))||alvo.some(a=>colunasDaArea(a).some(s=>norm(s)===norm(nome)));
+  if(repetida){showToast('Já existe uma coluna para esse status');return;}
+  try{
+    await db('POST','metas',alvo.map(a=>({mes:MES_COLUNA,assessor:USER.nome,
+      area:AREA_COLUNA,produto:a+'|'+nome,meta_valor:1})));
+    await loadData();renderCurView();
+    showToast('✅ Coluna "'+nome+'" criada para '+nomesAreas(alvo),true);
+  }catch(e){showToast('Erro: '+e.message)}
 }
-function removeCustomCol(nome){
-  const cols=kbCustomCols().filter(c=>norm(c)!==norm(nome));
-  localStorage.setItem('kb_custom_cols',JSON.stringify(cols));
-  renderCurView();
+async function removeCustomCol(nome,ak){
+  const alvo=alvoColunas(ak||'');
+  const linhas=colunasDoBanco().filter(c=>norm(c.nome)===norm(nome)&&alvo.includes(c.area));
+  if(!linhas.length)return;
+  if(!confirm('Remover a coluna "'+nome+'" de '+nomesAreas([...new Set(linhas.map(c=>c.area))])+'?\nOs cards continuam com o status atual, só a coluna some.'))return;
+  try{
+    for(const c of linhas)await db('PATCH','metas',{meta_valor:0},'id=eq.'+c.id);
+    await loadData();renderCurView();
+    showToast('Coluna "'+nome+'" removida',true);
+  }catch(e){showToast('Erro: '+e.message)}
 }
 
 // ── Busca de cliente sem travar a digitação ──
@@ -5793,17 +6145,17 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   ].join('');
 
   // Kanban columns
-  const _cust=kbCustomCols();
+  const _cust=colunasDaArea(window._kbArea||'');
   const _custReuniao=_cust.filter(c=>/r2|reuni/.test(norm(c)));
   const _custOutras=_cust.filter(c=>!/r2|reuni/.test(norm(c)));
   const KB_COLS=[
     ['Ligar Cliente','📞','#5A3A3E'],
     ['Agendar Reunião','🗓️','#854F0B'],
     ['Reunião Agendada','📅','#3C3489'],
-    ..._custReuniao.map(c=>[c,'📅','#3C3489']),
+    ..._custReuniao.map(c=>[c,'📅','#3C3489',true]),
     ['Cliente Confirmar','⏳','#0C447C'],
     ['Cliente Topou','🤝','#085041'],
-    ..._custOutras.map(c=>[c,'📌','#7A5C8A']),
+    ..._custOutras.map(c=>[c,'📌','#7A5C8A',true]),
     ['__BOL__','✅','#085041'],
     ['__PERD__','❌','#A32D2D'],
     ['__NSA__','🚫','#6E6A66']      // "Não se Aplica": fora do jogo, mas visível
@@ -5872,14 +6224,14 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
 
   function buildKanban(opps,seg){
     seg=seg||'';
-    return KB_COLS.map(([key,emoji,cor])=>{
+    return KB_COLS.map(([key,emoji,cor,custom])=>{
       const mk=(seg+'|'+key).replace(/\\/g,'').replace(/'/g,'');
       window._kbColIds=window._kbColIds||{};
       let rows;
       // uma oportunidade cai na coluna do seu status exato; se o status não tem
       // coluna própria (ex.: "Ligar Cliente c AI", "R2 agendada"), o scFunil manda
       // para a etapa equivalente em vez de jogá-la no balaio "Classificar"
-      const colunasKb=[...SC_CHAIN,...kbCustomCols()];
+      const colunasKb=[...SC_CHAIN,..._cust];
       const temColuna=r=>colunasKb.some(x=>norm(x)===norm(r.sc||''));
       const naColuna=(r,k)=>norm(r.sc||'')===norm(k)||(!temColuna(r)&&scFunil(r.sc)===norm(k));
       if(key==='__BOL__')rows=opps.filter(isB);
@@ -5894,7 +6246,9 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
         +'<span style="display:flex;align-items:center;gap:6px">'
         +(rows.length?'<input type="checkbox" '+(colSel?'checked ':'')+'title="Selecionar a coluna inteira" onclick="event.stopPropagation()" onchange="kbSelCol(\''+mk+'\',this.checked)" style="width:13px;height:13px;cursor:pointer;accent-color:'+cor+'">':'')
         +emoji+' '+(key==='__BOL__'?'Boletado':key==='__PERD__'?'Perdido':key==='__NSA__'?'Não se aplica':key)+'</span>'
-        +'<span class="kb-count">'+rows.length+'</span>'
+        +'<span style="display:flex;align-items:center;gap:4px">'
+        +(custom?'<span title="Remover esta coluna da área" onclick="event.stopPropagation();removeCustomCol(\''+String(key).replace(/['"\\]/g,'')+'\',\''+(window._kbArea||'')+'\')" style="cursor:pointer;opacity:.45;font-weight:700">✕</span>':'')
+        +'<span class="kb-count">'+rows.length+'</span></span>'
         +'</div>'
         +'<div style="font-size:10px;font-weight:700;color:'+cor+';padding:0 8px 8px">'+(fmt(vol)||'—')+'</div>'
         +(()=>{
@@ -6134,7 +6488,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
           +'<div style="font-size:10px;color:var(--muted);margin-bottom:5px">Status atual: <b>'+(r.sc||'(vazio)')+'</b></div>'
           +'<select style="width:100%;font-size:11px;padding:5px;border:1px solid var(--border);border-radius:4px" onchange="setStatusManual(\''+r.id+'\',this.value)">'
           +'<option value="">Mudar para status existente...</option>'+opts+'</select>'
-          +(r.sc?'<button class="btn sm" style="width:100%;margin-top:5px" onclick="promoteStatus(\''+scBruto+'\')">📌 Criar coluna "'+(r.sc.length>22?r.sc.substring(0,22)+'…':r.sc)+'"</button>':'')
+          +(r.sc?'<button class="btn sm" style="width:100%;margin-top:5px" onclick="promoteStatus(\''+scBruto+'\',\''+r.area+'\')">📌 Criar coluna "'+(r.sc.length>22?r.sc.substring(0,22)+'…':r.sc)+'"</button>':'')
           +'</div>';
       }).join('')
       +(semStatus.length>15?'<button class="btn sm" style="width:100%;margin-top:4px" onclick="kbVerMais(\'|classificar\')">'+((window._kbMore||{})['|classificar']?'Ver menos ↑':'Ver mais '+(semStatus.length-15)+' ↓')+'</button>':'')
