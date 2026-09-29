@@ -107,7 +107,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .pin-btn:hover{background:var(--wine-l);border-color:var(--wine);color:var(--wine)}
 .pin-btn:active{transform:scale(.93)}
 .pin-btn.del{color:var(--muted);font-size:16px}
-#login-err{color:var(--red);font-size:12px;min-height:18px;margin-top:4px}
+#login-err{color:var(--red);font-size:12px;min-height:18px;margin-top:4px;line-height:1.55;max-width:320px;margin-left:auto;margin-right:auto}
 .login-checking{color:var(--muted);font-size:12px;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
 
 /* ── APP ── */
@@ -125,6 +125,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .topbar-brand{display:flex;align-items:center;gap:10px}
 .topbar-brand h1{font-size:16px;font-weight:700;color:var(--text)}
 .topbar-date{font-size:11px;color:var(--muted)}
+.sync-chip{display:none;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:20px;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:var(--card);white-space:nowrap;user-select:none}
+.sync-chip:hover{border-color:var(--wine);color:var(--wine)}
+.sync-chip.novo{background:#0850410F;border-color:#08504155;color:#085041}
+.sync-chip.novo .pt{width:6px;height:6px;border-radius:50%;background:#085041;animation:pulsa 1.4s infinite}
+@keyframes pulsa{0%,100%{opacity:1}50%{opacity:.25}}
 .topbar-right{display:flex;align-items:center;gap:10px}
 .user-pill{display:flex;align-items:center;gap:6px;background:var(--wine-l);border:1px solid var(--accent-b);border-radius:4px;padding:4px 12px 4px 6px}
 .user-avatar{width:24px;height:24px;border-radius:50%;background:var(--wine);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
@@ -160,7 +165,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .kpi.wine .kpi-val{color:var(--wine-d)}
 .kpi-sub{font-size:11px;color:var(--muted);margin-top:4px}
 
-.area-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+.area-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px}
 .area-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:14px 16px;border-left:3px solid var(--wine)}
 .area-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border-l);border:1px solid var(--border-l);border-radius:4px;overflow:hidden;margin-bottom:2px}
 .area-cell{background:var(--surf2);padding:7px 4px;text-align:center}
@@ -1038,6 +1043,7 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
         </div>
       </div>
       <div class="topbar-right">
+        <div id="sync-chip" class="sync-chip" onclick="sincroniza(true)" title="Atualizar agora"></div>
         <div id="emp-wrap"></div>
         <div class="user-pill">
           <div class="user-avatar" id="user-av"></div>
@@ -1809,13 +1815,26 @@ document.addEventListener('keydown',ev=>{
 });
 function updateDots(){for(let i=0;i<4;i++)document.getElementById('d'+i).classList.toggle('on',i<pin.length)}
 
+function explicaErroApi(st){
+  if(st===402)return{t:'Banco bloqueado por cobrança',
+    d:'O Supabase devolveu 402 (pagamento pendente ou limite do plano estourado) e cortou o acesso ao banco. '
+      +'Não é o sistema nem o seu PIN: alguém precisa entrar em supabase.com, abrir o projeto e regularizar a fatura ou o plano.'};
+  if(st===401||st===403)return{t:'Chave de acesso recusada',
+    d:'O banco recusou a credencial do sistema (erro '+st+'). A chave do projeto provavelmente foi trocada.'};
+  if(st===404)return{t:'Projeto não encontrado',d:'O endereço do banco respondeu 404.'};
+  if(st===429)return{t:'Excesso de requisições',d:'O banco pediu para esperar (429). Tente de novo em um minuto.'};
+  if(st>=500)return{t:'Banco fora do ar',d:'O Supabase respondeu com erro '+st+'. Tente de novo em alguns minutos.'};
+  return{t:'Erro de conexão',d:'O banco respondeu com erro '+st+'.'};
+}
 async function doLogin(){
   const err=document.getElementById('login-err');
   err.textContent='Verificando...';
   const pinAtual=pin;
   try{
     const res=await fetch(SUPA+'/rest/v1/usuarios?pin=eq.'+pinAtual+'&ativo=eq.true&select=*',{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});
-    if(!res.ok)throw new Error('Erro '+res.status);
+    if(!res.ok){const x=explicaErroApi(res.status);
+      err.innerHTML='<b>'+x.t+'</b><br><span style="font-weight:400">'+x.d+'</span>';
+      pin='';updateDots();return;}
     const data=await res.json();
     if(!data||!data.length){err.textContent='PIN incorreto.';pin='';updateDots();return;}
     USER=normalizaUsuario(data[0]);   // areas limpas: 'emp:qrk' é empresa, não área
@@ -1824,7 +1843,8 @@ async function doLogin(){
     document.getElementById('app').style.display='block';
     await initApp();
   }catch(e){
-    err.textContent='Erro de conexão: '+e.message;
+    err.innerHTML='<b>Sem conexão com o banco</b><br><span style="font-weight:400">'
+      +String(e&&e.message||e)+'. Verifique a internet e tente de novo.</span>';
     pin='';updateDots();
   }
 }
@@ -1842,30 +1862,51 @@ function tempoAtras(iso){
   const d=Math.floor(h/24);
   return{txt:'há '+d+' dia'+(d>1?'s':''),on:false};
 }
-// ── AUTO-ATUALIZAÇÃO: detecta versão nova publicada e avisa o usuário ──
-const APP_VERSION='20260819-1833';
-let _verTimer=null;
-async function checarVersao(){
+// ── AUTO-ATUALIZAÇÃO ──
+// Dois sinais, porque um só falha: a versão carimbada (que pode esquecer de
+// mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
+// isso, cada um fica rodando a versão que o navegador guardou — foi assim que
+// duas telas passaram a mostrar números diferentes.
+const APP_VERSION='20260929-1356';
+let _verTimer=null,_verTam=0;
+const urlApp=()=>location.href.split('?')[0].split('#')[0];
+async function tamanhoPublicado(){
   try{
-    const res=await fetch(location.href.split('?')[0]+'?v='+Date.now(),{cache:'no-store'});
+    const r=await fetch(urlApp()+'?v='+Date.now(),{method:'HEAD',cache:'no-store'});
+    return +(r.headers.get('content-length')||0);
+  }catch(e){return 0}
+}
+// no boot vale a conferência pesada: pega até versão que o navegador serviu do cache
+async function conferirNoBoot(){
+  try{
+    const res=await fetch(urlApp()+'?v='+Date.now(),{cache:'no-store'});
     const txt=await res.text();
     const m=txt.match(/APP_VERSION='([^']+)'/);
-    if(m&&m[1]!==APP_VERSION)mostrarAvisoVersao();
+    _verTam=txt.length;
+    if(m&&m[1]!==APP_VERSION)mostrarAvisoVersao(m[1]);
   }catch(e){}
 }
-function mostrarAvisoVersao(){
+async function checarVersao(){
+  const t=await tamanhoPublicado();
+  if(!t||!_verTam)return;
+  if(Math.abs(t-_verTam)>2)mostrarAvisoVersao();
+}
+function mostrarAvisoVersao(nova){
   if(document.getElementById('aviso-versao'))return;
   clearInterval(_verTimer);
   const d=document.createElement('div');
   d.id='aviso-versao';
   d.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#4A0E16;color:#fff;padding:12px 18px;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;gap:14px;font-size:13px';
-  d.innerHTML='✨ Nova versão do sistema disponível'
-    +'<button onclick="location.reload()" style="background:#fff;color:#4A0E16;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer">Atualizar agora</button>';
+  d.innerHTML='<span>✨ <b>Versão nova publicada</b><br>'
+    +'<span style="font-size:11px;opacity:.85">Enquanto não atualizar, seus números podem não bater com os do time.</span></span>'
+    +'<button onclick="location.reload(true)" style="background:#fff;color:#4A0E16;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Atualizar agora</button>';
   document.body.appendChild(d);
 }
 function startVersaoCheck(){
   clearInterval(_verTimer);
-  _verTimer=setInterval(checarVersao,5*60000);
+  conferirNoBoot();
+  _verTimer=setInterval(checarVersao,2*60000);
+  window.addEventListener('focus',checarVersao);
 }
 let _hbTimer=null;
 async function pingPresenca(){
@@ -1894,7 +1935,8 @@ async function initApp(){
   }
 }
 async function initAppInterno(){
-  document.getElementById('topbar-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+  document.getElementById('topbar-date').innerHTML=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})
+    +' <span style="opacity:.55" title="Versão que este navegador está rodando. Se estiver diferente da de outra pessoa, alguém precisa atualizar a página.">· v'+APP_VERSION+'</span>';
   document.getElementById('user-av').textContent=initials(USER.nome);
   document.getElementById('user-nm').textContent=USER.nome;
   restauraEmp();
@@ -1930,6 +1972,9 @@ async function loadData(){
   if(eu)USER.empresas=eu.empresas;
   aplicaEmpresa();
   DAILY={};(daily||[]).forEach(d=>{DAILY[d.oportunidade_id]={tipo:d.tipo,acao:d.acao,id:d.id}});
+  // acabou de ler tudo: alinha a sonda para não recarregar de novo daqui a 15s
+  _ultCheia=Date.now();_pend=false;
+  try{lerSonda().then(s=>{if(s){_sonda=s;_ultOk=Date.now()}pintaSync()}).catch(()=>{})}catch(e){}
 }
 
 // ── NAV ──
@@ -1980,21 +2025,64 @@ function renderCurView(){
   else if(v==='a-daily')renderAssessorDaily(c);
 }
 
-// ── AUTO-REFRESH: a cada 60s recarrega dados e re-renderiza (exceto em upload/modal aberto) ──
-setInterval(async()=>{
-  if(!USER)return;
-  if(curView==='d-upload')return; // não interromper upload
-  const modalOpen=[...document.querySelectorAll('.modal-bg')].some(m=>m.style.display==='flex');
-  if(modalOpen)return; // não interromper edição
-  if(_dragId||window._arrastando)return;            // não redesenhar no meio de um arrasto
-  if(SELECTED.size)return;                          // nem no meio de uma seleção em massa
-  const foco=document.activeElement;                // nem enquanto alguém digita (objetivos do dia, notas, filtros)
-  if(foco&&/^(INPUT|TEXTAREA|SELECT)$/.test(foco.tagName))return;
+// ══ SINCRONIA ENTRE AS TELAS ══
+// A cada 15s sai uma SONDA barata (a alteração mais recente + a contagem).
+// Só quando ela muda é que os dados inteiros vêm de novo — atualiza mais rápido
+// e gasta menos banda que o recarregamento cego de 60 em 60 segundos.
+let _sonda='',_syncBusy=false,_pend=false,_ultOk=0,_ultCheia=0,_ultTecla=0;
+document.addEventListener('keydown',()=>{_ultTecla=Date.now()},true);
+
+function filtroAreasUser(){
+  const areas=USER.perfil==='diretor'?Object.keys(AREAS):(USER.areas||[]);
+  return areas.length?'or=('+areas.map(a=>'area.eq.'+a).join(',')+')&':'';
+}
+async function lerSonda(){
+  const url=SUPA+'/rest/v1/oportunidades?'+filtroAreasUser()+'select=updated_at&order=updated_at.desc&limit=1';
+  const r=await fetch(url,{headers:{apikey:KEY,'Authorization':'Bearer '+KEY,'Range':'0-0','Prefer':'count=exact'}});
+  if(!r.ok)return '';
+  const tot=(r.headers.get('content-range')||'').split('/')[1]||'?';
+  const j=await r.json().catch(()=>[]);
+  return (((j[0]||{}).updated_at)||'')+'|'+tot;
+}
+// redesenhar no meio de uma ação atrapalha; a sonda continua rodando e o aviso espera
+function podeRedesenhar(){
+  if(curView==='d-upload')return false;
+  if([...document.querySelectorAll('.modal-bg')].some(m=>m.style.display==='flex'))return false;
+  if(_dragId||window._arrastando)return false;
+  if(SELECTED.size)return false;
+  const f=document.activeElement;
+  if(f&&/^(INPUT|TEXTAREA)$/.test(f.tagName)&&Date.now()-_ultTecla<20000)return false;
+  return true;
+}
+function pintaSync(){
+  const el=document.getElementById('sync-chip');if(!el)return;
+  el.style.display='flex';
+  if(_pend){el.className='sync-chip novo';el.innerHTML='<span class="pt"></span>Atualizações novas — clique';return}
+  const s=Math.round((Date.now()-_ultOk)/1000);
+  el.className='sync-chip';
+  el.innerHTML='🔄 '+(s<75?'em dia':s<3600?('há '+Math.round(s/60)+' min'):'sem sinal');
+}
+async function sincroniza(forcar){
+  if(!USER||_syncBusy)return;
+  _syncBusy=true;
   try{
-    await loadData();
-    renderCurView();
+    const s=await lerSonda();
+    if(s){_ultOk=Date.now();if(s!==_sonda)_pend=true;}
+    // uma recarga cheia de tempos em tempos pega o que a sonda não vê (metas, usuários, colunas)
+    if(Date.now()-_ultCheia>5*60000)_pend=true;
+    if(_pend&&(forcar||podeRedesenhar())){
+      await loadData();
+      if(s)_sonda=s;
+      _ultCheia=Date.now();_pend=false;
+      renderCurView();
+    }
   }catch(e){}
-},60000);
+  finally{_syncBusy=false;pintaSync()}
+}
+setInterval(()=>sincroniza(false),15000);
+setInterval(pintaSync,20000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)sincroniza(false)});
+window.addEventListener('focus',()=>sincroniza(false));
 
 // ── ATIVIDADE (extraída do histórico automático) ──
 function getActivity(){
@@ -2073,6 +2161,16 @@ function prodMeterHtml(rowsArr,hue,titulo){
     +(entries.length?linhas:'<div class="mempty">Nenhuma oportunidade</div>')
     +'</div>';
 }
+// o recorte de empresa some da vista e faz duas telas discordarem sem ninguém notar
+function recorteEmpresaHtml(){
+  if(!temDuasEmpresas())return '';
+  const rec=empAtual();
+  return '<span style="font-weight:600;font-size:10px;letter-spacing:.04em;margin-left:8px;padding:2px 9px;border-radius:20px;'
+    +'border:1px solid '+(rec?empCor(rec):'var(--border)')+';color:'+(rec?empCor(rec):'var(--muted)')+';cursor:pointer" '
+    +'onclick="setEmp(\''+(rec?'':empresasDoUsuario()[0])+'\')" '
+    +'title="Clique para alternar entre uma empresa e as duas">🏢 '
+    +(rec?empNome(rec):'Quark + QRK')+'</span>';
+}
 function renderDiretor(c=document.getElementById('main-content')){
   const bolVol=OPPS.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
   const bolN=OPPS.filter(isB).length;
@@ -2109,7 +2207,7 @@ function renderDiretor(c=document.getElementById('main-content')){
   c.innerHTML=`
   <!-- Area cards -->
   <div id="dash-areas">
-  <div class="section-label">Desempenho por área</div>
+  <div class="section-label">Desempenho por área ${recorteEmpresaHtml()}</div>
   <div class="area-cards">
     ${aData.map(({ak,a,rows,bol,bolN:bN,pipe:p,pend:pend2,ef,pct})=>`
     <div class="area-card${rows.length?' clicavel':''}" style="border-left-color:${a.color}"${rows.length?` onclick="abrirBoletasArea('${ak}')" title="Ver boletas fechadas e topadas de ${a.name}"`:''}>
@@ -2865,6 +2963,7 @@ async function salvarTrabalhoDaily(qKey,id){
   if(retroD)hist.push(retroD);
   patch.historico=hist;
   try{
+    patch.updated_at=new Date().toISOString();
     await db('PATCH','oportunidades',patch,'id=eq.'+id);
     showToast(retroD?'📦 '+r.cliente+' — boleta de '+mesExtenso(retroD.para)+', foi para o Histórico':'💾 '+r.cliente+' atualizado',true);
     await loadData();renderCurView();
@@ -3204,7 +3303,7 @@ const AREA_COMPROMISSO='compromisso';   // objetivos do dia moram na tabela meta
 const EVTS={
   lig:{ico:'📞',rot:'Ligações feitas',cor:'var(--wine)',base:'',baseRot:''},
   mar:{ico:'📅',rot:'Reuniões marcadas',cor:'#2F6795',base:'lig',baseRot:'das ligações',
-    dica:'Conta o ato: a ligação estava marcada para aquele dia, nesse dia a pessoa pôs a data da reunião no card e o status foi para Reunião Agendada. Só mudar o status, só agendar a ligação ou arrastar o card não conta.'},
+    dica:'Conta quando a ligação do card foi marcada para aquele dia e o card tem data de reunião. Ligação marcada sem data de reunião não conta, e mudar o status ou arrastar o card também não.'},
   reu:{ico:'🤝',rot:'Reuniões feitas',cor:'#5E5896',base:'mar',baseRot:'das marcadas'},
   bol:{ico:'✅',rot:'Fechados',cor:'var(--green)',base:'reu',baseRot:'das reuniões feitas'},
 };
@@ -3258,54 +3357,57 @@ function eventosDe(r){
   return ev;
 }
 // ══ REUNIÃO MARCADA ══
-// É o ATO, no dia em que aconteceu: a ligação estava marcada para aquele dia,
-// nesse dia a pessoa pôs a data da reunião no card e o status foi para
-// "Reunião Agendada" (ou adiante). Só mexer no status, só agendar a ligação,
-// arrastar o card ou ter uma data velha na agenda NÃO é reunião marcada.
-// Guarda também o que NÃO passou, com o motivo: número baixo tem que ser auditável.
+// Simples: se a ligação do card foi marcada PARA aquele dia e o card tem data
+// de reunião, é uma reunião marcada naquele dia. Não olha status, não exige que
+// tudo tenha sido salvo junto. Só agendar a ligação, sem data de reunião, não é.
+// Guarda também o que ficou de fora, com o motivo: o número tem que ser auditável.
 function analiseMarcacoes(r){
   if(r.__mk)return r.__mk;
-  const hist=(r.historico||[]),ok=[],nao=[];
-  const prim=hist.find(h=>h.campo==='Status comercial');
-  let st=prim?(prim.de||''):(r.sc||'');   // status vigente, reconstruído da linha do tempo
-  let lig='';                              // data da "Ligação marcada" vigente
-  let i=0;
-  while(i<hist.length){
-    // o mesmo salvamento grava várias linhas com o mesmo carimbo de data/hora
-    const carimbo=hist[i].data;
-    let marcou=null;
-    while(i<hist.length&&hist[i].data===carimbo){
-      const h=hist[i++];
-      if(h.campo===CAMPO_LIG_DATA)lig=isoDia(h.para)||'';
-      if(h.campo==='Status comercial'&&h.para)st=h.para;
-      if(h.campo==='Reunião marcada'&&h.para)marcou=h;
-    }
-    if(!marcou)continue;
-    const dia=isoHist(carimbo);
-    if(!dia)continue;
-    const alvo=isoDia(marcou.para);
-    const motivo=lig!==dia
-        ?(lig?'a ligação marcada era de '+brData(lig)+', não de '+brData(dia):'sem ligação marcada para '+brData(dia))
-      :ETAPA_IDX(st)<2?'o card ficou em “'+(st||'—')+'”, não foi para Reunião Agendada'
+  const ok=[],nao=[];
+  const tl=[];
+  (r.historico||[]).forEach(h=>{
+    if(h.campo!==CAMPO_LIG_DATA&&h.campo!=='Reunião marcada')return;
+    const iso=isoHist(h.data);if(!iso)return;
+    tl.push({iso,campo:h.campo,para:isoDia(h.para)||'',quem:h.usuario||''});
+  });
+  // card antigo, sem registro da reunião: vale a data que está nele hoje
+  const reuBase=tl.some(x=>x.campo==='Reunião marcada')?'':(isoDia(r.reuniao_data)||'');
+  // a reunião daquele dia de ligação: a primeira registrada daquele dia em diante
+  // (o registro pode entrar depois, inclusive retroativo), senão a que já estava no card
+  const reuNoDia=d=>{
+    const pos=tl.find(x=>x.campo==='Reunião marcada'&&x.para&&x.iso>=d);
+    if(pos)return pos.para;
+    let v=reuBase;
+    tl.forEach(x=>{if(x.campo==='Reunião marcada'&&x.iso<=d)v=x.para});
+    return v;
+  };
+  const vistos=new Set();
+  tl.forEach(x=>{
+    if(x.campo!==CAMPO_LIG_DATA||!x.para)return;
+    const dia=x.para;
+    if(vistos.has(dia))return;
+    vistos.add(dia);
+    const reu=reuNoDia(dia);
+    const motivo=!reu?'a ligação de '+brData(dia)+' não tem data de reunião no card'
+      :reu<dia?'a reunião no card é de '+brData(reu)+', anterior à ligação de '+brData(dia)
       :'';
-    const reg={carimbo,dia,alvo,quem:marcou.usuario||'',motivo};
-    (motivo?nao:ok).push(reg);
-  }
+    (motivo?nao:ok).push({dia,alvo:reu,quem:x.quem,motivo});
+  });
   const res={ok,nao};
   try{Object.defineProperty(r,'__mk',{value:res,enumerable:false,configurable:true})}catch(e){r.__mk=res}
   return res;
 }
 function marcacaoDeReuniao(r,add){
   analiseMarcacoes(r).ok.forEach(m=>
-    add('mar',m.carimbo,'ligação de '+brData(m.dia)+' virou reunião em '+brData(m.alvo),m.quem));
+    add('mar',m.dia,'ligação marcada para '+brData(m.dia)+' com reunião em '+brData(m.alvo),m.quem));
 }
-// data da reunião preenchida que NÃO virou reunião marcada, com o porquê
 function marcacoesRecusadas(rows,de,ate){
   const out=[];
   rows.forEach(r=>analiseMarcacoes(r).nao.forEach(m=>{
     if(m.dia<de||m.dia>ate)return;
+    if(!m.alvo)return;                       // sem data de reunião é só ligação, não é gap
     if(_apQuem&&(m.quem?normUsuario(m.quem)!==norm(_apQuem):!eDono(r,_apQuem)))return;
-    out.push({r,quando:m.dia,txt:'pôs a reunião de '+brData(m.alvo)+' — '+m.motivo});
+    out.push({r,quando:m.dia,txt:m.motivo});
   }));
   return out;
 }
@@ -4000,8 +4102,8 @@ function fuGapsHtml(rows,ativas){
     {ico:'💤',rot:'Paradas há 7 dias ou mais',n:parado.length,itens:parado,tit:'💤 Oportunidades paradas',sub:'sem registro há uma semana',alerta:parado.length>0},
     {ico:'🕳️',rot:'Sem data nenhuma',n:semNada.length,itens:semNada,tit:'🕳️ Sem data nenhuma',sub:'não entram em nenhuma agenda',alerta:semNada.length>0},
     {ico:'👻',rot:'Reunião passou sem registro',n:reuFuro.length,itens:reuFuro,tit:'👻 Reuniões sem confirmação',sub:'aconteceu? marque no card',alerta:reuFuro.length>0},
-    {ico:'📅',rot:'Data de reunião que não virou marcação',n:foraRegra.length,itens:foraRegra,
-      tit:'📅 Ficaram de fora das reuniões marcadas',sub:'faltou a ligação do dia ou o status',alerta:foraRegra.length>0},
+    {ico:'📅',rot:'Ligação do dia com reunião antiga',n:foraRegra.length,itens:foraRegra,
+      tit:'📅 Ficaram de fora das reuniões marcadas',sub:'a data da reunião é anterior à ligação',alerta:foraRegra.length>0},
     {ico:'❌',rot:'Perdidas no mês',n:perdidas.length,itens:perdidas,tit:'❌ Perdidas no mês',sub:'cliente negou'},
   ];
   return '<div class="fu-q fu-q-gap" style="--fc:var(--red)">'
@@ -5763,6 +5865,7 @@ async function kbDrop(ev,statusKey){
   }
   patch.historico=hist;
   try{
+    patch.updated_at=new Date().toISOString();
     await db('PATCH','oportunidades',patch,'id=eq.'+id);
     showToast('✅ '+r.cliente+' → '+(statusKey==='__BOL__'?'Boletado':statusKey),true);
     await loadData();
