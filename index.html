@@ -1788,15 +1788,56 @@ async function patchOppSeguro(dados,filtro){
     showToast('⚠️ Salvo, mas o banco não tem a(s) coluna(s): '+faltantes.join(', ')+'. Peça ao diretor para rodar o SQL no Supabase.');
   }
 }
+// Leitura incompleta não pode ser silenciosa: é exatamente assim que duas
+// telas passam a mostrar números diferentes do mesmo banco.
+function conferirLeitura(){
+  const i=(window._dbInfo||{})['oportunidades'];
+  if(!i||i.lidas>=i.total)return;
+  console.warn('leitura incompleta',i);
+  showToast('⚠ Li '+i.lidas+' de '+i.total+' oportunidades do banco — me avise, os números estão incompletos');
+}
+// o que a tela está realmente enxergando, em uma linha
+function linhaConferencia(){
+  const i=(window._dbInfo||{})['oportunidades']||{total:0,lidas:0};
+  const vis=OPPS_ALL.length, ativas=OPPS.length, falta=i.lidas<i.total;
+  return '<div style="font-size:10px;color:'+(falta?'var(--red)':'var(--muted-l)')+';margin:-14px 0 14px">'
+    +(falta?'⚠ ':'')+ativas+' no fluxo · '+vis+' no recorte · '+i.lidas+' de '+i.total+' lidas do banco'
+    +(temDuasEmpresas()?' · '+(empAtual()?empNome(empAtual()):'Quark + QRK'):'')
+    +'</div>';
+}
+// Quanto o banco tem × quanto chegou aqui. É o que denuncia leitura cortada.
+window._dbInfo={};
 async function db(method,table,data,filter){
   let url=`${SUPA}/rest/v1/${table}`;
   if(filter)url+=`?${filter}`;
   const headers={'apikey':KEY,'Authorization':`Bearer ${KEY}`,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':'return=minimal'};
-  if(method==='GET')headers['Range']='0-9999';
-  const r=await fetch(url,{method,headers,body:data?JSON.stringify(data):undefined});
-  if(!r.ok){const e=await r.text();throw new Error(e)}
-  if(r.status===204)return null;
-  return r.json();
+  if(method!=='GET'){
+    const r=await fetch(url,{method,headers,body:data?JSON.stringify(data):undefined});
+    if(!r.ok){const e=await r.text();throw new Error(e)}
+    if(r.status===204)return null;
+    return r.json();
+  }
+  // ── LEITURA PAGINADA ──
+  // Uma resposta só tem teto. Quem puxa muita área (o diretor puxa todas)
+  // estourava esse teto e perdia linhas — e nem ficava sabendo. Agora vem de
+  // mil em mil até acabar, e guardamos o total que o banco declara para conferir.
+  const PAG=1000, TETO=80000;
+  let todas=[],ini=0,total=null;
+  while(ini<TETO){
+    const h=Object.assign({},headers,{'Range-Unit':'items','Range':ini+'-'+(ini+PAG-1),
+      'Prefer':ini===0?'count=exact':'count=none'});
+    const r=await fetch(url,{method:'GET',headers:h});
+    if(!r.ok){const e=await r.text();throw new Error(e)}
+    const cr=r.headers.get('content-range')||'';
+    const t=parseInt((cr.split('/')[1]||''),10);
+    if(!isNaN(t))total=t;
+    const j=await r.json().catch(()=>[]);
+    todas=todas.concat(j||[]);
+    if(!j||j.length<PAG)break;
+    ini+=PAG;
+  }
+  window._dbInfo[table]={total:(total===null?todas.length:total),lidas:todas.length,filtro:filter||''};
+  return todas;
 }
 
 aplicarTema(temaAtual()); // sincroniza ícone do botão e defaults do Chart.js no boot
@@ -1867,7 +1908,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20260929-1356';
+const APP_VERSION='20261001-1421';
 let _verTimer=null,_verTam=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 async function tamanhoPublicado(){
@@ -1972,6 +2013,7 @@ async function loadData(){
   if(eu)USER.empresas=eu.empresas;
   aplicaEmpresa();
   DAILY={};(daily||[]).forEach(d=>{DAILY[d.oportunidade_id]={tipo:d.tipo,acao:d.acao,id:d.id}});
+  conferirLeitura();
   // acabou de ler tudo: alinha a sonda para não recarregar de novo daqui a 15s
   _ultCheia=Date.now();_pend=false;
   try{lerSonda().then(s=>{if(s){_sonda=s;_ultOk=Date.now()}pintaSync()}).catch(()=>{})}catch(e){}
@@ -2135,6 +2177,34 @@ function tint(hex,amt){
 }
 // Medidor compacto por produto: boletado (sólido) sobre a trilha do pipe (mesma cor, clara).
 // Tudo em CSS — sem canvas, sem altura fixa: o bloco encolhe conforme o nº de produtos.
+// A quebra tem que fechar com o total do card. Antes, Investimentos mostrava só
+// Renda variável e Renda fixa — tudo que caía em Asset Allocation/IA sumia da
+// conta sem aviso. Agora os grupos saem dos próprios dados e o que sobrar cai
+// num grupo "sem classificação": nenhuma boleta pode ficar fora da vista.
+function quebraPorProduto(ak,rows,a){
+  if(!rows.length)return '';
+  let html='',cobertas=0;
+  if(ak==='inv'){
+    // cores distintas entre si: três tons de vinho não se separam na leitura
+    const grupos=[['rv','Renda variável','#8B1C2A'],['rf','Renda fixa','#378ADD'],['invg','Asset Allocation / IA','#0F8A7E']];
+    const conhecidas=new Set(grupos.map(g=>g[0]));
+    grupos.forEach(([k,rot,cor])=>{
+      const rs=rows.filter(r=>subAreaOf(r)===k);
+      if(!rs.length)return;
+      cobertas+=rs.length;
+      html+=prodMeterHtml(rs,corMarca(cor),rot);
+    });
+    const soltas=rows.filter(r=>!conhecidas.has(subAreaOf(r)));
+    if(soltas.length){cobertas+=soltas.length;html+=prodMeterHtml(soltas,corMarca('#6E6A66'),'Sem classificação');}
+  }else{
+    cobertas=rows.length;
+    html=prodMeterHtml(rows,a.color,'Por produto');
+  }
+  // trava: se algum dia sobrar card fora da quebra, isso aparece na tela
+  if(cobertas!==rows.length)html+='<div style="font-size:10px;color:var(--red);margin-top:6px">'
+    +'⚠ '+(rows.length-cobertas)+' oportunidade(s) fora da quebra — me avise</div>';
+  return html;
+}
 function prodMeterHtml(rowsArr,hue,titulo){
   const map={};
   rowsArr.forEach(r=>{const pk=r.produto||'Outros';if(!map[pk])map[pk]={bol:0,pipe:0};map[pk].pipe+=(r.pipe||0);if(isB(r))map[pk].bol+=(r.atual||0);});
@@ -2208,6 +2278,7 @@ function renderDiretor(c=document.getElementById('main-content')){
   <!-- Area cards -->
   <div id="dash-areas">
   <div class="section-label">Desempenho por área ${recorteEmpresaHtml()}</div>
+  ${linhaConferencia()}
   <div class="area-cards">
     ${aData.map(({ak,a,rows,bol,bolN:bN,pipe:p,pend:pend2,ef,pct})=>`
     <div class="area-card${rows.length?' clicavel':''}" style="border-left-color:${a.color}"${rows.length?` onclick="abrirBoletasArea('${ak}')" title="Ver boletas fechadas e topadas de ${a.name}"`:''}>
@@ -2242,10 +2313,7 @@ function renderDiretor(c=document.getElementById('main-content')){
           +'</div>'
           +'</div>';
       })()}
-      ${ak==='inv'
-        ?prodMeterHtml(rows.filter(r=>subAreaOf(r)==='rv'),corMarca('#8B1C2A'),'Renda variável')
-         +prodMeterHtml(rows.filter(r=>subAreaOf(r)==='rf'),corMarca('#378ADD'),'Renda fixa')
-        :rows.length?prodMeterHtml(rows,a.color,'Por produto'):''}
+      ${quebraPorProduto(ak,rows,a)}
       <div style="display:flex;align-items:center;gap:8px;margin-top:12px">
         <div style="flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="width:${pct}%;min-width:4px;height:5px;background:${a.color};border-radius:3px;transition:width .6s ease"></div></div>
         <span style="font-size:10px;color:var(--muted);flex-shrink:0">${pct}% realizado</span>
