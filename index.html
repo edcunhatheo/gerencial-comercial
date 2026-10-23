@@ -279,6 +279,15 @@ tr.bol td{background:var(--green-bg)}
 .kb-col{min-width:262px;max-width:262px;background:var(--surf3);border-radius:6px;padding:10px;flex-shrink:0}
 .kb-col-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .kb-count{background:var(--card);border-radius:4px;padding:1px 8px;font-size:10px;font-weight:700;color:var(--muted)}
+/* agenda externa do closer — prefixo próprio para não colidir com a agenda interna (.ag-*) */
+.cal-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,1fr);gap:18px;align-items:start}
+@media(max-width:1100px){.cal-grid{grid-template-columns:1fr}}
+.cal-li{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border-l);border-radius:5px;margin-bottom:6px;background:var(--card);cursor:pointer}
+.cal-li:hover{border-color:var(--wine)}
+.cal-d{font-size:11px;font-weight:700;color:var(--muted);min-width:34px}
+.cal-cli{font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal-sub{font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal-bt{cursor:pointer;opacity:.5;font-size:14px}.cal-bt:hover{opacity:1}
 .cross{display:inline-block;margin:2px 0 1px;font-size:9px;font-weight:700;color:#2F6795;background:#2F679512;border:1px solid #2F679533;border-radius:10px;padding:1px 7px;text-transform:uppercase;letter-spacing:.03em;cursor:help;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .kb-exp{cursor:pointer;opacity:.4;font-weight:700;font-size:13px;line-height:1;padding:0 1px;transition:opacity .15s,transform .15s}
 .kb-exp:hover{opacity:1;transform:translateY(1px)}
@@ -1068,6 +1077,7 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
       <button class="modal-x" onclick="closeModal('edit')">×</button>
     </div>
     <div id="e-outras" style="display:none"></div>
+    <div id="e-agenda-bt" style="display:none;margin:-4px 0 12px"></div>
     <div class="form-row">
       <div class="fg"><label>Cliente <span style="font-weight:400;text-transform:none;font-size:9px">(corrija se estiver errado)</span></label>
         <input type="text" id="e-cliente" placeholder="Nome do cliente">
@@ -1107,8 +1117,11 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
       <div class="fg"><label>📞 Ligação marcada (data)</label>
         <input type="date" id="e-ligacao">
       </div>
-      <div class="fg"><label>📅 Reunião marcada (data)</label>
-        <input type="date" id="e-reuniao">
+      <div class="fg"><label>📅 Reunião marcada</label>
+        <div style="display:flex;gap:6px">
+          <input type="date" id="e-reuniao" style="flex:1">
+          <input type="time" id="e-reuniao-hora" style="width:108px" title="Hora da reunião">
+        </div>
       </div>
     </div>
     <div class="form-row">
@@ -1147,6 +1160,7 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
   <div class="modal" style="max-width:400px">
     <div class="modal-hdr"><h2>Novo usuário</h2><button class="modal-x" onclick="closeModal('user')">×</button></div>
     <div class="fg"><label>Nome completo</label><input type="text" id="u-nome" placeholder="Nome do assessor"></div>
+    <div class="fg"><label>Agenda (e-mail do Google)</label><input type="text" id="u-agenda" placeholder="nome@empresa.com.br"></div>
     <div class="form-row">
       <div class="fg"><label>PIN (4 dígitos)</label><input type="text" id="u-pin" maxlength="4" placeholder="0000"></div>
       <div class="fg"><label>Perfil</label>
@@ -1259,8 +1273,11 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
       </div>
     </div>
     <div class="form-row">
-      <div class="fg"><label>📅 Reunião marcada (data)</label>
-        <input type="date" id="n-reuniao">
+      <div class="fg"><label>📅 Reunião marcada</label>
+        <div style="display:flex;gap:6px">
+          <input type="date" id="n-reuniao" style="flex:1">
+          <input type="time" id="n-reuniao-hora" style="width:108px" title="Hora da reunião">
+        </div>
       </div>
       <div class="fg"><label>👤 Responsável (time)</label>
         <select id="n-resp"><option value="">Sem responsável</option></select>
@@ -1525,7 +1542,7 @@ function segmentoDaOpp(r){
   for(const s of SEGMENTOS_ACORDO){if(SEG_MATCH[s]&&SEG_MATCH[s](r))return s;}
   return null;
 }
-const metasDoMes=()=>METAS.filter(m=>m.area!==AREA_ACORDO&&m.area!==AREA_COMPROMISSO&&m.area!==AREA_COLUNA);
+const metasDoMes=()=>METAS.filter(m=>m.area!==AREA_ACORDO&&m.area!==AREA_COMPROMISSO&&m.area!==AREA_COLUNA&&m.area!==AREA_CONFIG);
 const acordosDoMes=()=>METAS.filter(m=>m.area===AREA_ACORDO);
 // aceita "150000", "150.000,00", "R$ 150.000" e devolve número
 function parseMoeda(s){
@@ -1560,6 +1577,7 @@ const EMPRESAS={
 const EMP_PADRAO='quark';
 const CAMPO_EMP='Empresa';
 const PREF_EMP='emp:';
+const PREF_CAL='cal:';   // e-mail da agenda do usuário, guardado junto das áreas
 const empOk=e=>EMPRESAS[e]?e:EMP_PADRAO;
 const empNome=e=>(EMPRESAS[empOk(e)]||{}).curto||e;
 const empCor=e=>(EMPRESAS[empOk(e)]||{}).cor||'var(--wine)';
@@ -1577,17 +1595,17 @@ const marcaEmpresa=(emp,ds)=>({campo:CAMPO_EMP,de:'',para:empOk(emp),usuario:(US
 // usuário: separa as empresas das áreas de verdade
 function normalizaUsuario(u){
   const todas=Array.isArray(u.areas)?u.areas:(u.areas?[].concat(u.areas):[]);
-  if(u.perfil==='diretor')return Object.assign({},u,{
-    areas:todas.filter(a=>!String(a).startsWith(PREF_EMP)),empresas:Object.keys(EMPRESAS)});
+  const agenda=(todas.find(a=>String(a).startsWith(PREF_CAL))||'').slice(PREF_CAL.length);
+  const limpa=todas.filter(a=>!String(a).startsWith(PREF_EMP)&&!String(a).startsWith(PREF_CAL));
+  if(u.perfil==='diretor')return Object.assign({},u,{areas:limpa,empresas:Object.keys(EMPRESAS),agenda});
   const emp=todas.filter(a=>String(a).startsWith(PREF_EMP)).map(a=>empOk(String(a).slice(PREF_EMP.length)));
-  return Object.assign({},u,{
-    areas:todas.filter(a=>!String(a).startsWith(PREF_EMP)),
-    empresas:emp.length?[...new Set(emp)]:[EMP_PADRAO],
-  });
+  return Object.assign({},u,{areas:limpa,empresas:emp.length?[...new Set(emp)]:[EMP_PADRAO],agenda});
 }
 const normalizaUsuarios=l=>(l||[]).map(normalizaUsuario);
 // volta para o formato que o banco guarda
-const areasComEmpresas=(areas,empresas)=>[...(areas||[]),...((empresas&&empresas.length?empresas:[EMP_PADRAO]).map(e=>PREF_EMP+e))];
+const areasComEmpresas=(areas,empresas,agenda)=>[...(areas||[]),
+  ...((empresas&&empresas.length?empresas:[EMP_PADRAO]).map(e=>PREF_EMP+e)),
+  ...(agenda?[PREF_CAL+String(agenda).trim()]:[])];
 
 function empresasDoUsuario(){
   if(!USER)return [EMP_PADRAO];
@@ -1998,7 +2016,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261023-1956';
+const APP_VERSION='20261023-2148';
 let _verTimer=null,_verTam=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 async function tamanhoPublicado(){
@@ -2114,10 +2132,10 @@ let curView='';
 function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
-    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-metas','🏆 Definições do mês'],['d-historico','📦 Histórico'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários'],['d-acordos','📋 Acordos por AI']]
+    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-agenda','📅 Agenda'],['d-metas','🏆 Definições do mês'],['d-historico','📦 Histórico'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários'],['d-acordos','📋 Acordos por AI']]
     :USER.perfil==='gestor'
-    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']]
-    :[['diretor','📊 Dashboard'],['a-opps','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']];
+    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-agenda','📅 Agenda'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']]
+    :[['diretor','📊 Dashboard'],['a-opps','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-agenda','📅 Agenda'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>{
     const ico=l.split(' ')[0];
     const lb=l.substring(ico.length+1);
@@ -2150,6 +2168,7 @@ function renderCurView(){
   else if(v==='d-upload')renderUpload(c);
   else if(v==='d-usuarios')renderUsuarios(c);
   else if(v==='d-acordos')renderAcordos(c);
+  else if(v==='d-agenda')renderAgendaExterna(c);
   else if(v==='d-historico')renderHistorico(c);
   else if(v==='a-opps')renderAssessorOpps(c);
   else if(v==='a-upload')renderTeamUpload(c);
@@ -3311,7 +3330,7 @@ function agendaContatosHtml(sel){
     +'<button onclick="agHoje()" title="Voltar para o mês atual">hoje</button></div></div>'
     +'<div class="ag-lbl">Realizado de fato</div>'
     +'<div class="ag-real">'+realizadoHtml(sel,ref,f)+'</div>'
-    +'<div class="ag-grid">'+dows+cels+'</div>'
+    +'<div class="cal-grid">'+dows+cels+'</div>'
     +lista
     +'<div class="ag-nota">A data do compromisso sai do card — <strong>📞 Vou ligar em</strong> e <strong>📅 Reunião em</strong>, no bloco “Trabalhar oportunidade” ou no modal da oportunidade. '
     +'“Feito” usa a mesma prova do quadro de efetividade: a confirmação no card, o movimento de status ou a data da reunião que já passou.</div>'
@@ -6468,7 +6487,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
           +(r.produto?'<span style="border:1px solid '+cr+';color:'+cr+';border-radius:4px;padding:0 6px;font-size:9px;font-weight:700;text-transform:uppercase">'+r.produto+'</span>':'')
           +'</div>';})()
       +(r.assessor?'<div class="kb-meta" style="font-weight:600">🧑‍💼 '+r.assessor+(r.responsavel?' · 👤'+r.responsavel:'')+'</div>':(r.responsavel?'<div class="kb-meta">👤 '+r.responsavel+'</div>':''))
-      +(r.reuniao_data?'<div class="kb-meta" style="color:#0C447C;font-weight:700">📅 Reunião '+fmtReuniao(r.reuniao_data)+'</div>':'')
+      +(r.reuniao_data?'<div class="kb-meta" style="color:#0C447C;font-weight:700">📅 Reunião '+fmtReuniao(r.reuniao_data)+(horaReuniao(r)?' às '+horaReuniao(r):'')+'</div>':'')
       +(r.todo?'<div class="kb-meta" style="color:var(--amber)">📋 '+r.todo.substring(0,40)+(r.todo_data?' ('+r.todo_data.split('-')[2]+'/'+r.todo_data.split('-')[1]+''+')':'')+'</div>':'')
       +(r.obs&&limpaTraco(r.obs)?'<div class="kb-meta" title="'+String(r.obs).replace(/"/g,'&quot;')+'" style="color:#8A6A3B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 '+String(r.obs).substring(0,48)+(r.obs.length>48?'…':'')+'</div>':'')
       +'<div class="kb-meta" style="display:flex;gap:4px;flex-wrap:wrap">'+mkChip(r,'lig')+mkChip(r,'reu')+'</div>'
@@ -7107,6 +7126,23 @@ function openEdit(id){
     const box=document.getElementById('e-outras');
     const html=outrasAreasHtml(r);
     box.style.display=html?'block':'none';box.innerHTML=html;
+    const bt=document.getElementById('e-agenda-bt');
+    if(bt){
+      const temData=!!isoDia(r.reuniao_data);
+      bt.style.display='block';
+      const conectada=agendaConectada();
+      const pend=pendenciaAgenda(r);
+      const cl=closerDaReuniao(r);
+      bt.innerHTML='<button class="btn sm" style="font-size:11px" '+(temData?'':'disabled title="Preencha a data da reunião primeiro" ')
+        +'onclick="mandarParaAgenda(\''+r.id+'\')">📅 '
+        +(conectada?('Pôr na agenda de '+(cl.nome||'quem atende'))
+          :cl.email?('Criar e convidar '+cl.nome):'Criar na minha agenda')+'</button>'
+        +'<span style="font-size:10.5px;color:'+(pend&&temData?'var(--amber)':'var(--muted-l)')+';margin-left:8px">'
+        +(!temData?'preencha a data e a hora da reunião abaixo'
+          :pend?('⚠ '+pend)
+          :('📅 vai para a agenda de <b>'+cl.nome+'</b> ('+cl.email+')'
+            +(eventoDaOpp(r)?' — já está lá, salvar só atualiza':' ao salvar')))+'</span>';
+    }
   })();
   fillSelect('e-sc',[...SC_PADRAO,...OPPS.map(x=>x.sc)],r.sc||'');
   fillSelect('e-pb',[...PB_PADRAO,...OPPS.map(x=>x.pb)],r.pb||'');
@@ -7125,6 +7161,7 @@ function openEdit(id){
     else info.style.display='none';
   })();
   document.getElementById('e-reuniao').value=r.reuniao_data||'';
+  document.getElementById('e-reuniao-hora').value=horaReuniao(r);
   document.getElementById('e-ligacao').value=dataLigacao(r)||'';
   document.getElementById('e-marcas').innerHTML=mkChip(r,'lig',true)+mkChip(r,'reu',true);
   const respSel=document.getElementById('e-resp');
@@ -7182,6 +7219,8 @@ async function saveEdit(){
    ['Cliente',r.cliente||'',newCli],['Assessor',r.assessor||'',newAss]].forEach(([campo,de,para])=>{if(de!==para&&para)hist.push({campo,de,para,usuario:USER.nome,data:ds})});
   const ligNova=document.getElementById('e-ligacao').value||'';
   if(ligNova!==(dataLigacao(r)||''))hist.push({campo:CAMPO_LIG_DATA,de:dataLigacao(r)||'',para:ligNova,usuario:USER.nome,data:ds});
+  const horaNova=document.getElementById('e-reuniao-hora').value||'';
+  if(horaNova!==horaReuniao(r))hist.push({campo:CAMPO_HORA,de:horaReuniao(r),para:horaNova,usuario:USER.nome,data:ds});
   const newObs=document.getElementById('e-obs').value.trim();
   if(newObs)hist.push({campo:'Observação',de:'',para:newObs,usuario:USER.nome,data:ds});
   const retro=arquivoRetroativo(r,newSc,newPb,document.getElementById('e-data').value,ds);
@@ -7195,8 +7234,10 @@ async function saveEdit(){
   try{
     const dadosPatch={cliente:newCli,assessor:newAss||r.assessor||'',sc:newSc,pb:newPb,atual:newAtual,data_boleta:document.getElementById('e-data').value||null,todo:document.getElementById('e-todo').value,todo_data:document.getElementById('e-todo-data').value||null,reuniao_data:document.getElementById('e-reuniao').value||null,responsavel:document.getElementById('e-resp').value||'',escalado_para:escPara||null,escala_motivo:escPara?(escMotivoRaw?escMotivoRaw+' — por '+USER.nome:'Escalada por '+USER.nome):null,obs:newObs||r.obs||'',historico:hist,updated_at:now.toISOString()};
     await patchOppSeguro(dadosPatch,`id=eq.${editId}`);
+    const idSalvo=editId;
     showToast(retro?'📦 Boleta de '+mesExtenso(retro.para)+' — foi direto para o Histórico dessa competência':'✅ Salvo com sucesso!',true);
     closeModal('edit');
+    setTimeout(()=>sincronizarAgenda(idSalvo),400);
     await loadData();
     if(curView==='a-opps')renderAssessorOpps();
     else if(curView==='a-daily')renderAssessorDaily();
@@ -7267,13 +7308,16 @@ async function saveNewOpp(){
     obs:document.getElementById('n-obs').value.trim(),
     fonte:'Manual',
     historico:[{campo:'Criação',de:'',para:'Oportunidade criada manualmente',usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})},
+      ...((document.getElementById('n-reuniao-hora')||{}).value?[{campo:CAMPO_HORA,de:'',para:document.getElementById('n-reuniao-hora').value,usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}]:[]),
       marcaEmpresa(lerSel('n-empresa')||empParaGravar(),now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}))]
   };
   try{
-    await db('POST','oportunidades',[opp]);
+    const criada=await db('POST','oportunidades',[opp]);
+    const idNovo=(criada&&criada[0]&&criada[0].id)||'';
     showToast('✅ Oportunidade criada!',true);
     closeModal('newopp');
-    ['n-assessor','n-cliente','n-produto','n-pipe','n-atual','n-sc','n-pb','n-todo','n-todo-data','n-reuniao','n-resp','n-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['n-assessor','n-cliente','n-produto','n-pipe','n-atual','n-sc','n-pb','n-todo','n-todo-data','n-reuniao','n-reuniao-hora','n-resp','n-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    if(idNovo)setTimeout(()=>sincronizarAgenda(idNovo),600);
     await loadData();
     renderCurView();
   }catch(e){showToast('Erro: '+e.message)}
@@ -7578,6 +7622,21 @@ const MARCAS={
 // Data em que o assessor VAI LIGAR. Guardada como marcador no histórico — a
 // última entrada é a que vale — para não exigir coluna nova no banco.
 const CAMPO_LIG_DATA='Ligação marcada';
+// A coluna reuniao_data só guarda o dia. A HORA e o id do evento criado na
+// agenda viajam como marcadores no histórico — a última entrada é a que vale.
+const CAMPO_HORA='Hora da reunião';
+const CAMPO_EVENTO='Evento na agenda';
+function horaReuniao(r){
+  let v='';
+  (r.historico||[]).forEach(h=>{if(h.campo===CAMPO_HORA)v=String(h.para||'').slice(0,5)});
+  return /^\d{2}:\d{2}$/.test(v)?v:'';
+}
+function eventoDaOpp(r){
+  let v='';
+  (r.historico||[]).forEach(h=>{if(h.campo===CAMPO_EVENTO)v=String(h.para||'')});
+  return v;
+}
+const quandoReuniao=r=>{const d=isoDia(r.reuniao_data);if(!d)return '';const h=horaReuniao(r);return brData(d)+(h?' às '+h:'')};
 function dataLigacao(r){
   let v='';
   (r.historico||[]).forEach(h=>{if(h.campo===CAMPO_LIG_DATA)v=parseDataBoleta(h.para)||''});
@@ -8544,6 +8603,427 @@ function rowsNoAlcance(){
       return true;
     });
 }
+
+// ══════════════════════════════════════════════════════════
+// ══ AGENDA DO CLOSER DENTRO DO SISTEMA ══
+// Duas metades. A primeira é ver a agenda aqui: o embed do Google, que não
+// precisa de nada além do e-mail cadastrado. A segunda é o confronto — reunião
+// marcada na agenda que não virou oportunidade — e essa exige LER os eventos,
+// o que só a API do Google faz. A chave fica num campo da tela, então o dia em
+// que ela for criada o confronto liga sozinho, sem mexer no código.
+// ══════════════════════════════════════════════════════════
+const AREA_CONFIG='config';
+function confGet(chave){
+  const m=(METAS_RAW||[]).find(x=>x.area===AREA_CONFIG&&String(x.produto||'').split('|')[0]===chave);
+  return m?String(m.produto||'').split('|').slice(1).join('|'):'';
+}
+async function confSet(chave,valor){
+  const m=(METAS_RAW||[]).find(x=>x.area===AREA_CONFIG&&String(x.produto||'').split('|')[0]===chave);
+  const produto=chave+'|'+String(valor||'').trim();
+  if(m)await db('PATCH','metas',{produto},'id=eq.'+m.id);
+  else await db('POST','metas',{mes:MES_COLUNA,assessor:USER.nome,area:AREA_CONFIG,produto,meta_valor:1});
+  await loadData();
+}
+const googleClientId=()=>confGet('google_client_id');
+
+// ── de quem eu posso ver a agenda ──
+// Agenda é coisa pessoal: cada um vê a sua. Gestor vê quem está nas áreas dele,
+// porque é o que ele responde. Diretor vê todas. A Cris não enxerga a agenda do
+// Vovo nem o contrário.
+function podeVerAgendaDe(u){
+  if(!u||!USER)return false;
+  if(norm(u.nome)===norm(USER.nome))return true;
+  if(USER.perfil==='diretor')return true;
+  if(USER.perfil==='gestor'){
+    if(u.perfil==='diretor')return false;        // gestor não olha a agenda do diretor
+    const minhas=USER.areas||[];
+    return (u.areas||[]).some(a=>minhas.includes(a));
+  }
+  return false;
+}
+function closersComAgenda(){
+  return USUARIOS.filter(u=>u.ativo!==false&&u.agenda&&podeVerAgendaDe(u))
+    .sort((a,b)=>a.nome.localeCompare(b.nome));
+}
+function agendaAlvo(){
+  const l=closersComAgenda();
+  const esc=window._agQuem;
+  if(esc&&l.some(u=>norm(u.nome)===norm(esc)))return l.find(u=>norm(u.nome)===norm(esc));
+  const eu=l.find(u=>norm(u.nome)===norm(USER.nome));
+  return eu||l[0]||null;
+}
+
+// ── o que o SISTEMA tem de reunião na semana ──
+function semanaAgenda(ref){
+  const d=ref?new Date(ref):new Date();
+  const dow=(d.getDay()+6)%7;
+  const seg=new Date(d);seg.setDate(d.getDate()-dow);
+  const dom=new Date(seg);dom.setDate(seg.getDate()+6);
+  return[localISO(seg),localISO(dom)];
+}
+function reunioesDoSistema(nome,de,ate){
+  const base=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS).filter(r=>!arquivada(r));
+  return base.filter(r=>{
+    const d=isoDia(r.reuniao_data);
+    if(!d||d<de||d>ate)return false;
+    if(!nome)return true;
+    return norm(r.responsavel||'')===norm(nome)||norm(r.assessor||'')===norm(nome);
+  }).sort((a,b)=>String(a.reuniao_data).localeCompare(String(b.reuniao_data)));
+}
+
+// ── ler o título do evento e achar o cliente ──
+// Os títulos do time seguem padrões: "R1 Dr. Daniel - AI Alexandra",
+// "R3 Pablo - AI Davi", "Leandro Ramos / Edson Silva", "Reunião de Alocação | Fabiana".
+// O que é interno (treino, 1:1, planejamento) não é reunião de cliente.
+const EV_INTERNO=/^(treino|planejamento|1:1|pilula|pílula|daily|alinhamento interno|almo[cç]o|f[eé]rias|folga|show|anivers|reuni[aã]o macro|reuni[aã]o semanal|coffee|happy)/i;
+function clienteDoEvento(titulo){
+  let t=String(titulo||'').trim();
+  if(!t||EV_INTERNO.test(t))return '';
+  t=t.replace(/^(confirmar|retorno do|retorno da|retorno|reuni[aã]o de alocação|reuni[aã]o|call|visita)\s*[|:-]?\s*/i,'');
+  t=t.replace(/^(R[1-9]|RE|R\d+)\s+/i,'');          // R1, R2, R3...
+  t=t.split(/\s+-\s+AI\s+/i)[0];                      // "Fulano - AI Beltrano"
+  t=t.split('|')[0];
+  t=t.split(' / ')[0];                                 // "Fulano / Beltrano"
+  t=t.replace(/\s*\(.*$/,'').replace(/,.*$/,'');
+  return t.trim();
+}
+// casa evento com oportunidade: primeiro pelo carimbo que a gente escreve, depois pelo nome
+const MARCA_EV=/\[GC:([^\]]+)\]/;
+function oppDoEvento(ev,universo){
+  const m=MARCA_EV.exec(ev.description||'');
+  if(m){const r=(universo||[]).find(x=>String(x.id)===m[1]);if(r)return r}
+  const cli=norm(clienteDoEvento(ev.summary));
+  if(!cli||cli.length<4)return null;
+  return (universo||[]).find(x=>{
+    const c=norm(x.cliente||'');
+    return c&&(c===cli||c.includes(cli)||cli.includes(c));
+  })||null;
+}
+
+// ── link que abre o Google Agenda já preenchido (sem precisar de chave) ──
+function linkAgenda(r){
+  const d=isoDia(r.reuniao_data);
+  if(!d)return '';
+  const h=horaReuniao(r)||'13:00';
+  const hh=+h.slice(0,2), mm=h.slice(3,5);
+  const ini=d.replace(/-/g,'')+'T'+String(hh).padStart(2,'0')+mm+'00';
+  const fim=d.replace(/-/g,'')+'T'+String((hh+1)%24).padStart(2,'0')+mm+'00';
+  const tit=(r.cliente||'Cliente')+(r.assessor?' - AI '+r.assessor:'');
+  const det='Oportunidade do Gerencial Comercial\\n'+((AREAS[r.area]||{}).name||r.area)
+    +(r.produto?' · '+r.produto:'')+'\\nVolume: '+(fmt(r.atual||r.pipe)||'—')+'\\n[GC:'+r.id+']';
+  const c=closerDaReuniao(r);
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+    +'&text='+encodeURIComponent(tit)
+    +'&dates='+ini+'/'+fim
+    +'&details='+encodeURIComponent(det)
+    // sem a chave, o evento nasce na conta logada no navegador; convidar o closer
+    // é o que garante que a reunião caia também na agenda DELE
+    +(c.email?'&add='+encodeURIComponent(c.email):'')
+    +'&ctz=America/Sao_Paulo';
+}
+// ══ CRIAR O EVENTO SOZINHO ══
+// Com a agenda conectada, salvar a oportunidade com data e hora já põe a
+// reunião na agenda de quem atende. O id do evento fica guardado no card:
+// mudar a data depois ATUALIZA o mesmo evento em vez de criar outro.
+const agendaConectada=()=>!!_gToken;
+function agendaDe(nome){
+  const u=USUARIOS.find(x=>norm(x.nome)===norm(nome||''));
+  return (u&&u.agenda)||'';
+}
+// A reunião é do closer: responsável primeiro, senão o assessor. O e-mail dele
+// é o que decide em QUAL agenda o evento nasce — e, quando não dá para escrever
+// direto nela, é o convidado, para a reunião aparecer na agenda dele mesmo assim.
+function closerDaReuniao(r){
+  const nome=(r&&(r.responsavel||r.assessor))||'';
+  return{nome,email:agendaDe(nome)};
+}
+function donoDaReuniao(r){
+  const c=closerDaReuniao(r);
+  return c.email||agendaDe(USER.nome)||'primary';
+}
+function corpoDoEvento(r){
+  const d=isoDia(r.reuniao_data);
+  const h=horaReuniao(r)||'13:00';
+  const fimH=String((+h.slice(0,2)+1)%24).padStart(2,'0')+':'+h.slice(3,5);
+  const c=closerDaReuniao(r);
+  return{
+    summary:(r.cliente||'Cliente')+(r.assessor?' - AI '+r.assessor:''),
+    attendees:c.email?[{email:c.email}]:undefined,
+    description:'Oportunidade do Gerencial Comercial\n'+((AREAS[r.area]||{}).name||r.area)
+      +(r.produto?' · '+r.produto:'')+'\nVolume: '+(fmt(r.atual||r.pipe)||'—')
+      +(r.todo?'\nPróximo passo: '+r.todo:'')+'\n[GC:'+r.id+']',
+    start:{dateTime:d+'T'+h+':00',timeZone:'America/Sao_Paulo'},
+    end:{dateTime:d+'T'+fimH+':00',timeZone:'America/Sao_Paulo'}
+  };
+}
+// devolve o id do evento, ou '' se não deu (e nunca derruba o salvamento)
+async function porNaAgendaAPI(r){
+  if(!agendaConectada())return '';
+  if(!isoDia(r.reuniao_data))return '';
+  const ev=eventoDaOpp(r);
+  const req=(cal,metodo,evId)=>fetch('https://www.googleapis.com/calendar/v3/calendars/'
+      +encodeURIComponent(cal)+'/events'+(evId?'/'+encodeURIComponent(evId):'')+'?sendUpdates=all',
+    {method:metodo,headers:{Authorization:'Bearer '+_gToken,'Content-Type':'application/json'},
+     body:JSON.stringify(corpoDoEvento(r))});
+  const alvo=donoDaReuniao(r);
+  let res=ev?await req(alvo,'PATCH',ev):await req(alvo,'POST');
+  if(ev&&(res.status===404||res.status===410))res=await req(alvo,'POST');   // apagaram na mão
+  // sem permissão de escrita na agenda do closer: grava na própria e convida ele
+  if((res.status===403||res.status===404)&&alvo!=='primary'){
+    window._agendaSemPermissao=alvo;
+    res=ev?await req('primary','PATCH',ev):await req('primary','POST');
+    if(ev&&(res.status===404||res.status===410))res=await req('primary','POST');
+  }
+  if(!res.ok)throw new Error('agenda respondeu '+res.status);
+  const j=await res.json();
+  return j.id||'';
+}
+// chamada depois de salvar: cria/atualiza e guarda o id no card
+// o que está faltando para o evento nascer sozinho — em uma frase
+function pendenciaAgenda(r){
+  const c=closerDaReuniao(r||{});
+  if(abertoDoArquivo())
+    return 'o sistema está aberto direto do computador (file://) — a agenda automática só funciona pelo endereço publicado';
+  if(c.nome&&!c.email)
+    return c.nome+' não tem e-mail de agenda cadastrado (Usuários → ✎ Áreas) — sem isso o evento cai na conta do Google deste navegador, não na agenda dele';
+  if(!c.nome)return 'defina o responsável ou o assessor para o sistema saber de quem é a agenda';
+  if(!googleClientId())return 'falta a chave do Google (aba 📅 Agenda) — por enquanto o evento nasce na conta logada neste navegador e '+c.nome+' entra como convidado';
+  if(!agendaConectada())return 'sua agenda não está conectada — clique em “Conectar a agenda” na aba 📅 Agenda (uma vez só)';
+  return '';
+}
+async function sincronizarAgenda(id){
+  const r=acharOpp(id);
+  if(!r||!isoDia(r.reuniao_data))return;
+  if(!agendaConectada()){
+    const p=pendenciaAgenda(r);
+    if(p)showToast('📅 Reunião salva. Sobre a agenda: '+p);
+    return;
+  }
+  const cl=closerDaReuniao(r);
+  if(cl.nome&&!cl.email)
+    showToast('⚠ '+cl.nome+' não tem e-mail de agenda cadastrado — o evento foi para a SUA agenda. Corrija em Usuários → ✎ Áreas');
+  window._agendaSemPermissao='';
+  try{
+    const novo=await porNaAgendaAPI(r);
+    if(!novo)return;
+    const antes=eventoDaOpp(r);
+    if(novo!==antes){
+      const now=new Date();
+      const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+      const hist=[...(r.historico||[]),{campo:CAMPO_EVENTO,de:antes,para:novo,usuario:USER.nome,data:ds}];
+      await db('PATCH','oportunidades',{historico:hist,updated_at:now.toISOString()},'id=eq.'+id);
+      // atualiza o card em memória na hora: sem isso, salvar de novo antes da
+      // próxima leitura criaria um segundo evento para a mesma reunião
+      r.historico=hist;r.updated_at=now.toISOString();
+      try{delete r.__ev;delete r.__mk}catch(e){}
+    }
+    if(window._agendaSemPermissao)
+      showToast('⚠ Não tenho permissão de escrever na agenda de '+cl.nome+'. Criei na minha e convidei '+cl.email
+        +' — ele precisa aceitar. Para gravar direto, peça que ele compartilhe a agenda com permissão de edição.');
+    else showToast('📅 '+r.cliente+' na agenda de '+((cl.email&&cl.nome)||USER.nome)+' — '+quandoReuniao(r),true);
+  }catch(e){showToast('⚠ Salvei a oportunidade, mas não consegui pôr na agenda: '+e.message)}
+}
+function mandarParaAgenda(id){
+  const r=acharOpp(id);if(!r)return;
+  if(!isoDia(r.reuniao_data)){showToast('Preencha a data da reunião antes');return}
+  if(agendaConectada())return sincronizarAgenda(id);
+  // Caminho sem chave: o Google cria o evento na CONTA LOGADA neste navegador.
+  // Não existe jeito de um site escrever na agenda de outra pessoa sem autorização.
+  // O que dá para fazer é convidar o closer — e só se o e-mail dele estiver cadastrado.
+  const c=closerDaReuniao(r);
+  if(!c.email){
+    const quem=c.nome||'o closer';
+    if(!confirm('Atenção: a agenda automática ainda não está ligada.\n\n'
+      +'Isto vai criar o evento na conta do Google aberta NESTE navegador — não na agenda de '+quem+'.\n\n'
+      +'Para cair na agenda dele, cadastre o e-mail em Usuários → ✎ Áreas (aí ele entra como convidado) '
+      +'ou ligue a agenda automática na aba 📅 Agenda.\n\nCriar mesmo assim?'))return;
+  }else{
+    showToast('📅 O evento nasce na sua conta do Google e '+c.nome+' ('+c.email+') entra como convidado');
+  }
+  const u=linkAgenda(r);
+  if(u)window.open(u,'_blank','noopener');
+}
+
+// ── a tela ──
+function renderAgendaExterna(c=document.getElementById('main-content')){
+  const lista=closersComAgenda();
+  const alvo=agendaAlvo();
+  const [de,ate]=semanaAgenda(window._agRef);
+  const doSistema=reunioesDoSistema(alvo?alvo.nome:'',de,ate);
+  const temChave=!!googleClientId();
+
+  const seletor=lista.length>1?'<select class="filter-sel" onchange="window._agQuem=this.value;renderCurView()">'
+      +lista.map(u=>'<option'+(alvo&&norm(u.nome)===norm(alvo.nome)?' selected':'')+'>'+u.nome+'</option>').join('')
+      +'</select>'
+    :(alvo?'<span style="font-size:11px;color:var(--muted);font-weight:700">'+alvo.nome+'</span>':'');
+
+  const eu=USUARIOS.find(x=>norm(x.nome)===norm(USER.nome));
+  const semCadastro='<div style="background:var(--amber-bg);border:1px solid var(--amber-b);border-radius:6px;padding:16px 18px">'
+    +'<div style="font-weight:700;color:#854F0B;margin-bottom:6px">'
+    +((eu&&!eu.agenda)?'Sua agenda ainda não está cadastrada':'Nenhuma agenda que você possa ver')+'</div>'
+    +'<div style="font-size:12.5px;color:var(--muted);line-height:1.6">'
+    +(USER.perfil==='diretor'||USER.perfil==='gestor'
+      ?'Vá em <b>👥 Usuários</b>, clique em <b>✎ Áreas</b> na linha da pessoa e preencha o campo <b>Agenda (e-mail do Google)</b>. Você enxerga a sua agenda e a de quem está nas suas áreas.'
+      :'Peça ao diretor para cadastrar o e-mail da sua agenda em <b>Usuários → ✎ Áreas</b>. Cada um enxerga apenas a própria agenda.')
+    +'</div></div>';
+
+  const frame=alvo?'<iframe title="Agenda de '+alvo.nome+'" style="width:100%;height:620px;border:1px solid var(--border);border-radius:6px;background:var(--card)" '
+      +'src="https://calendar.google.com/calendar/embed?src='+encodeURIComponent(alvo.agenda)
+      +'&ctz=America%2FSao_Paulo&mode=WEEK&showTitle=0&showPrint=0&showCalendars=0&showTz=0"></iframe>'
+      +'<div style="font-size:10.5px;color:var(--muted-l);margin-top:6px">Se aparecer “sem permissão”, '+alvo.nome+' precisa compartilhar a agenda com você no Google — ou abrir o sistema logado na própria conta.</div>':'';
+
+  const listaSistema=doSistema.length
+    ? doSistema.map(r=>{
+        const d=isoDia(r.reuniao_data);
+        return '<div class="cal-li" onclick="openEdit(\''+r.id+'\')">'
+          +'<div class="cal-d">'+brData(d).slice(0,5)+'</div>'
+          +'<div style="flex:1;min-width:0">'
+          +'<div class="cal-cli">'+r.cliente+'</div>'
+          +'<div class="cal-sub">'+(horaReuniao(r)?horaReuniao(r)+' · ':'')+((AREAS[r.area]||{}).name||r.area)+(r.produto?' · '+r.produto:'')
+          +(r.responsavel||r.assessor?' · '+(r.responsavel||r.assessor):'')+'</div></div>'
+          +'<span class="cal-bt" title="Abrir no Google Agenda já preenchido" onclick="event.stopPropagation();mandarParaAgenda(\''+r.id+'\')">📅</span>'
+          +'</div>';
+      }).join('')
+    : '<div style="font-size:12px;color:var(--muted-l);padding:10px 2px">Nenhuma reunião marcada no sistema nesta semana.</div>';
+
+  const blocoConfronto=abertoDoArquivo()
+    ? '<div style="background:var(--red-bg);border:1px solid var(--red-b);border-radius:6px;padding:14px 16px">'
+      +'<div style="font-weight:700;color:var(--red);margin-bottom:5px">⚠ Abra pelo endereço publicado</div>'
+      +'<div style="font-size:12px;color:var(--muted);line-height:1.6">Este arquivo está rodando direto do computador '
+      +'(<code>file://</code>) e o Google recusa login vindo daí (<i>Erro 400: invalid_request</i>). '
+      +'Publique no GitHub e acesse por <b>https://edcunhatheo.github.io/gerencial-comercial/</b> — a agenda automática só liga por lá.</div></div>'
+    : temChave
+    ? '<div id="ag-confronto"><button class="btn wine sm" onclick="conectarAgenda()">🔗 Conectar a agenda e conferir</button>'
+      +'<div style="font-size:11px;color:var(--muted);margin-top:6px">Compara os eventos da agenda com as oportunidades e mostra o que está só de um lado.</div></div>'
+    : '<div style="background:var(--surf2);border:1px dashed var(--border);border-radius:6px;padding:14px 16px">'
+      +'<div style="font-weight:700;font-size:12.5px;margin-bottom:6px">⚠ Falta a chave do Google para o confronto automático</div>'
+      +'<div style="font-size:12px;color:var(--muted);line-height:1.6">Ver a agenda acima já funciona. Para o sistema <b>avisar</b> que tem reunião na agenda sem oportunidade, ele precisa ler os eventos — e para isso o Google exige uma chave de aplicativo (gratuita, uma vez).<br>'
+      +'<b>Como criar:</b> console.cloud.google.com → novo projeto → <i>APIs e serviços</i> → ative <b>Google Calendar API</b> → <i>Credenciais</i> → <b>Criar ID do cliente OAuth</b> → tipo <b>Aplicativo da Web</b> → em origens JavaScript autorizadas coloque <code>https://edcunhatheo.github.io</code> → copie o ID e cole aqui embaixo.</div>'
+      +(USER.perfil==='diretor'?'<div style="display:flex;gap:8px;margin-top:10px">'
+        +'<input id="ag-chave" placeholder="000000-xxxx.apps.googleusercontent.com" style="flex:1;font-size:12px;padding:6px 8px;border:1px solid var(--border);border-radius:4px">'
+        +'<button class="btn sm wine" onclick="salvarChaveGoogle()">Salvar chave</button></div>':'')
+      +'</div>';
+
+  c.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px">'
+    +'<div><div class="section-label" style="margin:0;border:none;padding:0">📅 Agenda do closer</div>'
+    +'<div style="font-size:11px;color:var(--muted)">semana de '+brData(de)+' a '+brData(ate)+'</div></div>'
+    +seletor+'</div>'
+    +(lista.length?('<div class="cal-grid">'
+      +'<div>'+frame+'</div>'
+      +'<div>'
+      +'<div class="section-label" style="margin:0 0 8px;border:none;padding:0">No sistema esta semana <span style="color:var(--muted);font-weight:600">('+doSistema.length+')</span></div>'
+      +listaSistema
+      +'<div style="margin-top:16px">'+blocoConfronto+'</div>'
+      +'</div></div>'):semCadastro);
+}
+async function salvarChaveGoogle(){
+  const v=String((document.getElementById('ag-chave')||{}).value||'').trim();
+  if(!v){showToast('Cole o ID do cliente');return}
+  try{await confSet('google_client_id',v);showToast('✅ Chave salva — agora dá para conectar a agenda',true);renderCurView();}
+  catch(e){showToast('Erro: '+e.message)}
+}
+
+// ── leitura dos eventos (só com a chave) ──
+let _gToken='';
+function carregaGis(){
+  return new Promise((ok,err)=>{
+    if(window.google&&google.accounts&&google.accounts.oauth2)return ok();
+    const s=document.createElement('script');
+    s.src='https://accounts.google.com/gsi/client';s.async=true;s.defer=true;
+    s.onload=()=>ok();s.onerror=()=>err(new Error('não consegui carregar o login do Google'));
+    document.head.appendChild(s);
+  });
+}
+const abertoDoArquivo=()=>location.protocol==='file:';
+async function conectarAgenda(){
+  if(abertoDoArquivo()){
+    alert('Este arquivo está aberto direto do computador (file://).\n\n'
+      +'O Google não autoriza login vindo daí — é preciso usar o endereço publicado:\n'
+      +'https://edcunhatheo.github.io/gerencial-comercial/\n\n'
+      +'Publique o arquivo no GitHub e conecte a agenda por lá.');
+    return;
+  }
+  const cid=googleClientId();
+  if(!cid){showToast('Falta a chave do Google');return}
+  try{
+    await carregaGis();
+    const tc=google.accounts.oauth2.initTokenClient({
+      client_id:cid,
+      scope:'https://www.googleapis.com/auth/calendar.events',
+      callback:async resp=>{
+        if(!resp||!resp.access_token){showToast('Autorização não concluída');return}
+        _gToken=resp.access_token;
+        await conferirAgenda();
+      }
+    });
+    tc.requestAccessToken();
+  }catch(e){showToast('Erro: '+e.message)}
+}
+async function eventosDaSemana(email,de,ate){
+  const url='https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(email)+'/events'
+    +'?timeMin='+encodeURIComponent(de+'T00:00:00-03:00')
+    +'&timeMax='+encodeURIComponent(ate+'T23:59:59-03:00')
+    +'&singleEvents=true&orderBy=startTime&maxResults=250';
+  const r=await fetch(url,{headers:{Authorization:'Bearer '+_gToken}});
+  if(!r.ok)throw new Error('agenda respondeu '+r.status);
+  const j=await r.json();
+  return (j.items||[]).map(e=>({id:e.id,summary:e.summary||'(sem título)',
+    description:e.description||'',link:e.htmlLink||'',
+    ini:(e.start&&(e.start.dateTime||e.start.date))||''}));
+}
+async function conferirAgenda(){
+  const alvo=agendaAlvo();if(!alvo)return;
+  const [de,ate]=semanaAgenda(window._agRef);
+  const box=document.getElementById('ag-confronto');
+  if(box)box.innerHTML='<div style="font-size:12px;color:var(--muted)">Lendo a agenda de '+alvo.nome+'...</div>';
+  try{
+    const evs=await eventosDaSemana(alvo.agenda,de,ate);
+    const universo=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS);
+    const comCliente=evs.filter(e=>clienteDoEvento(e.summary));
+    const orfaos=[],casados=[];
+    comCliente.forEach(e=>{const r=oppDoEvento(e,universo);(r?casados:orfaos).push({e,r})});
+    const doSistema=reunioesDoSistema(alvo.nome,de,ate);
+    const semEvento=doSistema.filter(r=>!casados.some(x=>x.r&&x.r.id===r.id));
+    window._agOrfaos=orfaos;
+    if(box)box.innerHTML=htmlConfronto(orfaos,semEvento,casados.length,evs.length,alvo);
+  }catch(e){
+    if(box)box.innerHTML='<div style="color:var(--red);font-size:12px">Não consegui ler a agenda: '+e.message
+      +'<br><span style="color:var(--muted)">Se for erro 404, o e-mail cadastrado não é o da agenda ou ela não foi compartilhada com você.</span></div>'
+      +'<button class="btn sm" style="margin-top:8px" onclick="conectarAgenda()">Tentar de novo</button>';
+  }
+}
+function htmlConfronto(orfaos,semEvento,nCasados,nEvs,alvo){
+  const linha=(ico,cor,tit,sub,bt)=>'<div class="cal-li" style="border-left:3px solid '+cor+'">'
+    +'<div style="font-size:15px">'+ico+'</div><div style="flex:1;min-width:0">'
+    +'<div class="cal-cli">'+tit+'</div><div class="cal-sub">'+sub+'</div></div>'+(bt||'')+'</div>';
+  return '<div class="section-label" style="margin:0 0 8px;border:none;padding:0">Agenda × sistema</div>'
+    +'<div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+nEvs+' eventos na agenda de '+alvo.nome
+    +' · '+nCasados+' já têm oportunidade</div>'
+    +(orfaos.length?orfaos.map((x,i)=>linha('🔴','var(--red)',
+        clienteDoEvento(x.e.summary),
+        'reunião na agenda sem oportunidade no sistema · '+String(x.e.ini).slice(0,10).split('-').reverse().slice(0,2).join('/'),
+        '<button class="btn sm wine" style="font-size:10.5px;white-space:nowrap" onclick="criarDoEvento('+i+')">Criar agora</button>')).join('')
+      :'<div style="font-size:12px;color:#085041;padding:6px 2px">✅ Toda reunião da agenda tem oportunidade no sistema.</div>')
+    +(semEvento.length?'<div style="margin-top:10px">'+semEvento.map(r=>linha('🟡','var(--amber)',
+        r.cliente,'marcada no sistema e não achei na agenda · '+brData(isoDia(r.reuniao_data)).slice(0,5),
+        '<span class="cal-bt" title="Abrir no Google Agenda já preenchido" onclick="mandarParaAgenda(\''+r.id+'\')">📅</span>')).join('')+'</div>':'')
+    +'<button class="btn sm" style="margin-top:10px" onclick="conferirAgenda()">↻ Conferir de novo</button>';
+}
+function criarDoEvento(i){
+  const x=(window._agOrfaos||[])[i];if(!x)return;
+  const cli=clienteDoEvento(x.e.summary);
+  const alvo=agendaAlvo();
+  openNewOpp&&openNewOpp();
+  setTimeout(()=>{
+    const set=(id,v)=>{const el=document.getElementById(id);if(el&&v)el.value=v};
+    set('n-cliente',cli);
+    set('n-reuniao',String(x.e.ini).slice(0,10));
+    set('n-assessor',alvo?alvo.nome:'');
+    const obs=document.getElementById('n-obs');
+    if(obs)obs.value='Criada a partir da agenda: "'+x.e.summary+'"';
+  },150);
+}
+
 // ══ ASSESSORES: renomear e unificar ══
 // O mesmo assessor entra com grafias diferentes pela planilha e vira duas
 // pessoas na conta. Aqui o nome é corrigido em TODAS as oportunidades de uma vez,
@@ -8871,7 +9351,7 @@ function renderUsuarios(c=document.getElementById('main-content')){
     <div style="font-size:14px;font-weight:700">${USUARIOS.length} usuários cadastrados</div>
     <button class="btn wine" onclick="document.getElementById('modal-user').style.display='flex'">+ Novo usuário</button>
   </div>
-  <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Empresa</th><th>Áreas</th><th>PIN</th><th>Status</th><th>Último acesso</th><th></th></tr></thead>
+  <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Empresa</th><th>Áreas</th><th>Agenda</th><th>PIN</th><th>Status</th><th>Último acesso</th><th></th></tr></thead>
   <tbody>${USUARIOS.map(u=>`<tr>
     <td style="font-weight:700">${u.nome}</td>
     <td><span class="badge ${u.perfil==='diretor'?'b-wine':u.perfil==='gestor'?'b-purple':'b-gray'}">${u.perfil}</span></td>
@@ -8880,6 +9360,7 @@ function renderUsuarios(c=document.getElementById('main-content')){
       ((u.areas||[]).map(a=>`<span class="badge b-gray" style="margin-right:3px">${AREAS[a]?.name||a}</span>`).join('')||'—')
       +(()=>{const f=areasForaDoPerfil(u.nome);return f.length
         ?`<span class="badge b-amber" style="margin-right:3px" title="Tem oportunidade nessa área mas ela não está no cadastro — clique em ✎ Áreas para incluir">⚠ ${f.map(k=>AREAS[k]?.name||k).join(' · ')}</span>`:''})()}</td>
+    <td>${u.agenda?`<span style="font-size:11px;color:var(--muted)" title="${u.agenda}">📅 ${String(u.agenda).split('@')[0]}</span>`:'<span style="font-size:11px;color:var(--muted-l)">—</span>'}</td>
     <td><code style="background:var(--cream);padding:2px 8px;border-radius:4px;font-size:12px;border:1px solid var(--border)">${u.pin}</code></td>
     <td><span class="badge ${u.ativo?'b-green':'b-red'}">${u.ativo?'Ativo':'Inativo'}</span></td>
     <td>${(()=>{const t=tempoAtras(u.ultimo_acesso);return t.on
@@ -8905,6 +9386,9 @@ async function editAreas(id){
     +'<div style="font-size:11px;color:var(--muted);margin-bottom:14px">Define o que '+(u.perfil==='gestor'?'a gestão enxerga (Daily do time, dashboard, metas)':'o comercial acessa')+'</div>'
     +'<div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-l);margin:4px 0 2px">Empresas</div>'
     +Object.entries(EMPRESAS).map(([k,e])=>'<label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;font-size:13px"><input type="checkbox" id="me-'+k+'" '+((u.empresas||[EMP_PADRAO]).includes(k)?'checked':'')+' style="width:15px;height:15px;accent-color:var(--wine)"> '+e.nome+'</label>').join('')
+    +'<div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-l);margin:12px 0 2px">Agenda (e-mail do Google)</div>'
+    +'<input id="m-agenda" value="'+String(u.agenda||'').replace(/"/g,'&quot;')+'" placeholder="nome@empresa.com.br" style="width:100%;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:4px">'
+    +'<div style="font-size:10px;color:var(--muted-l);margin-top:3px">Usado para mostrar a agenda desta pessoa dentro do sistema</div>'
     +'<div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted-l);margin:12px 0 2px">Áreas</div>'
     +Object.entries(AREAS).map(([k,a])=>'<label style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer;font-size:13px"><input type="checkbox" id="ma-'+k+'" '+(atuais.includes(k)?'checked':'')+' style="width:15px;height:15px;accent-color:var(--wine)"> '+a.name+'</label>').join('')
     +'<div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">'
@@ -8919,7 +9403,8 @@ async function saveAreas(id){
   const emps=Object.keys(EMPRESAS).filter(k=>document.getElementById('me-'+k)?.checked);
   if(!emps.length){showToast('Escolha pelo menos uma empresa');return}
   try{
-    await db('PATCH','usuarios',{areas:areasComEmpresas(areas,emps)},'id=eq.'+id);
+    const ag=(document.getElementById('m-agenda')||{}).value||'';
+    await db('PATCH','usuarios',{areas:areasComEmpresas(areas,emps,ag)},'id=eq.'+id);
     document.getElementById('modal-areas')?.remove();
     USUARIOS=normalizaUsuarios(await db('GET','usuarios','','order=nome.asc'));
     renderUsuarios();
@@ -8939,7 +9424,8 @@ async function saveUser(){
   const emps=Object.keys(EMPRESAS).filter(e=>document.getElementById('ue-'+e)?.checked);
   if(!emps.length){showToast('Escolha pelo menos uma empresa');return}
   try{
-    await db('POST','usuarios',{nome,pin:pin2,perfil,areas:areasComEmpresas(areas,emps),ativo:true});
+    const ag=(document.getElementById('u-agenda')||{}).value||'';
+    await db('POST','usuarios',{nome,pin:pin2,perfil,areas:areasComEmpresas(areas,emps,ag),ativo:true});
     showToast('✅ Usuário criado!',true);
     closeModal('user');
     USUARIOS=normalizaUsuarios(await db('GET','usuarios','','order=nome.asc'));
