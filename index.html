@@ -279,6 +279,9 @@ tr.bol td{background:var(--green-bg)}
 .kb-col{min-width:262px;max-width:262px;background:var(--surf3);border-radius:6px;padding:10px;flex-shrink:0}
 .kb-col-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .kb-count{background:var(--card);border-radius:4px;padding:1px 8px;font-size:10px;font-weight:700;color:var(--muted)}
+.cross{display:inline-block;margin:2px 0 1px;font-size:9px;font-weight:700;color:#2F6795;background:#2F679512;border:1px solid #2F679533;border-radius:10px;padding:1px 7px;text-transform:uppercase;letter-spacing:.03em;cursor:help;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kb-exp{cursor:pointer;opacity:.4;font-weight:700;font-size:13px;line-height:1;padding:0 1px;transition:opacity .15s,transform .15s}
+.kb-exp:hover{opacity:1;transform:translateY(1px)}
 .kb-add-etapa{width:100%;padding:14px 10px;background:transparent;border:2px dashed var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.03em;transition:all .15s}
 .kb-add-etapa:hover{border-color:var(--wine);color:var(--wine)}
 .kb-card{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:8px;cursor:grab;transition:all .15s}
@@ -1064,6 +1067,16 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
       <h2 id="modal-edit-title">Atualizar oportunidade</h2>
       <button class="modal-x" onclick="closeModal('edit')">×</button>
     </div>
+    <div id="e-outras" style="display:none"></div>
+    <div class="form-row">
+      <div class="fg"><label>Cliente <span style="font-weight:400;text-transform:none;font-size:9px">(corrija se estiver errado)</span></label>
+        <input type="text" id="e-cliente" placeholder="Nome do cliente">
+      </div>
+      <div class="fg"><label>Assessor (AI) <span style="font-weight:400;text-transform:none;font-size:9px">(escolha ou digite)</span></label>
+        <input type="text" id="e-assessor" list="e-ass-lista" placeholder="Nome do assessor">
+        <datalist id="e-ass-lista"></datalist>
+      </div>
+    </div>
     <div class="form-row">
       <div class="fg"><label>Status comercial <span style="font-weight:400;text-transform:none;font-size:9px">(escolha ou digite um novo)</span></label>
         <select id="e-sc" onchange="scPbChange('e-sc','e-sc-novo')"></select>
@@ -1162,6 +1175,30 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
       <button class="btn" onclick="closeModal('user')">Cancelar</button>
       <button class="btn wine" onclick="saveUser()">Salvar</button>
     </div>
+  </div>
+</div>
+
+<!-- ── MODAL EXPORTAR: tudo, uma área ou uma etapa ── -->
+<div id="modal-export" class="modal-bg" style="display:none">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-hdr"><h2>📥 Exportar planilha</h2><button class="modal-x" onclick="closeModal('export')">×</button></div>
+    <div class="fg"><label>Área</label><select id="x-area"></select></div>
+    <div class="fg"><label>Etapa do funil</label><select id="x-etapa"></select></div>
+    <div id="x-previa" style="font-size:12px;color:var(--muted);margin-top:4px"></div>
+    <div class="modal-ftr">
+      <button class="btn" onclick="closeModal('export')">Cancelar</button>
+      <button class="btn wine" onclick="exportarFiltrado()">Baixar Excel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL ASSESSORES: renomear e unificar ── -->
+<div id="modal-assessores" class="modal-bg" style="display:none">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-hdr"><h2>👥 Assessores</h2><button class="modal-x" onclick="closeModal('assessores')">×</button></div>
+    <div style="font-size:12px;color:var(--muted);margin:-6px 0 12px">Renomeie um assessor ou junte dois nomes que são a mesma pessoa. A troca vale para todas as oportunidades.</div>
+    <div id="as-lista" style="max-height:48vh;overflow:auto"></div>
+    <div class="modal-ftr"><button class="btn" onclick="closeModal('assessores')">Fechar</button></div>
   </div>
 </div>
 
@@ -1415,6 +1452,54 @@ function todosAssessores(){
 }
 const assDe=r=>canonAssessor(r.assessor)||stripAcc(String(r.assessor||'').trim().toUpperCase());
 
+// ══ O MESMO CLIENTE EM OUTRA ÁREA ══
+// Cliente de consórcio que também tem seguro é oportunidade de cross-sell — e
+// hoje ninguém via isso, porque cada área só olha o próprio funil. O cruzamento
+// é pelo nome normalizado do cliente, dentro do que a pessoa pode enxergar.
+function outrasOportunidades(r){
+  if(!r||!r.cliente)return [];
+  const alvo=norm(r.cliente);
+  if(!alvo)return [];
+  const base=OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS;
+  return base.filter(o=>o.id!==r.id&&norm(o.cliente||'')===alvo&&o.area!==r.area);
+}
+function outrasAreasResumo(r){
+  const outras=outrasOportunidades(r);
+  if(!outras.length)return null;
+  const m=new Map();
+  outras.forEach(o=>{
+    const k=o.area;
+    if(!m.has(k))m.set(k,{area:k,nome:(AREAS[k]||{}).name||k,cor:(AREAS[k]||{}).color||'var(--muted)',n:0,vol:0,rows:[]});
+    const x=m.get(k);x.n++;x.vol+=(o.atual||o.pipe||0);x.rows.push(o);
+  });
+  return{outras,areas:[...m.values()]};
+}
+// etiqueta curta, para o card do Kanban e da lista
+function selosOutrasAreas(r){
+  const res=outrasAreasResumo(r);
+  if(!res)return '';
+  return '<span class="cross" title="'+res.outras.length+' oportunidade(s) deste cliente em outra área: '
+    +res.areas.map(a=>a.nome+' ('+a.n+')').join(', ').replace(/"/g,'&quot;')+'">🔗 '
+    +res.areas.map(a=>a.nome).join(' · ')+'</span>';
+}
+// faixa dentro do modal da oportunidade, clicável
+function outrasAreasHtml(r){
+  const res=outrasAreasResumo(r);
+  if(!res)return '';
+  const total=res.outras.reduce((s,o)=>s+(o.atual||o.pipe||0),0);
+  return '<div style="background:var(--surf2);border:1px solid var(--border);border-left:3px solid #2F6795;'
+    +'border-radius:4px;padding:9px 12px;margin:-4px 0 14px">'
+    +'<div style="font-size:10px;font-weight:700;color:#2F6795;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px">'
+    +'🔗 Este cliente também está em outra área</div>'
+    +res.areas.map(a=>'<div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12px;padding:2px 0">'
+      +'<span><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+a.cor+';margin-right:6px"></span>'
+      +'<b>'+a.nome+'</b> <span style="color:var(--muted)">· '+a.rows.map(o=>(o.produto||'—')+' ('+(o.sc||'sem status')+')').join(' · ')+'</span></span>'
+      +'<span style="font-weight:700;color:var(--muted)">'+(fmt(a.vol)||'—')+'</span></div>').join('')
+    +'<div style="font-size:10px;color:var(--muted);margin-top:6px;padding-top:5px;border-top:1px dashed var(--border)">'
+    +res.outras.length+' oportunidade(s) · '+(fmt(total)||'R$0')+' — vale conversar com quem atende as duas pontas</div>'
+    +'</div>';
+}
+
 // ── ACORDOS DO MÊS ──
 // Ficam na MESMA tabela `metas` (uma vez por mês, sem histórico), marcados com area='acordo'
 // pra não se misturarem com as metas de Definições do mês.
@@ -1569,13 +1654,18 @@ function chipEmpresa(e,mini){
   return '<span class="emp-chip'+(mini?' mini':'')+'" style="--ec:'+empCor(e)+'">'+empNome(e)+'</span>';
 }
 
-const isB=r=>{const k=norm(r.pb||'');return k==='boletado'||k==='a boletar'};
-// "A Boletar" = o cliente fechou mas a boleta ainda não foi processada.
-// Para volume/pipe segue valendo como fechada (isB), mas NÃO pontua no ranking do time —
-// ranking só conta boleta efetivamente boletada.
-const isBoletadoFirmado=r=>norm(r.pb||'')==='boletado';
+// "A boletar" = o cliente fechou mas a boleta ainda NÃO foi processada.
+// Sai do funil de prospecção (isB), mas não é receita: nenhum número de
+// "boletado" — valor, contagem, efetivação, meta, quebra por produto — pode
+// somar um card que está "A boletar". Ele aparece separado, em cima da linha.
+const isB=r=>{const k=norm(r.pb||'');return k==='boletado'||k==='a boletar'};   // saiu do funil
+const isBol=r=>norm(r.pb||'').startsWith('boletado');                           // virou receita
+const isBoletadoFirmado=isBol;
 const isABoletar=r=>norm(r.pb||'')==='a boletar';
 const pbFechada=v=>{const k=norm(v||'');return k.startsWith('boletado')||k==='a boletar'};
+const pbBoletada=v=>norm(v||'').startsWith('boletado');
+const somaBol=rs=>rs.filter(isBol).reduce((s,r)=>s+(r.atual||0),0);
+const somaAbol=rs=>rs.filter(isABoletar).reduce((s,r)=>s+(r.atual||r.pipe||0),0);
 const isPerdida=r=>norm(r.sc||'')==='cliente negou';
 const isPend=r=>{const k=norm(r.pb||'');return k.includes('todo')||k.includes('email')||k.includes('aguardando')};
 const matchBadge=(v,map)=>{const k=norm(v);for(const[kk,b]of Object.entries(map)){if(k.includes(norm(kk)))return b;}return null};
@@ -1908,7 +1998,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261001-1421';
+const APP_VERSION='20261023-1956';
 let _verTimer=null,_verTam=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 async function tamanhoPublicado(){
@@ -2207,7 +2297,7 @@ function quebraPorProduto(ak,rows,a){
 }
 function prodMeterHtml(rowsArr,hue,titulo){
   const map={};
-  rowsArr.forEach(r=>{const pk=r.produto||'Outros';if(!map[pk])map[pk]={bol:0,pipe:0};map[pk].pipe+=(r.pipe||0);if(isB(r))map[pk].bol+=(r.atual||0);});
+  rowsArr.forEach(r=>{const pk=r.produto||'Outros';if(!map[pk])map[pk]={bol:0,pipe:0};map[pk].pipe+=(r.pipe||0);if(isBol(r))map[pk].bol+=(r.atual||0);});
   const entries=Object.entries(map).sort((x,y)=>(y[1].bol-x[1].bol)||(y[1].pipe-x[1].pipe));
   const totBol=entries.reduce((s,e)=>s+e[1].bol,0);
   const totPipe=entries.reduce((s,e)=>s+e[1].pipe,0);
@@ -2242,8 +2332,8 @@ function recorteEmpresaHtml(){
     +(rec?empNome(rec):'Quark + QRK')+'</span>';
 }
 function renderDiretor(c=document.getElementById('main-content')){
-  const bolVol=OPPS.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
-  const bolN=OPPS.filter(isB).length;
+  const bolVol=somaBol(OPPS);
+  const bolN=OPPS.filter(isBol).length;
   const pipe=OPPS.reduce((s,r)=>s+(r.pipe||0),0);
   const pend=OPPS.filter(isPend).length;
   const efet=OPPS.length?Math.round(bolN/OPPS.length*100):0;
@@ -2251,13 +2341,14 @@ function renderDiretor(c=document.getElementById('main-content')){
   // Area data
   const aData=areasVis().map(([ak,a])=>{
     const rows=OPPS.filter(r=>r.area===ak);
-    const bol=rows.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
-    const bolN2=rows.filter(isB).length;
+    const bol=somaBol(rows);
+    const bolN2=rows.filter(isBol).length;
+    const abol=somaAbol(rows), abolN=rows.filter(isABoletar).length;
     const p=rows.reduce((s,r)=>s+(r.pipe||0),0);
     const pend2=rows.filter(isPend).length;
     const ef=rows.length?Math.round(bolN2/rows.length*100):0;
     const pct=p>0?Math.min(Math.round(bol/p*100),100):0;
-    return{ak,a,rows,bol,bolN:bolN2,pipe:p,pend:pend2,ef,pct};
+    return{ak,a,rows,bol,bolN:bolN2,abol,abolN,pipe:p,pend:pend2,ef,pct};
   });
 
   // Assessor ranking — só boleta boletada pontua; "A Boletar" fica separado
@@ -2280,7 +2371,7 @@ function renderDiretor(c=document.getElementById('main-content')){
   <div class="section-label">Desempenho por área ${recorteEmpresaHtml()}</div>
   ${linhaConferencia()}
   <div class="area-cards">
-    ${aData.map(({ak,a,rows,bol,bolN:bN,pipe:p,pend:pend2,ef,pct})=>`
+    ${aData.map(({ak,a,rows,bol,bolN:bN,abol,abolN,pipe:p,pend:pend2,ef,pct})=>`
     <div class="area-card${rows.length?' clicavel':''}" style="border-left-color:${a.color}"${rows.length?` onclick="abrirBoletasArea('${ak}')" title="Ver boletas fechadas e topadas de ${a.name}"`:''}>
       <div class="area-card-header">
         <div class="area-tag" style="color:${a.color}">${a.name}</div>
@@ -2301,14 +2392,19 @@ function renderDiretor(c=document.getElementById('main-content')){
       ${(()=>{
         const topRows=rows.filter(r=>!isB(r)&&!isPerdida(r)&&norm(r.sc||'').includes('topou'));
         const topV=topRows.reduce((s2,r)=>s2+(r.atual||r.pipe||0),0);
-        const proj=bol+topV;
+        const proj=bol+abol+topV;
+        const linhaAbol=abolN?'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px;padding-bottom:5px;border-bottom:1px dashed var(--amber-b)">'
+          +'<span style="font-size:10px;font-weight:700;color:#854F0B;text-transform:uppercase;letter-spacing:.04em" title="Cliente fechou, boleta ainda não processada — não entra em boletado">A boletar</span>'
+          +'<span style="font-size:13px;font-weight:700;color:#854F0B">'+(fmt(abol)||'—')+' <span style=\'font-size:10px;font-weight:600\'>('+abolN+')</span></span>'
+          +'</div>':'';
         return '<div style="background:var(--amber-bg);border:1px solid var(--amber-b);border-radius:4px;padding:9px 12px;margin-top:8px">'
+          +linhaAbol
           +'<div style="display:flex;justify-content:space-between;align-items:baseline">'
           +'<span style="font-size:10px;font-weight:700;color:#854F0B;text-transform:uppercase;letter-spacing:.04em">Topadas</span>'
           +'<span style="font-size:13px;font-weight:700;color:#854F0B">'+(topRows.length?(fmt(topV)||'—')+' <span style=\'font-size:10px;font-weight:600\'>('+topRows.length+')</span>':'—')+'</span>'
           +'</div>'
           +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:5px;padding-top:5px;border-top:1px dashed var(--amber-b)">'
-          +'<span style="font-size:10px;font-weight:700;color:#6B5310;text-transform:uppercase;letter-spacing:.04em">Projeção c/ topadas</span>'
+          +'<span style="font-size:10px;font-weight:700;color:#6B5310;text-transform:uppercase;letter-spacing:.04em">Projeção c/ a boletar e topadas</span>'
           +'<span style="font-size:14px;font-weight:800;color:'+(proj>bol?'#6B5310':'var(--muted-l)')+'">'+(fmt(proj)||'—')+'</span>'
           +'</div>'
           +'</div>';
@@ -2324,6 +2420,7 @@ function renderDiretor(c=document.getElementById('main-content')){
       <div style="border-top:1px solid var(--border-l);padding-top:8px;margin-top:4px">
         <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span style="font-size:11px;font-weight:600;color:#8B1C2A">Renda variável</span><span style="font-size:11px;color:var(--muted-l)">—</span></div>
         <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span style="font-size:11px;font-weight:600;color:#378ADD">Renda fixa</span><span style="font-size:11px;color:var(--muted-l)">—</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0"><span style="font-size:11px;font-weight:600;color:#0F8A7E">Asset Allocation / IA</span><span style="font-size:11px;color:var(--muted-l)">—</span></div>
       </div>`:''}
       `}
     </div>`).join('')}
@@ -2391,7 +2488,7 @@ function renderDiretor(c=document.getElementById('main-content')){
         const cel=(arr,dISO,destaque)=>{
           if(!arr||!arr.length)return '<td style="text-align:center;padding:7px 4px;'+(destaque?'background:rgba(255,255,255,.14);':'')+'opacity:.5">—</td>';
           const v=arr.reduce((s2,r)=>s2+(r.atual||r.pipe||0),0);
-          const fechadas=arr.filter(isB).length;
+          const fechadas=arr.filter(isBol).length;
           const passado=dISO<hjISO;
           const tudoFechado=fechadas===arr.length&&arr.length>0;
           const cor=tudoFechado?'#9FF0D0':passado?(fechadas>0?'#FFDFA3':'#FFB8B3'):'#fff';
@@ -2777,7 +2874,7 @@ function funilPipelineHtml(){
       const areaAtivos=areaOpps.filter(r=>!isB(r));
       const fd=FUNIL_ETAPAS.map(([key,label])=>{
         if(key==='__BOL__'){
-          const rows=areaOpps.filter(isB);
+          const rows=areaOpps.filter(isBol);
           return{label,n:rows.length,vol:rows.reduce((s,r)=>s+(r.atual||0),0),bol:true};
         }
         if(key==='__PERD__'){
@@ -3411,7 +3508,7 @@ function eventosDe(r){
       if(di===0&&pi>di)add('lig',h.data,'saiu de “'+(h.de||'—')+'” para “'+(h.para||'—')+'”',q);
       if(di>=2&&pi>di)add('reu',h.data,'avançou de “'+(h.de||'—')+'” para “'+(h.para||'—')+'”',q);
     }
-    if(h.campo==='Pendência boleta'&&pbFechada(h.para))add('bol',h.data,'boleta → '+h.para,q);
+    if(h.campo==='Pendência boleta'&&pbBoletada(h.para))add('bol',h.data,'boleta → '+h.para,q);
   });
   marcacaoDeReuniao(r,add);
   const rd=isoDia(r.reuniao_data);
@@ -5359,7 +5456,7 @@ function applyFilter(){
   const kEl=document.getElementById('pipeline-kpis');
   if(kEl){
     const tP=rows.reduce((s,r)=>s+(r.pipe||0),0);
-    const tB=rows.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+    const tB=somaBol(rows);
     kEl.innerHTML=`<div class="kpi wine"><div class="kpi-lbl">Boletado</div><div class="kpi-val">${fmt(tB)||'R$0'}</div></div>
     <div class="kpi"><div class="kpi-lbl">Pipe</div><div class="kpi-val">${fmt(tP)}</div><div class="kpi-sub">${rows.length} opor.</div></div>
     <div class="kpi"><div class="kpi-lbl">Pendências</div><div class="kpi-val">${rows.filter(isPend).length}</div></div>`;
@@ -5374,8 +5471,8 @@ function applyFilter(){
       const areaBreak=areasVis().map(([ak,a])=>{
         const ar=rows.filter(r=>r.area===ak);
         if(!ar.length)return'';
-        const bol=ar.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
-        const bolN=ar.filter(isB).length;
+        const bol=somaBol(ar);
+        const bolN=ar.filter(isBol).length;
         const pipe=ar.reduce((s,r)=>s+(r.pipe||0),0);
         const ef=ar.length?Math.round(bolN/ar.length*100):0;
         return`<div style="background:var(--card);border:1px solid ${a.color}33;border-radius:6px;padding:14px 16px;border-top:3px solid ${a.color}">
@@ -6231,7 +6328,7 @@ function cockpitBuckets(){
   const hojeList=ativos.filter(r=>!reunioesHoje.includes(r)&&r.todo_data===hoje);
   const quaseLa=ativos.filter(r=>!reunioesHoje.includes(r)&&!atrasados.includes(r)&&!hojeList.includes(r)&&(norm(r.sc||'')==='cliente topou'||norm(r.pb||'')==='a boletar'));
   const parados=ativos.filter(r=>!reunioesHoje.includes(r)&&!atrasados.includes(r)&&!hojeList.includes(r)&&!quaseLa.includes(r)&&daysSince(getLastMoveDate(r))>7);
-  return{hoje,myOpps,ativos,reunioesHoje,atrasados,hojeList,quaseLa,parados,boletadas:myOpps.filter(isB)};
+  return{hoje,myOpps,ativos,reunioesHoje,atrasados,hojeList,quaseLa,parados,boletadas:myOpps.filter(isBol)};
 }
 const COCKPIT_DET={
   acoes:{ico:'🎯',t:'Ações para hoje',sub:'TODOs marcados para hoje e os que já venceram',cor:'var(--wine)',bg:'var(--wine-l)',col:'O que fazer'},
@@ -6298,7 +6395,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   const hoje=today();
   const hora=new Date().getHours();
   const saud=hora<12?'Bom dia':hora<18?'Boa tarde':'Boa noite';
-  const bolVol=myOpps.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+  const bolVol=somaBol(myOpps);
   // cada número do banner abre a lista do que está por trás dele
   const stat=(k,v,rot,n)=>'<div class="cockpit-stat'+((n===undefined?v:n)?' clic':'')+'"'
     +((n===undefined?v:n)?' onclick="abrirCockpit(\''+k+'\')" title="Ver quais são"':'')+'>'
@@ -6364,6 +6461,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       +'<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">'+r.cliente+'</span>'
       +(r.escalado_para?'<span title="Escalada para '+String(r.escalado_para).replace(/"/g,'')+'" style="font-size:11px;flex-shrink:0">🚨</span>':'')
       +'</div>'
+      +selosOutrasAreas(r)
       +(()=>{const sub=subAreaOf(r);const cr=(SUBAREAS[sub]||{}).color||'#888';
         return '<div class="kb-meta" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'
           +'<span style="font-size:9px;font-weight:700;color:'+cr+';text-transform:uppercase;letter-spacing:.03em">'+((SUBAREAS[sub]||{}).name||'')+'</span>'
@@ -6440,6 +6538,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
         +(rows.length?'<input type="checkbox" '+(colSel?'checked ':'')+'title="Selecionar a coluna inteira" onclick="event.stopPropagation()" onchange="kbSelCol(\''+mk+'\',this.checked)" style="width:13px;height:13px;cursor:pointer;accent-color:'+cor+'">':'')
         +emoji+' '+(key==='__BOL__'?'Boletado':key==='__PERD__'?'Perdido':key==='__NSA__'?'Não se aplica':key)+'</span>'
         +'<span style="display:flex;align-items:center;gap:4px">'
+        +(rows.length?'<span class="kb-exp" title="Baixar só esta coluna em Excel" onclick="event.stopPropagation();exportarColuna(\''+mk+'\',\''+String(key).replace(/['"\\]/g,'')+'\')">⤓</span>':'')
         +(custom?'<span title="Remover esta coluna da área" onclick="event.stopPropagation();removeCustomCol(\''+String(key).replace(/['"\\]/g,'')+'\',\''+(window._kbArea||'')+'\')" style="cursor:pointer;opacity:.45;font-weight:700">✕</span>':'')
         +'<span class="kb-count">'+rows.length+'</span></span>'
         +'</div>'
@@ -6523,7 +6622,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +stat('acoes',atrasados.length+hojeList.length,'🎯 Ações p/ hoje')
     +stat('reunioes',reunioesHoje.length,'📅 Reuniões hoje')
     +stat('quase',quaseLa.length,'🔥 Prontas p/ fechar')
-    +stat('boletado',fmt(bolVol)||'R$0','✓ Já boletado',myOpps.filter(isB).length)
+    +stat('boletado',fmt(bolVol)||'R$0','✓ Já boletado',myOpps.filter(isBol).length)
     +'</div></div>'
 
     // Nova oportunidade · virada de mês
@@ -6537,7 +6636,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       const segs=subareasVis().filter(([sk])=>!fArea||sk===fArea).map(([sk,a])=>{
         const so=kbOpps.filter(r=>subAreaOf(r)===sk);
         const etapas=SC_CHAIN.map(s=>so.filter(r=>!isB(r)&&scFunil(r.sc)===norm(s)).length);
-        const bolRows=so.filter(isB);
+        const bolRows=so.filter(isBol);
         const perdRows=so.filter(r=>!isB(r)&&isPerdida(r));
         const perdV=perdRows.reduce((s2,r)=>s2+(r.pipe||0),0);
         const pipeAtivo=so.filter(r=>!isB(r)).reduce((s2,r)=>s2+(r.pipe||0),0);
@@ -6547,7 +6646,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
         so.forEach(r=>{const k=norm(r.produto||'');if(!pm.has(k))pm.set(k,{nome:r.produto||'(sem produto)',rows:[]});pm.get(k).rows.push(r)});
         const produtos=[...pm.values()].map(p=>{
           const pe=SC_CHAIN.map(s2p=>p.rows.filter(r=>!isB(r)&&scFunil(r.sc)===norm(s2p)).length);
-          const pb=p.rows.filter(isB);
+          const pb=p.rows.filter(isBol);
           const pp=p.rows.filter(r=>!isB(r)&&isPerdida(r));
           return{nome:p.nome,etapas:pe,bolN:pb.length,perdN:pp.length,perdV:pp.reduce((x,r)=>x+(r.pipe||0),0),pipeAtivo:p.rows.filter(r=>!isB(r)).reduce((x,r)=>x+(r.pipe||0),0),bolV:pb.reduce((x,r)=>x+(r.atual||0),0)};
         }).sort((x,y)=>y.pipeAtivo+y.bolV-(x.pipeAtivo+x.bolV));
@@ -6611,7 +6710,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'<button style="padding:6px 12px;font-size:11px;font-weight:700;border:none;cursor:pointer;background:'+((window._kbView||'kanban')==='kanban'?'var(--wine)':'var(--card)')+';color:'+((window._kbView||'kanban')==='kanban'?'#fff':'var(--muted)')+'" onclick="window._kbView=\'kanban\';renderAssessorOpps()">📋 Kanban</button>'
     +'<button style="padding:6px 12px;font-size:11px;font-weight:700;border:none;cursor:pointer;background:'+((window._kbView||'kanban')==='lista'?'var(--wine)':'var(--card)')+';color:'+((window._kbView||'kanban')==='lista'?'#fff':'var(--muted)')+'" onclick="window._kbView=\'lista\';renderAssessorOpps()">☰ Lista</button>'
     +'</div>'
-    +'<button class="btn sm" style="font-size:11px" onclick="exportarOpps()" title="Baixa uma planilha com todas as oportunidades e todas as informações">📥 Exportar</button>'
+    +'<button class="btn sm" style="font-size:11px" onclick="abrirExport()" title="Baixar planilha: tudo, só uma área ou só uma etapa">📥 Exportar</button>'
     +'<select class="filter-sel" onchange="window._kbArea=this.value;renderAssessorOpps()">'
     +'<option value="">Todas as áreas ('+myOpps.length+')</option>'
     +subareasVis().map(([k,a])=>{
@@ -6619,10 +6718,13 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
         return '<option value="'+k+'"'+(fArea===k?' selected':'')+'>'+a.name+' ('+n+')</option>';
       }).join('')
     +'</select>'
+    +'<span style="display:inline-flex;align-items:center;gap:4px">'
     +'<select class="filter-sel" onchange="window._kbAss=this.value;renderAssessorOpps()">'
     +'<option value="">Todos assessores</option>'
     +todosAssessores().filter(a=>myOpps.some(r=>assDe(r)===a)).map(a=>'<option'+((window._kbAss||'')===a?' selected':'')+'>'+a+'</option>').join('')
     +'</select>'
+    +(podeMexerAssessor()?'<button class="btn sm" style="font-size:11px;padding:5px 8px" title="Renomear ou unificar assessores repetidos" onclick="abrirAssessores()">✎</button>':'')
+    +'</span>'
     +(()=>{const m=new Map();myOpps.map(r=>r.produto).filter(Boolean).forEach(p=>{if(!m.has(norm(p)))m.set(norm(p),p)});
       const prods=[...m.values()].sort((a,b)=>a.localeCompare(b));
       return prods.length?'<select class="filter-sel" onchange="window._kbProd=this.value;renderAssessorOpps()">'
@@ -6745,7 +6847,7 @@ async function quickBoletar(id){
 // ── ASSESSOR: MEU PAINEL ──
 function renderAssessorDash(c=document.getElementById('main-content')){
   const myOpps=oppsDoUsuario();   // arquivadas ficam só no Histórico
-  const bolRows=myOpps.filter(isB);
+  const bolRows=myOpps.filter(isBol);
   const bolV=bolRows.reduce((s,r)=>s+(r.atual||0),0);
   const ativos=myOpps.filter(r=>!isB(r));
   const pipeV=ativos.reduce((s,r)=>s+(r.pipe||0),0);
@@ -6759,7 +6861,7 @@ function renderAssessorDash(c=document.getElementById('main-content')){
       if(m.produto&&norm(r.produto||'')!==norm(m.produto))return false;
       return true;
     });
-    const boletado=rows.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
+    const boletado=somaBol(rows);
     const pct=m.meta_valor>0?Math.min(Math.round(boletado/m.meta_valor*100),999):0;
     return{...m,boletado,pct};
   });
@@ -6768,8 +6870,8 @@ function renderAssessorDash(c=document.getElementById('main-content')){
   const segCards=subareasVis().map(([sk,a])=>{
     const so=myOpps.filter(r=>subAreaOf(r)===sk);
     if(!so.length)return'';
-    const sb=so.filter(isB).reduce((s,r)=>s+(r.atual||0),0);
-    const sbN=so.filter(isB).length;
+    const sb=somaBol(so);
+    const sbN=so.filter(isBol).length;
     const sp=so.filter(r=>!isB(r)).reduce((s,r)=>s+(r.pipe||0),0);
     const spN=so.filter(r=>!isB(r)).length;
     return '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:16px;border-top:4px solid '+a.color+'">'
@@ -6998,6 +7100,14 @@ function openEdit(id){
   const r=acharOpp(id);if(!r)return;
   editId=r.id;
   document.getElementById('modal-edit-title').textContent=r.cliente+' — '+(r.produto||AREAS[r.area]?.name||r.area);
+  document.getElementById('e-cliente').value=r.cliente||'';
+  document.getElementById('e-assessor').value=r.assessor||'';
+  document.getElementById('e-ass-lista').innerHTML=todosAssessores().map(a=>'<option value="'+a.replace(/"/g,'&quot;')+'">').join('');
+  (function(){
+    const box=document.getElementById('e-outras');
+    const html=outrasAreasHtml(r);
+    box.style.display=html?'block':'none';box.innerHTML=html;
+  })();
   fillSelect('e-sc',[...SC_PADRAO,...OPPS.map(x=>x.sc)],r.sc||'');
   fillSelect('e-pb',[...PB_PADRAO,...OPPS.map(x=>x.pb)],r.pb||'');
   document.getElementById('e-atual').value=r.atual||'';
@@ -7064,9 +7174,12 @@ async function saveEdit(){
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const newSc=lerSel('e-sc');
   const newPb=lerSel('e-pb');
+  const newCli=String(document.getElementById('e-cliente').value||'').trim()||r.cliente;
+  const newAss=String(document.getElementById('e-assessor').value||'').trim();
   const newAtual=parseFloat(document.getElementById('e-atual').value)||0;
   const hist=[...(r.historico||[])];
-  [['Status comercial',r.sc,newSc],['Pendência boleta',r.pb,newPb],['Volume atual',String(r.atual||0),String(newAtual)]].forEach(([campo,de,para])=>{if(de!==para&&para)hist.push({campo,de,para,usuario:USER.nome,data:ds})});
+  [['Status comercial',r.sc,newSc],['Pendência boleta',r.pb,newPb],['Volume atual',String(r.atual||0),String(newAtual)],
+   ['Cliente',r.cliente||'',newCli],['Assessor',r.assessor||'',newAss]].forEach(([campo,de,para])=>{if(de!==para&&para)hist.push({campo,de,para,usuario:USER.nome,data:ds})});
   const ligNova=document.getElementById('e-ligacao').value||'';
   if(ligNova!==(dataLigacao(r)||''))hist.push({campo:CAMPO_LIG_DATA,de:dataLigacao(r)||'',para:ligNova,usuario:USER.nome,data:ds});
   const newObs=document.getElementById('e-obs').value.trim();
@@ -7080,7 +7193,7 @@ async function saveEdit(){
     else hist.push({campo:'Escala',de:r.escalado_para||'',para:'Resolvida',usuario:USER.nome,data:ds});
   }
   try{
-    const dadosPatch={sc:newSc,pb:newPb,atual:newAtual,data_boleta:document.getElementById('e-data').value||null,todo:document.getElementById('e-todo').value,todo_data:document.getElementById('e-todo-data').value||null,reuniao_data:document.getElementById('e-reuniao').value||null,responsavel:document.getElementById('e-resp').value||'',escalado_para:escPara||null,escala_motivo:escPara?(escMotivoRaw?escMotivoRaw+' — por '+USER.nome:'Escalada por '+USER.nome):null,obs:newObs||r.obs||'',historico:hist,updated_at:now.toISOString()};
+    const dadosPatch={cliente:newCli,assessor:newAss||r.assessor||'',sc:newSc,pb:newPb,atual:newAtual,data_boleta:document.getElementById('e-data').value||null,todo:document.getElementById('e-todo').value,todo_data:document.getElementById('e-todo-data').value||null,reuniao_data:document.getElementById('e-reuniao').value||null,responsavel:document.getElementById('e-resp').value||'',escalado_para:escPara||null,escala_motivo:escPara?(escMotivoRaw?escMotivoRaw+' — por '+USER.nome:'Escalada por '+USER.nome):null,obs:newObs||r.obs||'',historico:hist,updated_at:now.toISOString()};
     await patchOppSeguro(dadosPatch,`id=eq.${editId}`);
     showToast(retro?'📦 Boleta de '+mesExtenso(retro.para)+' — foi direto para o Histórico dessa competência':'✅ Salvo com sucesso!',true);
     closeModal('edit');
@@ -8418,10 +8531,11 @@ async function doUploadMain(input){
 }
 
 // ── PLANILHA MODELO para o time baixar ──
-function exportarOpps(){
+// o que cada um pode exportar — o mesmo alcance que ele enxerga
+function rowsNoAlcance(){
   const isDir=USER.perfil==='diretor';
   const isGest=USER.perfil==='gestor';
-  let rows=isDir?[...OPPS]
+  return isDir?[...OPPS]
     :isGest?OPPS.filter(r=>(USER.areas||[]).length?(USER.areas||[]).includes(r.area):true)
     :OPPS.filter(r=>{
       if(norm(r.assessor)===norm(USER.nome))return true;
@@ -8429,7 +8543,143 @@ function exportarOpps(){
       if(r.responsavel&&norm(r.responsavel)!==norm(USER.nome))return false;
       return true;
     });
+}
+// ══ ASSESSORES: renomear e unificar ══
+// O mesmo assessor entra com grafias diferentes pela planilha e vira duas
+// pessoas na conta. Aqui o nome é corrigido em TODAS as oportunidades de uma vez,
+// com registro no histórico de cada card — nada muda calado.
+const podeMexerAssessor=()=>USER&&(USER.perfil==='diretor'||USER.perfil==='gestor');
+function assessoresComContagem(){
+  const m=new Map();
+  rowsNoAlcance().forEach(r=>{
+    const nome=String(r.assessor||'').trim()||'(sem assessor)';
+    const k=norm(nome);
+    if(!m.has(k))m.set(k,{nome,n:0,vol:0,ids:[]});
+    const x=m.get(k);x.n++;x.vol+=(r.atual||r.pipe||0);x.ids.push(r.id);
+  });
+  return[...m.values()].sort((a,b)=>b.n-a.n||a.nome.localeCompare(b.nome));
+}
+function abrirAssessores(){
+  pintaAssessores();
+  document.getElementById('modal-assessores').style.display='flex';
+}
+function pintaAssessores(){
+  const lista=assessoresComContagem();
+  const opts=lista.map(a=>'<option value="'+a.nome.replace(/"/g,'&quot;')+'">').join('');
+  document.getElementById('as-lista').innerHTML=
+    '<datalist id="as-nomes">'+opts+'</datalist>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px">'
+    +'<thead><tr style="text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase">'
+    +'<th style="padding:6px 4px">Assessor</th><th style="padding:6px 4px;text-align:right">Cards</th>'
+    +'<th style="padding:6px 4px;text-align:right">Volume</th><th style="padding:6px 4px">Passar a chamar de</th><th></th></tr></thead><tbody>'
+    +lista.map((a,i)=>'<tr style="border-top:1px solid var(--border-l)">'
+      +'<td style="padding:6px 4px;font-weight:600">'+a.nome+'</td>'
+      +'<td style="padding:6px 4px;text-align:right">'+a.n+'</td>'
+      +'<td style="padding:6px 4px;text-align:right;color:var(--muted)">'+(fmt(a.vol)||'—')+'</td>'
+      +'<td style="padding:6px 4px"><input id="as-novo-'+i+'" list="as-nomes" placeholder="'+a.nome.replace(/"/g,'&quot;')+'" '
+        +'style="width:100%;font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:4px"></td>'
+      +'<td style="padding:6px 4px"><button class="btn sm" style="font-size:11px" onclick="aplicarAssessor('+i+')">Aplicar</button></td>'
+      +'</tr>').join('')
+    +'</tbody></table>';
+  window._asLista=lista;
+}
+async function aplicarAssessor(i){
+  const a=(window._asLista||[])[i];if(!a)return;
+  const novo=String((document.getElementById('as-novo-'+i)||{}).value||'').trim();
+  if(!novo){showToast('Escreva o nome novo');return}
+  if(norm(novo)===norm(a.nome)){showToast('É o mesmo nome');return}
+  const existe=(window._asLista||[]).some(x=>norm(x.nome)===norm(novo));
+  const msg=existe
+    ?'Juntar "'+a.nome+'" ('+a.n+' cards) dentro de "'+novo+'"?\nOs dois viram um assessor só.'
+    :'Renomear "'+a.nome+'" para "'+novo+'" em '+a.n+' oportunidade(s)?';
+  if(!confirm(msg))return;
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  let ok=0,erro=0;
+  showToast('Atualizando '+a.n+' oportunidade(s)...');
+  for(const id of a.ids){
+    const r=acharOpp(id);if(!r)continue;
+    const hist=[...(r.historico||[]),{campo:'Assessor',de:r.assessor||'',para:novo,usuario:USER.nome,data:ds}];
+    try{await db('PATCH','oportunidades',{assessor:novo,historico:hist,updated_at:now.toISOString()},'id=eq.'+id);ok++}
+    catch(e){erro++}
+  }
+  await loadData();pintaAssessores();renderCurView();
+  showToast(erro?('⚠ '+ok+' atualizadas, '+erro+' falharam'):('✅ '+ok+' oportunidade(s) agora são de "'+novo+'"'),!erro);
+}
+
+// ── EXPORTAR COM RECORTE: uma área, uma etapa, ou os dois ──
+function abrirExport(){
+  const base=rowsNoAlcance();
+  const ar=document.getElementById('x-area');
+  ar.innerHTML='<option value="">Todas as áreas</option>'
+    +areasVis().map(([k,a])=>'<option value="'+k+'">'+a.name+' ('+base.filter(r=>r.area===k).length+')</option>').join('');
+  if(window._kbArea&&SUBS_DA_AREA)Object.keys(SUBS_DA_AREA).forEach(k=>{
+    if((SUBS_DA_AREA[k]||[]).includes(window._kbArea))ar.value=k;
+  });
+  const et=document.getElementById('x-etapa');
+  const etapas=[...SC_CHAIN,...kbCustomCols()];
+  et.innerHTML='<option value="">Todas as etapas</option>'
+    +etapas.map(s=>'<option value="'+s.replace(/"/g,'&quot;')+'">'+s+'</option>').join('')
+    +'<option value="__BOL__">✅ Boletado</option><option value="__ABOL__">🕗 A boletar</option>'
+    +'<option value="__PERD__">❌ Perdido</option><option value="__NSA__">🚫 Não se aplica</option>';
+  ar.onchange=et.onchange=previaExport;
+  previaExport();
+  document.getElementById('modal-export').style.display='flex';
+}
+function filtroExport(){
+  const ak=document.getElementById('x-area').value;
+  const et=document.getElementById('x-etapa').value;
+  let rows=rowsNoAlcance();
+  if(ak)rows=rows.filter(r=>r.area===ak);
+  if(et==='__BOL__')rows=rows.filter(isBol);
+  else if(et==='__ABOL__')rows=rows.filter(isABoletar);
+  else if(et==='__PERD__')rows=rows.filter(r=>!isB(r)&&isPerdida(r));
+  else if(et==='__NSA__')rows=rows.filter(r=>!isB(r)&&norm(r.sc||'')==='nao se aplica');
+  else if(et)rows=rows.filter(r=>!isB(r)&&!isPerdida(r)&&(norm(r.sc||'')===norm(et)||scFunil(r.sc)===norm(et)));
+  const rot=[ak?((AREAS[ak]||{}).name||ak):'',et?nomeColuna(et==='__ABOL__'?'A boletar':et):''].filter(Boolean);
+  return{rows,rot};
+}
+function previaExport(){
+  const{rows,rot}=filtroExport();
+  const vol=somaBol(rows), pipe=rows.reduce((s,r)=>s+(r.pipe||0),0);
+  document.getElementById('x-previa').innerHTML=rows.length
+    ?'<b>'+rows.length+' oportunidade'+(rows.length>1?'s':'')+'</b>'+(rot.length?' · '+rot.join(' · '):' · tudo')
+      +'<br>pipe '+(fmt(pipe)||'R$0')+' · boletado '+(fmt(vol)||'R$0')
+    :'<span style="color:var(--red)">Nada nesse recorte</span>';
+}
+function exportarFiltrado(){
+  const{rows,rot}=filtroExport();
+  if(!rows.length){showToast('Nada nesse recorte');return}
+  const nome=rot.length?rot.map(slugArq).join('-'):'tudo';
+  planilhaOpps(rows,'oportunidades-'+nome,rot.join(' · ')||'Oportunidades');
+  closeModal('export');
+  showToast('✅ '+rows.length+' oportunidades na planilha'+(rot.length?' ('+rot.join(' · ')+')':''),true);
+}
+function exportarOpps(){
+  const rows=rowsNoAlcance();
   if(!rows.length){showToast('Nada para exportar no seu alcance');return}
+  planilhaOpps(rows,'oportunidades-completo');
+}
+// ── BAIXAR UMA COLUNA DO KANBAN ──
+// O que está na tela é o que sai na planilha: a mesma coluna, com os filtros de
+// área, assessor, produto e busca já aplicados. Usa os ids que a própria coluna
+// registrou ao ser desenhada, em vez de reconstruir a regra.
+function nomeColuna(key){
+  return key==='__BOL__'?'Boletado':key==='__PERD__'?'Perdido':key==='__NSA__'?'Não se aplica':String(key||'coluna');
+}
+const slugArq=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[^a-zA-Z0-9]+/g,'-').replace(/^-|-$/g,'').toLowerCase()||'export';
+function exportarColuna(mk,key){
+  const ids=(window._kbColIds||{})[mk]||[];
+  const rows=ids.map(id=>acharOpp(id)).filter(Boolean);
+  if(!rows.length){showToast('Essa coluna está vazia');return}
+  const rot=nomeColuna(key);
+  const recorte=[window._kbArea?((SUBAREAS[window._kbArea]||{}).name||window._kbArea):'',
+                 window._kbAss||'',window._kbProd||''].filter(Boolean).join(' · ');
+  planilhaOpps(rows,'kanban-'+slugArq(rot)+(recorte?'-'+slugArq(recorte):''),rot);
+  showToast('✅ '+rows.length+' de "'+rot+'" na planilha'+(recorte?' ('+recorte+')':''),true);
+}
+function planilhaOpps(rows,arquivo,aba){
   const br=iso=>iso&&/^\d{4}-\d{2}-\d{2}/.test(String(iso))?String(iso).slice(0,10).split('-').reverse().join('/'):(iso||'');
   const brDT=iso=>{if(!iso)return '';const d=new Date(iso);return isNaN(d)?'':d.toLocaleDateString('pt-BR')+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
   const dados=[['Área','Segmento','Cliente','AI','Produto','Valor Pipe','Valor Atual','STATUS COMERCIAL','PENDENCIA BOLETA','Data Boleta','ToDo','Data ToDo','Reunião','Responsável','OBS','Escalada para','Motivo escala','Criada em','Atualizada em','Linha do tempo']];
@@ -8441,9 +8691,9 @@ function exportarOpps(){
   const ws=XLSX.utils.aoa_to_sheet(dados);
   ws['!cols']=[{wch:12},{wch:14},{wch:26},{wch:26},{wch:22},{wch:12},{wch:12},{wch:20},{wch:20},{wch:11},{wch:26},{wch:11},{wch:11},{wch:16},{wch:32},{wch:14},{wch:20},{wch:16},{wch:16},{wch:60}];
   const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Oportunidades');
-  XLSX.writeFile(wb,'oportunidades-completo-'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.xlsx');
-  showToast('✅ '+rows.length+' oportunidades exportadas com tudo dentro!',true);
+  XLSX.utils.book_append_sheet(wb,ws,String(aba||'Oportunidades').slice(0,28));
+  XLSX.writeFile(wb,(arquivo||'oportunidades')+'-'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.xlsx');
+  if(!aba)showToast('✅ '+rows.length+' oportunidades exportadas com tudo dentro!',true);
 }
 function baixarModelo(){
   const dados=[
