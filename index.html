@@ -2016,29 +2016,42 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261024-1519';
-let _verTimer=null,_verTam=0;
+const APP_VERSION='20261024-1553';
+let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
-async function tamanhoPublicado(){
-  try{
-    const r=await fetch(urlApp()+'?v='+Date.now(),{method:'HEAD',cache:'no-store'});
-    return +(r.headers.get('content-length')||0);
-  }catch(e){return 0}
+// Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
+// content-length de um HEAD: o GitHub manda o tamanho comprimido (gzip), que
+// nunca bate com o texto — o aviso aparecia para todo mundo o tempo todo.
+async function lerPublicado(){
+  const res=await fetch(urlApp()+'?v='+Date.now(),{cache:'no-store'});
+  const txt=await res.text();
+  const m=txt.match(/APP_VERSION='([^']+)'/);
+  return {versao:m?m[1]:'',tam:txt.length};
 }
 // no boot vale a conferência pesada: pega até versão que o navegador serviu do cache
 async function conferirNoBoot(){
   try{
-    const res=await fetch(urlApp()+'?v='+Date.now(),{cache:'no-store'});
-    const txt=await res.text();
-    const m=txt.match(/APP_VERSION='([^']+)'/);
-    _verTam=txt.length;
-    if(m&&m[1]!==APP_VERSION)mostrarAvisoVersao(m[1]);
+    const p=await lerPublicado();
+    _verTam=p.tam;
+    if(p.versao&&p.versao!==APP_VERSION)mostrarAvisoVersao(p.versao);
   }catch(e){}
 }
 async function checarVersao(){
-  const t=await tamanhoPublicado();
-  if(!t||!_verTam)return;
-  if(Math.abs(t-_verTam)>2)mostrarAvisoVersao();
+  // o foco da janela dispara muito; uma conferência a cada 30s basta
+  if(Date.now()-_verUlt<30000)return;
+  _verUlt=Date.now();
+  try{
+    const p=await lerPublicado();
+    if(!p.tam||!_verTam)return;
+    if((p.versao&&p.versao!==APP_VERSION)||Math.abs(p.tam-_verTam)>2)mostrarAvisoVersao(p.versao);
+  }catch(e){}
+}
+// reload(true) é ignorado pelos navegadores e o GitHub deixa a página 10 min
+// em cache: o botão recarregava a versão velha. Primeiro força o cache a buscar
+// a nova, depois recarrega.
+async function atualizarAgora(){
+  try{await fetch(urlApp(),{cache:'reload'})}catch(e){}
+  location.reload();
 }
 function mostrarAvisoVersao(nova){
   if(document.getElementById('aviso-versao'))return;
@@ -2048,7 +2061,7 @@ function mostrarAvisoVersao(nova){
   d.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#4A0E16;color:#fff;padding:12px 18px;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.35);z-index:9999;display:flex;align-items:center;gap:14px;font-size:13px';
   d.innerHTML='<span>✨ <b>Versão nova publicada</b><br>'
     +'<span style="font-size:11px;opacity:.85">Enquanto não atualizar, seus números podem não bater com os do time.</span></span>'
-    +'<button onclick="location.reload(true)" style="background:#fff;color:#4A0E16;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Atualizar agora</button>';
+    +'<button onclick="atualizarAgora()"style="background:#fff;color:#4A0E16;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Atualizar agora</button>';
   document.body.appendChild(d);
 }
 function startVersaoCheck(){
