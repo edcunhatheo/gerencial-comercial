@@ -2016,7 +2016,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261023-2148';
+const APP_VERSION='20261023-2206';
 let _verTimer=null,_verTam=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 async function tamanhoPublicado(){
@@ -2122,6 +2122,7 @@ async function loadData(){
   aplicaEmpresa();
   DAILY={};(daily||[]).forEach(d=>{DAILY[d.oportunidade_id]={tipo:d.tipo,acao:d.acao,id:d.id}});
   conferirLeitura();
+  try{religarAgenda()}catch(e){}
   // acabou de ler tudo: alinha a sonda para não recarregar de novo daqui a 15s
   _ultCheia=Date.now();_pend=false;
   try{lerSonda().then(s=>{if(s){_sonda=s;_ultOk=Date.now()}pintaSync()}).catch(()=>{})}catch(e){}
@@ -8761,10 +8762,10 @@ async function porNaAgendaAPI(r){
   if(!agendaConectada())return '';
   if(!isoDia(r.reuniao_data))return '';
   const ev=eventoDaOpp(r);
-  const req=(cal,metodo,evId)=>fetch('https://www.googleapis.com/calendar/v3/calendars/'
+  const req=(cal,metodo,evId)=>comToken(()=>fetch('https://www.googleapis.com/calendar/v3/calendars/'
       +encodeURIComponent(cal)+'/events'+(evId?'/'+encodeURIComponent(evId):'')+'?sendUpdates=all',
     {method:metodo,headers:{Authorization:'Bearer '+_gToken,'Content-Type':'application/json'},
-     body:JSON.stringify(corpoDoEvento(r))});
+     body:JSON.stringify(corpoDoEvento(r))}));
   const alvo=donoDaReuniao(r);
   let res=ev?await req(alvo,'PATCH',ev):await req(alvo,'POST');
   if(ev&&(res.status===404||res.status===410))res=await req(alvo,'POST');   // apagaram na mão
@@ -8893,7 +8894,9 @@ function renderAgendaExterna(c=document.getElementById('main-content')){
       +'(<code>file://</code>) e o Google recusa login vindo daí (<i>Erro 400: invalid_request</i>). '
       +'Publique no GitHub e acesse por <b>https://edcunhatheo.github.io/gerencial-comercial/</b> — a agenda automática só liga por lá.</div></div>'
     : temChave
-    ? '<div id="ag-confronto"><button class="btn wine sm" onclick="conectarAgenda()">🔗 Conectar a agenda e conferir</button>'
+    ? '<div id="ag-confronto"><button class="btn wine sm" onclick="conectarAgenda()">🔗 '
+      +(agendaConectada()?'Conferir a agenda agora':'Conectar a agenda e conferir')+'</button>'
+      +(agendaConectada()?'<span style="font-size:11px;color:#085041;font-weight:700;margin-left:8px">● conectada</span>':'')
       +'<div style="font-size:11px;color:var(--muted);margin-top:6px">Compara os eventos da agenda com as oportunidades e mostra o que está só de um lado.</div></div>'
     : '<div style="background:var(--surf2);border:1px dashed var(--border);border-radius:6px;padding:14px 16px">'
       +'<div style="font-weight:700;font-size:12.5px;margin-bottom:6px">⚠ Falta a chave do Google para o confronto automático</div>'
@@ -8924,7 +8927,51 @@ async function salvarChaveGoogle(){
 }
 
 // ── leitura dos eventos (só com a chave) ──
-let _gToken='';
+let _gToken='',_gConta='';
+// O Google devolve um token que vale ~1h e morre ao recarregar a página. Quem
+// já autorizou uma vez não precisa clicar de novo: dá para pedir o token em
+// silêncio (prompt vazio). Só quando o Google recusar é que voltamos a pedir.
+const LEMBRA_AGENDA='gc_agenda_ok';
+function marcouAgenda(v){try{v?localStorage.setItem(LEMBRA_AGENDA,'1'):localStorage.removeItem(LEMBRA_AGENDA)}catch(e){}}
+function jaAutorizou(){try{return localStorage.getItem(LEMBRA_AGENDA)==='1'}catch(e){return false}}
+let _tokenClient=null;
+async function clienteToken(){
+  const cid=googleClientId();
+  if(!cid)return null;
+  if(_tokenClient)return _tokenClient;
+  await carregaGis();
+  _tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:cid,scope:'https://www.googleapis.com/auth/calendar.events',callback:()=>{}
+  });
+  return _tokenClient;
+}
+// pede o token sem incomodar; devolve false se o Google exigir a tela de consentimento
+function pedeTokenSilencioso(){
+  return new Promise(async ok=>{
+    try{
+      const tc=await clienteToken();
+      if(!tc)return ok(false);
+      tc.callback=resp=>{
+        if(resp&&resp.access_token){_gToken=resp.access_token;marcouAgenda(true);ok(true)}
+        else ok(false);
+      };
+      tc.requestAccessToken({prompt:''});
+    }catch(e){ok(false)}
+  });
+}
+// token vencido no meio do caminho: renova uma vez antes de dar erro na cara
+async function comToken(fn){
+  let r=await fn();
+  if(r&&r.status===401&&await pedeTokenSilencioso())r=await fn();
+  return r;
+}
+async function religarAgenda(){
+  if(!googleClientId()||!jaAutorizou()||abertoDoArquivo())return;
+  if(await pedeTokenSilencioso()){
+    const el=document.getElementById('ag-confronto');
+    if(el)conferirAgenda();
+  }
+}
 function carregaGis(){
   return new Promise((ok,err)=>{
     if(window.google&&google.accounts&&google.accounts.oauth2)return ok();
@@ -8946,17 +8993,14 @@ async function conectarAgenda(){
   const cid=googleClientId();
   if(!cid){showToast('Falta a chave do Google');return}
   try{
-    await carregaGis();
-    const tc=google.accounts.oauth2.initTokenClient({
-      client_id:cid,
-      scope:'https://www.googleapis.com/auth/calendar.events',
-      callback:async resp=>{
-        if(!resp||!resp.access_token){showToast('Autorização não concluída');return}
-        _gToken=resp.access_token;
-        await conferirAgenda();
-      }
-    });
-    tc.requestAccessToken();
+    if(await pedeTokenSilencioso()){await conferirAgenda();return}
+    const tc=await clienteToken();
+    tc.callback=async resp=>{
+      if(!resp||!resp.access_token){showToast('Autorização não concluída');return}
+      _gToken=resp.access_token;marcouAgenda(true);
+      await conferirAgenda();
+    };
+    tc.requestAccessToken({prompt:'consent'});
   }catch(e){showToast('Erro: '+e.message)}
 }
 async function eventosDaSemana(email,de,ate){
@@ -8964,7 +9008,7 @@ async function eventosDaSemana(email,de,ate){
     +'?timeMin='+encodeURIComponent(de+'T00:00:00-03:00')
     +'&timeMax='+encodeURIComponent(ate+'T23:59:59-03:00')
     +'&singleEvents=true&orderBy=startTime&maxResults=250';
-  const r=await fetch(url,{headers:{Authorization:'Bearer '+_gToken}});
+  const r=await comToken(()=>fetch(url,{headers:{Authorization:'Bearer '+_gToken}}));
   if(!r.ok)throw new Error('agenda respondeu '+r.status);
   const j=await r.json();
   return (j.items||[]).map(e=>({id:e.id,summary:e.summary||'(sem título)',
@@ -8996,7 +9040,8 @@ function htmlConfronto(orfaos,semEvento,nCasados,nEvs,alvo){
   const linha=(ico,cor,tit,sub,bt)=>'<div class="cal-li" style="border-left:3px solid '+cor+'">'
     +'<div style="font-size:15px">'+ico+'</div><div style="flex:1;min-width:0">'
     +'<div class="cal-cli">'+tit+'</div><div class="cal-sub">'+sub+'</div></div>'+(bt||'')+'</div>';
-  return '<div class="section-label" style="margin:0 0 8px;border:none;padding:0">Agenda × sistema</div>'
+  return '<div class="section-label" style="margin:0 0 8px;border:none;padding:0">Agenda × sistema'
+    +'<span style="font-size:10px;color:#085041;font-weight:700;margin-left:8px">● conectada</span></div>'
     +'<div style="font-size:11px;color:var(--muted);margin-bottom:8px">'+nEvs+' eventos na agenda de '+alvo.nome
     +' · '+nCasados+' já têm oportunidade</div>'
     +(orfaos.length?orfaos.map((x,i)=>linha('🔴','var(--red)',
