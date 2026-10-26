@@ -2016,7 +2016,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261024-1553';
+const APP_VERSION='20261024-1600';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -2146,10 +2146,10 @@ let curView='';
 function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
-    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-agenda','📅 Agenda'],['d-metas','🏆 Definições do mês'],['d-historico','📦 Histórico'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários'],['d-acordos','📋 Acordos por AI']]
+    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-agenda','📅 Agenda'],['d-metas','🏆 Definições do mês'],['d-historico','📦 Histórico'],['d-upload','📤 Upload'],['d-usuarios','👥 Usuários']]
     :USER.perfil==='gestor'
-    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-agenda','📅 Agenda'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']]
-    :[['diretor','📊 Dashboard'],['a-opps','🎯 Guia do dia'],['d-pipeline','📈 Follow-up'],['d-agenda','📅 Agenda'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']];
+    ?[['diretor','📊 Dashboard'],['d-guia','🎯 Guia do dia'],['d-agenda','📅 Agenda'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']]
+    :[['diretor','📊 Dashboard'],['a-opps','🎯 Guia do dia'],['d-agenda','📅 Agenda'],['d-metas','🏆 Metas'],['d-historico','📦 Histórico'],['a-upload','📤 Subir planilha'],['a-dash','👤 Meu painel']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,l])=>{
     const ico=l.split(' ')[0];
     const lb=l.substring(ico.length+1);
@@ -2987,7 +2987,6 @@ function timeGerencialHtml(){
       +'<div style="font-size:10px;font-weight:700;color:'+(d.ativHoje?'#0F6E56':'#A32D2D')+';margin-bottom:10px">'+(d.ativHoje?'📝 '+d.ativHoje+' registro'+(d.ativHoje!==1?'s':'')+' hoje':'😴 nenhum registro hoje')+'</div>'
       +'<div style="display:flex;gap:6px">'
       +'<button class="btn sm" style="flex:1" onclick="abrirGerencial(\''+nomeSafe+'\')">📊 Meta</button>'
-      +'<button class="btn sm" style="flex:1" onclick="verDailyDe(\''+nomeSafe+'\')">📈 Follow-up</button>'
       +'</div>'
       +'</div>';
   }).join('');
@@ -8064,7 +8063,7 @@ function metasCardHtml(nome){
   const {segs}=segmentosDoAssessor(nome);
   const comAcordo=segs.filter(x=>x.meta>0);
   if(!comAcordo.length){
-    return '<div style="font-size:10px;color:var(--muted-l);padding:6px 0 2px">Sem acordo definido — configure na aba Acordos por AI</div>';
+    return '<div style="font-size:10px;color:var(--muted-l);padding:6px 0 2px">Sem acordo definido</div>';
   }
   const tMeta=comAcordo.reduce((s,x)=>s+x.meta,0);
   const tReal=comAcordo.reduce((s,x)=>s+x.realizado,0);
@@ -8189,11 +8188,8 @@ function abrirGerencial(nome){
       +'</div>'
     :'';
   document.getElementById('ger-body').innerHTML=cabecalho+legendaBarra
-    +(segs.length?blocos:'<div class="empty" style="padding:20px"><p>Nenhum acordo definido e nenhuma oportunidade neste assessor.<br>Defina os acordos na aba <strong>Acordos por AI</strong>.</p></div>')
-    +rodape
-    +'<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">'
-    +'<button class="btn sm" onclick="closeModal(\'gerencial\');verDailyDe(\''+String(nome).replace(/'/g,'')+'\')">☀️ Ver dia de atuação</button>'
-    +'</div>';
+    +(segs.length?blocos:'<div class="empty" style="padding:20px"><p>Nenhum acordo definido e nenhuma oportunidade neste assessor.</p></div>')
+    +rodape;
   document.getElementById('modal-gerencial').style.display='flex';
 }
 
