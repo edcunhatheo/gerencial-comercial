@@ -2526,7 +2526,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261104-1540';
+const APP_VERSION='20261104-1810';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3087,8 +3087,12 @@ let _sonda='',_syncBusy=false,_pend=false,_ultOk=0,_ultCheia=0,_ultTecla=0;
 document.addEventListener('keydown',()=>{_ultTecla=Date.now()},true);
 
 function filtroAreasUser(){
-  const areas=USER.perfil==='diretor'?Object.keys(AREAS):(USER.areas||[]);
-  return areas.length?'or=('+areas.map(a=>'area.eq.'+a).join(',')+')&':'';
+  if(USER.perfil==='diretor')return '';
+  const areas=USER.areas||[];
+  // Sem área no cadastro a pessoa não enxerga NADA — antes isso virava
+  // "enxerga tudo", o contrário do combinado e do que a tela promete.
+  if(!areas.length)return 'area=eq.__sem_area__&';
+  return 'or=('+areas.map(a=>'area.eq.'+a).join(',')+')&';
 }
 async function lerSonda(){
   const url=SUPA+'/rest/v1/oportunidades?'+filtroAreasUser()+'select=updated_at&order=updated_at.desc&limit=1';
@@ -4700,7 +4704,7 @@ async function salvarObjSemana(ak){
 }
 // as oportunidades de uma área, dentro do recorte de empresa já aplicado
 function macroRows(ak){
-  const base=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS);
+  const base=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS).filter(visivelParaMim);
   return ak?base.filter(r=>r.area===ak):base;
 }
 function macroAreas(){
@@ -8065,32 +8069,39 @@ async function kbDrop(ev,statusKey){
 // não é dele. O card que já teve reunião continua com ele até a boleta.
 const ETAPAS_DO_CLOSER=new Set(['r1','ar2','r2','conf','topou','bol']);
 const jaTeveReuniao=r=>(r.historico||[]).some(h=>h.campo===MARCAS.reu.campo&&h.para===MARCAS.reu.on);
-function cardDoCloser(r){
+// a etapa certa: da Reunião Agendada em diante
+function etapaDoCloser(r){
   if(ETAPAS_DO_CLOSER.has(etapaFunil(r)))return true;
   // "Já teve reunião um dia" NÃO basta: card que voltou para a prospecção é do
   // sales ops de novo — a bola é de quem está com ela agora, não de quem já a
-  // teve. (Era por aqui que o closer via "Agendar Reunião": a base está cheia
-  // de card com reunião antiga no histórico parado numa coluna de ops.)
-  // Só a oportunidade que MORREU ou foi arquivada depois de uma reunião
+  // teve. Só a oportunidade que MORREU ou foi arquivada depois de uma reunião
   // continua sendo história dele.
   if(etapaFunil(r)!=='perd'&&!arquivada(r))return false;
   return jaTeveReuniao(r);
 }
+// ...e a reunião certa: a DELE.
+// A área não identifica o closer — Seguro tem Cris e Vovô, Consórcio tem
+// Rafael e Silas. Quem responde pela reunião é o RESPONSÁVEL do card.
+// Reunião sem responsável aparece para todos os closers da área: melhor
+// dois olharem do que ela ficar invisível esperando um dono que ninguém
+// sabe que falta.
+function cardDoCloser(r,quem){
+  if(!etapaDoCloser(r))return false;
+  const dono=norm(r.responsavel||'');
+  return !dono||dono===norm(quem||(USER&&USER.nome)||'');
+}
+// ══ A REGRA ÚNICA DE QUEM VÊ O QUÊ ══
+// Kanban, funil e listas passam por aqui: duas telas que respondem
+// diferente à mesma pergunta é como o sistema perde a confiança.
+function visivelParaMim(r){
+  if(!USER)return false;
+  if(USER.perfil==='diretor')return true;
+  if(!(USER.areas||[]).includes(r.area))return false;   // sem área no cadastro, não vê nada
+  if(USER.perfil==='closer')return cardDoCloser(r);
+  return true;                                          // head e sales ops: a área inteira
+}
 function oppsDoUsuario(){
-  const base=OPPS.filter(r=>!arquivada(r));      // arquivadas moram no Histórico
-  const daArea=r=>!(USER.areas||[]).length||(USER.areas||[]).includes(r.area);
-  if(USER.perfil==='diretor')return base;
-  // o head vê tudo DAS ÁREAS DELE. A consulta ao banco já filtra por área,
-  // mas repetir aqui é barato e impede que uma mudança na consulta vire
-  // vazamento silencioso de uma área para outra.
-  if(USER.perfil==='head')return base.filter(daArea);
-  if(USER.perfil==='ops')return base.filter(daArea);
-  if(USER.perfil==='closer')return base.filter(r=>daArea(r)&&cardDoCloser(r));
-  return base.filter(r=>{
-    if(r.responsavel)return norm(r.responsavel)===norm(USER.nome);
-    if(norm(r.assessor)===norm(USER.nome))return true;
-    return daArea(r);
-  });
+  return OPPS.filter(r=>!arquivada(r)&&visivelParaMim(r));   // arquivadas moram no Histórico
 }
 
 // ══════════════════════════════════════════════════════════
@@ -8450,13 +8461,13 @@ function linhaDoRecorte(){
   const as=(USER.areas||[]).map(k=>(AREAS[k]||{}).name||k);
   const onde=as.length?as.join(', '):'<b style="color:var(--red)">nenhuma área no seu cadastro</b>';
   const emps=(USER.empresas||[]).map(empNome);
-  const regra=USER.perfil==='closer'?'da <b>Reunião agendada</b> em diante'
+  const regra=USER.perfil==='closer'?'<b>as suas reuniões</b>, da <b>Reunião agendada</b> em diante'
     :USER.perfil==='ops'?'o funil inteiro'
     :USER.perfil==='head'?'tudo do time':'o que é seu';
   return '<div class="recorte"><b>'+PERFIL_ROT(USER.perfil)+'</b> · você está vendo '+regra
     +' em <b>'+(as.length?as.join(', '):onde)+'</b>'
     +' · <b>'+(emps.join(' e ')||'—')+'</b>'
-    +(USER.perfil==='closer'?' — as colunas de prospecção são do sales ops e não aparecem aqui':'')
+    +(USER.perfil==='closer'?' — reunião de outro closer e as colunas de prospecção não aparecem aqui':'')
     +'</div>'+blocoVazio();
 }
 
@@ -8486,9 +8497,15 @@ function blocoVazio(){
       +'o diretor marca a outra empresa em <b>Usuários → ✎ Acesso</b> e elas aparecem.');
   else if(!vivas)
     li.push('As '+naEmpresa+' oportunidades do seu recorte estão <b>arquivadas</b> — elas moram no Histórico, não no quadro.');
-  else if(USER.perfil==='closer')
-    li.push('Há <b>'+vivas+'</b> oportunidade'+(vivas===1?'':'s')+' na sua área, mas nenhuma chegou em '
-      +'<b>Reunião agendada</b>. Como closer, você só vê daí em diante — a prospecção é do sales ops.');
+  else if(USER.perfil==='closer'){
+    const naEtapa=(OPPS||[]).filter(r=>!arquivada(r)&&(USER.areas||[]).includes(r.area)&&etapaDoCloser(r)).length;
+    li.push(naEtapa
+      ?'Há <b>'+naEtapa+'</b> reuni'+(naEtapa===1?'ão':'ões')+' na sua área, mas '
+        +(naEtapa===1?'ela está':'todas estão')+' com <b>outro closer</b> como responsável. '
+        +'Você vê as que têm o seu nome — e as que ainda não têm dono.'
+      :'Há <b>'+vivas+'</b> oportunidade'+(vivas===1?'':'s')+' na sua área, mas nenhuma chegou em '
+        +'<b>Reunião agendada</b>. Como closer, você só vê daí em diante — a prospecção é do sales ops.');
+  }
   else li.push('Há '+vivas+' oportunidade'+(vivas===1?'':'s')+' carregada'+(vivas===1?'':'s')
       +', mas nenhuma entra no seu recorte.');
   return '<div class="vazio-pq"><div class="vazio-pq-t">Por que não aparece nada aqui</div>'
