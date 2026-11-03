@@ -688,6 +688,13 @@ tr.bol td{background:var(--green-bg)}
 .inv-ass input{width:14px;height:14px;cursor:pointer;accent-color:var(--green);flex-shrink:0;margin:0}
 .inv-ass-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
 .inv-ass-n:hover{color:var(--wine)}
+.inv-soma{padding:7px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);background:var(--wine-ll)}
+.inv-soma-n{font-size:15px;font-weight:800;color:var(--wine);vertical-align:-1px;margin-right:3px}
+.inv-soma b{color:var(--text)}
+.inv-ass-m{font-size:9.5px;font-weight:800;color:var(--muted);border:1px solid var(--border);
+  border-radius:3px;padding:0 4px;flex-shrink:0}
+.inv-ass-g{font-size:9.5px;font-weight:800;color:#fff;background:var(--wine);border:1px solid var(--wine);
+  border-radius:3px;padding:0 4px;flex-shrink:0}
 .inv-ass-c{font-size:10px;color:var(--muted-l);flex-shrink:0}
 .inv-x{opacity:0;cursor:pointer;font-size:14px;line-height:1;color:var(--red);flex-shrink:0;
   padding:0 2px;transition:opacity .12s}
@@ -730,6 +737,16 @@ tr.bol td{background:var(--green-bg)}
 .inv-tbl td.inv-ck input{width:17px;height:17px;cursor:pointer;accent-color:var(--wine)}
 .inv-cli{font-weight:600}
 .inv-mut{color:var(--muted);font-size:12px}
+.inv-card.comass .inv-card-n{color:var(--wine)}
+.inv-card-f i{font-style:normal;font-size:8.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.05em;color:var(--muted-l);margin-right:5px}
+.inv-lk{cursor:pointer;border-bottom:1px dashed var(--accent-b);font-weight:700}
+.inv-lk:hover{color:var(--wine);border-bottom-color:var(--wine)}
+.inv-lk.g{border-bottom:0;font-weight:800}
+.inv-lk.g:hover{opacity:.75}
+.inv-z{opacity:.45;font-weight:700}
+.inv-ja.pend{color:var(--muted);border-color:var(--border)}
+.inv-ja.seu{color:#fff;background:var(--wine);border-color:var(--wine)}
 .inv-ja{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--green);
   border:1px solid var(--green-b);border-radius:4px;padding:1px 6px;cursor:help}
 .inv-rod{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding:12px 16px;
@@ -2021,6 +2038,7 @@ const AREA_ACORDO='acordo';
 const AREA_COLUNA='coluna';
 const AREA_DYM='dym';     // os campos digitados da Daily CEO
 const AREA_PAPEL='papel'; // a dupla closer/sales ops de cada área
+const AREA_INV='invest';  // o que já foi varrido no Investor — isso é trabalho, não preferência
 const MES_COLUNA='9999-12';
 const SEG_INVESTOR='The Investor';
 const LINHA_CASA='__CASA__'; // guarda a meta da casa por segmento (linha "Metas" da planilha)
@@ -2039,7 +2057,7 @@ function segmentoDaOpp(r){
   for(const s of SEGMENTOS_ACORDO){if(SEG_MATCH[s]&&SEG_MATCH[s](r))return s;}
   return null;
 }
-const metasDoMes=()=>METAS.filter(m=>m.area!==AREA_ACORDO&&m.area!==AREA_COMPROMISSO&&m.area!==AREA_COLUNA&&m.area!==AREA_CONFIG&&m.area!==AREA_OBJSEM&&m.area!==AREA_DYM&&m.area!==AREA_PAPEL);
+const metasDoMes=()=>METAS.filter(m=>m.area!==AREA_ACORDO&&m.area!==AREA_COMPROMISSO&&m.area!==AREA_COLUNA&&m.area!==AREA_CONFIG&&m.area!==AREA_OBJSEM&&m.area!==AREA_DYM&&m.area!==AREA_PAPEL&&m.area!==AREA_INV);
 const acordosDoMes=()=>METAS.filter(m=>m.area===AREA_ACORDO);
 // aceita "150000", "150.000,00", "R$ 150.000" e devolve número
 function parseMoeda(s){
@@ -2526,7 +2544,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261104-1810';
+const APP_VERSION='20261105-1620';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -2852,10 +2870,22 @@ function atDetalhe(ap,k,de,ate){
       n?('viraram '+(ap.n.mar||0)+' reuniões marcadas — '+Math.round((ap.n.mar||0)/n*100)+'% das ligações'):''];
   }
   if(k==='mar'){
-    const futuras=(ap.mar||[]).filter(x=>isoDia(x.r.reuniao_data)>today()).length;
+    // o desfecho DESTAS reuniões — não o total da pessoa na janela.
+    // Dizer "0 marcadas · 2 deram no show" é uma frase que não fecha.
+    let fez=0,nos=0,fut=0,mudo=0;
+    (ap.mar||[]).forEach(x=>{
+      const r=x.r,d=isoDia(r.reuniao_data);
+      const depois=(r.historico||[]).slice((x.e.i==null?-1:x.e.i)+1);
+      if(depois.some(h=>h.campo===MARCAS.reu.campo&&h.para===MARCAS.reu.on))fez++;
+      else if(depois.some(ehNoShow))nos++;
+      else if(d&&d>today())fut++;
+      else mudo++;
+    });
     const pl=(n,um,mais)=>n+' '+(n===1?um:mais);
-    return[pl(ap.n.reu||0,'já aconteceu','já aconteceram')+' · '+pl(ap.n.nos||0,'deu no show','deram no show')
-      +' · '+pl(futuras,'ainda por vir','ainda por vir'),''];
+    return[pl(fez,'já aconteceu','já aconteceram')+' · '+pl(nos,'deu no show','deram no show')
+      +' · '+pl(fut,'ainda por vir','ainda por vir')
+      +(mudo?' · '+pl(mudo,'sem resposta','sem resposta'):''),
+      mudo?'“sem resposta” é reunião cuja data já passou e ninguém registrou o que houve':''];
   }
   if(k==='reu'){
     const tot=(ap.n.reu||0)+(ap.n.nos||0);
@@ -4458,9 +4488,9 @@ function eventosDe(r){
   const ev=[];let feitas=0;
   // a oportunidade nasce no dia em que entrou: é a boca do funil
   const nasceu=isoDia(r.created_at)||isoHist(r.created_at);
-  const add=(t,data,txt,quem,inf)=>{
+  const add=(t,data,txt,quem,inf,extra)=>{
     const iso=isoDia(data)||isoHist(data);
-    if(iso)ev.push({t,iso,txt,quem:quem||'',inf:!!inf});
+    if(iso)ev.push(Object.assign({t,iso,txt,quem:quem||'',inf:!!inf},extra||{}));
   };
   (r.historico||[]).forEach(h=>{
     const q=h.usuario;
@@ -4511,10 +4541,12 @@ function analiseMarcacoes(r){
   if(r.__mk)return r.__mk;
   const ok=[],nao=[];
   const tl=[];
-  (r.historico||[]).forEach(h=>{
+  (r.historico||[]).forEach((h,i)=>{
     if(h.campo!==CAMPO_LIG_DATA&&h.campo!=='Reunião marcada')return;
     const iso=isoHist(h.data);if(!iso)return;
-    tl.push({iso,campo:h.campo,para:isoDia(h.para)||'',quem:h.usuario||''});
+    // a posição importa: tudo que acontece no mesmo dia tem a mesma data,
+    // e só a ordem no histórico diz o que veio antes
+    tl.push({iso,i,campo:h.campo,para:isoDia(h.para)||'',quem:h.usuario||''});
   });
   // card antigo, sem registro da reunião: vale a data que está nele hoje
   const reuBase=tl.some(x=>x.campo==='Reunião marcada')?'':(isoDia(r.reuniao_data)||'');
@@ -4527,17 +4559,22 @@ function analiseMarcacoes(r){
     tl.forEach(x=>{if(x.campo==='Reunião marcada'&&x.iso<=d)v=x.para});
     return v;
   };
+  // Uma marcação por pessoa por dia. Antes era uma por DIA, ponto — e aí,
+  // quando duas pessoas mexiam no mesmo card no mesmo dia (o diretor marca,
+  // o cliente não aparece, o sales ops remarca), só a primeira existia e a
+  // segunda sumia da conta. Clicar duas vezes continua valendo uma.
   const vistos=new Set();
   tl.forEach(x=>{
     if(x.campo!==CAMPO_LIG_DATA||!x.para)return;
     const dia=x.para;
-    if(vistos.has(dia))return;
-    vistos.add(dia);
+    const chave=dia+'|'+norm(x.quem||'');
+    if(vistos.has(chave))return;
+    vistos.add(chave);
     const reu=reuNoDia(dia);
     const motivo=!reu?'a ligação de '+brData(dia)+' não tem data de reunião no card'
       :reu<dia?'a reunião no card é de '+brData(reu)+', anterior à ligação de '+brData(dia)
       :'';
-    (motivo?nao:ok).push({dia,alvo:reu,quem:x.quem,motivo});
+    (motivo?nao:ok).push({dia,alvo:reu,quem:x.quem,motivo,i:x.i});
   });
   const res={ok,nao};
   try{Object.defineProperty(r,'__mk',{value:res,enumerable:false,configurable:true})}catch(e){r.__mk=res}
@@ -4545,7 +4582,8 @@ function analiseMarcacoes(r){
 }
 function marcacaoDeReuniao(r,add){
   analiseMarcacoes(r).ok.forEach(m=>
-    add('mar',m.dia,'ligação marcada para '+brData(m.dia)+' com reunião em '+brData(m.alvo),m.quem));
+    add('mar',m.dia,'ligação marcada para '+brData(m.dia)+' com reunião em '+brData(m.alvo),
+        m.quem,false,{i:m.i}));
 }
 function marcacoesRecusadas(rows,de,ate){
   const out=[];
@@ -9444,6 +9482,17 @@ function statusDoSistema(){
     if(arquivada(r))x.arq++;else x.n++;});
   return [...m.values()].sort((a,b)=>(b.n+b.arq)-(a.n+a.arq)||a.nome.localeCompare(b.nome));
 }
+// quantas oportunidades a varredura já gerou, por assessor
+function invGeradasPorAss(){
+  const base=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS)||[];
+  const sel=base.length+'|g';
+  if(window.__invG&&window.__invG.k===sel)return window.__invG.v;
+  const m={};
+  base.forEach(r=>{if(r.fonte!=='Investor'||!r.assessor)return;
+    const k=norm(r.assessor);m[k]=(m[k]||0)+1});
+  window.__invG={k:sel,v:m};
+  return m;
+}
 const statusEhPadrao=s=>SC_PADRAO.some(x=>norm(x)===norm(s));
 
 // ── RENOMEAR (e, de quebra, juntar) ──
@@ -11126,7 +11175,59 @@ function invGrava(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true
   catch(e){showToast('O navegador não deixou guardar — a carteira é grande demais para ele');return false}}
 const invCarteira=()=>invLer(INV_CART,null);
 const invMarcas=()=>invLer(INV_MARK,{});
-const invFeitos=()=>invLer(INV_FEITOS,[]);
+// ══ O QUE JÁ FOI VARRIDO MORA NO BANCO ══
+// Varrer a carteira de um assessor é trabalho de uma hora. Guardar isso no
+// navegador foi erro meu: some ao trocar de máquina, limpar o histórico ou
+// abrir em outro perfil — e o time não enxerga o que já foi feito.
+function invRows(tipo){
+  const k=tipo+'|';
+  return (METAS_RAW||[]).filter(x=>x.area===AREA_INV&&String(x.produto||'').indexOf(k)===0)
+    .map(x=>({id:x.id,nome:String(x.produto).slice(k.length)}));
+}
+// A OPORTUNIDADE GERADA É A PROVA DO TRABALHO.
+// Marca guardada se perde; oportunidade criada, não. Então "já fiz o
+// Investor com fulano" é lido primeiro das oportunidades que a varredura
+// gerou — e só depois das marcas. Assim o ✓ aparece sozinho em quem já
+// foi varrido, mesmo que o navegador tenha sido trocado ou limpo.
+function invFeitos(){
+  const base=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS)||[];
+  const sel=base.length+'|'+((METAS_RAW||[]).length);
+  if(window.__invF&&window.__invF.k===sel)return window.__invF.v;
+  const m=new Map();
+  base.forEach(r=>{if(r.fonte==='Investor'&&r.assessor)m.set(norm(r.assessor),r.assessor)});
+  invRows('feito').forEach(x=>m.set(norm(x.nome),x.nome));
+  invRows('naofeito').forEach(x=>m.delete(norm(x.nome)));   // destravado à mão manda
+  const v=[...m.values()];
+  window.__invF={k:sel,v};
+  return v;
+}
+const invLimpaCacheFeitos=()=>{try{delete window.__invF}catch(e){window.__invF=null}};
+async function invMarca(tipo,nome,ligar){
+  const atual=invRows(tipo).filter(x=>norm(x.nome)===norm(nome));
+  try{
+    if(ligar&&!atual.length){
+      const nova={mes:MES_COLUNA,assessor:(USER&&USER.nome)||'',area:AREA_INV,produto:tipo+'|'+nome,meta_valor:1};
+      const res=await db('POST','metas',nova);
+      (METAS_RAW=METAS_RAW||[]).push(Object.assign(nova,(Array.isArray(res)&&res[0])||{id:'tmp'+Date.now()}));
+    }else if(!ligar&&atual.length){
+      for(const a of atual){await db('DELETE','metas','',''+'id=eq.'+a.id);
+        const i=METAS_RAW.findIndex(x=>x.id===a.id);if(i>=0)METAS_RAW.splice(i,1)}
+    }
+  }catch(e){showToast('Não consegui salvar: '+e.message);return false}
+  return true;
+}
+// o que ficou no navegador de antes sobe uma vez, para ninguém perder nada
+async function invMigraLocal(){
+  if(window.__invMig)return;window.__invMig=1;
+  const velhos=invLer(INV_FEITOS,[]),velhosFora=invLer(INV_OFF,null);
+  let n=0;
+  for(const nm of velhos)if(!invFeitos().some(x=>norm(x)===norm(nm))){if(await invMarca('feito',nm,true))n++}
+  if(Array.isArray(velhosFora))for(const nm of velhosFora)
+    if(!invRows('fora').some(x=>norm(x.nome)===norm(nm))){if(await invMarca('fora',nm,true))n++}
+  if(n){try{localStorage.removeItem(INV_FEITOS)}catch(e){}
+    showToast(n+' marcaç'+(n===1?'ão':'ões')+' do Investor subiu para o banco — agora não se perde mais',true);
+    renderInvestor();}
+}
 const invChave=(conta,k)=>String(conta)+'|'+k;
 
 // ── de que assessor é a tela agora ──
@@ -11196,6 +11297,29 @@ function invToggle(conta,k,el){
   invGrava(INV_MARK,M);
   invPintaTopo();
 }
+// o cartão inteiro é refeito a cada clique: ele mostra o do assessor, o
+// acumulado e os links — texto solto não daria conta
+function invPintaCards(){
+  const box=document.querySelector('.inv-cards');if(!box||!invCarteira())return;
+  box.innerHTML=INV_PROD.map(P=>{
+    const a=invConta(P,invAss()),t=invConta(P,'');
+    const bt=(n,esc,tit,cls)=>n
+      ?'<span class="inv-lk'+(cls?' '+cls:'')+'" title="'+tit+'" onclick="invLista(\''+P.k+'\',\''+esc+'\')">'+n+'</span>'
+      :'<span class="inv-z">'+n+'</span>';
+    return '<div class="inv-card'+(invAss()?' comass':'')+'" style="--ac:'+AREAS[P.area].color+'">'
+      +'<div class="inv-card-r">'+P.rot+'</div>'
+      +(invAss()
+        ?'<div class="inv-card-n" id="inv-n-'+P.k+'">'+bt(a.total,'ass','Ver os '+a.total+' clientes de '+invAss()+' em '+P.rot,'g')+'</div>'
+         +'<div class="inv-card-s">'+invAss()+' · '+bt(a.pend,'ass-pend','Ver quem está marcado e ainda não virou oportunidade')
+           +' a gerar · '+bt(a.ger,'ass-ger','Ver quem já virou oportunidade')+' no funil</div>'
+        :'<div class="inv-card-n" id="inv-n-'+P.k+'">'+bt(t.pend,'tudo-pend','Ver tudo que está marcado e ainda não virou oportunidade','g')+'</div>'
+         +'<div class="inv-card-s">marcadas, ainda não geradas</div>')
+      +'<div class="inv-card-f"><i>Varredura</i> '
+        +bt(t.ger,'tudo-ger','Ver tudo que a varredura já pôs no funil')+' no funil · '
+        +bt(t.pend,'tudo-pend','Ver tudo que está marcado e ainda não virou oportunidade')+' a gerar</div>'
+      +'</div>';
+  }).join('');
+}
 // o gerencial do topo sobe a cada clique
 function invPintaTopo(){
   const cart=invCarteira();if(!cart)return;
@@ -11210,6 +11334,7 @@ function invPintaTopo(){
     });
     const el=document.getElementById('inv-n-'+P.k);if(el)el.textContent=nov;
   });
+  invPintaCards();
   const b=document.getElementById('inv-bt-gerar');
   if(b){const n=invPendentesDoAss().length;
     b.textContent=n?'Gerar '+n+' oportunidade'+(n>1?'s':'')+' no Kanban':'Nada marcado ainda';
@@ -11261,12 +11386,13 @@ async function invGerar(nome,fechar){
     for(let i=0;i<novas.length;i+=50){await db('POST','oportunidades',novas.slice(i,i+50));ok+=novas.slice(i,i+50).length}
   }catch(e){showToast('Parou em '+ok+': '+e.message)}
   if(ok){
-    // as marcas que viraram oportunidade saem do rascunho — a partir daqui
-    // quem responde "isso existe?" é o funil
-    const M=invMarcas();
-    pend.slice(0,ok).forEach(x=>{delete M[invChave(x.l[0],x.P.k)]});
-    invGrava(INV_MARK,M);
-    const F=invFeitos();if(!F.some(n=>norm(n)===norm(ass))){F.push(ass);invGrava(INV_FEITOS,F)}
+    // A MARCA FICA. Apagar o tique depois de gerar foi erro meu: para quem
+    // acabou de varrer 90 clientes, a tela volta ao estado "nada marcado" e
+    // parece que o trabalho sumiu — mesmo com as oportunidades criadas.
+    // Agora a célula vira um ✓ travado dizendo que virou oportunidade.
+    if(!invFeitos().some(n=>norm(n)===norm(ass)))await invMarca('feito',ass,true);
+    await invMarca('naofeito',ass,false);
+    invLimpaCacheFeitos();
     showToast(ok+' oportunidade'+(ok>1?'s':'')+' de '+ass+' em Agendar Reunião',true);
   }
   await loadData();renderInvestor();
@@ -11276,9 +11402,11 @@ async function invGerar(nome,fechar){
 // fechar o assessor deixando marca no rascunho é perder trabalho.
 async function invFechaAssessor(nome,forcar){
   const ass=nome||invAss();if(!ass)return;
-  const F=invFeitos(),i=F.findIndex(n=>norm(n)===norm(ass));
-  if(i>=0&&!forcar){                         // destravando: só tira o ✓
-    F.splice(i,1);invGrava(INV_FEITOS,F);renderInvestor();return;
+  const jaFeito=invFeitos().some(n=>norm(n)===norm(ass));
+  if(jaFeito&&!forcar){                      // destravando: só tira o ✓
+    await invMarca('feito',ass,false);
+    await invMarca('naofeito',ass,true);     // vence até o que vem das oportunidades
+    invLimpaCacheFeitos();renderInvestor();return;
   }
   const pend=invPendentesDoAss(ass);
   if(pend.length){
@@ -11291,8 +11419,9 @@ async function invFechaAssessor(nome,forcar){
       await invGerar(ass,true);return;
     }
   }
-  if(i<0){F.push(ass);invGrava(INV_FEITOS,F)}
-  renderInvestor();
+  if(!jaFeito)await invMarca('feito',ass,true);
+  await invMarca('naofeito',ass,false);
+  invLimpaCacheFeitos();renderInvestor();
 }
 const invFeito=nome=>invFeitos().some(n=>norm(n)===norm(nome));
 function invSoFaltam(el){window._invFalta=!!el.checked;renderInvestor()}
@@ -11306,20 +11435,28 @@ const INV_FORA_PADRAO=['BARBARA GERALDO','SANDRO DIAS','THIAGO INAOKA','GABRIELA
   'AUGUSTO MORAN','RODRIGO GARCIA','PAOLA SOARES','RODRIGO LAURENZANO','GIOVANI CARIOCA',
   'ARTUR SHIGUEFUZI','DIOGO ISHIBASHI','LETICIA BATISTA'];
 function invFora(){
+  const doBanco=invRows('fora').map(x=>x.nome);
+  if(doBanco.length)return doBanco;
+  // primeira vez: a semente ainda vale, mas só até alguém mexer
   let v=null;try{v=localStorage.getItem(INV_OFF)}catch(e){}
-  if(v===null){invGrava(INV_OFF,INV_FORA_PADRAO);return INV_FORA_PADRAO.slice()}
+  if(v===null)return INV_FORA_PADRAO.slice();
   try{return JSON.parse(v)||[]}catch(e){return []}
 }
 const invEstaFora=n=>invFora().some(x=>norm(x)===norm(n));
-function invTiraAss(nome){
+async function invTiraAss(nome){
   if(!confirm('Tirar '+nome+' da varredura?\n\nEle sai desta tela mas a carteira continua inteira — '
     +'dá para trazer de volta no rodapé da lista.'))return;
-  const F=invFora();F.push(nome);invGrava(INV_OFF,F);
+  // a semente precisa virar linha de banco antes, senão tirar um faria os
+  // outros onze voltarem
+  for(const n of invFora())if(!invRows('fora').some(x=>norm(x.nome)===norm(n)))await invMarca('fora',n,true);
+  await invMarca('fora',nome,true);
   if(norm(invAss())===norm(nome))window._invAss='';
   renderInvestor();
 }
-function invVoltaAss(nome){
-  const F=invFora().filter(x=>norm(x)!==norm(nome));invGrava(INV_OFF,F);renderInvestor();
+async function invVoltaAss(nome){
+  for(const n of invFora())if(!invRows('fora').some(x=>norm(x.nome)===norm(n)))await invMarca('fora',n,true);
+  await invMarca('fora',nome,false);
+  renderInvestor();
 }
 function invVerFora(){window._invVerFora=!window._invVerFora;renderInvestor()}
 
@@ -11373,6 +11510,62 @@ function invTrocaCarteira(){
 function invBuscaDeb(v){window._invBusca=v;clearTimeout(window._invT);
   window._invT=setTimeout(()=>renderInvestor(),250)}
 
+// ══ A CONTA DE CADA CAIXINHA ══
+// "Gerada" é lida das OPORTUNIDADES, não das marcas: a oportunidade criada
+// sobrevive a troca de navegador, a marca não. "A gerar" é o que está
+// ticado e ainda não existe no funil. Sem assessor, é a varredura inteira.
+function invConta(P,ass){
+  const cart=invCarteira();
+  const out={pend:0,ger:0,total:0,pendL:[],gerL:[]};
+  if(!cart)return out;
+  const M=invMarcas(),ix=invIndiceFunil(),so=norm(ass||'');
+  // a gerar: marcado na planilha e ainda fora do funil
+  cart.linhas.forEach(l=>{
+    if(invAncora(l)||invEstaFora(l[1]))return;
+    if(so&&norm(l[1])!==so)return;
+    if(!M[invChave(l[0],P.k)])return;
+    if(invNoFunil(ix,l[3],P.area))return;
+    out.pendL.push({cliente:l[3],assessor:l[1],fone:l[4]||''});
+  });
+  // no funil: o que a varredura já criou
+  (OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS).forEach(r=>{
+    if(r.fonte!=='Investor'||r.area!==P.area)return;
+    if(so&&norm(r.assessor||'')!==so)return;
+    out.gerL.push({cliente:r.cliente,assessor:r.assessor,id:r.id,sc:r.sc});
+  });
+  out.pendL.sort((a,b)=>String(a.cliente).localeCompare(b.cliente));
+  out.gerL.sort((a,b)=>String(a.cliente).localeCompare(b.cliente));
+  out.pend=out.pendL.length;out.ger=out.gerL.length;out.total=out.pend+out.ger;
+  return out;
+}
+// ── quem está por trás do número ──
+function invLista(pk,escopo){
+  const P=INV_PROD.find(x=>x.k===pk);if(!P)return;
+  const soAss=escopo.indexOf('ass')===0;
+  const ass=soAss?invAss():'';
+  const c=invConta(P,ass);
+  const quais=/-pend$/.test(escopo)?'pend':/-ger$/.test(escopo)?'ger':'ambos';
+  const linhas=[];
+  if(quais!=='ger')c.pendL.forEach(x=>linhas.push({...x,est:'a gerar'}));
+  if(quais!=='pend')c.gerL.forEach(x=>linhas.push({...x,est:'no funil'}));
+  if(!linhas.length){showToast('Nada aqui ainda');return}
+  linhas.sort((a,b)=>String(a.cliente).localeCompare(b.cliente));
+  document.getElementById('gs-title').textContent=
+    P.rot+' — '+linhas.length+' cliente'+(linhas.length===1?'':'s')+(ass?' de '+ass:' na varredura');
+  document.getElementById('gs-body').innerHTML=
+    '<div class="tbl-wrap" style="max-height:52vh;overflow:auto"><table class="inv-tbl">'
+    +'<thead><tr><th>Cliente</th>'+(ass?'':'<th>Assessor</th>')+'<th>Situação</th></tr></thead><tbody>'
+    +linhas.map(x=>'<tr'+(x.id?' style="cursor:pointer" onclick="closeModal(\'gesto\');openEdit(\''+x.id+'\')"':'')+'>'
+      +'<td class="inv-cli">'+(x.cliente||'—')+'</td>'
+      +(ass?'':'<td class="inv-mut">'+(x.assessor||'—')+'</td>')
+      +'<td><span class="inv-ja'+(x.est==='a gerar'?' pend':'')+'">'+x.est+'</span>'
+      +(x.sc?'<span class="inv-mut" style="margin-left:7px">'+x.sc+'</span>':'')+'</td></tr>').join('')
+    +'</tbody></table></div>'
+    +'<div class="gs-nota">“A gerar” está ticado e ainda não virou oportunidade. '
+      +'“No funil” já virou — clique na linha para abrir o card.</div>'
+    +'<div class="gs-acoes"><button class="btn" onclick="closeModal(\'gesto\')">Fechar</button></div>';
+  document.getElementById('modal-gesto').style.display='flex';
+}
 // ── A TELA ──
 function renderInvestor(c){
   c=c||document.getElementById('main-content');
@@ -11398,28 +11591,43 @@ function renderInvestor(c){
     return;
   }
 
+  invMigraLocal();
   const M=invMarcas(),ix=invIndiceFunil();
   const porConta={};cart.linhas.forEach(l=>porConta[l[0]]=l);
 
   // ── gerencial do topo ──
+  // Quando há um assessor na tela, o número grande é O DELE: é com ele que
+  // você está falando agora. O acumulado da varredura fica embaixo e só
+  // cresce. Os dois abrem a lista de quem está por trás do número.
   const cards=INV_PROD.map(P=>{
-    let nov=0;
-    Object.keys(M).forEach(ch=>{const [conta,kk]=ch.split('|');if(kk!==P.k)return;
-      const l=porConta[conta];if(l&&!invEstaFora(l[1])&&!invNoFunil(ix,l[3],P.area))nov++});
-    const noFunil=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS).filter(r=>r.area===P.area&&r.fonte==='Investor').length;
-    return '<div class="inv-card" style="--ac:'+AREAS[P.area].color+'">'
+    const a=invConta(P,invAss());
+    const t=invConta(P,'');
+    const bt=(n,esc,tit,cls)=>n
+      ?'<span class="inv-lk'+(cls?' '+cls:'')+'" title="'+tit+'" onclick="invLista(\''+P.k+'\',\''+esc+'\')">'+n+'</span>'
+      :'<span class="inv-z">'+n+'</span>';
+    return '<div class="inv-card'+(invAss()?' comass':'')+'" style="--ac:'+AREAS[P.area].color+'">'
       +'<div class="inv-card-r">'+P.rot+'</div>'
-      +'<div class="inv-card-n" id="inv-n-'+P.k+'">'+nov+'</div>'
-      +'<div class="inv-card-s">marcadas, ainda não geradas</div>'
-      +'<div class="inv-card-f">'+noFunil+' já no funil pela varredura</div>'
+      +(invAss()
+        ?'<div class="inv-card-n" id="inv-n-'+P.k+'">'
+           +bt(a.total,'ass','Ver os '+a.total+' clientes de '+invAss()+' em '+P.rot,'g')+'</div>'
+         +'<div class="inv-card-s">'+invAss()+' · '
+           +bt(a.pend,'ass-pend','Ver quem está marcado e ainda não virou oportunidade')+' a gerar · '
+           +bt(a.ger,'ass-ger','Ver quem já virou oportunidade')+' no funil</div>'
+        :'<div class="inv-card-n" id="inv-n-'+P.k+'">'
+           +bt(t.pend,'tudo-pend','Ver tudo que está marcado e ainda não virou oportunidade','g')+'</div>'
+         +'<div class="inv-card-s">marcadas, ainda não geradas</div>')
+      +'<div class="inv-card-f"><i>Varredura</i> '
+        +bt(t.ger,'tudo-ger','Ver tudo que a varredura já pôs no funil')+' no funil · '
+        +bt(t.pend,'tudo-pend','Ver tudo que está marcado e ainda não virou oportunidade')+' a gerar</div>'
       +'</div>';
   }).join('');
 
   // ── quem está na varredura ──
+  const G=invGeradasPorAss();
   const ass=new Map();
   cart.linhas.forEach(l=>{
     const n=(l[1]||'').trim()||'(sem assessor)';
-    if(!ass.has(n))ass.set(n,{n,tot:0,marc:0,man:0});
+    if(!ass.has(n))ass.set(n,{n,tot:0,marc:0,man:0,ger:G[norm(n)]||0});
     const a=ass.get(n);
     if(invAncora(l))return;
     a.tot++;if(l[6])a.man++;
@@ -11438,6 +11646,14 @@ function renderInvestor(c){
     +'<b>Assessores</b><span class="inv-mut">'+feitos+'/'+dentro.length+'</span>'
     +'<div class="inv-prog-b"><div style="width:'+pct+'%"></div></div>'
     +'</div>'
+    +(function(){
+      // a soma que importa: quanta oportunidade a varredura já pôs no funil
+      const ger=dentro.reduce((s,a)=>s+a.ger,0), marc=dentro.reduce((s,a)=>s+a.marc,0);
+      return '<div class="inv-soma">'
+        +'<span class="inv-soma-n">'+ger+'</span> oportunidade'+(ger===1?'':'s')+' gerada'+(ger===1?'':'s')
+        +(marc?' · <b>'+marc+'</b> cliente'+(marc===1?'':'s')+' marcado'+(marc===1?'':'s')+' esperando':'')
+        +'</div>';
+    })()
     +'<label class="inv-flt"><input type="checkbox" '+(window._invFalta?'checked ':'')
     +'onchange="invSoFaltam(this)"> só quem falta</label>'
     +'<div class="inv-lista">'
@@ -11448,7 +11664,11 @@ function renderInvestor(c){
         +'title="'+(f?'Investor feito — clique para destravar':'Marcar que você fez o Investor com '+a.n)+'" '
         +'onchange="invFechaAssessor(\''+nm+'\',this.checked)">'
         +'<span class="inv-ass-n" onclick="invSetAss(\''+nm+'\')" title="'+a.n+'">'+a.n+'</span>'
-        +'<span class="inv-ass-c">'+a.tot+(a.marc?' · <b>'+a.marc+'</b>':'')+'</span>'
+        +'<span class="inv-ass-c" title="'+a.tot+' clientes na carteira">'+a.tot+'</span>'
+        +(a.marc?'<span class="inv-ass-m" title="'+a.marc+' cliente'+(a.marc===1?'':'s')
+          +' marcado'+(a.marc===1?'':'s')+', ainda sem oportunidade">'+a.marc+'</span>':'')
+        +(a.ger?'<span class="inv-ass-g" title="'+a.ger+' oportunidade'+(a.ger===1?'':'s')
+          +' já gerada'+(a.ger===1?'':'s')+' com '+a.n+'">'+a.ger+'</span>':'')
         +'<span class="inv-x" title="Tirar da varredura" onclick="invTiraAss(\''+nm+'\')">×</span>'
         +'</div>';
     }).join('')
@@ -11502,10 +11722,12 @@ function renderInvestor(c){
         +'<td class="inv-mut">'+(String(l[0]).startsWith('m1')||String(l[0]).startsWith('__')?'—':l[0]||'')+'</td>'
         +'<td class="inv-mut">'+(l[4]||'—')+'</td>'
         +INV_PROD.map(P=>{
+          const marcado=!!M[invChave(l[0],P.k)];
           if(invNoFunil(ix,l[3],P.area))
-            return '<td class="inv-ck"><span class="inv-ja" title="Já existe oportunidade deste cliente em '
-              +P.rot+' — não gera de novo">no funil</span></td>';
-          return '<td class="inv-ck"><input type="checkbox" '+(M[invChave(l[0],P.k)]?'checked ':'')
+            return '<td class="inv-ck"><span class="inv-ja'+(marcado?' seu':'')+'" title="'
+              +(marcado?'Você marcou e já virou oportunidade em '+P.rot:'Já existe oportunidade deste cliente em '+P.rot)
+              +' — não gera de novo">'+(marcado?'✓ gerada':'no funil')+'</span></td>';
+          return '<td class="inv-ck"><input type="checkbox" '+(marcado?'checked ':'')
             +'onchange="invToggle(\''+String(l[0]).replace(/'/g,'')+'\',\''+P.k+'\',this)"></td>';
         }).join('')
         +'</tr>').join('')
