@@ -285,6 +285,16 @@ tr.bol td{background:var(--green-bg)}
 .tb-semana tr:hover td{background:transparent !important}
 .kb-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;align-items:flex-start}
 .kb-col{min-width:262px;max-width:262px;background:var(--surf3);border-radius:3px;padding:10px;flex-shrink:0}
+/* filtro de reuniões por período, em cima do quadro */
+.kb-perbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 10px}
+.kb-perlb{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-right:3px}
+.kb-per{font-size:11px;font-weight:700;padding:5px 11px;border:1px solid var(--border);background:var(--card);
+  color:var(--muted);border-radius:999px;cursor:pointer;transition:.12s}
+.kb-per:hover{border-color:var(--accent-b);color:var(--wine-d)}
+.kb-per.on{background:var(--wine);border-color:var(--wine);color:#fff}
+.kb-per.lim{border-style:dashed;font-weight:400}
+.kb-perdt{font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:999px;background:var(--card);color:var(--muted);cursor:pointer}
+.kb-perot{font-size:11.5px;color:var(--wine-d);font-weight:700;margin-left:4px}
 .kb-col-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .kb-count{background:var(--card);border-radius:4px;padding:1px 8px;font-size:10px;font-weight:700;color:var(--muted)}
 /* agenda externa do closer — prefixo próprio para não colidir com a agenda interna (.ag-*) */
@@ -358,6 +368,7 @@ tr.bol td{background:var(--green-bg)}
 .fq-t .vazia:hover td{background:transparent}
 /* ══ CAIXA DE GESTO ══ */
 #modal-gesto .modal{padding:0}
+#modal-gesto.larga .modal{max-width:780px!important}
 #gs-body{padding:16px 20px 18px}
 .gs-f{display:grid;grid-template-columns:1fr 110px;gap:10px}
 .gs-f label{display:grid;gap:4px}
@@ -430,6 +441,68 @@ tr.bol td{background:var(--green-bg)}
 .at-mini tr.mais td{color:var(--wine);font-weight:700;text-align:right;border-bottom:none}
 
 /* a navegação de semana */
+.at-mini td.x{width:28px;text-align:center}
+.at-x{cursor:pointer;color:var(--muted-l);font-size:15px;line-height:1;padding:0 4px;font-weight:700}
+.at-x:hover{color:var(--red)}
+.at-mini tr.ajmao td{background:var(--wine-ll)}
+.at-aj{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;padding-top:10px;
+  border-top:1px dashed var(--border)}
+.at-aj-t{font-size:11px;color:var(--muted)}
+.at-aj-u{cursor:pointer;border:1px solid var(--border);border-radius:3px;padding:1px 6px;margin-left:5px;
+  color:var(--muted);background:var(--card)}
+.at-aj-u:hover{color:var(--wine);border-color:var(--wine)}
+/* ── A SEMANA ── */
+.sw-placar{font-size:13px;color:var(--muted);margin:2px 0 12px}
+.sw-placar b{font-size:26px;font-weight:800;color:var(--wine);vertical-align:-2px}
+.sw-placar i{display:block;font-style:normal;font-size:11.5px;color:var(--muted-l);margin-top:2px}
+.sw-bar{display:flex;height:34px;border-radius:3px;overflow:hidden;border:1px solid var(--border)}
+.sw-seg{display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;
+  cursor:pointer;transition:filter .12s;min-width:4px}
+.sw-seg:hover{filter:brightness(1.12)}
+.sw-legs{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px}
+.sw-lg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);cursor:pointer}
+.sw-lg:hover{color:var(--text)}
+.sw-lg i{width:10px;height:10px;border-radius:2px;display:inline-block;border:1px solid rgba(0,0,0,.08)}
+.sw-lg b{color:var(--text)}
+.sw-est{display:flex;align-items:stretch;flex-wrap:wrap;gap:0}
+.sw-prox{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}
+.sw-prox .sw-passo{flex:none;min-width:0}
+.sw-prox-nota{font-size:11.5px;color:var(--muted);margin-top:11px}
+/* o volume de cada oportunidade na lista, e a soma embaixo */
+.sw-val{text-align:right;font-weight:700;color:var(--wine-d);white-space:nowrap}
+.sw-val.zero{font-weight:400;color:var(--muted-l);font-style:italic}
+.sw-tot td{border-top:1.5px solid var(--border);font-weight:700;font-size:12px;
+  color:var(--text);padding-top:9px;background:var(--surf2)}
+.sw-tot td:last-child{text-align:right;color:var(--wine);white-space:nowrap}
+.sw-tot i{font-style:normal;font-weight:400;color:var(--muted)}
+.sw-passo{flex:1;min-width:104px;text-align:center;padding:12px 8px;background:var(--card);
+  border:1px solid var(--border);border-radius:3px}
+.sw-passo.marco{border-color:var(--wine);background:var(--wine-ll)}
+.sw-passo.clic{cursor:pointer;transition:background .12s,box-shadow .12s}
+.sw-passo.clic:hover{background:var(--hover);box-shadow:0 2px 8px rgba(26,5,8,.08)}
+.sw-passo.marco.clic:hover{background:var(--wine-l)}
+.sw-passo b{display:block;font-size:27px;font-weight:800;line-height:1.05;color:var(--text)}
+.sw-passo.marco b{color:var(--wine)}
+.sw-passo span{display:block;font-size:9.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.04em;color:var(--muted);margin-top:3px}
+.sw-passo i{display:block;font-style:normal;font-size:10px;color:var(--muted-l);margin-top:2px}
+.sw-seta{display:flex;align-items:center;justify-content:center;width:46px;flex-shrink:0}
+.sw-seta span{font-size:10px;font-weight:700;color:var(--muted-l)}
+.sw-seta span::before{content:'→ ';color:var(--border)}
+.sw-ac-l{display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid var(--border-l);
+  cursor:pointer;font-size:12.5px}
+.sw-ac-l:last-child{border-bottom:0}
+.sw-ac-l:hover{background:var(--hover)}
+.sw-ac-p{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sw-ac-l b{font-weight:700}
+.sw-ac-l i{font-style:normal;color:var(--muted);font-size:11.5px;flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw-ac-d{color:var(--muted-l);font-size:11px;flex-shrink:0}
+.sw-ac-t{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
+.sw-ac-m{padding:8px 10px;font-size:11.5px;color:var(--muted-l)}
+.sw-ok{font-size:12.5px;color:var(--muted);padding:6px 2px}
+.sw-vz{font-size:12.5px;color:var(--muted-l);font-style:italic;padding:10px 2px}
+@media(max-width:900px){.sw-seta{width:100%;height:18px}.sw-seta span::before{content:'↓ '}}
 .at-gran{display:flex;border:1px solid var(--border);border-radius:3px;overflow:hidden;margin-right:4px}
 .at-gb{border:0;background:var(--card);color:var(--muted);font-size:11px;font-weight:700;
   padding:5px 12px;cursor:pointer;border-right:1px solid var(--border);transition:background .12s,color .12s}
@@ -669,6 +742,37 @@ tr.bol td{background:var(--green-bg)}
 .recorte{font-size:11.5px;color:var(--muted);background:var(--surf2);border:1px solid var(--border);
   border-left:3px solid var(--wine);border-radius:3px;padding:8px 14px;margin-bottom:14px}
 .recorte b{color:var(--text)}
+/* ── print do Investor ── */
+.rl{width:1040px;box-sizing:border-box;padding:34px 38px 26px;background:#fff;color:#1C1B1A;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Roboto,sans-serif}
+.rl-h{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;
+  padding-bottom:16px;border-bottom:2px solid #7A2233;margin-bottom:20px}
+.rl-t1{font-size:25px;font-weight:800;letter-spacing:-.01em;color:#7A2233}
+.rl-t2{font-size:12.5px;color:#85817C;margin-top:4px}
+.rl-big{text-align:right;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.06em;color:#85817C;line-height:1.3}
+.rl-big span{display:block;font-size:46px;font-weight:800;color:#7A2233;letter-spacing:-.02em;line-height:1}
+.rl-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.rl-c{border:1px solid #E2DCD7;border-left:3px solid #7A2233;border-radius:3px;padding:11px 13px}
+.rl-cob .rl-c{border-left-color:#B0ACA7;background:#FAF8F6}
+.rl-c-r{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#85817C;
+  line-height:1.3;min-height:24px}
+.rl-c-n{font-size:27px;font-weight:800;line-height:1.1;margin-top:2px}
+.rl-c-s{font-size:10.5px;color:#B0ACA7;margin-top:2px}
+.rl-sec{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#7A2233;
+  margin:22px 0 8px;padding-bottom:6px;border-bottom:1px solid #E2DCD7}
+.rl-tb{width:100%;border-collapse:collapse;font-size:12.5px}
+.rl-tb th{text-align:center;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  color:#85817C;padding:7px 8px;border-bottom:1px solid #E2DCD7;background:#FAF8F6}
+.rl-tb th:first-child{text-align:left}
+.rl-tb td{text-align:center;padding:6px 8px;border-bottom:1px solid #EEE9E5}
+.rl-tb td i{color:#D2C9C9;font-style:normal}
+.rl-tb td b{font-weight:700}
+.rl-nm{text-align:left!important;font-weight:600}
+.rl-t{font-weight:800;color:#7A2233}
+.rl-tb tfoot td{border-top:2px solid #7A2233;border-bottom:0;font-weight:800;background:#FAF8F6}
+.rl-vz{color:#B0ACA7;font-style:italic;padding:18px!important}
+.rl-pe{margin-top:18px;padding-top:10px;border-top:1px solid #EEE9E5;font-size:10px;color:#B0ACA7}
 .inv-wrap{display:grid;grid-template-columns:286px minmax(0,1fr);gap:14px;align-items:start}
 @media(max-width:940px){.inv-wrap{grid-template-columns:1fr}}
 .inv-side{background:var(--card);border:1px solid var(--border);border-radius:3px;
@@ -758,15 +862,14 @@ tr.bol td{background:var(--green-bg)}
 .gesto.fut:hover{opacity:1}
 .g-quando{font-size:9px;color:var(--muted-l);margin:1px 0 2px;letter-spacing:.02em}
 .cross{display:inline-block;margin:2px 0 1px;font-size:9px;font-weight:700;color:var(--blue);background:var(--blue)12;border:1px solid #6E6A6433;border-radius:4px;padding:1px 7px;text-transform:uppercase;letter-spacing:.03em;cursor:help;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kb-card.kb-investor{border-top:4px solid #DC2626;padding-top:7px}
+.kb-investor-tag{font-size:9px;font-weight:800;letter-spacing:.08em;color:#DC2626;margin-bottom:4px}
 .kb-exp{cursor:pointer;opacity:.4;font-weight:700;font-size:13px;line-height:1;padding:0 1px;transition:opacity .15s,transform .15s}
 .kb-exp:hover{opacity:1;transform:translateY(1px)}
 .kb-add-etapa{width:100%;padding:14px 10px;background:transparent;border:2px dashed var(--border);border-radius:3px;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.03em;transition:all .15s}
 .kb-add-etapa:hover{border-color:var(--wine);color:var(--wine)}
 .kb-card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:10px 12px;margin-bottom:8px;cursor:grab;transition:all .15s}
 .kb-card:active{cursor:grabbing}
-/* veio da Esteira de Indicações (THE INVESTOR): faixa vermelha no topo do card */
-.kb-card.kb-investor{border-top:4px solid #DC2626;padding-top:7px}
-.kb-investor-tag{font-size:9px;font-weight:800;letter-spacing:.08em;color:#DC2626;margin-bottom:4px}
 .kb-col{transition:background .15s,transform .15s}
 .kb-card:hover{border-color:var(--accent-b);box-shadow:none;transform:translateY(-1px)}
 .kb-cli{font-size:12px;font-weight:700;line-height:1.3}
@@ -2007,6 +2110,18 @@ function outrasAreasResumo(r){
   return{outras,areas:[...m.values()]};
 }
 // etiqueta curta, para o card do Kanban e da lista
+// ── de onde veio a oportunidade ───────────────────────────────────────────
+// A varredura do The Investor já gravou a fonte de três jeitos ao longo do
+// tempo: 'Investor', 'THE INVESTOR' e, no começo, só um registro de criação
+// assinado pela Esteira de Indicações. Testar a grafia exata deixava de fora
+// tudo que a aba nova gera — por isso aqui se olha o sentido, não a letra.
+function veioDoInvestor(r){
+  if(!r)return false;
+  if(/investor/i.test(String(r.fonte||'')))return true;
+  const H=Array.isArray(r.historico)?r.historico:[];
+  return H.some(h=>h&&(norm(h.usuario||'')==='esteira de indicacoes'
+    ||(h.campo==='Criação'&&/varredura +investor/i.test(String(h.para||'')))));
+}
 function selosOutrasAreas(r){
   const res=outrasAreasResumo(r);
   if(!res)return '';
@@ -2042,6 +2157,7 @@ const AREA_COLUNA='coluna';
 const AREA_DYM='dym';     // os campos digitados da Daily CEO
 const AREA_PAPEL='papel'; // a dupla closer/sales ops de cada área
 const AREA_INV='invest';  // o que já foi varrido no Investor — isso é trabalho, não preferência
+const AREA_ATIV='ativ';   // conserto à mão na Atividade: tirar o que não é, pôr o que faltou
 const MES_COLUNA='9999-12';
 const SEG_INVESTOR='The Investor';
 const LINHA_CASA='__CASA__'; // guarda a meta da casa por segmento (linha "Metas" da planilha)
@@ -2060,7 +2176,7 @@ function segmentoDaOpp(r){
   for(const s of SEGMENTOS_ACORDO){if(SEG_MATCH[s]&&SEG_MATCH[s](r))return s;}
   return null;
 }
-const metasDoMes=()=>METAS.filter(m=>m.area!==AREA_ACORDO&&m.area!==AREA_COMPROMISSO&&m.area!==AREA_COLUNA&&m.area!==AREA_CONFIG&&m.area!==AREA_OBJSEM&&m.area!==AREA_DYM&&m.area!==AREA_PAPEL&&m.area!==AREA_INV);
+const metasDoMes=()=>METAS.filter(m=>m.area!==AREA_ACORDO&&m.area!==AREA_COMPROMISSO&&m.area!==AREA_COLUNA&&m.area!==AREA_CONFIG&&m.area!==AREA_OBJSEM&&m.area!==AREA_DYM&&m.area!==AREA_PAPEL&&m.area!==AREA_INV&&m.area!==AREA_ATIV);
 const acordosDoMes=()=>METAS.filter(m=>m.area===AREA_ACORDO);
 // aceita "150000", "150.000,00", "R$ 150.000" e devolve número
 function parseMoeda(s){
@@ -2326,7 +2442,7 @@ async function salvarPrint(id){
 const initials=n=>n.trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
 
 function showToast(msg,ok=false){const t=document.getElementById('toast');t.textContent=msg;t.style.background=ok?'#5E1A27':'#8B1C2A';t.style.opacity='1';clearTimeout(t._t);t._t=setTimeout(()=>t.style.opacity='0',3500)}
-function closeModal(id){document.getElementById('modal-'+id).style.display='none'}
+function closeModal(id){const m=document.getElementById('modal-'+id);m.style.display='none';m.classList.remove('larga')}
 
 // ── RISCO / TEMPO ──
 function daysSince(dateStr){
@@ -2547,7 +2663,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261105-1620';
+const APP_VERSION='20261109-1015';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -2831,11 +2947,13 @@ function atPessoas(caixa){
     .filter(n=>!caixa||caixaDe(n)===caixa)
     .sort((a,b)=>a.localeCompare(b));
 }
+let _apArea='';
 function atApura(nome,de,ate){
   let rows=fuBase().filter(r=>!arquivada(r));
   if(atArea())rows=rows.filter(r=>r.area===atArea());
   rows=nome?rowsDoComercial(nome,rows):rows;
-  return comQuem(nome||'',()=>apurar(rows,de,ate));
+  const ant=_apArea;_apArea=atArea()||'';
+  try{return comQuem(nome||'',()=>apurar(rows,de,ate))}finally{_apArea=ant}
 }
 const atVal=(ap,k)=>k==='bol'?(ap.vol||0):(ap.n[k]||0);
 const atTexto=(ap,k)=>k==='bol'?fmtR(ap.vol):String(ap.n[k]||0);
@@ -2915,6 +3033,73 @@ function atDetalhe(ap,k,de,ate){
   }
   return[nBoletas(ap.n.bol||0),''];
 }
+// ── o rodapé de conserto, só para o diretor ──
+function blocoAjustes(q,de,ate){
+  const tirados=ajustesAtiv().filter(a=>a.acao==='excl'&&a.campos[1]===q.met
+    &&a.campos[2]>=de&&a.campos[2]<=ate
+    &&(!q.quem||norm(a.campos[3]||'')===norm(q.quem)));
+  return '<div class="at-aj">'
+    +'<button class="btn sm" onclick="abrirIncluirAtiv()">+ Incluir à mão</button>'
+    +(tirados.length
+      ?'<span class="at-aj-t">'+tirados.length+' tirado'+(tirados.length===1?'':'s')+' da conta — '
+        +tirados.map(a=>'<span class="at-aj-u" title="Trazer de volta" onclick="desfazAjuste(\''+a.id+'\')">'
+          +brData(a.campos[2])+' '+(a.campos[3]||'')+' ↩</span>').join(' ')+'</span>'
+      :'<span class="at-aj-t">nada tirado da conta nesta janela</span>')
+    +'</div>';
+}
+async function tirarDaConta(rid,t,iso,quem){
+  if(!podeAjustarAtiv()){showToast('Só o diretor ajusta a atividade');return}
+  const r=acharOpp(rid);
+  if(!confirm('Tirar este registro da conta?\n\n'+((r&&r.cliente)||rid)+' · '+(MET[t]||{rot:t}).rot
+    +' · '+brData(iso)+(quem?' · '+quem:'')
+    +'\n\nO card não muda — só este registro deixa de contar na Atividade. Dá para trazer de volta.'))return;
+  try{await ajusteAtivGrava(['excl',rid,t,iso,norm(quem||'')].join('|'))}
+  catch(e){showToast('Não consegui salvar: '+e.message);return}
+  showToast('Tirado da conta',true);renderAtividade();
+}
+async function desfazAjuste(id){
+  if(!podeAjustarAtiv())return;
+  try{await ajusteAtivApaga(id)}catch(e){showToast('Não consegui desfazer: '+e.message);return}
+  showToast('Desfeito',true);renderAtividade();
+}
+function abrirIncluirAtiv(){
+  if(!podeAjustarAtiv()){showToast('Só o diretor ajusta a atividade');return}
+  const q=atQ();
+  const gente=atPessoas(MET[q.met].caixa);
+  const areas=areasVis();
+  document.getElementById('gs-title').textContent='Incluir '+metLow(q.met)+' à mão';
+  document.getElementById('gs-body').innerHTML=
+    '<div class="gs-nota">Para quando o sistema não viu o que aconteceu. Entra na conta marcado '
+    +'como incluído à mão, com o seu nome — e sai com um clique.</div>'
+    +'<div class="gs-f" style="grid-template-columns:1fr 1fr">'
+      +'<label><span>Métrica</span><select id="aj-met">'
+        +Object.keys(MET).map(k=>'<option value="'+k+'"'+(k===q.met?' selected':'')+'>'+MET[k].rot+'</option>').join('')
+      +'</select></label>'
+      +'<label><span>De quem</span><select id="aj-quem">'
+        +gente.map(n=>'<option'+(norm(n)===norm(q.quem)?' selected':'')+'>'+n+'</option>').join('')
+      +'</select></label>'
+      +'<label><span>Dia</span><input type="date" id="aj-dia" value="'+localISO(new Date())+'"></label>'
+      +'<label><span>Área</span><select id="aj-area"><option value="">Todas</option>'
+        +areas.map(([k,a])=>'<option value="'+k+'"'+(k===atArea()?' selected':'')+'>'+a.name+'</option>').join('')
+      +'</select></label>'
+    +'</div>'
+    +'<div class="gs-f" style="grid-template-columns:1fr"><label><span>Cliente ou motivo</span>'
+      +'<input id="aj-rot" placeholder="Ex: Reunião do João que o sistema não pegou"></label></div>'
+    +'<div class="gs-acoes"><button class="btn" onclick="closeModal(\'gesto\')">Cancelar</button>'
+      +'<button class="btn wine" onclick="salvarIncluirAtiv()">Incluir</button></div>';
+  document.getElementById('modal-gesto').style.display='flex';
+}
+async function salvarIncluirAtiv(){
+  const v=id=>(document.getElementById(id)||{}).value||'';
+  const met=v('aj-met'),quem=v('aj-quem'),dia=v('aj-dia'),ak=v('aj-area');
+  const rot=String(v('aj-rot')).trim().replace(/[|]/g,' ');
+  if(!met||!quem||!dia){showToast('Preencha métrica, pessoa e dia');return}
+  closeModal('gesto');
+  try{await ajusteAtivGrava(['add',met,dia,norm(quem),ak,rot||('('+quem+')')].join('|'))}
+  catch(e){showToast('Não consegui salvar: '+e.message);return}
+  showToast('Incluído à mão — '+MET[met].rot+' de '+quem+' em '+brData(dia),true);
+  renderAtividade();
+}
 function blocoPergunta(){
   const q=atQ(),[de,ate,quando]=atRangeQ(q.per);
   const caixa=MET[q.met].caixa;
@@ -2928,14 +3113,26 @@ function blocoPergunta(){
   const area=[['','todas as áreas']].concat(areasVis().map(([k,a])=>[k,a.name]));
   const[det,det2]=atDetalhe(ap,q.met,de,ate);
   const itens=fuItens(ap[q.met]||[]);
-  const mostra=itens.slice().sort((x,y)=>(y.quando||'').localeCompare(x.quando||'')).slice(0,5);
-  const linhas=mostra.length?mostra.map(x=>'<tr onclick="openEdit(\''+x.r.id+'\')">'
+  // o que o diretor pôs à mão vem primeiro: é o que ele acabou de mexer e
+  // precisa poder desfazer sem caçar na lista
+  const mostra=itens.slice().sort((x,y)=>
+    (y.aj?1:0)-(x.aj?1:0)||(y.quando||'').localeCompare(x.quando||'')).slice(0,5);
+  const pode=podeAjustarAtiv();
+  const linhas=mostra.length?mostra.map(x=>{
+    const abre=x.aj?'':' onclick="openEdit(\''+x.r.id+'\')"';
+    const tirar=pode?'<td class="x">'+(x.aj
+      ?'<span class="at-x" title="Desfazer esta inclusão à mão" onclick="event.stopPropagation();desfazAjuste(\''+x.aj+'\')">×</span>'
+      :'<span class="at-x" title="Isto não é '+metLow(q.met)+' — tirar da conta"'
+        +' onclick="event.stopPropagation();tirarDaConta(\''+x.r.id+'\',\''+x.t+'\',\''+x.quando+'\',\''
+        +String(x.quem||'').replace(/['\\]/g,'')+'\')">×</span>')+'</td>':'';
+    return '<tr'+abre+(x.aj?' class="ajmao"':'')+'>'
       +'<td>'+(x.r.cliente||'—')+'</td>'
       +'<td class="o">'+(x.txt||'—')+'</td>'
-      +'<td class="q">'+(x.quando?brData(x.quando):'—')+'</td></tr>').join('')
-    :'<tr class="vazia"><td colspan="3">nenhum registro no período</td></tr>';
+      +'<td class="q">'+(x.quando?brData(x.quando):'—')+'</td>'+tirar+'</tr>';
+  }).join('')
+    :'<tr class="vazia"><td colspan="'+(pode?4:3)+'">nenhum registro no período</td></tr>';
   const verTodas=itens.length>mostra.length
-    ?'<tr class="mais"><td colspan="3" onclick="fuAbrir(\''+fuKey(itens,MET[q.met].rot+(q.quem?' · '+q.quem:' · time todo'),quando)+'\')">ver as '+itens.length+' →</td></tr>'
+    ?'<tr class="mais"><td colspan="'+(podeAjustarAtiv()?4:3)+'" onclick="fuAbrir(\''+fuKey(itens,MET[q.met].rot+(q.quem?' · '+q.quem:' · time todo'),quando)+'\')">ver as '+itens.length+' →</td></tr>'
     :'';
   const nome=q.quem?('de '+q.quem):'do time todo';
   return '<div class="at-card at-perg">'
@@ -2947,8 +3144,10 @@ function blocoPergunta(){
         +(q.area?' em '+((AREAS[q.area]||{}).name||q.area):'')+', '+quando+'</b>'
         +(det?'<div>'+det+'</div>':'')+(det2?'<div>'+det2+'</div>':'')+'</div>'
     +'</div>'
-    +'<table class="at-mini"><thead><tr><th>Cliente</th><th>O que ficou registrado</th><th>Quando</th></tr></thead>'
+    +'<table class="at-mini"><thead><tr><th>Cliente</th><th>O que ficou registrado</th><th>Quando</th>'
+      +(pode?'<th></th>':'')+'</tr></thead>'
       +'<tbody>'+linhas+verTodas+'</tbody></table>'
+    +(pode?blocoAjustes(q,de,ate):'')
     +'</div>';
 }
 
@@ -3059,6 +3258,7 @@ const SVG_ICONES={
   painel:'M3 3h6v6H3zM11 3h6v6h-6zM3 11h6v6H3zM11 11h6v6h-6z',
   ativ:'M2 11h3.5l2-6 3 12 2.5-6H18',
   carteira:'M3 5h14v11H3zM3 9h14M8 13h6M6 13h.01',
+  semana:'M3 15l4-5 3 3 4-6 3 4M3 4h14v13H3z',
 };
 const svgIco=k=>'<svg class="tab-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" '
   +'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
@@ -3067,7 +3267,7 @@ let curView='';
 function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
-    ?[['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-guia','Guia do dia','guia'],['d-investor','Investor','carteira'],['d-agenda','Agenda','agenda'],['d-metas','Definições do mês','metas'],['d-historico','Histórico','hist'],['d-upload','Upload','upload'],['d-usuarios','Usuários','usuar']]
+    ?[['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-semana','A semana','semana'],['d-guia','Guia do dia','guia'],['d-investor','Investor','carteira'],['d-agenda','Agenda','agenda'],['d-metas','Definições do mês','metas'],['d-historico','Histórico','hist'],['d-upload','Upload','upload'],['d-usuarios','Usuários','usuar']]
     :USER.perfil==='head'
     ?[['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-guia','Guia do dia','guia'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']]
     :[['a-opps','Guia do dia','guia'],['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']];
@@ -3104,6 +3304,7 @@ function renderCurView(){
   else if(v==='d-daily')renderDaily(c);
   else if(v==='d-ativ')renderAtividade(c);
   else if(v==='d-investor')renderInvestor(c);
+  else if(v==='d-semana')renderSemana(c);
   else if(v==='d-agenda')renderAgendaExterna(c);
   else if(v==='d-historico')renderHistorico(c);
   else if(v==='a-opps')renderAssessorOpps(c);
@@ -4569,13 +4770,18 @@ function analiseMarcacoes(r){
   const vistos=new Set();
   tl.forEach(x=>{
     if(x.campo!==CAMPO_LIG_DATA||!x.para)return;
-    const dia=x.para;
+    // A MARCAÇÃO É DATADA NO DIA EM QUE FOI REGISTRADA, não no dia para o
+    // qual a ligação ficou agendada. "Ligação marcada" com data futura é
+    // agenda, não trabalho feito — e contá-la no dia futuro fazia a mesma
+    // marcação aparecer duas vezes: no dia em que a pessoa marcou e de novo
+    // no dia em que ela tinha planejado ligar.
+    const dia=x.iso;
     const chave=dia+'|'+norm(x.quem||'');
     if(vistos.has(chave))return;
     vistos.add(chave);
-    const reu=reuNoDia(dia);
+    const reu=reuNoDia(x.para||dia);
     const motivo=!reu?'a ligação de '+brData(dia)+' não tem data de reunião no card'
-      :reu<dia?'a reunião no card é de '+brData(reu)+', anterior à ligação de '+brData(dia)
+      :reu<dia?'a reunião no card é de '+brData(reu)+', anterior ao registro de '+brData(dia)
       :'';
     (motivo?nao:ok).push({dia,alvo:reu,quem:x.quem,motivo,i:x.i});
   });
@@ -4584,9 +4790,49 @@ function analiseMarcacoes(r){
   return res;
 }
 function marcacaoDeReuniao(r,add){
-  analiseMarcacoes(r).ok.forEach(m=>
+  const reg=analiseMarcacoes(r).ok;
+  reg.forEach(m=>
     add('mar',m.dia,'ligação marcada para '+brData(m.dia)+' com reunião em '+brData(m.alvo),
         m.quem,false,{i:m.i}));
+  // ── MARCAÇÃO SEM GESTO ──
+  // Pôr um card em "Reunião agendada" ou "R2 agendada" É marcar uma reunião,
+  // tenha vindo do botão ou de um arrasto no quadro. Sem isso, quem organiza
+  // o Kanban na mão trabalha de graça: a reunião existe e o número não.
+  // Vale só quando a coluna de origem é anterior — mover para trás é no show,
+  // não marcação — e nunca em cima de uma marcação já registrada do mesmo
+  // autor no mesmo dia, para não contar o mesmo fato duas vezes.
+  const H=r.historico||[];
+  // o botão grava a marcação e MOVE o card em seguida: se logo antes do
+  // movimento a mesma pessoa registrou a marcação, é o mesmo gesto — a
+  // vizinhança no histórico diz isso melhor que qualquer comparação de data
+  const doGesto=(i,quem)=>{
+    for(let j=Math.max(0,i-4);j<i;j++){
+      const x=H[j];if(!x)continue;
+      if(norm(x.usuario||'')!==norm(quem||''))continue;
+      if(x.campo==='Reunião marcada'||x.campo===CAMPO_LIG_DATA)return true;
+    }
+    return false;
+  };
+  const jaTem=(dia,quem)=>reg.some(m=>m.dia===dia&&norm(m.quem||'')===norm(quem||''));
+  H.forEach((h,i)=>{
+    if(h.campo!=='Status comercial')return;
+    const pi=ETAPA_IDX(h.para),di=ETAPA_IDX(h.de);
+    if(pi!==2||!(di>=0&&di<pi))return;         // 2 = Reunião Agendada (e R2 Agendada)
+    const dia=isoHist(h.data);
+    if(!dia||doGesto(i,h.usuario)||jaTem(dia,h.usuario))return;
+    // SEM REUNIÃO, NÃO HÁ MARCAÇÃO. Mover um card para a coluna e tirar dois
+    // dias depois, sem data nenhuma, é arrumar o quadro — não é trabalho
+    // comercial. Só conta se existe data de reunião no card, ou se depois
+    // daquele movimento alguém registrou o desfecho de uma (aconteceu ou no
+    // show), que é prova de que a reunião existiu mesmo sem a data ter ficado.
+    const alvo=isoDia(r.reuniao_data)||dataR2(r)||'';
+    const teveDesfecho=H.slice(i+1).some(x=>
+      (x.campo===MARCAS.reu.campo&&x.para===MARCAS.reu.on)||ehNoShow(x));
+    if(!alvo&&!teveDesfecho)return;
+    add('mar',h.data,'⚠ moveu o card para “'+(h.para||'—')+'”'
+      +(alvo?' — reunião em '+brData(alvo):' — a reunião teve desfecho registrado depois'),
+      h.usuario,true,{i});
+  });
 }
 function marcacoesRecusadas(rows,de,ate){
   const out=[];
@@ -4604,6 +4850,321 @@ function marcacoesRecusadas(rows,de,ate){
 // Atividade é de quem REGISTRA, não de quem é dono do card: se o Jackson
 // marca a ligação num card de seguro da Cris, a ligação é dele e o seguro é a
 // área dela. Registro sem autor (evento inferido) fica com o dono do card.
+// ══════════════════════════════════════════════════════════
+// A SEMANA — o andamento da esteira
+// Existem duas semanas: a do ESFORÇO (o que o time fez) e a do
+// COMPROMISSO (as reuniões cuja data caía aqui, marcadas quando fossem).
+// A Atividade responde a primeira; esta aba responde a segunda — que é a
+// que o CEO pergunta. E conta a reunião de dois jeitos lado a lado: o que
+// foi registrado no botão, e o que o movimento do card prova que aconteceu.
+// ══════════════════════════════════════════════════════════
+const SEM_EST={
+  fez:   {rot:'Aconteceu',      cor:'#6B1C2C',txt:'#fff', ajuda:'alguém apertou “Aconteceu”'},
+  andou: {rot:'Andou',          cor:'#9F606C',txt:'#fff', ajuda:'o card avançou — a reunião aconteceu, só não foi registrada'},
+  nos:   {rot:'No show',        cor:'#8A6A6A',txt:'#fff', ajuda:'alguém apertou “No show”'},
+  nosinf:{rot:'Remarcada',      cor:'#C09A9A',txt:'#fff', ajuda:'voltou para agendar depois da data — no show não registrado'},
+  mudo:  {rot:'Sem resposta',   cor:'#D8AEB7',txt:'#1C1B1A',ajuda:'a data passou, o card não andou e ninguém tocou'},
+  porvir:{rot:'Ainda por vir',  cor:'#E8CDD3',txt:'#1C1B1A',ajuda:'a reunião ainda não chegou'},
+  fora:  {rot:'Saiu do jogo',   cor:'#E2DCD7',txt:'#85817C',ajuda:'perdida ou marcada como não se aplica'},
+};
+const SEM_ORDEM=['fez','andou','nos','nosinf','mudo','porvir','fora'];
+const SEM_ANDOU=new Set(['ar2','r2','conf','topou','bol']);
+// em que pé está a reunião que estava marcada para aquele dia
+function semClassif(r){
+  const d=isoDia(r.reuniao_data)||dataR2(r);
+  const H=r.historico||[];
+  if(H.some(h=>h.campo===MARCAS.reu.campo&&h.para===MARCAS.reu.on&&isoHist(h.data)>=d))return 'fez';
+  if(H.some(h=>ehNoShow(h)&&isoHist(h.data)>=d))return 'nos';
+  const et=etapaFunil(r);
+  if(SEM_ANDOU.has(et))return 'andou';
+  if(d>today())return 'porvir';
+  if(et==='perd')return 'fora';
+  // voltou para a prospecção depois da data: é no show que ninguém registrou
+  if(et==='agendar')return 'nosinf';
+  if(et==='r1')return 'mudo';
+  return 'fora';
+}
+function semJanela(){
+  const off=window._semOff|0;
+  const d=new Date();d.setDate(d.getDate()+7*off);
+  const [a,b]=semanaDe(d);
+  return {de:a,ate:b,off,
+    rot:off===0?'Esta semana':off===-1?'Semana passada':brData(a)+' a '+brData(b),
+    sub:brData(a)+' a '+brData(b)};
+}
+function semDados(){
+  const J=semJanela();
+  const base=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS).filter(r=>!arquivada(r));
+  const rows=atArea()?base.filter(r=>r.area===atArea()):base;
+  // as reuniões cuja DATA caía na semana — o compromisso
+  const reus=rows.filter(r=>{const d=isoDia(r.reuniao_data)||dataR2(r);return d&&d>=J.de&&d<=J.ate});
+  const porEst={};SEM_ORDEM.forEach(k=>porEst[k]=[]);
+  reus.forEach(r=>porEst[semClassif(r)].push(r));
+  // o esforço da semana
+  const ap=comQuem('',()=>apurar(rows,J.de,J.ate));
+  const entraram=rows.filter(r=>{const d=isoDia(r.created_at)||isoHist(r.created_at);
+    return d&&d>=J.de&&d<=J.ate}).length;
+  return {J,rows,reus,porEst,ap,entraram};
+}
+// ── a barra do compromisso: uma só, proporcional, clicável ──
+function semBarra(D){
+  const tot=D.reus.length;
+  if(!tot)return '<div class="sw-vz">Nenhuma reunião tinha data nesta semana.</div>';
+  const segs=SEM_ORDEM.filter(k=>D.porEst[k].length).map(k=>{
+    const n=D.porEst[k].length,p=n/tot*100;
+    const E=SEM_EST[k];
+    return '<div class="sw-seg" style="width:'+p.toFixed(2)+'%;background:'+E.cor+';color:'+E.txt+'" '
+      +'title="'+E.rot+' — '+E.ajuda+'" onclick="semLista(\''+k+'\')">'
+      +(p>=7?'<b>'+n+'</b>':'')+'</div>';
+  }).join('');
+  const leg=SEM_ORDEM.filter(k=>D.porEst[k].length).map(k=>{
+    const E=SEM_EST[k];
+    return '<span class="sw-lg" onclick="semLista(\''+k+'\')" title="'+E.ajuda+'">'
+      +'<i style="background:'+E.cor+'"></i>'+E.rot+' <b>'+D.porEst[k].length+'</b></span>';
+  }).join('');
+  return '<div class="sw-bar">'+segs+'</div><div class="sw-legs">'+leg+'</div>';
+}
+// ── a esteira: degraus com a conversão entre eles ──
+function semEsteira(D){
+  const n=D.ap.n;
+  const fez=D.porEst.fez.length, andou=D.porEst.andou.length;
+  const emFech=D.porEst.fez.concat(D.porEst.andou)
+    .filter(r=>['conf','topou','bol'].includes(etapaFunil(r))).length;
+  const passos=[
+    {k:'entraram',   rot:'Entraram',      v:D.entraram,      sub:'oportunidades novas'},
+    {k:'lig',        rot:'Ligações',      v:n.lig||0,        sub:'clientes tocados'},
+    {k:'mar',        rot:'Marcadas',      v:n.mar||0,        sub:'reuniões agendadas'},
+    {k:'tinham',     rot:'Tinham reunião',v:D.reus.length,   sub:'com data nesta semana',marco:1},
+    {k:'aconteceram',rot:'Aconteceram',   v:fez+andou,       sub:fez+' registradas · '+andou+' pelo card',marco:1},
+    {k:'fechamento', rot:'Em fechamento', v:emFech,          sub:'topou ou confirmando'},
+    {k:'bol',        rot:'Boletadas',     v:n.bol||0,        sub:fmtR(D.ap.vol||0)},
+  ];
+  return '<div class="sw-est">'+passos.map((p,i)=>{
+    const ant=i>0?passos[i-1].v:0;
+    const conv=i>0&&ant?Math.round(p.v/ant*100)+'%':'';
+    const k=p.k;
+    return (i>0?'<div class="sw-seta"><span>'+conv+'</span></div>':'')
+      +'<div class="sw-passo'+(p.marco?' marco':'')+(p.v&&k?' clic':'')+'"'
+      +(p.v&&k?' onclick="semAbrir(\''+k+'\')" title="Ver as '+p.v+' — '+p.rot.toLowerCase()+'"':'')
+      +'><b>'+p.v+'</b><span>'+p.rot+'</span><i>'+p.sub+'</i></div>';
+  }).join('')+'</div>';
+}
+// ── o que exige cobrança ──
+function semAcao(D){
+  const alvo=[].concat(D.porEst.mudo.map(r=>({r,k:'mudo'})),D.porEst.nosinf.map(r=>({r,k:'nosinf'})));
+  if(!alvo.length)return '<div class="sw-ok">Nada em aberto nesta semana — toda reunião teve desfecho.</div>';
+  return '<div class="sw-ac">'+alvo.slice(0,12).map(({r,k})=>{
+    const d=isoDia(r.reuniao_data)||dataR2(r);
+    return '<div class="sw-ac-l" onclick="openEdit(\''+r.id+'\')">'
+      +'<span class="sw-ac-p" style="background:'+SEM_EST[k].cor+'"></span>'
+      +'<b>'+(r.cliente||'—')+'</b>'
+      +'<i>'+((AREAS[r.area]||{}).name||r.area)+' · '+(r.responsavel||r.assessor||'sem dono')+'</i>'
+      +'<span class="sw-ac-d">'+brData(d)+'</span>'
+      +'<span class="sw-ac-t" style="color:'+SEM_EST[k].cor+'">'+SEM_EST[k].rot+'</span>'
+      +'</div>';
+  }).join('')+'<div class="sw-ac-m">'
+    +'<span class="inv-lk" onclick="semAbrir(\'mudo\')">ver as sem resposta</span> · '
+    +'<span class="inv-lk" onclick="semAbrir(\'nosinf\')">ver as remarcadas</span>'
+    +(alvo.length>12?' · + '+(alvo.length-12)+' além das listadas':'')+'</div></div>';
+}
+// ══ A SEMANA QUE VEM ══
+// O follow pro CEO não termina no que passou: ele precisa do que já está
+// assumido para a semana seguinte. Isso não é previsão nem meta — é compromisso
+// que já tem data e nome, e por isso todo número aqui também abre a lista.
+function semProx(D){
+  D=D||semDados();
+  const off=(window._semOff|0)+1;
+  const d=new Date();d.setDate(d.getDate()+7*off);
+  const [de,ate]=semanaDe(d);
+  const diaR1=r=>isoDia(r.reuniao_data)||'';
+  const naJanela=x=>x&&x>=de&&x<=ate;
+  const vivas=D.rows.filter(r=>!isPerdida(r));
+  const r2=vivas.filter(r=>naJanela(dataR2(r)));
+  const r1=vivas.filter(r=>naJanela(diaR1(r))&&r2.indexOf(r)<0);
+  const reus=r1.concat(r2);
+  const fech=D.rows.filter(r=>['topou','conf'].includes(etapaFunil(r)));
+  const vol=l=>l.reduce((s,r)=>s+(r.atual||r.pipe||0),0);
+  return {de,ate,off,reus,r1,r2,fech,vol,
+    rot:off===1?'A semana que vem':brData(de)+' a '+brData(ate),
+    sub:brData(de)+' a '+brData(ate)};
+}
+function semProxHtml(D){
+  const P=semProx(D);
+  const tiles=[
+    {k:'px-reu', rot:'Reuniões marcadas',v:P.reus.length,sub:fmtR(P.vol(P.reus))+' em jogo',marco:1},
+    {k:'px-r1',  rot:'Primeiras (R1)',   v:P.r1.length,  sub:'cliente novo na mesa'},
+    {k:'px-r2',  rot:'Segundas (R2)',    v:P.r2.length,  sub:'já avançaram uma vez'},
+    {k:'px-fech',rot:'Negócios para fechar',v:P.fech.length,sub:fmtR(P.vol(P.fech))+' topado ou confirmando',marco:1},
+  ];
+  const grade='<div class="sw-prox">'+tiles.map(t=>
+    '<div class="sw-passo'+(t.marco?' marco':'')+(t.v?' clic':'')+'"'
+    +(t.v?' onclick="semAbrir(\''+t.k+'\')" title="Ver as '+t.v+' — '+t.rot.toLowerCase()+'"':'')
+    +'><b>'+t.v+'</b><span>'+t.rot+'</span><i>'+t.sub+'</i></div>').join('')+'</div>';
+  const nota=P.reus.length
+    ?'<div class="sw-prox-nota">As reuniões já têm data marcada. Os negócios para fechar são o estoque de hoje em <b>Cliente Topou</b> e <b>Cliente Confirmar</b> — não dependem de data.</div>'
+    :'<div class="sw-vz">Nenhuma reunião marcada para '+P.sub+' ainda.</div>';
+  return (P.reus.length?grade:'')+nota+(P.reus.length?'':grade);
+}
+// ══ TODO NÚMERO ABRE A LISTA ══
+// Número que não se pode abrir é número que ninguém confere — e é
+// exatamente o que o diretor vai precisar levar nome por nome pro CEO.
+const SEM_PASSO={
+  entraram:   {rot:'Oportunidades que entraram',sub:'criadas dentro da semana'},
+  lig:        {rot:'Ligações',                  sub:'clientes tocados na semana'},
+  mar:        {rot:'Reuniões marcadas',         sub:'agendadas durante a semana, para qualquer data'},
+  tinham:     {rot:'Reuniões com data nesta semana',sub:'o compromisso que a semana assumiu'},
+  aconteceram:{rot:'Reuniões que aconteceram',  sub:'registradas no botão ou provadas pelo movimento do card'},
+  fechamento: {rot:'Em fechamento',             sub:'reunião feita e card em confirmar, topou ou boletado'},
+  bol:        {rot:'Boletadas',                 sub:'viraram receita na semana'},
+  'px-reu':   {rot:'Reuniões marcadas para a semana que vem',sub:'compromisso que já tem data e nome'},
+  'px-r1':    {rot:'Primeiras reuniões da semana que vem',   sub:'cliente que senta na mesa pela primeira vez'},
+  'px-r2':    {rot:'R2 marcadas para a semana que vem',       sub:'segunda reunião, o cliente já avançou'},
+  'px-fech':  {rot:'Negócios para fechar',                  sub:'estoque de hoje em Cliente Topou e Cliente Confirmar'},
+};
+function semItens(k,D){
+  D=D||semDados();
+  const dia=r=>isoDia(r.reuniao_data)||dataR2(r)||'';
+  const comEstado=l=>l.map(r=>({r,quando:dia(r),extra:SEM_EST[semClassif(r)].rot}));
+  const ev=t=>(D.ap[t]||[]).map(x=>({r:x.r,quando:x.e.iso,extra:x.e.txt||'',quem:x.e.quem||''}));
+  if(k==='entraram')return D.rows.filter(r=>{const d=isoDia(r.created_at)||isoHist(r.created_at);
+      return d&&d>=D.J.de&&d<=D.J.ate})
+    .map(r=>({r,quando:isoDia(r.created_at)||isoHist(r.created_at),extra:'entrou no sistema'}));
+  if(k==='lig'||k==='mar'||k==='bol')return ev(k);
+  if(k==='tinham')return comEstado(D.reus);
+  if(k==='aconteceram')return comEstado(D.porEst.fez.concat(D.porEst.andou));
+  if(k==='fechamento')return comEstado(D.porEst.fez.concat(D.porEst.andou)
+    .filter(r=>['conf','topou','bol'].includes(etapaFunil(r))));
+  if(String(k).indexOf('px-')===0){
+    const P=semProx(D);
+    if(k==='px-fech')return P.fech.map(r=>({r,quando:dia(r),extra:fmtR(r.atual||r.pipe||0)}));
+    const l=k==='px-r1'?P.r1:k==='px-r2'?P.r2:P.reus;
+    return l.map(r=>({r,quando:P.r2.indexOf(r)>=0?dataR2(r):isoDia(r.reuniao_data),
+      extra:P.r2.indexOf(r)>=0?'R2 marcada':'R1 marcada'}));
+  }
+  if(SEM_EST[k])return comEstado(D.porEst[k]||[]);
+  return [];
+}
+function semAbrir(k){
+  const D=semDados();
+  const itens=semItens(k,D);
+  const E=SEM_PASSO[k]||SEM_EST[k]||{rot:k,sub:''};
+  const rot=E.rot, sub=E.ajuda||E.sub||'';
+  if(!itens.length){showToast('Nenhuma '+String(rot).toLowerCase()+' nesta semana');return}
+  const janRot=String(k).indexOf('px-')===0?semProx(D).sub:D.J.rot.toLowerCase();
+  document.getElementById('gs-title').textContent=rot+' — '+itens.length+' · '+janRot;
+  const valDe=r=>(r.atual||r.pipe||0);
+  const total=itens.reduce((a,x)=>a+valDe(x.r),0);
+  const semVal=itens.filter(x=>!valDe(x.r)).length;
+  document.getElementById('gs-body').innerHTML=
+    (sub?'<div class="gs-nota">'+sub+'</div>':'')
+    +'<div class="tbl-wrap" style="max-height:54vh;overflow:auto"><table class="inv-tbl">'
+    +'<thead><tr><th>Cliente</th><th>Área</th><th>Quem</th><th>Dia</th><th>Situação</th><th>Está em</th>'
+      +'<th style="text-align:right">Volume</th></tr></thead><tbody>'
+    +itens.slice().sort((a,b)=>valDe(b.r)-valDe(a.r)||String(a.r.cliente||'').localeCompare(String(b.r.cliente||'')))
+      .map(x=>'<tr style="cursor:pointer" onclick="closeModal(\'gesto\');openEdit(\''+x.r.id+'\')">'
+        +'<td class="inv-cli">'+(x.r.cliente||'—')+'</td>'
+        +'<td class="inv-mut">'+((AREAS[x.r.area]||{}).name||x.r.area||'—')+'</td>'
+        +'<td class="inv-mut">'+(x.quem||x.r.responsavel||x.r.assessor||'—')+'</td>'
+        +'<td class="inv-mut">'+(x.quando?brData(x.quando):'—')+'</td>'
+        +'<td class="inv-mut">'+(x.extra||'—')+'</td>'
+        +'<td class="inv-mut">'+(x.r.sc||'—')+'</td>'
+        +'<td class="sw-val'+(valDe(x.r)?'':' zero')+'">'+(valDe(x.r)?fmt(valDe(x.r)):'sem valor')+'</td>'
+        +'</tr>').join('')
+    +'</tbody><tfoot><tr class="sw-tot"><td colspan="6">Total'
+      +(semVal?' <i>· '+semVal+(semVal===1?' sem valor preenchido':' sem valor preenchido')+'</i>':'')
+      +'</td><td>'+fmtR(total)+'</td></tr></tfoot></table></div>'
+    +'<div class="gs-acoes">'
+      +'<button class="btn wine" onclick="semListaPrint(\''+k+'\')" title="Gerar a imagem desta lista">Baixar print</button>'
+      +'<button class="btn" onclick="semListaCopiar(\''+k+'\')" title="Copiar a imagem para colar no WhatsApp">Copiar imagem</button>'
+      +'<button class="btn" onclick="semBaixarLista(\''+k+'\')">Baixar CSV</button>'
+      +'<button class="btn" onclick="closeModal(\'gesto\')">Fechar</button></div>';
+  document.getElementById('modal-gesto').classList.add('larga');
+  document.getElementById('modal-gesto').style.display='flex';
+}
+const semLista=semAbrir;   // a barra e a legenda entram pela mesma porta
+// a lista nominal, para levar pro CEO sem transcrever na mão
+function semBaixarLista(k){
+  const D=semDados(),itens=semItens(k,D);
+  const E=SEM_PASSO[k]||SEM_EST[k]||{rot:k};
+  const esc=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
+  const linhas=[['Cliente','Área','Quem','Dia','Situação','Está em','Produto','Valor']]
+    .concat(itens.map(x=>[x.r.cliente,(AREAS[x.r.area]||{}).name||x.r.area,
+      x.quem||x.r.responsavel||x.r.assessor,x.quando?brData(x.quando):'',x.extra,x.r.sc,x.r.produto,
+      x.r.atual||x.r.pipe||0]));
+  const csv='\ufeff'+linhas.map(l=>l.map(esc).join(';')).join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  const base=String(k).indexOf('px-')===0?semProx(D).de:D.J.de;
+  a.download=('semana-'+base+'-'+String(E.rot).toLowerCase().replace(/\W+/g,'-')+'.csv');
+  a.click();URL.revokeObjectURL(a.href);
+  showToast(itens.length+' linha'+(itens.length===1?'':'s')+' no CSV',true);
+}
+function semAnda(n){window._semOff=Math.min(0,(window._semOff|0)+n);renderSemana()}
+function renderSemana(c=document.getElementById('main-content')){
+  const D=semDados(),J=D.J;
+  const fez=D.porEst.fez.length,andou=D.porEst.andou.length;
+  const entregues=fez+andou;
+  const optArea='<option value="">Todas as áreas</option>'
+    +areasVis().map(([k,a])=>'<option value="'+k+'"'+(k===atArea()?' selected':'')+'>'+a.name+'</option>').join('');
+  c.innerHTML='<div class="mc-top">'
+    +'<div><h2 class="mc-tit">A semana</h2>'
+    +'<div class="mc-sub">O que a semana prometeu entregar, e o que virou '+recorteEmpresaHtml()+'</div></div>'
+    +'<div class="mc-ctr"><label class="at-sel"><span>Área</span>'
+      +'<select onchange="window._atArea=this.value;renderSemana()">'+optArea+'</select></label>'
+      +'<button class="btn sm" onclick="semBaixarPrint()">Baixar print</button></div></div>'
+    +'<div class="at-semana">'
+      +'<button onclick="semAnda(-1)" title="Semana anterior">◀</button>'
+      +'<b>'+J.rot+'</b><span>'+J.sub+'</span>'
+      +'<button onclick="semAnda(1)" '+((window._semOff|0)>=0?'disabled ':'')+'title="Semana seguinte">▶</button>'
+    +'</div>'
+    +'<div class="at-card"><div class="at-ct">O compromisso da semana'
+      +'<span>'+D.reus.length+' reuni'+(D.reus.length===1?'ão tinha':'ões tinham')+' data aqui · clique numa faixa para ver quem</span>'
+      +(D.reus.length?'<button class="btn sm" style="margin-left:auto" onclick="semAbrir(\'tinham\')">Ver as '+D.reus.length+' →</button>':'')+'</div>'
+      +'<div class="sw-placar"><b>'+entregues+'</b> de <b>'+D.reus.length+'</b> entregues'
+        +'<i>'+fez+' registradas no botão · '+andou+' provadas pelo movimento do card</i></div>'
+      +semBarra(D)+'</div>'
+    +'<div class="at-card"><div class="at-ct">A esteira<span>do que entrou até o que boletou, com a conversão de cada degrau</span></div>'
+      +semEsteira(D)+'</div>'
+    +'<div class="at-card"><div class="at-ct">'+semProx(D).rot
+      +'<span>o que já está assumido para '+semProx(D).sub+' · clique em qualquer número para ver quem</span></div>'
+      +semProxHtml(D)+'</div>'
+    +'<div class="at-card"><div class="at-ct">Precisa de você'
+      +'<span>reunião que passou e não teve desfecho, ou voltou para agendar sem registrar o no show</span></div>'
+      +semAcao(D)+'</div>';
+}
+// ══ CONSERTO À MÃO DA ATIVIDADE ══
+// Nenhuma regra automática acerta sempre: o sistema deduz a partir do rastro
+// que o time deixa, e rastro tem buraco. Em vez de esconder isso, o diretor
+// pode tirar um registro que não é e pôr um que faltou — sempre com autor,
+// data e motivo, e sempre reversível. Número que não se pode corrigir é
+// número que se passa a ignorar.
+function ajustesAtiv(){
+  return (METAS_RAW||[]).filter(x=>x.area===AREA_ATIV).map(x=>{
+    const c=String(x.produto||'').split('|');
+    return {id:x.id,acao:c[0],campos:c.slice(1),quemFez:x.assessor||'',motivo:x.observacao||''};
+  });
+}
+const chaveExcl=(rid,t,iso,quem)=>[rid,t,iso,norm(quem||'')].join('|');
+function excluidosAtiv(){
+  const k=(METAS_RAW||[]).length;
+  if(window.__exAt&&window.__exAt.k===k)return window.__exAt.v;
+  const s=new Map();
+  ajustesAtiv().forEach(a=>{if(a.acao==='excl')s.set(a.campos.join('|'),a)});
+  window.__exAt={k,v:s};return s;
+}
+const limpaCacheAtiv=()=>{try{delete window.__exAt}catch(e){window.__exAt=null}};
+const podeAjustarAtiv=()=>USER&&USER.perfil==='diretor';
+async function ajusteAtivGrava(produto,motivo){
+  const nova={mes:MES_COLUNA,assessor:(USER&&USER.nome)||'',area:AREA_ATIV,produto,meta_valor:1};
+  const res=await db('POST','metas',nova);
+  (METAS_RAW=METAS_RAW||[]).push(Object.assign(nova,(Array.isArray(res)&&res[0])||{id:'tmp'+Date.now()}));
+  limpaCacheAtiv();
+}
+async function ajusteAtivApaga(id){
+  await db('DELETE','metas','','id=eq.'+id);
+  const i=(METAS_RAW||[]).findIndex(x=>x.id===id);if(i>=0)METAS_RAW.splice(i,1);
+  limpaCacheAtiv();
+}
 let _apQuem='';
 function comQuem(nome,fn){
   const ant=_apQuem;_apQuem=nome||'';
@@ -4620,11 +5181,13 @@ function rowsDoComercial(nome,base){
 const TIPOS_EV=[...FUNIL_K,'nos','r1f','r2f','perd'];
 function apurar(rows,de,ate){
   const quem=_apQuem?norm(_apQuem):'';
+  const EX=excluidosAtiv();
   const S={},vis={};
   TIPOS_EV.forEach(t=>{S[t]=[];vis[t]=new Set()});
   rows.forEach(r=>eventosDe(r).forEach(e=>{
     if(!S[e.t])return;
     if(e.iso<de||e.iso>ate)return;
+    if(EX.has(chaveExcl(r.id,e.t,e.iso,e.quem)))return;   // o diretor disse que isso não é
     if(quem){
       const autor=e.quem?normUsuario(e.quem):'';
       if(autor?autor!==quem:!eDono(r,_apQuem))return;
@@ -4632,6 +5195,16 @@ function apurar(rows,de,ate){
     if(vis[e.t].has(r.id))return;
     vis[e.t].add(r.id);S[e.t].push({r,e});
   }));
+  // o que o diretor pôs à mão entra junto, marcado como tal
+  ajustesAtiv().forEach(a=>{
+    if(a.acao!=='add')return;
+    const [t,iso,quemN,ak,rot]=a.campos;
+    if(!S[t]||iso<de||iso>ate)return;
+    if(quem&&norm(quemN||'')!==quem)return;
+    if(_apArea&&ak&&ak!==_apArea)return;
+    S[t].push({r:{id:'aj:'+a.id,cliente:rot||'(incluído à mão)',area:ak||'',sc:'',atual:0,pipe:0,historico:[]},
+      e:{t,iso,txt:'✎ incluído à mão por '+(a.quemFez||'—'),quem:quemN||'',inf:true,aj:a.id}});
+  });
   const vol=S.bol.reduce((s,x)=>s+(x.r.atual||0),0);
   const n={};TIPOS_EV.forEach(t=>n[t]=S[t].length);
   // dinheiro de cada etapa: o que ela representa em volume
@@ -5645,7 +6218,7 @@ function fuAbrir(k){
     +'<div style="font-size:10px;color:var(--muted-l);margin-top:6px">Clique em qualquer linha para abrir a oportunidade.</div>';
   document.getElementById('modal-area').style.display='flex';
 }
-const fuItens=(lista)=>lista.map(x=>({r:x.r,quando:x.e.iso,txt:x.e.txt,quem:x.e.quem}));
+const fuItens=(lista)=>lista.map(x=>({r:x.r,quando:x.e.iso,txt:x.e.txt,quem:x.e.quem,t:x.e.t,aj:x.e.aj}));
 
 // ══ OBJETIVOS DO DIA ══
 // Guardados na tabela metas: area='compromisso', produto='AAAA-MM-DD|tipo'.
@@ -8556,6 +9129,35 @@ function blocoVazio(){
       +' · empresas: '+minhasEmp
       +' · do banco: '+doBanco+' → na sua empresa: '+naEmpresa+' → não arquivadas: '+vivas+'</div></div>';
 }
+// ── filtro de reuniões por período ─────────────────────────────────────────
+// A reunião de um card é a data que ele marcou: a da R1, a da R2, ou as duas.
+function diasDeReuniao(r){
+  const a=[],x=isoDia(r.reuniao_data);if(x)a.push(x);
+  const y=dataR2(r);if(y&&y!==x)a.push(y);
+  return a;
+}
+function kbPerJanela(p){
+  p=String(p||'');
+  const mais=n=>{const d=new Date();d.setDate(d.getDate()+n);return localISO(d)};
+  if(p==='hoje')   return{de:mais(0),ate:mais(0),rot:'Hoje'};
+  if(p==='amanha') return{de:mais(1),ate:mais(1),rot:'Amanhã'};
+  if(p==='semana'){const[a,b]=semanaDe(new Date());return{de:a,ate:b,rot:'Esta semana'}}
+  if(p==='passada'){const d=new Date();d.setDate(d.getDate()-7);const[a,b]=semanaDe(d);return{de:a,ate:b,rot:'Semana passada'}}
+  if(p.indexOf('data:')===0){const d=p.slice(5);return d?{de:d,ate:d,rot:brData(d)}:null}
+  return null;
+}
+function kbPeriodo(p){window._kbPer=(window._kbPer===p?'':p);renderAssessorOpps()}
+function kbPeriodoData(v){window._kbPer=v?('data:'+v):'';renderAssessorOpps()}
+function kbBarraReunioes(n){
+  const p=window._kbPer||'',J=kbPerJanela(p);
+  const chip=(k,rot)=>'<button class="kb-per'+(p===k?' on':'')+'" onclick="kbPeriodo(\''+k+'\')">'+rot+'</button>';
+  return '<div class="kb-perbar"><span class="kb-perlb">Reuniões</span>'
+    +chip('hoje','Hoje')+chip('amanha','Amanhã')+chip('semana','Esta semana')+chip('passada','Semana passada')
+    +'<input type="date" class="kb-perdt" value="'+(p.indexOf('data:')===0?p.slice(5):'')+'" onchange="kbPeriodoData(this.value)" title="Um dia específico">'
+    +(J?'<span class="kb-perot">'+J.rot+' · '+n+(n===1?' reunião':' reuniões')+'</span>'
+       +'<button class="kb-per lim" onclick="window._kbPer=\'\';renderAssessorOpps()">limpar</button>':'')
+    +'</div>';
+}
 function renderAssessorOpps(c=document.getElementById('main-content')){
   const isDir=mandaNaArea();
   const myOpps=oppsDoUsuario();
@@ -8619,10 +9221,6 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   ].filter(c=>(String(c[0]).indexOf('__')===0||!colunaOculta(c[0],window._kbArea||''))
             &&colunaDoPerfil(c[0]));
 
-  // Oportunidade que veio da Esteira de Indicações (THE INVESTOR): fonte própria, ou criada antes dela pela Esteira.
-  function veioDoInvestor(r){
-    return r.fonte==='THE INVESTOR'||(Array.isArray(r.historico)&&r.historico.some(h=>h&&h.usuario==='Esteira de Indicações'));
-  }
   function kbCard(r){
     const dias=daysSince(getLastMoveDate(r));
     const risk=isB(r)?null:riskColor(dias);
@@ -8679,6 +9277,9 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   const fProd=window._kbProd||'';
   if(fProd)kbOpps=kbOpps.filter(r=>norm(r.produto||'')===norm(fProd));
   if(fCliKb)kbOpps=kbOpps.filter(r=>(r.cliente||'').toLowerCase().includes(fCliKb.toLowerCase()));
+  // reuniões do período escolhido: fica só quem tem data de reunião dentro da janela
+  const JP=kbPerJanela(window._kbPer||'');
+  if(JP)kbOpps=kbOpps.filter(r=>diasDeReuniao(r).some(d=>d>=JP.de&&d<=JP.ate));
 
   // ── população do funil de efetividade ──
   // Segue os filtros que definem QUEM/O QUÊ: área, assessor, responsável, produto, cliente.
@@ -8842,7 +9443,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'</select>'
     +'<select class="filter-sel" onchange="window._kbAg=this.value;renderAssessorOpps()">'
     +'<option value="">Agenda: tudo</option>'
-    +[['todo-hoje','TODOs de hoje'],['todo-atrasado','TODOs atrasados'],['reuniao-hoje','Reuniões de hoje'],['parado','Parados +7 dias']].map(([v,l])=>'<option value="'+v+'"'+((window._kbAg||'')===v?' selected':'')+'>'+l+'</option>').join('')
+    +[['todo-hoje','TODOs de hoje'],['todo-atrasado','TODOs atrasados'],['parado','Parados +7 dias']].map(([v,l])=>'<option value="'+v+'"'+((window._kbAg||'')===v?' selected':'')+'>'+l+'</option>').join('')
     +'</select>'
     +((()=>{const resps=[...new Set(myOpps.map(r=>r.responsavel).filter(Boolean))].sort();
       return resps.length?'<select class="filter-sel" onchange="window._kbResp=this.value;renderAssessorOpps()">'
@@ -8874,6 +9475,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
         +'<button class="btn sm" onclick="clearSelectionG()">Limpar seleção</button>'
         +'</div>';
     })():'')
+    +kbBarraReunioes(kbOpps.length)
     +kbHtml
     +(semStatus.length?'<div class="kb-board" style="margin-top:-8px"><div class="kb-col" style="border:1.5px dashed var(--muted-l);background:var(--surf2)">'
       +(()=>{window._kbColIds=window._kbColIds||{};window._kbColIds['|classificar']=semStatus.map(r=>r.id);const csel=semStatus.length>0&&semStatus.every(r=>SELECTED.has(r.id));
@@ -11575,6 +12177,190 @@ function invLista(pk,escopo){
     +'<div class="gs-acoes"><button class="btn" onclick="closeModal(\'gesto\')">Fechar</button></div>';
   document.getElementById('modal-gesto').style.display='flex';
 }
+// ══ O PRINT DA VARREDURA ══
+// Três perguntas numa folha só: quanto a varredura gerou por área, de que
+// tamanho era a carteira, e o que saiu da conversa com cada assessor.
+// Desenhado à parte da tela, para a imagem não depender da rolagem nem do
+// assessor que estiver aberto no momento.
+function invMatriz(){
+  const cart=invCarteira();
+  const base=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS)||[];
+  const porAss={},porArea={},clientes=new Set();
+  let total=0;
+  base.forEach(r=>{
+    if(r.fonte!=='Investor')return;
+    const P=INV_PROD.find(x=>x.area===r.area);if(!P)return;
+    const a=(r.assessor||'(sem assessor)').trim();
+    porAss[a]=porAss[a]||{nome:a,tot:0};
+    porAss[a][P.k]=(porAss[a][P.k]||0)+1;porAss[a].tot++;
+    porArea[P.k]=(porArea[P.k]||0)+1;total++;
+    clientes.add(norm(r.cliente||'')+'|'+a);
+  });
+  const linhas=Object.values(porAss).sort((x,y)=>y.tot-x.tot||x.nome.localeCompare(y.nome));
+  // a carteira: o universo de onde isso saiu
+  const dentro=new Set(),assDentro=new Set();
+  let naCarteira=0;
+  if(cart)cart.linhas.forEach(l=>{
+    if(invAncora(l)||invEstaFora(l[1]))return;
+    naCarteira++;dentro.add(l[0]);assDentro.add((l[1]||'').trim());
+  });
+  const feitos=invFeitos().filter(n=>!invEstaFora(n));
+  return {linhas,porArea,total,clientes:clientes.size,naCarteira,
+    assessores:assDentro.size,feitos:feitos.length,
+    quando:cart?new Date(cart.quando):null,arquivo:cart?cart.arquivo:''};
+}
+function invRelatorioHtml(){
+  const M=invMatriz();
+  const hoje=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const pct=M.assessores?Math.round(M.feitos/M.assessores*100):0;
+  const cobertura=M.naCarteira?((M.clientes/M.naCarteira)*100):0;
+  const card=(rot,n,sub)=>'<div class="rl-c"><div class="rl-c-r">'+rot+'</div>'
+    +'<div class="rl-c-n">'+n+'</div><div class="rl-c-s">'+sub+'</div></div>';
+  const linhas=M.linhas.length?M.linhas.map(a=>'<tr>'
+      +'<td class="rl-nm">'+a.nome+'</td>'
+      +INV_PROD.map(P=>'<td>'+(a[P.k]?'<b>'+a[P.k]+'</b>':'<i>—</i>')+'</td>').join('')
+      +'<td class="rl-t">'+a.tot+'</td></tr>').join('')
+    :'<tr><td colspan="6" class="rl-vz">Nenhuma oportunidade gerada ainda</td></tr>';
+  return '<div class="rl">'
+    +'<div class="rl-h"><div><div class="rl-t1">The Investor — varredura da carteira</div>'
+      +'<div class="rl-t2">'+hoje
+        +(M.quando?' · carteira de '+M.quando.toLocaleDateString('pt-BR'):'')+'</div></div>'
+      +'<div class="rl-big"><span>'+M.total+'</span>oportunidades geradas</div></div>'
+    +'<div class="rl-cards">'
+      +INV_PROD.map(P=>card(P.rot,M.porArea[P.k]||0,
+          M.total?Math.round(((M.porArea[P.k]||0)/M.total)*100)+'% do total':'—')).join('')
+    +'</div>'
+    +'<div class="rl-cards rl-cob">'
+      +card('Clientes na carteira',M.naCarteira.toLocaleString('pt-BR'),'universo varrido')
+      +card('Clientes que viraram oportunidade',M.clientes.toLocaleString('pt-BR'),
+            cobertura.toFixed(1).replace('.',',')+'% da carteira')
+      +card('Assessores varridos',M.feitos+' de '+M.assessores,pct+'% do time')
+      +card('Média por assessor varrido',M.feitos?(M.total/M.feitos).toFixed(1).replace('.',','):'—',
+            'oportunidades por conversa')
+    +'</div>'
+    +'<div class="rl-sec">O que saiu de cada assessor</div>'
+    +'<table class="rl-tb"><thead><tr><th>Assessor</th>'
+      +INV_PROD.map(P=>'<th>'+P.rot+'</th>').join('')+'<th class="rl-t">Total</th></tr></thead>'
+    +'<tbody>'+linhas+'</tbody>'
+    +(M.linhas.length?'<tfoot><tr><td class="rl-nm">Total</td>'
+      +INV_PROD.map(P=>'<td>'+(M.porArea[P.k]||0)+'</td>').join('')
+      +'<td class="rl-t">'+M.total+'</td></tr></tfoot>':'')
+    +'</table>'
+    +'<div class="rl-pe">Gerado pelo Gerencial Comercial · '+(USER&&USER.nome||'')+'</div>'
+    +'</div>';
+}
+// ── o print da lista aberta ───────────────────────────────────────────────
+// A tabela da tela rola; a imagem não pode rolar. Então o print é montado de
+// novo num palco fora da tela, sem scroll, no mesmo papel do relatório do
+// Investor — e sai pronto para colar no grupo ou no follow do CEO.
+const SEM_PRINT_MAX=60;
+function semListaRelatorioHtml(k){
+  const D=semDados(), itens=semItens(k,D);
+  const E=SEM_PASSO[k]||SEM_EST[k]||{rot:k,sub:''};
+  const jan=String(k).indexOf('px-')===0?semProx(D).sub:D.J.sub;
+  const quando=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const val=r=>(r.atual||r.pipe||0);
+  const tot=itens.reduce((a,x)=>a+val(x.r),0);
+  const semVal=itens.filter(x=>!val(x.r)).length;
+  const emp=temDuasEmpresas()?(empAtual()?empNome(empAtual()):'Quark + QRK'):'';
+  const rec=[atArea()?((AREAS[atArea()]||{}).name||atArea()):'Todas as áreas',emp].filter(Boolean).join(' · ');
+  const ord=itens.slice().sort((a,b)=>val(b.r)-val(a.r)
+    ||String(a.r.cliente||'').localeCompare(String(b.r.cliente||'')));
+  const corta=ord.length>SEM_PRINT_MAX;
+  const linhas=ord.slice(0,SEM_PRINT_MAX).map(x=>'<tr>'
+      +'<td class="rl-nm">'+(x.r.cliente||'—')+'</td>'
+      +'<td>'+((AREAS[x.r.area]||{}).name||x.r.area||'—')+'</td>'
+      +'<td>'+(x.quem||x.r.responsavel||x.r.assessor||'—')+'</td>'
+      +'<td>'+(x.quando?brData(x.quando):'—')+'</td>'
+      +'<td>'+(x.extra||'—')+'</td>'
+      +'<td>'+(x.r.sc||'—')+'</td>'
+      +'<td class="rl-t">'+(val(x.r)?fmt(val(x.r)):'<i>—</i>')+'</td></tr>').join('');
+  return '<div class="rl">'
+    +'<div class="rl-h"><div><div class="rl-t1">'+E.rot+'</div>'
+      +'<div class="rl-t2">'+jan+' · '+rec+' · gerado em '+quando+'</div></div>'
+      +'<div class="rl-big"><span>'+itens.length+'</span>'+(itens.length===1?'oportunidade':'oportunidades')+'</div></div>'
+    +'<table class="rl-tb"><thead><tr><th>Cliente</th><th>Área</th><th>Quem</th><th>Dia</th>'
+      +'<th>Situação</th><th>Está em</th><th>Volume</th></tr></thead>'
+    +'<tbody>'+linhas+'</tbody>'
+    +'<tfoot><tr><td class="rl-nm">Total</td><td colspan="5"></td>'
+      +'<td class="rl-t">'+fmtR(tot)+'</td></tr></tfoot></table>'
+    +(corta?'<div class="rl-pe">Mostrando as '+SEM_PRINT_MAX+' maiores · '
+      +(ord.length-SEM_PRINT_MAX)+' além dessas. O total e a contagem acima consideram todas — a lista completa sai no CSV.</div>':'')
+    +(semVal?'<div class="rl-pe">'+semVal+(semVal===1?' sem valor preenchido':' sem valor preenchido')
+      +' — o total considera só as que têm.</div>':'')
+    +'<div class="rl-pe">Gerencial Comercial · Quark Investimentos</div>'
+  +'</div>';
+}
+async function semListaCanvas(k){
+  if(typeof html2canvas==='undefined'){showToast('Recurso de imagem ainda carregando — tente de novo');return null}
+  const palco=document.createElement('div');
+  palco.style.cssText='position:absolute;left:-99999px;top:0;width:1040px;background:#FFFFFF';
+  palco.innerHTML=semListaRelatorioHtml(k);
+  document.body.appendChild(palco);
+  try{return await html2canvas(palco.firstChild,{scale:2,backgroundColor:'#FFFFFF',useCORS:true})}
+  catch(e){showToast('Erro ao gerar a imagem: '+e.message);return null}
+  finally{palco.remove()}
+}
+function semListaNome(k){
+  const E=SEM_PASSO[k]||SEM_EST[k]||{rot:k};
+  const D=semDados();
+  const base=String(k).indexOf('px-')===0?semProx(D).de:D.J.de;
+  return 'semana-'+base+'-'+String(E.rot).toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\W+/g,'-').replace(/^-|-$/g,'');
+}
+async function semListaPrint(k){
+  const c=await semListaCanvas(k);if(!c)return;
+  const a=document.createElement('a');
+  a.download=semListaNome(k)+'.png';
+  a.href=c.toDataURL('image/png');a.click();
+  showToast('Print salvo nos seus downloads',true);
+}
+async function semListaCopiar(k){
+  const c=await semListaCanvas(k);if(!c)return;
+  try{
+    const blob=await new Promise(res=>c.toBlob(res,'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+    showToast('Print copiado — cole com Ctrl+V',true);
+  }catch(e){semListaPrint(k)}
+}
+async function semBaixarPrint(){
+  if(typeof html2canvas==='undefined'){showToast('Recurso de imagem ainda carregando');return}
+  const el=document.getElementById('main-content');
+  const bg=getComputedStyle(document.body).backgroundColor||'#FAF8F6';
+  try{
+    const c=await html2canvas(el,{scale:2,backgroundColor:bg,useCORS:true});
+    const a=document.createElement('a');
+    a.download='semana-'+semJanela().de+'.png';
+    a.href=c.toDataURL('image/png');a.click();
+    showToast('Print da semana salvo',true);
+  }catch(e){showToast('Erro ao gerar a imagem: '+e.message)}
+}
+async function invCanvas(){
+  if(typeof html2canvas==='undefined'){showToast('Recurso de imagem ainda carregando — tente de novo');return null}
+  if(!invCarteira()){showToast('Suba a carteira primeiro');return null}
+  const palco=document.createElement('div');
+  palco.style.cssText='position:absolute;left:-99999px;top:0;width:1040px;background:#FFFFFF';
+  palco.innerHTML=invRelatorioHtml();
+  document.body.appendChild(palco);
+  try{return await html2canvas(palco.firstChild,{scale:2,backgroundColor:'#FFFFFF',useCORS:true})}
+  catch(e){showToast('Erro ao gerar a imagem: '+e.message);return null}
+  finally{palco.remove()}
+}
+async function invBaixarPrint(){
+  const c=await invCanvas();if(!c)return;
+  const a=document.createElement('a');
+  a.download='the-investor-'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.png';
+  a.href=c.toDataURL('image/png');a.click();
+  showToast('Print salvo nos seus downloads',true);
+}
+async function invCopiarPrint(){
+  const c=await invCanvas();if(!c)return;
+  try{
+    const blob=await new Promise(res=>c.toBlob(res,'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+    showToast('Print copiado — cole com Ctrl+V',true);
+  }catch(e){invBaixarPrint()}
+}
 // ── A TELA ──
 function renderInvestor(c){
   c=c||document.getElementById('main-content');
@@ -11584,7 +12370,10 @@ function renderInvestor(c){
       +' clientes · carteira de '+new Date(cart.quando).toLocaleDateString('pt-BR')
       +(cart.arquivo?' · '+cart.arquivo:'')):'nenhuma carteira carregada')
     +'</div></div>'
-    +(cart?'<button class="btn sm" onclick="invTrocaCarteira()">Trocar planilha</button>':'')+'</div>';
+    +(cart?'<div style="display:flex;gap:6px">'
+      +'<button class="btn wine sm" onclick="invBaixarPrint()" title="Gerar a imagem com o resumo da varredura">Baixar print</button>'
+      +'<button class="btn sm" onclick="invCopiarPrint()" title="Copiar a imagem para colar no WhatsApp">Copiar imagem</button>'
+      +'<button class="btn sm" onclick="invTrocaCarteira()">Trocar planilha</button></div>':'')+'</div>';
 
   if(!cart){
     c.innerHTML=topo
