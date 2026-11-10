@@ -565,6 +565,7 @@ tr.bol td{background:var(--green-bg)}
 .dy-g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .dy-f{display:grid;gap:3px;font-size:10px;color:var(--muted)}
 .dy-f span{font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.dy-dica{display:block;font-size:9.5px;font-style:normal;color:var(--muted-l);margin-top:3px;line-height:1.3}
 .dy-f input{font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:3px;background:var(--surf2);color:var(--text);width:100%}
 .dy-sub{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
   border-top:1px dashed var(--border);padding-top:8px;margin-top:2px}
@@ -2663,7 +2664,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261109-1015';
+const APP_VERSION='20261109-1420';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -5562,6 +5563,22 @@ async function dymSet(d,e,a,f,valor,texto){
     }
   }catch(err){showToast('Não consegui salvar: '+err.message)}
 }
+// ── REUNIÕES MARCADAS PELO SALES OPS ──────────────────────────────────────
+// O sistema conta pelo rastro que o time deixa, e rastro tem buraco: às vezes
+// a reunião foi marcada e o gesto não foi registrado. No fechamento, quem
+// assina o número é o diretor — então o campo aceita o valor na mão e só cai
+// na contagem automática quando fica vazio. Vazio ≠ zero: por isso o 'on'.
+function dyMarcadas(ak,dia,emp,d){
+  const manual=dymT(dia,emp,ak,'marc')==='on';
+  const sis=(d&&d.ap&&d.ap.n&&d.ap.n.mar)||0;
+  return {n:manual?dymN(dia,emp,ak,'marc'):sis, sis:sis, manual:manual};
+}
+async function dyMarcCampo(ak,el){
+  const v=String(el.value).trim();
+  const num=v===''?0:(parseMoeda(v)||0);
+  await dymSet(dyData(),dyEmp(),ak,'marc',num,v===''?'':'on');
+  dyPintaForms();dyPintaPrev();
+}
 // o campo do formulário: grava e repinta só o relatório
 async function dyCampo(ak,f,el,tipo){
   const v=el.value;
@@ -5872,7 +5889,7 @@ function dyRelClose(){
       +(d.closers.length>1?'<div class="rep-tot"><span>Pago hoje · total da área<small>projetado '+dyK(proj)+'</small></span><b>'+dyK(pago)+'</b></div>':'')
       +'<div class="rep-role">SalesOps'+(ops?'<small>'+dyEsc(ops)+'</small>':'')+'</div>'
       +'<div class="rep-stats"><div><b>'+d.ap.n.lig+'<small>/'+dymN(dia,emp,ak,'calls')+'</small></b><span>ligações feitas</span></div>'
-        +'<div><b class="g">'+d.ap.n.mar+'<small>/'+dymN(dia,emp,ak,'goal')+'</small></b><span>reuniões marcadas</span></div></div>'
+        +'<div><b class="g">'+dyMarcadas(ak,dia,emp,d).n+'<small>/'+dymN(dia,emp,ak,'goal')+'</small></b><span>reuniões marcadas</span></div></div>'
       +(obs.trim()?'<div class="rep-call"><b>Obs</b> · '+dyEsc(obs.trim())+'</div>':'')
       +dyInvBloco(ak,'close')
       +'</div>';
@@ -5899,7 +5916,8 @@ function dyResumo(){
       +m('Pago hoje',dyK(pago),dyK(proj),dyPct(pago,proj)+' da projeção')
       +m('Reuniões aconteceram',fez,d.reun.length,dyPct(fez,d.reun.length))
       +m('Ligações feitas',d.ap.n.lig,dymN(dia,emp,ak,'calls'),dyPct(d.ap.n.lig,dymN(dia,emp,ak,'calls'))+' da meta')
-      +m('Reuniões marcadas',d.ap.n.mar,dymN(dia,emp,ak,'goal'),dyPct(d.ap.n.mar,dymN(dia,emp,ak,'goal'))+' da meta')
+      +(()=>{const M=dyMarcadas(ak,dia,emp,d),g=dymN(dia,emp,ak,'goal');
+          return m('Reuniões marcadas',M.n,g,dyPct(M.n,g)+' da meta')})()
       +'</div></div>';
   }).join('')+'</div>';
 }
@@ -6026,7 +6044,16 @@ function dyPintaForms(){
           +'onkeydown="if(event.key===\'Enter\')this.blur()"></label>'
         +'</div>'
       +'<div class="dy-g3">'+cmp('goal','Reuniões a marcar','n')
-        +cmp(modo==='close'?'obs':'gap',modo==='close'?'Observação do dia':'Gap do dia','t','grid-column:span 2')+'</div>'
+        +(modo==='close'?(()=>{const M=dyMarcadas(ak,dia,emp,d);
+            return '<label class="dy-f"><span>Reuniões marcadas</span>'
+              +'<input value="'+(M.manual?M.n:'')+'" placeholder="o sistema contou '+M.sis+'" '
+              +'onblur="dyMarcCampo(\''+ak+'\',this)" '
+              +'onkeydown="if(event.key===\'Enter\')this.blur()">'
+              +'<i class="dy-dica">'+(M.manual
+                ?'preenchido na mão · apague para voltar aos '+M.sis+' do sistema'
+                :'vazio usa a contagem do sistema')+'</i></label>'})():'')
+        +cmp(modo==='close'?'obs':'gap',modo==='close'?'Observação do dia':'Gap do dia','t',
+             modo==='close'?'grid-column:span 3':'grid-column:span 2')+'</div>'
       +dyItens(d,modo)
       +dyRetomar(ak,dia)
       +inv+'</div></details>';
