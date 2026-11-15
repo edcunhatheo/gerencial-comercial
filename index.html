@@ -465,6 +465,35 @@ tr.bol td{background:var(--green-bg)}
 .sw-lg i{width:10px;height:10px;border-radius:2px;display:inline-block;border:1px solid rgba(0,0,0,.08)}
 .sw-lg b{color:var(--text)}
 .sw-est{display:flex;align-items:stretch;flex-wrap:wrap;gap:0}
+/* ── TAREFAS ── */
+.tr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:11px}
+.tr-c{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--bc,var(--wine));
+  border-radius:3px;padding:13px 15px;cursor:pointer;transition:background .12s,box-shadow .12s}
+.tr-c:hover{background:var(--hover);box-shadow:0 2px 10px rgba(26,5,8,.08)}
+.tr-c.vazia{border-left-color:var(--border);cursor:default;opacity:.62}
+.tr-c.vazia:hover{background:var(--card);box-shadow:none}
+.tr-c b{display:block;font-size:28px;font-weight:800;line-height:1.05;color:var(--bc,var(--wine))}
+.tr-c.vazia b{color:var(--muted-l)}
+.tr-c span{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--text);margin-top:3px}
+.tr-c i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:4px;line-height:1.35}
+.tr-c em{display:block;font-style:normal;font-size:11px;font-weight:700;color:var(--muted);margin-top:6px}
+.tr-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tr-tbl th{text-align:left;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--muted);padding:7px 9px;border-bottom:1px solid var(--border);background:var(--surf2)}
+.tr-tbl td{padding:8px 9px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tr-tbl tr:hover td{background:var(--hover)}
+.tr-cli{font-weight:700;cursor:pointer}
+.tr-cli small{display:block;font-weight:400;font-size:10px;color:var(--muted-l)}
+.tr-pq{color:var(--muted);font-size:11.5px}
+.tr-val{text-align:right;font-weight:700;color:var(--wine-d);white-space:nowrap}
+.tr-ac{display:flex;gap:5px;justify-content:flex-end;flex-wrap:wrap}
+.tr-ac button{font-size:10.5px;font-weight:700;padding:4px 9px;border:1px solid var(--border);
+  background:var(--card);color:var(--muted);border-radius:3px;cursor:pointer;white-space:nowrap}
+.tr-ac button:hover{border-color:var(--wine);color:var(--wine)}
+.tr-ac button.w{background:var(--wine);border-color:var(--wine);color:#fff}
+.tr-mais{font-size:11.5px;color:var(--muted);padding:9px 2px}
+.tr-vz{padding:22px;text-align:center;color:var(--muted-l);font-style:italic}
 .sw-prox{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}
 .sw-prox .sw-passo{flex:none;min-width:0}
 .sw-prox-nota{font-size:11.5px;color:var(--muted);margin-top:11px}
@@ -2325,7 +2354,8 @@ const pbBoletada=v=>norm(v||'').startsWith('boletado');
 const somaBol=rs=>rs.filter(isBol).reduce((s,r)=>s+(r.atual||0),0);
 const somaAbol=rs=>rs.filter(isABoletar).reduce((s,r)=>s+(r.atual||r.pipe||0),0);
 const isPerdida=r=>norm(r.sc||'')==='cliente negou';
-const isPend=r=>{const k=norm(r.pb||'');return k.includes('todo')||k.includes('email')||k.includes('aguardando')};
+const isPend=r=>{const k=norm(r.pb||'').replace(/\s+/g,' ');   // "To Do Comercial" tem espaço: sem isso, 143 cards ficavam fora
+  return k.includes('todo')||k.includes('to do')||k.includes('email')||k.includes('aguardando')};
 const matchBadge=(v,map)=>{const k=norm(v);for(const[kk,b]of Object.entries(map)){if(k.includes(norm(kk)))return b;}return null};
 const today=()=>new Date().toISOString().split('T')[0];
 // ── data da boleta: aceita aaaa-mm-dd, dd/mm/aaaa, dd/mm/aa e serial do Excel ──
@@ -2664,7 +2694,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261109-1420';
+const APP_VERSION='20261115-2050';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3260,6 +3290,7 @@ const SVG_ICONES={
   ativ:'M2 11h3.5l2-6 3 12 2.5-6H18',
   carteira:'M3 5h14v11H3zM3 9h14M8 13h6M6 13h.01',
   semana:'M3 15l4-5 3 3 4-6 3 4M3 4h14v13H3z',
+  tarefas:'M4 6h12M4 10h12M4 14h7M2.5 6l.8.8L5 5M2.5 10l.8.8L5 9',
 };
 const svgIco=k=>'<svg class="tab-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" '
   +'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
@@ -3268,10 +3299,10 @@ let curView='';
 function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
-    ?[['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-semana','A semana','semana'],['d-guia','Guia do dia','guia'],['d-investor','Investor','carteira'],['d-agenda','Agenda','agenda'],['d-metas','Definições do mês','metas'],['d-historico','Histórico','hist'],['d-upload','Upload','upload'],['d-usuarios','Usuários','usuar']]
+    ?[['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-semana','A semana','semana'],['d-tarefas','Tarefas','tarefas'],['d-guia','Guia do dia','guia'],['d-investor','Investor','carteira'],['d-agenda','Agenda','agenda'],['d-metas','Definições do mês','metas'],['d-historico','Histórico','hist'],['d-upload','Upload','upload'],['d-usuarios','Usuários','usuar']]
     :USER.perfil==='head'
-    ?[['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-guia','Guia do dia','guia'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']]
-    :[['a-opps','Guia do dia','guia'],['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']];
+    ?[['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-tarefas','Tarefas','tarefas'],['d-guia','Guia do dia','guia'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']]
+    :[['a-opps','Guia do dia','guia'],['d-tarefas','Tarefas','tarefas'],['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,lb,ic])=>
     `<button class="nav-tab${v===curView?' active':''}" title="${lb}" onclick="setView('${v}',this)">${svgIco(ic)}<span class="tab-lb">${lb}</span></button>`).join('');
   window._tabLabels=Object.fromEntries(tabs.map(([v,lb])=>[v,lb]));
@@ -3297,6 +3328,7 @@ function renderCurView(){
   if(v==='diretor')renderDiretor(c);
   else if(v==='d-pipeline')renderDPipeline(c);
   else if(v==='d-guia')renderAssessorOpps(c);
+  else if(v==='d-tarefas')renderTarefas(c);
   else if(v==='d-metas')renderMetas(c);
   else if(v==='d-upload')renderUpload(c);
   else if(v==='d-usuarios')renderUsuarios(c);
@@ -5133,6 +5165,243 @@ function renderSemana(c=document.getElementById('main-content')){
       +'<span>reunião que passou e não teve desfecho, ou voltou para agendar sem registrar o no show</span></div>'
       +semAcao(D)+'</div>';
 }
+
+// ══ TAREFAS ══════════════════════════════════════════════════════════════
+// A regra não é "tem TODO?". É se o card tem um próximo passo VÁLIDO PARA A
+// COLUNA ONDE ELE ESTÁ: quem está em reunião precisa de data, e data que
+// ainda não passou; quem está em qualquer outra coluna precisa de um TODO
+// com prazo ou de uma reunião marcada. Ligar para o cliente não é tarefa —
+// é a própria coluna dizendo o que fazer.
+// Caixa que não se esvazia com um clique vira relatório, então toda linha
+// traz aqui dentro o gesto que a resolve.
+const TAR_REU=new Set(['r1','r2']);
+// Prospecção não vira tarefa: em "Ligar Cliente" e "Agendar Reunião" a
+// própria coluna já diz o que fazer, e exigir TODO ali só enchia a lista de
+// ruído — eram 348 dos 396 TODOs vencidos. Quem topou também fica de fora:
+// o próximo passo dele é a data da boleta, que tem caixa própria.
+const TAR_PROSPECCAO=new Set(['agendar','ligar']);
+const tarSoPipeline=r=>!TAR_PROSPECCAO.has(etapaFunil(r));
+const tarHoje=()=>localISO(new Date());
+const tarDataReu=r=>isoDia(r.reuniao_data)||dataR2(r)||'';
+const tarTodoD=r=>String(r.todo_data||'').slice(0,10);
+const tarVal=r=>r.atual||r.pipe||0;
+const tarIdade=d=>d?Math.max(0,Math.round((Date.parse(tarHoje())-Date.parse(d))/864e5)):0;
+const tarParado=r=>daysSince(getLastMoveDate(r));
+function tarBase(){
+  const base=oppsDoUsuario().filter(r=>!isB(r)&&!isPerdida(r)&&norm(r.sc||'')!=='nao se aplica');
+  const ak=atArea();
+  return ak?base.filter(r=>r.area===ak):base;
+}
+const TAREFAS={
+  reuvencida:{rot:'Reunião que passou',cor:'#8B1C2A',
+    sub:'o dia chegou, o card continua esperando desfecho',
+    fn:r=>TAR_REU.has(etapaFunil(r))&&tarDataReu(r)&&tarDataReu(r)<tarHoje(),
+    diz:r=>'era '+brData(tarDataReu(r))+' · '+tarIdade(tarDataReu(r))+' dia'+(tarIdade(tarDataReu(r))===1?'':'s')+' atrás',
+    acoes:[['Aconteceu','abrirCaixaAconteceu',1],['No show','registraNoShow',0],['Remarcar','abrirCaixaMarcar',0]]},
+  reusemdata:{rot:'Reunião sem data',cor:'#9F606C',
+    sub:'está na coluna de reunião e não tem dia marcado',
+    fn:r=>TAR_REU.has(etapaFunil(r))&&!tarDataReu(r),
+    diz:r=>'em “'+(r.sc||'—')+'” há '+tarParado(r)+' dias, sem data nenhuma',
+    acoes:[['Marcar data','abrirCaixaMarcar',1]]},
+  topousemboleta:{rot:'Topou sem data de boleta',cor:'#8B1C2A',
+    sub:'o cliente disse sim e a boleta não tem dia',
+    fn:r=>norm(r.sc||'').includes('topou')&&!parseDataBoleta(r.data_boleta),
+    diz:r=>'topou há '+tarParado(r)+' dias e segue sem data de boleta',
+    acoes:[['Pôr a data','tarDataBoleta',1]]},
+  sempasso:{rot:'Sem próximo passo',cor:'#C09A9A',
+    sub:'fora da reunião, sem TODO e sem reunião marcada',
+    fn:r=>tarSoPipeline(r)&&!TAR_REU.has(etapaFunil(r))&&etapaFunil(r)!=='topou'
+      &&!String(r.todo||'').trim()&&!tarDataReu(r),
+    diz:r=>'em “'+(r.sc||'sem status')+'”, nada combinado',
+    acoes:[['Escrever TODO','tarTodo',1]]},
+  todovenc:{rot:'TODO vencido',cor:'#9F606C',
+    sub:'o prazo que o próprio time deu passou e a tarefa segue aberta',
+    fn:r=>tarSoPipeline(r)&&!TAR_REU.has(etapaFunil(r))&&etapaFunil(r)!=='topou'
+      &&tarTodoD(r)&&tarTodoD(r)<tarHoje()&&!tarDataReu(r),
+    diz:r=>'“'+String(r.todo||'—').slice(0,44)+'” venceu '+brData(tarTodoD(r))
+      +' · '+tarIdade(tarTodoD(r))+'d',
+    acoes:[['Concluir','tarConcluir',1],['Novo prazo','tarTodo',0]]},
+  travada:{rot:'Travada numa pendência',cor:'#B0ACA7',
+    sub:'parada esperando alguém de dentro de casa',
+    fn:r=>tarSoPipeline(r)&&isPend(r),
+    diz:r=>'pendência “'+(r.pb||'—')+'” há '+tarParado(r)+' dias',
+    acoes:[['Escrever TODO','tarTodo',0]]},
+  parada:{rot:'Parada há mais de 7 dias',cor:'#B0ACA7',
+    sub:'ninguém tocou no card na última semana',
+    fn:r=>tarParado(r)>7,
+    diz:r=>tarParado(r)+' dias sem nenhum movimento',
+    acoes:[['Escrever TODO','tarTodo',0]]},
+};
+const TAR_ORDEM=['reuvencida','reusemdata','topousemboleta','sempasso','todovenc','travada','parada'];
+const TAR_TETO=25;                      // a lista abre nas maiores; o resto vem no "ver todas"
+function tarItens(k){
+  const T=TAREFAS[k];if(!T)return [];
+  return tarBase().filter(T.fn).sort((a,b)=>tarVal(b)-tarVal(a)
+    ||String(a.cliente||'').localeCompare(String(b.cliente||'')));
+}
+// ── a tela ──
+function renderTarefas(c=document.getElementById('main-content')){
+  const optArea='<option value="">Todas as áreas</option>'
+    +areasVis().map(([k,a])=>'<option value="'+k+'"'+(k===atArea()?' selected':'')+'>'+a.name+'</option>').join('');
+  const base=tarBase();
+  const caixas=TAR_ORDEM.map(k=>{
+    const T=TAREFAS[k],l=tarItens(k);
+    const vol=l.reduce((s,r)=>s+tarVal(r),0);
+    return '<div class="tr-c'+(l.length?'':' vazia')+'" style="--bc:'+T.cor+'"'
+      +(l.length?' onclick="tarAbrir(\''+k+'\')" title="Ver as '+l.length+'"':'')+'>'
+      +'<b>'+l.length+'</b><span>'+T.rot+'</span><i>'+T.sub+'</i>'
+      +(l.length?'<em>'+fmtR(vol)+' em jogo</em>':'<em>nada aqui</em>')+'</div>';
+  }).join('');
+  c.innerHTML='<div class="mc-top">'
+    +'<div><h2 class="mc-tit">Tarefas</h2>'
+    +'<div class="mc-sub">O que precisa de você, e por quê · '+base.length
+      +' oportunidade'+(base.length===1?'':'s')+' no fluxo '+recorteEmpresaHtml()+'</div></div>'
+    +'<div class="mc-ctr"><label class="at-sel"><span>Área</span>'
+      +'<select onchange="window._atArea=this.value;renderTarefas()">'+optArea+'</select></label></div></div>'
+    +'<div class="at-card"><div class="at-ct">O que está em aberto'
+      +'<span>clique numa caixa para ver os nomes e resolver ali mesmo</span></div>'
+      +'<div class="tr-grid">'+caixas+'</div>'
+      +'<div class="sw-prox-nota">Um card pode aparecer em mais de uma caixa — são perguntas diferentes '
+      +'sobre o mesmo atraso. <b>Prospecção não gera tarefa</b>: em “Ligar Cliente” e “Agendar Reunião” a '
+      +'própria coluna já diz o que fazer, então elas só aparecem em “parada há mais de 7 dias”.</div>'
+    +'</div>';
+}
+// ── a lista, com o gesto que resolve ──
+function tarAbrir(k,todas){
+  const T=TAREFAS[k];if(!T)return;
+  const l=tarItens(k);
+  if(!l.length){showToast('Nada nesta caixa');return}
+  const mostra=todas?l:l.slice(0,TAR_TETO);
+  const vol=l.reduce((s,r)=>s+tarVal(r),0);
+  const bt=(r,[rot,fn,forte])=>'<button class="'+(forte?'w':'')+'" onclick="event.stopPropagation();'
+    +fn+'(\''+r.id+'\')">'+rot+'</button>';
+  const linhas=mostra.map(r=>'<tr>'
+    +'<td class="tr-cli" onclick="closeModal(\'area\');openEdit(\''+r.id+'\')" title="Abrir a oportunidade">'
+      +(r.cliente||'—')+'<small>'+((SUBAREAS[subAreaOf(r)]||{}).name||r.area||'—')
+      +' · '+(r.responsavel||r.assessor||'sem dono')+'</small></td>'
+    +'<td class="tr-pq">'+T.diz(r)+'</td>'
+    +'<td class="tr-val">'+(tarVal(r)?fmt(tarVal(r)):'<i style="font-weight:400;color:var(--muted-l)">sem valor</i>')+'</td>'
+    +'<td><div class="tr-ac">'+(T.acoes||[]).map(a=>bt(r,a)).join('')+'</div></td>'
+    +'</tr>').join('');
+  document.getElementById('ba-title').innerHTML=T.rot
+    +' <span style="font-size:11px;font-weight:600;color:var(--muted)">· '+l.length
+    +' oportunidade'+(l.length===1?'':'s')+' · '+fmtR(vol)+'</span>';
+  document.getElementById('ba-body').innerHTML=
+    '<div class="gs-nota" style="margin:0 0 12px">'+T.sub+'</div>'
+    +'<div class="tbl-wrap" style="max-height:58vh;overflow:auto"><table class="tr-tbl">'
+    +'<thead><tr><th>Cliente</th><th>Por que está aqui</th><th style="text-align:right">Volume</th><th></th></tr></thead>'
+    +'<tbody>'+linhas+'</tbody></table></div>'
+    +(l.length>mostra.length
+      ? '<div class="tr-mais">Mostrando as '+mostra.length+' maiores · '
+        +'<span class="inv-lk" onclick="tarAbrir(\''+k+'\',1)">ver todas as '+l.length+'</span></div>'
+      : '')
+    +'<div class="gs-acoes" style="margin-top:12px">'
+      +'<button class="btn" onclick="tarBaixarLista(\''+k+'\')">Baixar CSV</button>'
+      +'<button class="btn" onclick="closeModal(\'area\')">Fechar</button></div>';
+  document.getElementById('modal-area').style.display='flex';
+  window._tarAberta=k;
+}
+function tarRepinta(){
+  if(curView==='d-tarefas')renderTarefas();
+  if(window._tarAberta&&document.getElementById('modal-area').style.display==='flex')
+    tarAbrir(window._tarAberta);
+}
+function tarBaixarLista(k){
+  const T=TAREFAS[k],l=tarItens(k);
+  const esc=x=>'"'+String(x==null?'':x).replace(/"/g,'""')+'"';
+  const linhas=[['Cliente','Área','Dono','Por que está aqui','Status','Pendência','TODO','Prazo do TODO','Reunião','Volume']]
+    .concat(l.map(r=>[r.cliente,(SUBAREAS[subAreaOf(r)]||{}).name||r.area,r.responsavel||r.assessor,
+      String(T.diz(r)).replace(/<[^>]+>/g,''),r.sc,r.pb,r.todo,tarTodoD(r),tarDataReu(r),tarVal(r)]));
+  const csv='﻿'+linhas.map(x=>x.map(esc).join(';')).join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='tarefas-'+k+'-'+tarHoje()+'.csv';
+  a.click();URL.revokeObjectURL(a.href);
+  showToast(l.length+' linha'+(l.length===1?'':'s')+' no CSV',true);
+}
+// ── os gestos que só existem aqui ──
+function tarTodo(id,fechando){
+  const r=acharOpp(id);if(!r)return;
+  const prox=proxDiaUtil();
+  window._tarFech=!!fechando;
+  document.getElementById('gs-title').textContent=(fechando?'Feito — e agora? · ':'Próximo passo — ')+(r.cliente||'cliente');
+  document.getElementById('gs-body').innerHTML=
+    '<div class="gs-nota">'+(fechando
+      ? 'O TODO “'+String(r.todo||'—').slice(0,60)+'” vai ser dado por concluído. Diga qual é o próximo passo, senão o card cai em “sem próximo passo”.'
+      : 'O que precisa ser feito, e até quando. É isso que tira o card desta lista.')+'</div>'
+    +'<div class="gs-f" style="margin-top:11px"><label><span>O que fazer</span>'
+      +'<input id="tr-txt" value="'+(fechando?'':String(r.todo||'').replace(/"/g,'&quot;'))+'" placeholder="ligar, enviar proposta, cobrar documento…"></label>'
+      +'<label><span>Até quando</span><input type="date" id="tr-dt" value="'+(fechando?prox:(tarTodoD(r)||prox))+'"></label></div>'
+    +'<div class="gs-acoes"><button class="btn wine" onclick="tarSalvarTodo(\''+id+'\')">Salvar</button>'
+      +(fechando?'<button class="btn" onclick="tarSoConcluir(\''+id+'\')" title="O card fica sem próximo passo definido">Só concluir</button>':'')
+      +'<button class="btn" onclick="closeModal(\'gesto\')">Cancelar</button></div>';
+  document.getElementById('modal-gesto').style.display='flex';
+}
+async function tarSalvarTodo(id){
+  const r=acharOpp(id);if(!r)return;
+  const txt=String((document.getElementById('tr-txt')||{}).value||'').trim();
+  const dt=(document.getElementById('tr-dt')||{}).value||'';
+  if(!txt){showToast('Escreva o que precisa ser feito');return}
+  if(!dt){showToast('Ponha a data — sem prazo ninguém cobra');return}
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const hist=[...(r.historico||[])];
+  if(window._tarFech&&String(r.todo||'').trim())
+    hist.push({campo:'TODO',de:String(r.todo||''),para:'concluído',usuario:USER.nome,data:ds});
+  hist.push({campo:'TODO',de:window._tarFech?'':String(r.todo||''),para:txt+' · até '+brData(dt),
+    usuario:USER.nome,data:ds});
+  window._tarFech=false;
+  try{
+    await db('PATCH','oportunidades',{todo:txt,todo_data:dt,historico:hist,updated_at:now.toISOString()},'id=eq.'+id);
+    Object.assign(r,{todo:txt,todo_data:dt,historico:hist,updated_at:now.toISOString()});
+    closeModal('gesto');showToast('Próximo passo salvo',true);tarRepinta();
+  }catch(e){showToast('Não consegui salvar: '+e.message)}
+}
+// Concluir sem dizer o que vem depois só muda o card de caixa — então o
+// gesto é um só: dá o anterior por feito e já pede o próximo.
+const tarConcluir=id=>tarTodo(id,1);
+async function tarSoConcluir(id){
+  const r=acharOpp(id);if(!r)return;
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const hist=[...(r.historico||[]),{campo:'TODO',de:String(r.todo||''),para:'concluído',
+    usuario:USER.nome,data:ds}];
+  try{
+    await db('PATCH','oportunidades',{todo:'',todo_data:null,historico:hist,updated_at:now.toISOString()},'id=eq.'+id);
+    Object.assign(r,{todo:'',todo_data:null,historico:hist,updated_at:now.toISOString()});
+    closeModal('gesto');showToast('TODO concluído — o card ficou sem próximo passo',true);tarRepinta();
+  }catch(e){showToast('Não consegui salvar: '+e.message)}
+}
+function tarDataBoleta(id){
+  const r=acharOpp(id);if(!r)return;
+  document.getElementById('gs-title').textContent='Data da boleta — '+(r.cliente||'cliente');
+  document.getElementById('gs-body').innerHTML=
+    '<div class="gs-nota">O dia em que a boleta foi (ou será) feita. É ele que joga o valor na competência certa.</div>'
+    +'<div class="gs-f" style="margin-top:11px"><label><span>Data da boleta</span>'
+      +'<input type="date" id="tr-db" value="'+(parseDataBoleta(r.data_boleta)||tarHoje())+'"></label>'
+      +'<label><span>Valor</span><input id="tr-vl" value="'+(r.atual||'')+'" placeholder="opcional"></label></div>'
+    +'<div class="gs-acoes"><button class="btn wine" onclick="tarSalvarBoleta(\''+id+'\')">Salvar</button>'
+      +'<button class="btn" onclick="closeModal(\'gesto\')">Cancelar</button></div>';
+  document.getElementById('modal-gesto').style.display='flex';
+}
+async function tarSalvarBoleta(id){
+  const r=acharOpp(id);if(!r)return;
+  const dt=(document.getElementById('tr-db')||{}).value||'';
+  if(!dt){showToast('Ponha a data');return}
+  const vlRaw=String((document.getElementById('tr-vl')||{}).value||'').trim();
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const patch={data_boleta:dt,updated_at:now.toISOString()};
+  if(vlRaw!=='')patch.atual=parseMoeda(vlRaw)||0;
+  patch.historico=[...(r.historico||[]),{campo:'Data da boleta',de:String(r.data_boleta||''),
+    para:brData(dt),usuario:USER.nome,data:ds}];
+  try{
+    await db('PATCH','oportunidades',patch,'id=eq.'+id);
+    Object.assign(r,patch);
+    closeModal('gesto');showToast('Data da boleta salva',true);tarRepinta();
+  }catch(e){showToast('Não consegui salvar: '+e.message)}
+}
+
 // ══ CONSERTO À MÃO DA ATIVIDADE ══
 // Nenhuma regra automática acerta sempre: o sistema deduz a partir do rastro
 // que o time deixa, e rastro tem buraco. Em vez de esconder isso, o diretor
@@ -8708,7 +8977,15 @@ async function kbDrop(ev,statusKey){
 // precisa ver o funil todo para saber o que ainda não virou reunião. Closer:
 // a mesma área, mas só da R1 agendada em diante, porque antes disso a bola
 // não é dele. O card que já teve reunião continua com ele até a boleta.
-const ETAPAS_DO_CLOSER=new Set(['r1','ar2','r2','conf','topou','bol']);
+const ETAPAS_DO_CLOSER=new Set(['agendar','r1','ar2','r2','conf','topou','bol']);
+// Em "Agendar Reunião" a fila é do sales ops: o closer só vê o card que tem
+// O NOME DELE. Sem essa exceção, os 290 cards sem dono apareceriam para
+// todos os closers de uma vez — que foi exatamente o problema de antes.
+const ETAPAS_SO_DO_DONO=new Set(['agendar']);
+// "Ligar Cliente" e "Agendar Reunião" caem na MESMA etapa ('agendar'), então
+// a diferença entre as duas colunas só existe pelo nome. O closer volta a ver
+// "Agendar Reunião"; a fila de ligação continua sendo só do sales ops.
+const ehColunaLigar=nome=>/^ligar/.test(norm(nome||''));
 const jaTeveReuniao=r=>(r.historico||[]).some(h=>h.campo===MARCAS.reu.campo&&h.para===MARCAS.reu.on);
 // a etapa certa: da Reunião Agendada em diante
 function etapaDoCloser(r){
@@ -8729,7 +9006,9 @@ function etapaDoCloser(r){
 function cardDoCloser(r,quem){
   if(!etapaDoCloser(r))return false;
   const dono=norm(r.responsavel||'');
-  return !dono||dono===norm(quem||(USER&&USER.nome)||'');
+  const eu=norm(quem||(USER&&USER.nome)||'');
+  if(ETAPAS_SO_DO_DONO.has(etapaFunil(r)))return !!dono&&dono===eu;
+  return !dono||dono===eu;
 }
 // ══ A REGRA ÚNICA DE QUEM VÊ O QUÊ ══
 // Kanban, funil e listas passam por aqui: duas telas que respondem
@@ -9093,6 +9372,7 @@ function colunaDoPerfil(nome){
   const n=String(nome||'');
   if(n==='__BOL__'||n==='__PERD__')return true;   // o fim da linha é dele também
   if(n.indexOf('__')===0)return false;            // "Não se Aplica" não é dele
+  if(ehColunaLigar(n))return false;               // a fila de ligação é do sales ops
   return ETAPAS_DO_CLOSER.has(etapaDoStatus(n));
 }
 // Uma linha dizendo o que esta tela está mostrando e por quê. Sem isso, "por
@@ -10123,11 +10403,11 @@ function statusDoSistema(){
 // quantas oportunidades a varredura já gerou, por assessor
 function invGeradasPorAss(){
   const base=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS)||[];
-  const sel=base.length+'|g';
+  const sel=base.length+'|g|'+((METAS_RAW||[]).length);   // apelido novo invalida o cache
   if(window.__invG&&window.__invG.k===sel)return window.__invG.v;
   const m={};
-  base.forEach(r=>{if(r.fonte!=='Investor'||!r.assessor)return;
-    const k=norm(r.assessor);m[k]=(m[k]||0)+1});
+  base.forEach(r=>{if(!veioDoInvestor(r)||!r.assessor)return;
+    const k=invKey(r.assessor);m[k]=(m[k]||0)+1});
   window.__invG={k:sel,v:m};
   return m;
 }
@@ -11822,6 +12102,28 @@ function invRows(tipo){
   return (METAS_RAW||[]).filter(x=>x.area===AREA_INV&&String(x.produto||'').indexOf(k)===0)
     .map(x=>({id:x.id,nome:String(x.produto).slice(k.length)}));
 }
+// ── UM NOME NA CARTEIRA, OUTRO NOS CARDS ─────────────────────────────────
+// A planilha da corretora chama "WANDERLEY JR"; o time escreve "WANDERLEY"
+// no card. São a mesma pessoa, e enquanto os dois nomes não se falam o
+// trabalho dela fica invisível na varredura. O apelido liga os dois sem
+// obrigar ninguém a reescrever nada: vive no banco como as outras marcas
+// (apelido|CARTEIRA|CARD) e vale para toda comparação de nome nesta aba.
+function invApelidos(){
+  const m={};
+  (METAS_RAW||[]).forEach(x=>{
+    if(x.area!==AREA_INV)return;
+    const c=String(x.produto||'').split('|');
+    if(c[0]!=='apelido'||!c[1]||!c[2])return;
+    m[norm(c[1])]=c[2];
+  });
+  return m;
+}
+// a chave de comparação de um assessor: o apelido quando existe, senão ele mesmo
+function invKey(nome){
+  const n=norm(nome||'');
+  const a=invApelidos()[n];
+  return a?norm(a):n;
+}
 // A OPORTUNIDADE GERADA É A PROVA DO TRABALHO.
 // Marca guardada se perde; oportunidade criada, não. Então "já fiz o
 // Investor com fulano" é lido primeiro das oportunidades que a varredura
@@ -11832,9 +12134,9 @@ function invFeitos(){
   const sel=base.length+'|'+((METAS_RAW||[]).length);
   if(window.__invF&&window.__invF.k===sel)return window.__invF.v;
   const m=new Map();
-  base.forEach(r=>{if(r.fonte==='Investor'&&r.assessor)m.set(norm(r.assessor),r.assessor)});
-  invRows('feito').forEach(x=>m.set(norm(x.nome),x.nome));
-  invRows('naofeito').forEach(x=>m.delete(norm(x.nome)));   // destravado à mão manda
+  base.forEach(r=>{if(veioDoInvestor(r)&&r.assessor)m.set(invKey(r.assessor),r.assessor)});
+  invRows('feito').forEach(x=>m.set(invKey(x.nome),x.nome));
+  invRows('naofeito').forEach(x=>m.delete(invKey(x.nome)));   // destravado à mão manda
   const v=[...m.values()];
   window.__invF={k:sel,v};
   return v;
@@ -11983,7 +12285,7 @@ function invPendentesDoAss(nome){
   const cart=invCarteira(),ass=nome||invAss();if(!cart||!ass)return [];
   const M=invMarcas(),ix=invIndiceFunil(),out=[];
   cart.linhas.forEach(l=>{
-    if(norm(l[1])!==norm(ass))return;
+    if(invKey(l[1])!==invKey(ass))return;
     INV_PROD.forEach(P=>{
       if(!M[invChave(l[0],P.k)])return;
       if(invNoFunil(ix,l[3],P.area))return;
@@ -12061,7 +12363,7 @@ async function invFechaAssessor(nome,forcar){
   await invMarca('naofeito',ass,false);
   invLimpaCacheFeitos();renderInvestor();
 }
-const invFeito=nome=>invFeitos().some(n=>norm(n)===norm(nome));
+const invFeito=nome=>invFeitos().some(n=>invKey(n)===invKey(nome));
 function invSoFaltam(el){window._invFalta=!!el.checked;renderInvestor()}
 
 // ── QUEM NÃO ENTRA NA VARREDURA ──
@@ -12156,19 +12458,19 @@ function invConta(P,ass){
   const cart=invCarteira();
   const out={pend:0,ger:0,total:0,pendL:[],gerL:[]};
   if(!cart)return out;
-  const M=invMarcas(),ix=invIndiceFunil(),so=norm(ass||'');
+  const M=invMarcas(),ix=invIndiceFunil(),so=ass?invKey(ass):'';
   // a gerar: marcado na planilha e ainda fora do funil
   cart.linhas.forEach(l=>{
     if(invAncora(l)||invEstaFora(l[1]))return;
-    if(so&&norm(l[1])!==so)return;
+    if(so&&invKey(l[1])!==so)return;
     if(!M[invChave(l[0],P.k)])return;
     if(invNoFunil(ix,l[3],P.area))return;
     out.pendL.push({cliente:l[3],assessor:l[1],fone:l[4]||''});
   });
   // no funil: o que a varredura já criou
   (OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS).forEach(r=>{
-    if(r.fonte!=='Investor'||r.area!==P.area)return;
-    if(so&&norm(r.assessor||'')!==so)return;
+    if(!veioDoInvestor(r)||r.area!==P.area)return;
+    if(so&&invKey(r.assessor)!==so)return;
     out.gerL.push({cliente:r.cliente,assessor:r.assessor,id:r.id,sc:r.sc});
   });
   out.pendL.sort((a,b)=>String(a.cliente).localeCompare(b.cliente));
@@ -12215,7 +12517,7 @@ function invMatriz(){
   const porAss={},porArea={},clientes=new Set();
   let total=0;
   base.forEach(r=>{
-    if(r.fonte!=='Investor')return;
+    if(!veioDoInvestor(r))return;
     const P=INV_PROD.find(x=>x.area===r.area);if(!P)return;
     const a=(r.assessor||'(sem assessor)').trim();
     porAss[a]=porAss[a]||{nome:a,tot:0};
@@ -12452,7 +12754,7 @@ function renderInvestor(c){
   const ass=new Map();
   cart.linhas.forEach(l=>{
     const n=(l[1]||'').trim()||'(sem assessor)';
-    if(!ass.has(n))ass.set(n,{n,tot:0,marc:0,man:0,ger:G[norm(n)]||0});
+    if(!ass.has(n))ass.set(n,{n,tot:0,marc:0,man:0,ger:G[invKey(n)]||0});
     const a=ass.get(n);
     if(invAncora(l))return;
     a.tot++;if(l[6])a.man++;
