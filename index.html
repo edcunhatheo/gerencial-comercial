@@ -2694,7 +2694,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261115-2050';
+const APP_VERSION='20261115-2135';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -5175,10 +5175,11 @@ function renderSemana(c=document.getElementById('main-content')){
 // Caixa que não se esvazia com um clique vira relatório, então toda linha
 // traz aqui dentro o gesto que a resolve.
 const TAR_REU=new Set(['r1','r2']);
-// Prospecção não vira tarefa: em "Ligar Cliente" e "Agendar Reunião" a
-// própria coluna já diz o que fazer, e exigir TODO ali só enchia a lista de
-// ruído — eram 348 dos 396 TODOs vencidos. Quem topou também fica de fora:
-// o próximo passo dele é a data da boleta, que tem caixa própria.
+// Prospecção não vira tarefa em caixa NENHUMA: em "Ligar Cliente" e
+// "Agendar Reunião" a própria coluna já diz o que fazer, e exigir TODO ou
+// cobrar parada ali só enchia a lista de ruído — eram 348 dos 396 TODOs
+// vencidos e 141 das 211 paradas. Quem topou também fica de fora: o próximo
+// passo dele é a data da boleta, que tem caixa própria.
 const TAR_PROSPECCAO=new Set(['agendar','ligar']);
 const tarSoPipeline=r=>!TAR_PROSPECCAO.has(etapaFunil(r));
 const tarHoje=()=>localISO(new Date());
@@ -5228,7 +5229,7 @@ const TAREFAS={
     acoes:[['Escrever TODO','tarTodo',0]]},
   parada:{rot:'Parada há mais de 7 dias',cor:'#B0ACA7',
     sub:'ninguém tocou no card na última semana',
-    fn:r=>tarParado(r)>7,
+    fn:r=>tarSoPipeline(r)&&tarParado(r)>7,
     diz:r=>tarParado(r)+' dias sem nenhum movimento',
     acoes:[['Escrever TODO','tarTodo',0]]},
 };
@@ -5262,8 +5263,8 @@ function renderTarefas(c=document.getElementById('main-content')){
       +'<span>clique numa caixa para ver os nomes e resolver ali mesmo</span></div>'
       +'<div class="tr-grid">'+caixas+'</div>'
       +'<div class="sw-prox-nota">Um card pode aparecer em mais de uma caixa — são perguntas diferentes '
-      +'sobre o mesmo atraso. <b>Prospecção não gera tarefa</b>: em “Ligar Cliente” e “Agendar Reunião” a '
-      +'própria coluna já diz o que fazer, então elas só aparecem em “parada há mais de 7 dias”.</div>'
+      +'sobre o mesmo atraso. <b>Prospecção não entra em nenhuma</b>: em “Ligar Cliente” e “Agendar Reunião” '
+      +'a própria coluna já diz o que fazer.</div>'
     +'</div>';
 }
 // ── a lista, com o gesto que resolve ──
