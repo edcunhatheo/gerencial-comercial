@@ -494,6 +494,11 @@ tr.bol td{background:var(--green-bg)}
 .tr-ac button.w{background:var(--wine);border-color:var(--wine);color:#fff}
 .tr-mais{font-size:11.5px;color:var(--muted);padding:9px 2px}
 .tr-vz{padding:22px;text-align:center;color:var(--muted-l);font-style:italic}
+.tr-massa{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px;padding:10px 13px;
+  background:var(--wine-l);border:1px solid var(--accent-b);border-radius:3px;font-size:12px}
+.tr-massa select{font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:3px;
+  background:var(--card);color:var(--text)}
+.tr-massa i{font-style:normal;font-size:10.5px;color:var(--muted)}
 .sw-prox{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}
 .sw-prox .sw-passo{flex:none;min-width:0}
 .sw-prox-nota{font-size:11.5px;color:var(--muted);margin-top:11px}
@@ -2694,7 +2699,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261115-2135';
+const APP_VERSION='20261115-2305';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3301,8 +3306,8 @@ function buildNav(){
   const tabs=isDiretor
     ?[['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-semana','A semana','semana'],['d-tarefas','Tarefas','tarefas'],['d-guia','Guia do dia','guia'],['d-investor','Investor','carteira'],['d-agenda','Agenda','agenda'],['d-metas','Definições do mês','metas'],['d-historico','Histórico','hist'],['d-upload','Upload','upload'],['d-usuarios','Usuários','usuar']]
     :USER.perfil==='head'
-    ?[['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-tarefas','Tarefas','tarefas'],['d-guia','Guia do dia','guia'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']]
-    :[['a-opps','Guia do dia','guia'],['d-tarefas','Tarefas','tarefas'],['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']];
+    ?[['d-macro','Funis de venda','funil'],['d-ativ','Atividade','ativ'],['d-tarefas','Tarefas','tarefas'],['d-guia','Guia do dia','guia'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']]
+    :[['a-opps','Guia do dia','guia'],['d-tarefas','Tarefas','tarefas'],['d-macro','Funis de venda','funil'],['d-ativ','Atividade','ativ'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,lb,ic])=>
     `<button class="nav-tab${v===curView?' active':''}" title="${lb}" onclick="setView('${v}',this)">${svgIco(ic)}<span class="tab-lb">${lb}</span></button>`).join('');
   window._tabLabels=Object.fromEntries(tabs.map(([v,lb])=>[v,lb]));
@@ -3529,8 +3534,11 @@ function recorteEmpresaHtml(){
 // de descer para o quadro. O card para na projeção; produto é detalhe e abre
 // num clique.
 function blocoAreasHtml(){
+  // O MESMO QUADRO, O RECORTE DE CADA UM. Para o diretor visivelParaMim é
+  // sempre verdadeiro, então nada muda; para o closer, o card passa a contar
+  // só as oportunidades dele — inclusive as que ele boletou.
   const aData=areasVis().map(([ak,a])=>{
-    const rows=OPPS.filter(r=>r.area===ak);
+    const rows=OPPS.filter(r=>r.area===ak&&visivelParaMim(r));
     const bol=somaBol(rows);
     const bolN2=rows.filter(isBol).length;
     const abol=somaAbol(rows), abolN=rows.filter(isABoletar).length;
@@ -3543,7 +3551,7 @@ function blocoAreasHtml(){
   return `
   <div id="dash-areas">
   <div class="section-label">Desempenho por área ${recorteEmpresaHtml()}</div>
-  ${linhaConferencia()}
+  ${USER&&USER.perfil==='diretor'?linhaConferencia():''}
   <div class="area-cards">
     ${aData.map(({ak,a,rows,bol,bolN:bN,abol,abolN,pipe:p,pend:pend2,ef,pct})=>`
     <div class="area-card${rows.length?' clicavel':''}" style="border-left-color:${a.color}"${rows.length?` onclick="abrirBoletasArea('${ak}')" title="Ver boletas fechadas e topadas de ${a.name}"`:''}>
@@ -5181,6 +5189,24 @@ const TAR_REU=new Set(['r1','r2']);
 // vencidos e 141 das 211 paradas. Quem topou também fica de fora: o próximo
 // passo dele é a data da boleta, que tem caixa própria.
 const TAR_PROSPECCAO=new Set(['agendar','ligar']);
+// ── quem pode ser responsável ──
+// O responsável é o CLOSER: quem leva o cliente da reunião até a boleta.
+// Sales ops, head e diretor cobram, não respondem pelo card. Um card no nome
+// de quem não fecha é um card sem dono com aparência de dono — e ele some da
+// tela de quem deveria estar com ele.
+function tarClosersDe(r){
+  return (USUARIOS||[]).filter(u=>u.ativo&&perfilOk(u)==='closer')
+    .filter(u=>!r||trabalhaArea(u.nome,r.area))
+    .filter(u=>!r||trabalhaEmpresa(u.nome,empresaDe(r)))
+    .map(u=>u.nome);
+}
+function tarPapelDe(nome){
+  const u=(USUARIOS||[]).find(x=>x.ativo&&norm(x.nome)===norm(nome));
+  return u?perfilOk(u):'';
+}
+const tarEhCloser=nome=>tarPapelDe(nome)==='closer';
+// quanto mais adiantado o card, pior é estar sem dono
+const TAR_GRAVIDADE={topou:0,conf:1,r2:2,ar2:3,r1:4,agendar:6,'':5};
 const tarSoPipeline=r=>!TAR_PROSPECCAO.has(etapaFunil(r));
 const tarHoje=()=>localISO(new Date());
 const tarDataReu=r=>isoDia(r.reuniao_data)||dataR2(r)||'';
@@ -5204,6 +5230,16 @@ const TAREFAS={
     fn:r=>TAR_REU.has(etapaFunil(r))&&!tarDataReu(r),
     diz:r=>'em “'+(r.sc||'—')+'” há '+tarParado(r)+' dias, sem data nenhuma',
     acoes:[['Marcar data','abrirCaixaMarcar',1]]},
+  semcloser:{rot:'Sem closer responsável',cor:'#6B1C2C',
+    sub:'card sem dono, ou no nome de quem não fecha',
+    fn:r=>{if(!tarSoPipeline(r))return false;          // prospecção não entra, aqui também não
+      const d=String(r.responsavel||'').trim();return !d||!tarEhCloser(d)},
+    ordem:r=>(TAR_GRAVIDADE[etapaFunil(r)]==null?7:TAR_GRAVIDADE[etapaFunil(r)]),
+    diz:r=>{const d=String(r.responsavel||'').trim();
+      if(!d)return 'sem responsável, em “'+(r.sc||'sem status')+'”';
+      const p=tarPapelDe(d);
+      return d+' é '+(p?PERFIL_ROT(p).toLowerCase():'de fora do cadastro')+', não closer';},
+    acoes:[['Pôr o closer','tarCloser',1]]},
   topousemboleta:{rot:'Topou sem data de boleta',cor:'#8B1C2A',
     sub:'o cliente disse sim e a boleta não tem dia',
     fn:r=>norm(r.sc||'').includes('topou')&&!parseDataBoleta(r.data_boleta),
@@ -5233,11 +5269,12 @@ const TAREFAS={
     diz:r=>tarParado(r)+' dias sem nenhum movimento',
     acoes:[['Escrever TODO','tarTodo',0]]},
 };
-const TAR_ORDEM=['reuvencida','reusemdata','topousemboleta','sempasso','todovenc','travada','parada'];
+const TAR_ORDEM=['reuvencida','reusemdata','semcloser','topousemboleta','sempasso','todovenc','travada','parada'];
 const TAR_TETO=25;                      // a lista abre nas maiores; o resto vem no "ver todas"
 function tarItens(k){
   const T=TAREFAS[k];if(!T)return [];
-  return tarBase().filter(T.fn).sort((a,b)=>tarVal(b)-tarVal(a)
+  const g=T.ordem||(()=>0);
+  return tarBase().filter(T.fn).sort((a,b)=>g(a)-g(b)||tarVal(b)-tarVal(a)
     ||String(a.cliente||'').localeCompare(String(b.cliente||'')));
 }
 // ── a tela ──
@@ -5292,6 +5329,11 @@ function tarAbrir(k,todas){
     +'<div class="tbl-wrap" style="max-height:58vh;overflow:auto"><table class="tr-tbl">'
     +'<thead><tr><th>Cliente</th><th>Por que está aqui</th><th style="text-align:right">Volume</th><th></th></tr></thead>'
     +'<tbody>'+linhas+'</tbody></table></div>'
+    +(k==='semcloser'?(()=>{const nomes=tarClosersDe(null);
+        return nomes.length?'<div class="tr-massa">Atribuir <b>'+l.length+'</b> de uma vez a '
+          +'<select id="tr-clm">'+nomes.map(n=>'<option>'+n+'</option>').join('')+'</select>'
+          +'<button class="btn sm" onclick="tarCloserEmMassa()">Aplicar</button>'
+          +'<i>só entram as da área e empresa dele</i></div>':''})():'')
     +(l.length>mostra.length
       ? '<div class="tr-mais">Mostrando as '+mostra.length+' maiores · '
         +'<span class="inv-lk" onclick="tarAbrir(\''+k+'\',1)">ver todas as '+l.length+'</span></div>'
@@ -5372,6 +5414,66 @@ async function tarSoConcluir(id){
     Object.assign(r,{todo:'',todo_data:null,historico:hist,updated_at:now.toISOString()});
     closeModal('gesto');showToast('TODO concluído — o card ficou sem próximo passo',true);tarRepinta();
   }catch(e){showToast('Não consegui salvar: '+e.message)}
+}
+function tarCloser(id){
+  const r=acharOpp(id);if(!r)return;
+  const nomes=tarClosersDe(r);
+  const atual=String(r.responsavel||'').trim();
+  document.getElementById('gs-title').textContent='Closer responsável — '+(r.cliente||'cliente');
+  document.getElementById('gs-body').innerHTML=
+    '<div class="gs-nota">Quem leva este cliente da reunião até a boleta. Só closer entra aqui — '
+    +'sales ops, head e diretor cobram, não respondem pelo card.</div>'
+    +(atual?'<div class="gs-nota">Hoje está com <b>'+atual+'</b>'
+       +(tarPapelDe(atual)?' ('+PERFIL_ROT(tarPapelDe(atual)).toLowerCase()+')':' — fora do cadastro')+'.</div>':'')
+    +(nomes.length
+      ? '<div class="gs-f" style="margin-top:11px"><label style="grid-column:span 2"><span>Closer</span>'
+        +'<select id="tr-cl">'+nomes.map(n=>'<option'+(norm(n)===norm(atual)?' selected':'')+'>'+n+'</option>').join('')
+        +'</select></label></div>'
+      : '<div class="gs-nota" style="color:var(--amber)">Nenhum closer cadastrado para '
+        +((AREAS[r.area]||{}).name||r.area)+' nesta empresa. Cadastre em <b>Usuários</b>.</div>')
+    +'<div class="gs-acoes">'
+      +(nomes.length?'<button class="btn wine" onclick="tarSalvarCloser(\''+id+'\')">Salvar</button>':'')
+      +'<button class="btn" onclick="closeModal(\'gesto\')">Cancelar</button></div>';
+  document.getElementById('modal-gesto').style.display='flex';
+}
+async function tarSalvarCloser(id){
+  const r=acharOpp(id);if(!r)return;
+  const nome=(document.getElementById('tr-cl')||{}).value||'';
+  if(!nome){showToast('Escolha o closer');return}
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const hist=[...(r.historico||[]),{campo:'Responsável',de:String(r.responsavel||''),para:nome,
+    usuario:USER.nome,data:ds}];
+  try{
+    await db('PATCH','oportunidades',{responsavel:nome,historico:hist,updated_at:now.toISOString()},'id=eq.'+id);
+    Object.assign(r,{responsavel:nome,historico:hist,updated_at:now.toISOString()});
+    closeModal('gesto');showToast('Agora é do '+nome,true);tarRepinta();
+  }catch(e){showToast('Não consegui salvar: '+e.message)}
+}
+// em massa: a lista inteira que está na tela, um closer só
+async function tarCloserEmMassa(){
+  const l=tarItens('semcloser');
+  if(!l.length){showToast('Nada para atribuir');return}
+  const nome=(document.getElementById('tr-clm')||{}).value||'';
+  if(!nome){showToast('Escolha o closer');return}
+  const alvo=l.filter(r=>tarClosersDe(r).some(n=>norm(n)===norm(nome)));
+  const fora=l.length-alvo.length;
+  if(!alvo.length){showToast(nome+' não atende nenhuma destas áreas');return}
+  if(!confirm('Pôr '+nome+' como closer de '+alvo.length+' oportunidade'+(alvo.length>1?'s':'')+'?\n\n'
+    +(fora?fora+' ficam de fora por serem de outra área ou empresa.\n\n':'')
+    +'Dá para mudar card a card depois.'))return;
+  let ok=0;
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  for(const r of alvo){
+    const hist=[...(r.historico||[]),{campo:'Responsável',de:String(r.responsavel||''),para:nome,
+      usuario:USER.nome,data:ds}];
+    try{
+      await db('PATCH','oportunidades',{responsavel:nome,historico:hist,updated_at:now.toISOString()},'id=eq.'+r.id);
+      Object.assign(r,{responsavel:nome,historico:hist,updated_at:now.toISOString()});ok++;
+    }catch(e){showToast('Parei em '+(r.cliente||'uma')+': '+e.message);break}
+  }
+  showToast(ok+' oportunidade'+(ok===1?'':'s')+' agora com '+nome,true);tarRepinta();
 }
 function tarDataBoleta(id){
   const r=acharOpp(id);if(!r)return;
@@ -5690,7 +5792,7 @@ function renderMacro(c=document.getElementById('main-content')){
     +'<div><h2 class="mc-tit">Funis de Venda — '+(empAtual()?empNome(empAtual()):'Quark e QRK')+'</h2>'
     +'<div class="mc-sub">'+sub+'</div></div>'
     +'<div class="mc-ctr">'
-      +'<button class="mc-per" onclick="setView(\'d-daily\')">Daily de hoje</button>'
+      +(USER&&USER.perfil==='diretor'?'<button class="mc-per" onclick="setView(\'d-daily\')">Daily de hoje</button>':'')
       +'<div class="mc-pers">'+MC_PERS.map(x=>bt(x[0],x[1])).join('')+'</div>'
     +'</div></div>'
     +'<div class="mc-grid">'+areas.map(([ak,a])=>cardFunilArea(ak,a)).join('')+'</div>';
@@ -9383,13 +9485,13 @@ function linhaDoRecorte(){
   const as=(USER.areas||[]).map(k=>(AREAS[k]||{}).name||k);
   const onde=as.length?as.join(', '):'<b style="color:var(--red)">nenhuma área no seu cadastro</b>';
   const emps=(USER.empresas||[]).map(empNome);
-  const regra=USER.perfil==='closer'?'<b>as suas reuniões</b>, da <b>Reunião agendada</b> em diante'
+  const regra=USER.perfil==='closer'?'<b>os cards com o seu nome</b>, de <b>Agendar Reunião</b> em diante'
     :USER.perfil==='ops'?'o funil inteiro'
     :USER.perfil==='head'?'tudo do time':'o que é seu';
   return '<div class="recorte"><b>'+PERFIL_ROT(USER.perfil)+'</b> · você está vendo '+regra
     +' em <b>'+(as.length?as.join(', '):onde)+'</b>'
     +' · <b>'+(emps.join(' e ')||'—')+'</b>'
-    +(USER.perfil==='closer'?' — reunião de outro closer e as colunas de prospecção não aparecem aqui':'')
+    +(USER.perfil==='closer'?' — card de outro closer, card sem dono em Agendar Reunião e a fila de Ligar Cliente não aparecem aqui':'')
     +'</div>'+blocoVazio();
 }
 
@@ -9703,7 +9805,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   });
 
   c.innerHTML=''
-    +(isDir?blocoAreasHtml():linhaDoRecorte())
+    +blocoAreasHtml()+(isDir?'':linhaDoRecorte())
 
     // Nova oportunidade · virada de mês
     +'<div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">'
@@ -11447,7 +11549,7 @@ function abrirFunilEtapa(k){
 // ══════════════════════════════════════════════════════════
 function abrirBoletasArea(ak){
   const a=AREAS[ak]||{name:ak,color:'var(--wine)'};
-  const rows=OPPS.filter(r=>r.area===ak);
+  const rows=OPPS.filter(r=>r.area===ak&&visivelParaMim(r));
   const fechadas=rows.filter(isBoletadoFirmado).sort((x,y)=>(y.atual||0)-(x.atual||0));
   const aBoletar=rows.filter(isABoletar).sort((x,y)=>(y.atual||y.pipe||0)-(x.atual||x.pipe||0));
   // mesma regra da caixa "Topadas" do card: topou, ainda não fechou e não foi perdida
