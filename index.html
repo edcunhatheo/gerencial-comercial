@@ -1858,6 +1858,11 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
         <div id="e-empresa-aviso" style="font-size:10.5px;color:var(--muted-l);margin-top:4px"></div>
       </div>
     </div>
+    <div class="form-row">
+      <div class="fg"><label>Corretor parceiro <span style="font-weight:400;text-transform:none;font-size:9px">(THE INVESTOR — aparece no hub dele)</span></label>
+        <select id="e-parc"><option value="">Nenhum</option></select>
+      </div>
+    </div>
     <div class="fg"><label>Confirmar o que aconteceu <span style="font-weight:400;text-transform:none;font-size:9px">(salva na hora)</span></label>
       <div id="e-marcas" style="display:flex;gap:8px;flex-wrap:wrap"></div>
     </div>
@@ -2013,6 +2018,9 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
       <div class="fg"><label>Responsável (time)</label>
         <select id="n-resp"><option value="">Sem responsável</option></select>
       </div>
+    </div>
+    <div class="fg"><label>Corretor parceiro <span style="font-weight:400;text-transform:none;font-size:9px">(THE INVESTOR — aparece no hub dele)</span></label>
+      <select id="n-parc"><option value="">Nenhum</option></select>
     </div>
     <div class="fg"><label>Observação</label>
       <textarea id="n-obs" placeholder="Observações..."></textarea>
@@ -10689,6 +10697,7 @@ function openEdit(id){
   const timeUsers=USUARIOS.filter(u=>u.ativo&&u.perfil!=='diretor').map(u=>u.nome);
   respSel.innerHTML='<option value="">Sem responsável</option>'+timeUsers.map(n=>'<option'+(norm(n)===norm(r.responsavel||'')?' selected':'')+'>'+n+'</option>').join('');
   if(r.responsavel&&!timeUsers.some(n=>norm(n)===norm(r.responsavel)))respSel.innerHTML+='<option selected>'+r.responsavel+'</option>';
+  (function(){const s=document.getElementById('e-parc');if(s)s.innerHTML=opcoesParceiro(parceiroDe(r));})();
   document.getElementById('e-obs').value='';
   const obsBox=document.getElementById('e-obs-atual');
   if(r.obs&&limpaTraco(r.obs)){obsBox.style.display='block';document.getElementById('e-obs-atual-txt').textContent=r.obs;}
@@ -10752,6 +10761,8 @@ async function saveEdit(){
     empNova=empOk(sel.value);
     hist.push(Object.assign(marcaEmpresa(empNova,ds),{de:de}));
   })();
+  (function(){const s=document.getElementById('e-parc');if(!s)return;const de=parceiroDe(r),para=s.value||'';
+    if(para!==de)hist.push({campo:CAMPO_PARCEIRO,de:de,para:para,usuario:USER.nome,data:ds});})();
   const newObs=document.getElementById('e-obs').value.trim();
   if(newObs)hist.push({campo:'Observação',de:'',para:newObs,usuario:USER.nome,data:ds});
   const retro=arquivoRetroativo(r,newSc,newPb,document.getElementById('e-data').value,ds);
@@ -10816,6 +10827,7 @@ function openNewOpp(){
     selE.innerHTML=minhas.map(e=>'<option value="'+e+'"'+(e===padrao?' selected':'')+'>'+EMPRESAS[e].nome+'</option>').join('');
     wrapE.style.display='flex';
   }else{selE.innerHTML='<option value="'+padrao+'" selected>'+EMPRESAS[padrao].nome+'</option>';wrapE.style.display='none';}
+  (function(){const s=document.getElementById('n-parc');if(s)s.innerHTML=opcoesParceiro('');})();
   document.getElementById('modal-newopp').style.display='flex';
 }
 
@@ -10843,14 +10855,15 @@ async function saveNewOpp(){
     fonte:'Manual',
     historico:[{campo:'Criação',de:'',para:'Oportunidade criada manualmente',usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})},
       ...((document.getElementById('n-reuniao-hora')||{}).value?[{campo:CAMPO_HORA,de:'',para:document.getElementById('n-reuniao-hora').value,usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}]:[]),
-      marcaEmpresa(lerSel('n-empresa')||empParaGravar(),now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}))]
+      marcaEmpresa(lerSel('n-empresa')||empParaGravar(),now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})),
+      ...(((document.getElementById('n-parc')||{}).value)?[{campo:CAMPO_PARCEIRO,de:'',para:document.getElementById('n-parc').value,usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}]:[])]
   };
   try{
     const criada=await db('POST','oportunidades',[opp]);
     const idNovo=(criada&&criada[0]&&criada[0].id)||'';
     showToast('Oportunidade criada!',true);
     closeModal('newopp');
-    ['n-assessor','n-cliente','n-produto','n-pipe','n-atual','n-sc','n-pb','n-todo','n-todo-data','n-reuniao','n-reuniao-hora','n-resp','n-obs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['n-assessor','n-cliente','n-produto','n-pipe','n-atual','n-sc','n-pb','n-todo','n-todo-data','n-reuniao','n-reuniao-hora','n-resp','n-obs','n-parc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     if(idNovo)setTimeout(()=>sincronizarAgenda(idNovo),600);
     await loadData();
     renderCurView();
@@ -11383,6 +11396,16 @@ const CAMPO_LIG_DATA='Ligação marcada';
 // A coluna reuniao_data só guarda o dia. A HORA e o id do evento criado na
 // agenda viajam como marcadores no histórico — a última entrada é a que vale.
 const CAMPO_HORA='Hora da reunião';
+// ── CORRETOR PARCEIRO (THE INVESTOR) ── quem enxerga este card no hub do corretor.
+// Fica no histórico, como a empresa: o último carimbo vale.
+const CAMPO_PARCEIRO='Corretor parceiro';
+const CORRETORES_PARCEIROS=['Franklin Lacerda','Julien Jonathan Gilleman','Carlos Sanches','Jackson Rocha de Oliveira','Rita de Cassia Polese Rocha','Carlos Rodney Santos Pinto','Gustavo Pelegrines','Laís Santos','Jose de Paula Junior','Rodrigo Vancini','Vinicios Motta','Adriano Porto','Anderson','Beth Tavares','Lucas Medeiros','Fernando Henrique Baena Alli','Cristina Urias','Poliana Zocal','Flávia Patrícia Novais Machado','Luci Jones Fernandes Cunha Brandao','Everton Queiros de Oliveira','Alexandre Cox de Barros Dias Filho','Marcel Costa','Sara Helena Vargas de Andrade','Lucas Brandão Viegas de Freitas','Maria Antonia','Mariana Brasil','Camila Correa Antunes Pereira','Pedro Henrique Cubas Peres','Matheus Vinicius Ribeiro','ILMARA MARTINS','GIOVANNI','ODAIR JUNIOR CLAUDINO','Rafael Gomes','Erica Lopes','Julio Louvisi','Bruno Bernardes','Joalline Vilela','Dalton Nunes Gonçalves Junior','Renato Carlos Evangelista','Andre Palm'];
+function parceiroDe(r){let p='';(r.historico||[]).forEach(h=>{if(h&&h.campo===CAMPO_PARCEIRO)p=String(h.para||'')});return p;}
+function opcoesParceiro(atual){
+  const lista=[...CORRETORES_PARCEIROS].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  if(atual&&!lista.includes(atual))lista.unshift(atual);
+  return '<option value="">Nenhum</option>'+lista.map(n=>'<option'+(n===atual?' selected':'')+'>'+n.replace(/</g,'&lt;')+'</option>').join('');
+}
 const CAMPO_EVENTO='Evento na agenda';
 function horaReuniao(r){
   let v='';
