@@ -286,14 +286,31 @@ tr.bol td{background:var(--green-bg)}
 .kb-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;align-items:flex-start}
 .kb-col{min-width:262px;max-width:262px;background:var(--surf3);border-radius:3px;padding:10px;flex-shrink:0}
 /* filtro de reuniões por período, em cima do quadro */
-.kb-perbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 10px}
-.kb-perlb{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-right:3px}
-.kb-per{font-size:11px;font-weight:700;padding:5px 11px;border:1px solid var(--border);background:var(--card);
+.kb-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:24px 0 9px}
+.kb-hint{font-size:11px;color:var(--muted-l)}
+.kb-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:var(--surf2);
+  border:1px solid var(--border);border-radius:7px;padding:8px 10px;margin-bottom:12px}
+.kb-sep{width:1px;align-self:stretch;background:var(--border);margin:1px 1px}
+.kb-fs{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1 1 420px;min-width:0}
+.kb-dupla{display:inline-flex;align-items:center;gap:4px}
+.kb-seg{display:flex;border:1px solid var(--border);border-radius:5px;overflow:hidden;background:var(--card);flex-shrink:0}
+.kb-seg button{padding:6px 13px;font-size:11px;font-weight:700;border:none;cursor:pointer;
+  background:transparent;color:var(--muted);font-family:inherit}
+.kb-seg button:hover{color:var(--wine)}
+.kb-seg button.on{background:var(--wine);color:#fff}
+.kb-mini{border:1px solid var(--border);background:var(--card);color:var(--muted);border-radius:5px;
+  padding:5px 7px;font-size:11px;line-height:1;cursor:pointer}
+.kb-mini:hover{border-color:var(--wine);color:var(--wine)}
+.kb-limpa{font-size:11px;font-weight:700;border:1px solid var(--accent-b);background:var(--wine-ll);
+  color:var(--wine-d);border-radius:5px;padding:6px 11px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.kb-limpa:hover{background:var(--wine);color:#fff;border-color:var(--wine)}
+.kb-per-legado{font-size:11px;font-weight:700;padding:5px 11px;border:1px solid var(--border);background:var(--card);
   color:var(--muted);border-radius:999px;cursor:pointer;transition:.12s}
 .kb-per:hover{border-color:var(--accent-b);color:var(--wine-d)}
 .kb-per.on{background:var(--wine);border-color:var(--wine);color:#fff}
 .kb-per.lim{border-style:dashed;font-weight:400}
-.kb-perdt{font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:999px;background:var(--card);color:var(--muted);cursor:pointer}
+.kb-perdt{font-size:11.5px;padding:5px 8px;border:1px solid var(--wine);border-radius:5px;
+  background:var(--card);color:var(--wine-d);font-weight:700;cursor:pointer;font-family:inherit}
 .kb-perot{font-size:11.5px;color:var(--wine-d);font-weight:700;margin-left:4px}
 .kb-col-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
 .kb-count{background:var(--card);border-radius:4px;padding:1px 8px;font-size:10px;font-weight:700;color:var(--muted)}
@@ -305,7 +322,16 @@ tr.bol td{background:var(--green-bg)}
 .cal-d{font-size:11px;font-weight:700;color:var(--muted);min-width:34px}
 .cal-cli{font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cal-sub{font-size:10.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cal-bt{cursor:pointer;opacity:.5;font-size:14px}.cal-bt:hover{opacity:1}
+.cal-bt{cursor:pointer;opacity:.5;font-size:14px;line-height:0;display:inline-flex}.cal-bt:hover{opacity:1}
+/* ── chip de meta: clicável, com lápis e × ── */
+.mt-chip{display:inline-flex;align-items:center;gap:4px;background:var(--surf2);
+  border:1px solid var(--border-l);border-radius:4px;padding:2px 8px;font-size:9.5px;white-space:nowrap}
+.mt-chip.ed{cursor:pointer;transition:background .12s,border-color .12s}
+.mt-chip.ed:hover{background:var(--wine-l);border-color:var(--accent-b)}
+.mt-pt{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.mt-bt{cursor:pointer;opacity:.45;font-size:11px;padding:0 1px}
+.mt-bt:hover{opacity:1;color:var(--wine)}
+.mt-bt.x:hover{color:var(--red)}
 /* ══ FUNIS DE VENDA ══ */
 .mc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
 .mc-tit{font-size:23px;font-weight:700;letter-spacing:-.01em;color:var(--wine);line-height:1.15}
@@ -369,6 +395,7 @@ tr.bol td{background:var(--green-bg)}
 /* ══ CAIXA DE GESTO ══ */
 #modal-gesto .modal{padding:0}
 #modal-gesto.larga .modal{max-width:780px!important}
+#modal-area.sb .modal{max-width:1180px!important;max-height:94vh}
 #gs-body{padding:16px 20px 18px}
 .gs-f{display:grid;grid-template-columns:1fr 110px;gap:10px}
 .gs-f label{display:grid;gap:4px}
@@ -465,6 +492,23 @@ tr.bol td{background:var(--green-bg)}
 .sw-lg i{width:10px;height:10px;border-radius:2px;display:inline-block;border:1px solid rgba(0,0,0,.08)}
 .sw-lg b{color:var(--text)}
 .sw-est{display:flex;align-items:stretch;flex-wrap:wrap;gap:0}
+/* ── o que a pessoa fez ── */
+.fz-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.fz-tbl th{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);
+  padding:7px 9px;border-bottom:1px solid var(--border);text-align:center;background:var(--surf2)}
+.fz-tbl th:first-child{text-align:left}
+.fz-tbl td{padding:7px 9px;border-bottom:1px solid var(--border);text-align:center;
+  font-variant-numeric:tabular-nums}
+.fz-tbl td:first-child{text-align:left;font-weight:600}
+.fz-tbl td.n{font-weight:700;color:var(--wine-d);cursor:pointer;border-radius:3px}
+.fz-tbl td.n:hover{background:var(--wine-l)}
+.fz-tbl td.z{color:var(--muted-l)}
+.fz-tbl tfoot td{border-top:1.5px solid var(--border);border-bottom:0;font-weight:800;
+  background:var(--surf2);color:var(--wine)}
+.fz-tbl tr.eu td{background:var(--wine-ll)}
+.fz-nome{display:flex;align-items:center;gap:7px}
+.fz-nome i{font-style:normal;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:1px 5px}
 /* ── TAREFAS ── */
 .tr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:11px}
 .tr-c{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--bc,var(--wine));
@@ -500,7 +544,7 @@ tr.bol td{background:var(--green-bg)}
   background:var(--card);color:var(--text)}
 .tr-massa i{font-style:normal;font-size:10.5px;color:var(--muted)}
 .sw-prox{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}
-.sw-prox .sw-passo{flex:none;min-width:0}
+.sw-prox .sw-passo{flex:none;min-width:0;display:flex;flex-direction:column;justify-content:center}
 .sw-prox-nota{font-size:11.5px;color:var(--muted);margin-top:11px}
 /* o volume de cada oportunidade na lista, e a soma embaixo */
 .sw-val{text-align:right;font-weight:700;color:var(--wine-d);white-space:nowrap}
@@ -520,6 +564,17 @@ tr.bol td{background:var(--green-bg)}
 .sw-passo span{display:block;font-size:9.5px;font-weight:700;text-transform:uppercase;
   letter-spacing:.04em;color:var(--muted);margin-top:3px}
 .sw-passo i{display:block;font-style:normal;font-size:10px;color:var(--muted-l);margin-top:2px}
+/* o volume é o que o diretor procura primeiro: tem de se ler de longe */
+.sw-passo em{display:block;font-style:normal;font-size:17px;font-weight:800;letter-spacing:-.01em;
+  color:var(--wine-d);margin-top:5px;font-variant-numeric:tabular-nums;line-height:1.1}
+.sw-passo.marco em{color:var(--wine)}
+.sw-passo em small{display:block;font-size:9.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.04em;color:var(--muted-l);margin-top:1px}
+/* as duas caixas de estoque ficam empilhadas, uma sobre a outra */
+.sw-pilha{display:grid;grid-template-rows:1fr 1fr;gap:10px;min-width:0}
+.sw-pilha .sw-passo{padding:10px 8px}
+.sw-pilha .sw-passo b{font-size:22px}
+.sw-pilha .sw-passo em{font-size:15px;margin-top:3px}
 .sw-seta{display:flex;align-items:center;justify-content:center;width:46px;flex-shrink:0}
 .sw-seta span{font-size:10px;font-weight:700;color:var(--muted-l)}
 .sw-seta span::before{content:'→ ';color:var(--border)}
@@ -600,6 +655,15 @@ tr.bol td{background:var(--green-bg)}
 .dy-f{display:grid;gap:3px;font-size:10px;color:var(--muted)}
 .dy-f span{font-weight:700;text-transform:uppercase;letter-spacing:.03em}
 .dy-dica{display:block;font-size:9.5px;font-style:normal;color:var(--muted-l);margin-top:3px;line-height:1.3}
+.dy-foto{font-size:11px;color:var(--muted);background:var(--surf2);border:1px solid var(--border);
+  border-left:3px solid var(--wine);border-radius:3px;padding:8px 11px;margin-bottom:11px;line-height:1.45}
+.dy-foto.sem{border-left-color:var(--amber);color:var(--amber)}
+.dy-foto-bt{margin-left:7px;font-weight:700;color:var(--wine);cursor:pointer;text-decoration:underline;
+  text-underline-offset:2px}
+.dy-foto-bt:hover{color:var(--wine-d)}
+.dy-res-sep{width:1px;align-self:stretch;background:var(--border);margin:0 3px}
+.dy-i-mt{font-size:11px;padding:4px 7px;border:1px solid var(--border);border-radius:3px;
+  background:var(--surf2);color:var(--text);min-width:150px;flex:1}
 .dy-f input{font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:3px;background:var(--surf2);color:var(--text);width:100%}
 .dy-sub{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
   border-top:1px dashed var(--border);padding-top:8px;margin-top:2px}
@@ -635,7 +699,7 @@ tr.bol td{background:var(--green-bg)}
 .dy-x{border:none;background:transparent;color:var(--muted-l);font-size:15px;line-height:1;cursor:pointer;padding:0 2px;border-radius:3px}
 .dy-x:hover{background:var(--red-bg);color:var(--red)}
 .dy-res-g{grid-column:1/-1;grid-row:3;display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
-.dy-ln .dy-i-nx{grid-column:1/-1;grid-row:4;border:1px dashed var(--border);background:var(--card)}
+.dy-ln .dy-i-mt{grid-column:1/-1;grid-row:4;margin-top:2px}
 .dy-flag{grid-column:1/-1;font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--blue)}
 .dy-ln .dy-i-tp{font-size:8.5px}
 .dy-flag.ed{color:var(--amber)}
@@ -690,6 +754,9 @@ tr.bol td{background:var(--green-bg)}
   padding-top:9px;font-size:19.1px;color:#DDD7D1}
 .rep-tot b{font-family:'EB Garamond',Georgia,serif;font-size:26.4px;color:#AFA7A2}
 .rep-tot small{font-size:16.1px;color:#B0ACA7;font-family:'Inter',sans-serif;font-weight:400;margin-left:6px}
+.rep-tot.pg{border-top:none;margin-top:0;padding-top:3px}
+.rep-tot.pg span{color:#E8A0B0}
+.rep-tot.pg b{color:#E8A0B0}
 .rep-stats{display:flex;gap:34px;margin:4px 0 2px}
 .rep-stats div b{display:block;font-family:'EB Garamond',Georgia,serif;font-size:38px;font-weight:700;line-height:1.1}
 .rep-stats div b.g{color:#AFA7A2}
@@ -703,6 +770,7 @@ tr.bol td{background:var(--green-bg)}
 .rep-empty{font-size:18.2px;color:#85817C}
 .rep-sub{font-size:16.8px;color:#B0ACA7;margin:-1px 0 3px 0}
 .rep-sub i{font-style:normal;color:#DDD7D1}
+.rep-sub.mot{color:#E8CDD3;font-style:italic}
 .t-ok{font-size:15.4px;color:#D4586C;margin-left:6px;font-weight:500}
 .t-no{font-size:15.4px;color:#C09A9A;margin-left:6px;font-weight:500}
 .t-mid{font-size:15.4px;color:#AFA7A2;margin-left:6px;font-weight:500}
@@ -1065,6 +1133,46 @@ html[data-theme="dark"] .area-card.clicavel:hover{box-shadow:0 6px 20px rgba(0,0
 .ba-tbl tbody tr:hover td{background:var(--hover)}
 .ba-tbl td.val{font-weight:700;font-variant-numeric:tabular-nums}
 .ba-vazio{font-size:11.5px;color:var(--muted);padding:8px 0}
+.sb-h{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--wine);
+  margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border);
+  display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.sb-fil{font-size:10px;font-weight:700;color:var(--muted);text-transform:none;letter-spacing:0}
+.sb-fil button{margin-left:7px;border:1px solid var(--border);background:var(--card);color:var(--wine);
+  font-size:10px;font-weight:700;border-radius:999px;padding:2px 9px;cursor:pointer;font-family:inherit}
+.sb-fil button:hover{background:var(--wine);color:#fff;border-color:var(--wine)}
+.sb-bars{display:flex;align-items:flex-end;gap:5px;overflow-x:auto;padding:4px 2px 0;margin-bottom:4px}
+.sb-col{flex:1 1 54px;min-width:54px;max-width:104px;display:flex;flex-direction:column;align-items:center;
+  gap:3px;border-radius:5px;padding:4px 2px 5px;cursor:pointer}
+.sb-col:hover{background:var(--surf2)}
+.sb-col.vz{cursor:default;opacity:.5}
+.sb-col.vz:hover{background:transparent}
+.sb-col.on{background:var(--wine-ll);box-shadow:inset 0 0 0 1px var(--accent-b)}
+.sb-v{font-size:11px;font-weight:700;color:var(--wine-d);font-variant-numeric:tabular-nums;height:14px}
+.sb-tr{width:100%;height:92px;display:flex;align-items:flex-end;
+  background:linear-gradient(var(--border-l),var(--border-l)) no-repeat bottom/100% 1px}
+.sb-b{width:100%;background:var(--wine);border-radius:3px 3px 0 0;transition:height .4s ease}
+.sb-col.sem .sb-b{background:var(--amber)}
+.sb-col.sem .sb-v{color:var(--amber)}
+.sb-col.sem{margin-left:9px;border-left:1px dashed var(--border);padding-left:9px}
+.sb-m{font-size:10px;font-weight:700;color:var(--text);white-space:nowrap}
+.sb-q{font-size:9.5px;color:var(--muted-l);white-space:nowrap}
+.sb-tbl td{white-space:nowrap;overflow:visible;max-width:none}
+.sb-tbl tr{cursor:default}
+.sb-tbl tbody tr:hover td{background:transparent}
+.sb-dt{font-size:11px;padding:4px 7px;border:1px solid var(--border);border-radius:4px;
+  background:var(--card);color:var(--muted);font-family:inherit;cursor:pointer}
+.sb-dt.ok{border-color:var(--wine);color:var(--wine-d);font-weight:700}
+.sb-obs{font-size:11px;padding:4px 7px;border:1px solid var(--border);border-radius:4px;
+  background:var(--surf2);color:var(--text);font-family:inherit;min-width:170px;width:100%}
+.sb-obs:focus{background:var(--card);border-color:var(--wine);outline:none}
+.sb-vars{display:flex;flex-wrap:wrap;gap:6px}
+.sb-var{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:var(--wine-d);
+  background:var(--wine-ll);border:1px solid var(--accent-b);border-radius:999px;padding:4px 6px 4px 11px}
+.sb-var button{border:none;background:transparent;color:var(--wine);font-size:13px;line-height:1;
+  cursor:pointer;padding:0 2px;border-radius:50%}
+.sb-var button:hover{background:var(--wine);color:#fff}
+.kb-abre{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+.kb-abre:hover{opacity:.75}
 .quadro-ass{transition:box-shadow .15s,transform .15s}
 .quadro-ass:hover{box-shadow:0 6px 20px rgba(26,5,8,.12);transform:translateY(-2px)}
 html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
@@ -1262,7 +1370,11 @@ html[data-theme="dark"] .quadro-ass:hover{box-shadow:0 6px 20px rgba(0,0,0,.55)}
 .hist-item:last-child{border:none}
 .hist-item strong{color:var(--text)}
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
-.filter-sel{padding:6px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text);font-size:12px;font-family:inherit;cursor:pointer;outline:none}
+.filter-sel{padding:6px 10px;border:1px solid var(--border);border-radius:5px;background:var(--card);color:var(--text);font-size:12px;font-family:inherit;cursor:pointer;outline:none;max-width:210px}
+.filter-sel:hover{border-color:var(--muted-l)}
+.filter-sel:focus{border-color:var(--wine)}
+.filter-sel.ativa{border-color:var(--wine);background:var(--wine-ll);color:var(--wine-d);font-weight:700}
+.kb-bar .filter-inp{flex:0 1 200px;min-width:130px;border-radius:5px}
 .filter-sel:focus{border-color:var(--wine)}
 .filter-inp{padding:6px 12px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text);font-size:12px;font-family:inherit;outline:none;flex:1;min-width:140px}
 .filter-inp:focus{border-color:var(--wine)}
@@ -2006,9 +2118,14 @@ function corTexto(hex){
 }
 function mkArea(name,base){return{name,base,get color(){return corMarca(base)}}}
 const AREAS={inv:mkArea('Investimentos','#8B1C2A'),cons:mkArea('Consórcio','#8B1C2A'),seg:mkArea('Seguro de vida','#8B1C2A'),saude:mkArea('Plano de saúde','#8B1C2A'),rt:mkArea('Revisão tributária','#8B1C2A')};
-const SUBAREAS={rv:mkArea('Renda variável','#6E6A64'),rf:mkArea('Renda fixa','#6E6A64'),invg:mkArea('Investimentos','#6E6A64'),cons:mkArea('Consórcio','#6E6A64'),seg:mkArea('Seguro de vida','#6E6A64'),saude:mkArea('Plano de saúde','#6E6A64'),rt:mkArea('Revisão tributária','#6E6A64')};
+const SUBAREAS={rv:mkArea('Renda variável','#6E6A64'),rf:mkArea('Renda fixa','#6E6A64'),invg:mkArea('Investimentos','#6E6A64'),cons:mkArea('Consórcio','#6E6A64'),seg:mkArea('Seguro de vida','#6E6A64'),dit:mkArea('DIT','#6E6A64'),saude:mkArea('Plano de saúde','#6E6A64'),rt:mkArea('Revisão tributária','#6E6A64')};
+// DIT é produto de Seguro de vida, e nasceu na QRK: o segmento parte em dois
+// para o volume de DIT não se esconder dentro de "Seguro de vida".
+const PROD_DIT=['dit','d.i.t','d i t','diaria de incapacidade temporaria'];
+const ehDIT=r=>{const p=norm(r&&r.produto||'');
+  return !!p&&(PROD_DIT.includes(p)||/^dit[\s\-]/.test(p));};
 // ── GESTOR: visão de diretor limitada às áreas do usuário ──
-const SUBS_DA_AREA={inv:['rv','rf','invg'],cons:['cons'],seg:['seg'],saude:['saude'],rt:['rt']};
+const SUBS_DA_AREA={inv:['rv','rf','invg'],cons:['cons'],seg:['seg','dit'],saude:['saude'],rt:['rt']};
 // ══ OS QUATRO PERFIS ══
 // O perfil deixou de ser "nível de acesso" e passou a ser O QUE A PESSOA FAZ.
 // Por isso ele também é a caixinha: sales ops e closer não precisam mais ser
@@ -2042,7 +2159,10 @@ const areasVis=()=>{
   return temEscopo()?e.filter(([k])=>(USER.areas||[]).includes(k)):e;
 };
 const subareasVis=()=>{
-  const e=Object.entries(SUBAREAS);
+  // DIT só aparece onde existe: na empresa que o vende. Segmento vazio num
+  // seletor só faz a pessoa procurar o que não tem.
+  const e=Object.entries(SUBAREAS).filter(([k])=>k!=='dit'
+    ||empAtual()==='qrk'||!empAtual()||(OPPS||[]).some(r=>r.area==='seg'&&ehDIT(r)));
   if(!temEscopo())return e;
   const subs=(USER.areas||[]).flatMap(a=>SUBS_DA_AREA[a]||[]);
   return e.filter(([k])=>subs.includes(k));
@@ -2057,6 +2177,7 @@ const PRODS_INV_GERAL=['ia','asset allocation','investimentos'];
 // (RV ou RF) se perderia e os dois virariam a mesma coisa.
 const PRODUTO_GERAL_RV='Renda variável', PRODUTO_GERAL_RF='Renda fixa';
 function subAreaOf(r){
+  if(r.area==='seg')return ehDIT(r)?'dit':'seg';
   if(r.area!=='inv')return r.area;
   const p=norm(r.produto||'');
   if(!p||PRODS_INV_GERAL.includes(p))return 'invg';   // IA/Asset Allocation, "Investimentos" ou sem produto
@@ -2699,7 +2820,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261115-2305';
+const APP_VERSION='20261121-1930';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3297,6 +3418,10 @@ const SVG_ICONES={
   semana:'M3 15l4-5 3 3 4-6 3 4M3 4h14v13H3z',
   tarefas:'M4 6h12M4 10h12M4 14h7M2.5 6l.8.8L5 5M2.5 10l.8.8L5 9',
 };
+// o mesmo desenho da aba Agenda, em tamanho de botão inline
+const icoAgenda=()=>'<svg viewBox="0 0 20 20" width="13" height="13" fill="none" stroke="currentColor" '
+  +'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+  +'<path d="'+SVG_ICONES.agenda+'"/></svg>';
 const svgIco=k=>'<svg class="tab-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" '
   +'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
   +'<path d="'+(SVG_ICONES[k]||SVG_ICONES.painel)+'"/></svg>';
@@ -4910,9 +5035,21 @@ const SEM_EST={
 };
 const SEM_ORDEM=['fez','andou','nos','nosinf','mudo','porvir','fora'];
 const SEM_ANDOU=new Set(['ar2','r2','conf','topou','bol']);
+// ── R1 OU R2: QUEM DECIDE É A COLUNA ──────────────────────────────────────
+// O marcador "R2 agendada" no histórico só existe quando alguém usou o botão
+// da R2. Quem arrasta o card para a coluna e põe a data nele não deixa esse
+// rastro — e são a maioria: de 11 cards em "R2 Agendada", só 1 tinha o
+// marcador. Enquanto a conta dependia dele, a R2 vivia zerada e os cards
+// entravam como primeira reunião. A coluna é o estado; o marcador, quando
+// existe, é só a data mais precisa.
+const semEhR2=r=>etapaFunil(r)==='r2'||!!dataR2(r);
+function semDiaReu(r){
+  const d2=dataR2(r), d1=isoDia(r.reuniao_data);
+  return semEhR2(r)?(d2||d1||''):(d1||d2||'');
+}
 // em que pé está a reunião que estava marcada para aquele dia
 function semClassif(r){
-  const d=isoDia(r.reuniao_data)||dataR2(r);
+  const d=semDiaReu(r);
   const H=r.historico||[];
   if(H.some(h=>h.campo===MARCAS.reu.campo&&h.para===MARCAS.reu.on&&isoHist(h.data)>=d))return 'fez';
   if(H.some(h=>ehNoShow(h)&&isoHist(h.data)>=d))return 'nos';
@@ -4938,7 +5075,7 @@ function semDados(){
   const base=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS).filter(r=>!arquivada(r));
   const rows=atArea()?base.filter(r=>r.area===atArea()):base;
   // as reuniões cuja DATA caía na semana — o compromisso
-  const reus=rows.filter(r=>{const d=isoDia(r.reuniao_data)||dataR2(r);return d&&d>=J.de&&d<=J.ate});
+  const reus=rows.filter(r=>{const d=semDiaReu(r);return d&&d>=J.de&&d<=J.ate});
   const porEst={};SEM_ORDEM.forEach(k=>porEst[k]=[]);
   reus.forEach(r=>porEst[semClassif(r)].push(r));
   // o esforço da semana
@@ -4978,7 +5115,7 @@ function semEsteira(D){
     {k:'tinham',     rot:'Tinham reunião',v:D.reus.length,   sub:'com data nesta semana',marco:1},
     {k:'aconteceram',rot:'Aconteceram',   v:fez+andou,       sub:fez+' registradas · '+andou+' pelo card',marco:1},
     {k:'fechamento', rot:'Em fechamento', v:emFech,          sub:'topou ou confirmando'},
-    {k:'bol',        rot:'Boletadas',     v:n.bol||0,        sub:fmtR(D.ap.vol||0)},
+    {k:'bol',        rot:'Boletadas',     v:n.bol||0,        vol:D.ap.vol||0,volRot:'de receita'},
   ];
   return '<div class="sw-est">'+passos.map((p,i)=>{
     const ant=i>0?passos[i-1].v:0;
@@ -4987,7 +5124,9 @@ function semEsteira(D){
     return (i>0?'<div class="sw-seta"><span>'+conv+'</span></div>':'')
       +'<div class="sw-passo'+(p.marco?' marco':'')+(p.v&&k?' clic':'')+'"'
       +(p.v&&k?' onclick="semAbrir(\''+k+'\')" title="Ver as '+p.v+' — '+p.rot.toLowerCase()+'"':'')
-      +'><b>'+p.v+'</b><span>'+p.rot+'</span><i>'+p.sub+'</i></div>';
+      +'><b>'+p.v+'</b><span>'+p.rot+'</span>'
+      +(p.sub?'<i>'+p.sub+'</i>':'')
+      +(p.vol!=null?'<em>'+fmtR(p.vol)+'<small>'+(p.volRot||'')+'</small></em>':'')+'</div>';
   }).join('')+'</div>';
 }
 // ── o que exige cobrança ──
@@ -4995,7 +5134,7 @@ function semAcao(D){
   const alvo=[].concat(D.porEst.mudo.map(r=>({r,k:'mudo'})),D.porEst.nosinf.map(r=>({r,k:'nosinf'})));
   if(!alvo.length)return '<div class="sw-ok">Nada em aberto nesta semana — toda reunião teve desfecho.</div>';
   return '<div class="sw-ac">'+alvo.slice(0,12).map(({r,k})=>{
-    const d=isoDia(r.reuniao_data)||dataR2(r);
+    const d=semDiaReu(r);
     return '<div class="sw-ac-l" onclick="openEdit(\''+r.id+'\')">'
       +'<span class="sw-ac-p" style="background:'+SEM_EST[k].cor+'"></span>'
       +'<b>'+(r.cliente||'—')+'</b>'
@@ -5017,32 +5156,45 @@ function semProx(D){
   const off=(window._semOff|0)+1;
   const d=new Date();d.setDate(d.getDate()+7*off);
   const [de,ate]=semanaDe(d);
-  const diaR1=r=>isoDia(r.reuniao_data)||'';
   const naJanela=x=>x&&x>=de&&x<=ate;
   const vivas=D.rows.filter(r=>!isPerdida(r));
-  const r2=vivas.filter(r=>naJanela(dataR2(r)));
-  const r1=vivas.filter(r=>naJanela(diaR1(r))&&r2.indexOf(r)<0);
+  const naSemana=vivas.filter(r=>naJanela(semDiaReu(r)));
+  const r2=naSemana.filter(semEhR2);
+  const r1=naSemana.filter(r=>!semEhR2(r));
   const reus=r1.concat(r2);
-  const fech=D.rows.filter(r=>['topou','conf'].includes(etapaFunil(r)));
+  const topou=D.rows.filter(r=>etapaFunil(r)==='topou');
+  const conf=D.rows.filter(r=>etapaFunil(r)==='conf');
+  const fech=topou.concat(conf);
   const vol=l=>l.reduce((s,r)=>s+(r.atual||r.pipe||0),0);
-  return {de,ate,off,reus,r1,r2,fech,vol,
+  return {de,ate,off,reus,r1,r2,fech,topou,conf,vol,
     rot:off===1?'A semana que vem':brData(de)+' a '+brData(ate),
     sub:brData(de)+' a '+brData(ate)};
 }
 function semProxHtml(D){
   const P=semProx(D);
   const tiles=[
-    {k:'px-reu', rot:'Reuniões marcadas',v:P.reus.length,sub:fmtR(P.vol(P.reus))+' em jogo',marco:1},
-    {k:'px-r1',  rot:'Primeiras (R1)',   v:P.r1.length,  sub:'cliente novo na mesa'},
-    {k:'px-r2',  rot:'Segundas (R2)',    v:P.r2.length,  sub:'já avançaram uma vez'},
-    {k:'px-fech',rot:'Negócios para fechar',v:P.fech.length,sub:fmtR(P.vol(P.fech))+' topado ou confirmando',marco:1},
+    {k:'px-reu', rot:'Reuniões marcadas',v:P.reus.length,vol:P.vol(P.reus),volRot:'em jogo',
+      sub:'com data na semana que vem',marco:1},
+    {k:'px-r1',  rot:'Primeiras (R1)',   v:P.r1.length,  vol:P.vol(P.r1),volRot:'em jogo',
+      sub:'cliente novo na mesa'},
+    {k:'px-r2',  rot:'Segundas (R2)',    v:P.r2.length,  vol:P.vol(P.r2),volRot:'em jogo',
+      sub:'já avançaram uma vez'},
   ];
-  const grade='<div class="sw-prox">'+tiles.map(t=>
-    '<div class="sw-passo'+(t.marco?' marco':'')+(t.v?' clic':'')+'"'
+  const pilha=[
+    {k:'px-topou',rot:'Topou, falta fechar',v:P.topou.length,vol:P.vol(P.topou),
+      volRot:'o cliente já disse sim',marco:1},
+    {k:'px-conf', rot:'Ainda decidindo',    v:P.conf.length,vol:P.vol(P.conf),
+      volRot:'em Cliente Confirmar'},
+  ];
+  const cartao=t=>'<div class="sw-passo'+(t.marco?' marco':'')+(t.v?' clic':'')+'"'
     +(t.v?' onclick="semAbrir(\''+t.k+'\')" title="Ver as '+t.v+' — '+t.rot.toLowerCase()+'"':'')
-    +'><b>'+t.v+'</b><span>'+t.rot+'</span><i>'+t.sub+'</i></div>').join('')+'</div>';
+    +'><b>'+t.v+'</b><span>'+t.rot+'</span>'
+    +(t.sub?'<i>'+t.sub+'</i>':'')
+    +'<em>'+fmtR(t.vol||0)+'<small>'+t.volRot+'</small></em></div>';
+  const grade='<div class="sw-prox">'+tiles.map(cartao).join('')
+    +'<div class="sw-pilha">'+pilha.map(cartao).join('')+'</div></div>';
   const nota=P.reus.length
-    ?'<div class="sw-prox-nota">As reuniões já têm data marcada. Os negócios para fechar são o estoque de hoje em <b>Cliente Topou</b> e <b>Cliente Confirmar</b> — não dependem de data.</div>'
+    ?'<div class="sw-prox-nota">As reuniões já têm data marcada. Os dois últimos são estoque de hoje, não dependem de data: <b>Topou</b> é promessa dada, falta a boleta sair; <b>Ainda decidindo</b> é cliente em <b>Cliente Confirmar</b>, que ainda pode dizer não.</div>'
     :'<div class="sw-vz">Nenhuma reunião marcada para '+P.sub+' ainda.</div>';
   return (P.reus.length?grade:'')+nota+(P.reus.length?'':grade);
 }
@@ -5060,11 +5212,13 @@ const SEM_PASSO={
   'px-reu':   {rot:'Reuniões marcadas para a semana que vem',sub:'compromisso que já tem data e nome'},
   'px-r1':    {rot:'Primeiras reuniões da semana que vem',   sub:'cliente que senta na mesa pela primeira vez'},
   'px-r2':    {rot:'R2 marcadas para a semana que vem',       sub:'segunda reunião, o cliente já avançou'},
-  'px-fech':  {rot:'Negócios para fechar',                  sub:'estoque de hoje em Cliente Topou e Cliente Confirmar'},
+  'px-fech':  {rot:'Negócios para fechar',                   sub:'estoque de hoje em Cliente Topou e Cliente Confirmar'},
+  'px-topou': {rot:'Topou, falta fechar',                    sub:'o cliente já disse sim — falta a boleta sair'},
+  'px-conf':  {rot:'Ainda decidindo',                        sub:'em Cliente Confirmar: a promessa ainda não veio'},
 };
 function semItens(k,D){
   D=D||semDados();
-  const dia=r=>isoDia(r.reuniao_data)||dataR2(r)||'';
+  const dia=r=>semDiaReu(r);
   const comEstado=l=>l.map(r=>({r,quando:dia(r),extra:SEM_EST[semClassif(r)].rot}));
   const ev=t=>(D.ap[t]||[]).map(x=>({r:x.r,quando:x.e.iso,extra:x.e.txt||'',quem:x.e.quem||''}));
   if(k==='entraram')return D.rows.filter(r=>{const d=isoDia(r.created_at)||isoHist(r.created_at);
@@ -5077,10 +5231,12 @@ function semItens(k,D){
     .filter(r=>['conf','topou','bol'].includes(etapaFunil(r))));
   if(String(k).indexOf('px-')===0){
     const P=semProx(D);
-    if(k==='px-fech')return P.fech.map(r=>({r,quando:dia(r),extra:fmtR(r.atual||r.pipe||0)}));
+    if(k==='px-fech'||k==='px-topou'||k==='px-conf'){
+      const l=k==='px-topou'?P.topou:k==='px-conf'?P.conf:P.fech;
+      return l.map(r=>({r,quando:dia(r),extra:fmtR(r.atual||r.pipe||0)}));
+    }
     const l=k==='px-r1'?P.r1:k==='px-r2'?P.r2:P.reus;
-    return l.map(r=>({r,quando:P.r2.indexOf(r)>=0?dataR2(r):isoDia(r.reuniao_data),
-      extra:P.r2.indexOf(r)>=0?'R2 marcada':'R1 marcada'}));
+    return l.map(r=>({r,quando:semDiaReu(r),extra:semEhR2(r)?'R2 marcada':'R1 marcada'}));
   }
   if(SEM_EST[k])return comEstado(D.porEst[k]||[]);
   return [];
@@ -5209,7 +5365,7 @@ const tarEhCloser=nome=>tarPapelDe(nome)==='closer';
 const TAR_GRAVIDADE={topou:0,conf:1,r2:2,ar2:3,r1:4,agendar:6,'':5};
 const tarSoPipeline=r=>!TAR_PROSPECCAO.has(etapaFunil(r));
 const tarHoje=()=>localISO(new Date());
-const tarDataReu=r=>isoDia(r.reuniao_data)||dataR2(r)||'';
+const tarDataReu=r=>semDiaReu(r);   // mesma regra da aba A semana: a coluna manda
 const tarTodoD=r=>String(r.todo_data||'').slice(0,10);
 const tarVal=r=>r.atual||r.pipe||0;
 const tarIdade=d=>d?Math.max(0,Math.round((Date.parse(tarHoje())-Date.parse(d))/864e5)):0;
@@ -5302,8 +5458,134 @@ function renderTarefas(c=document.getElementById('main-content')){
       +'<div class="sw-prox-nota">Um card pode aparecer em mais de uma caixa — são perguntas diferentes '
       +'sobre o mesmo atraso. <b>Prospecção não entra em nenhuma</b>: em “Ligar Cliente” e “Agendar Reunião” '
       +'a própria coluna já diz o que fazer.</div>'
-    +'</div>';
+    +'</div>'
+    +'<div class="at-card"><div class="at-ct">O que você fez'
+      +'<span>cada gesto registrado no sistema, somado por dia, semana e mês · clique num número para ver quais</span></div>'
+      +fezQuadroHtml(USER.nome)+'</div>'
+    +(mandaNaArea()
+      ?'<div class="at-card"><div class="at-ct">O que o time fez'
+        +'<span>o mesmo rastro, pessoa por pessoa · do mais ativo no mês para o menos</span></div>'
+        +fezTimeHtml()+'</div>'
+      :'');
 }
+
+// ══ O QUE A PESSOA FEZ ═══════════════════════════════════════════════════
+// Nada de contador novo: todo gesto já deixa uma linha no histórico, com
+// autor e hora. O quadro só lê esse rastro e soma por dia, semana e mês.
+// Assim o número nunca diverge do card — e não há como "fazer" sem aparecer,
+// nem aparecer sem ter feito.
+const FEZ_TIPOS=[
+  {k:'mar',  rot:'Reuniões marcadas',       fn:h=>h.campo==='Reunião marcada'&&!!h.para},
+  {k:'desf', rot:'Desfechos registrados',   fn:h=>(h.campo===MARCAS.reu.campo&&h.para===MARCAS.reu.on)||ehNoShow(h),
+    sub:'aconteceu ou no show'},
+  {k:'lig',  rot:'Ligações registradas',    fn:h=>h.campo===MARCAS.lig.campo},
+  {k:'todo', rot:'Próximos passos definidos',fn:h=>h.campo==='TODO'&&h.para!=='concluído'},
+  {k:'todoc',rot:'Tarefas concluídas',      fn:h=>h.campo==='TODO'&&h.para==='concluído'},
+  {k:'resp', rot:'Closer atribuído',        fn:h=>h.campo==='Responsável'&&!!h.para},
+  {k:'dbol', rot:'Data de boleta posta',    fn:h=>h.campo==='Data da boleta'},
+  {k:'bol',  rot:'Boletas fechadas',        fn:h=>h.campo==='Pendência boleta'&&norm(h.para||'').startsWith('boletado')},
+];
+const FEZ_MAP=Object.fromEntries(FEZ_TIPOS.map(t=>[t.k,t]));
+function fezJanelas(){
+  const h=localISO(new Date());
+  const [s1,s2]=semanaDe(new Date());
+  return [{k:'hoje',rot:'Hoje',de:h,ate:h},
+          {k:'sem', rot:'Esta semana',de:s1,ate:s2},
+          {k:'mes', rot:'Este mês',de:h.slice(0,7)+'-01',ate:h}];
+}
+// Um gesto, um fato: marcar reunião grava ligação E marcação no mesmo
+// instante. Conta como marcação, não como as duas.
+function fezDe(nome,de,ate){
+  const base=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS)||[];
+  const out={};FEZ_TIPOS.forEach(t=>out[t.k]=[]);
+  const eu=norm(nome||'');
+  base.forEach(r=>{
+    const grupos={};
+    (r.historico||[]).forEach(h=>{
+      if(!h||norm(h.usuario||'')!==eu)return;
+      const d=isoHist(h.data);if(!d||d<de||d>ate)return;
+      const t=FEZ_TIPOS.find(x=>x.fn(h));if(!t)return;
+      const g=String(h.data||d);
+      (grupos[g]=grupos[g]||[]).push({t,h,d});
+    });
+    Object.values(grupos).forEach(l=>{
+      const temMar=l.some(x=>x.t.k==='mar');
+      l.forEach(x=>{
+        if(temMar&&x.t.k==='lig')return;         // a ligação da marcação já é a marcação
+        out[x.t.k].push({r,quando:x.d,txt:x.h.para||''});
+      });
+    });
+  });
+  return out;
+}
+function fezTotais(nome){
+  const o={};
+  fezJanelas().forEach(J=>{const f=fezDe(nome,J.de,J.ate);
+    o[J.k]={por:Object.fromEntries(FEZ_TIPOS.map(t=>[t.k,f[t.k].length])),
+            tot:FEZ_TIPOS.reduce((s,t)=>s+f[t.k].length,0)}});
+  return o;
+}
+function fezQuadroHtml(nome){
+  const T=fezTotais(nome),J=fezJanelas();
+  const cel=(k,jk)=>{const n=T[jk].por[k];
+    return n?'<td class="n" onclick="fezAbrir(\''+String(nome).replace(/'/g,"\\'")+'\',\''+k+'\',\''+jk+'\')">'+n+'</td>'
+            :'<td class="z">—</td>'};
+  const linhas=FEZ_TIPOS.filter(t=>J.some(x=>T[x.k].por[t.k])).map(t=>'<tr>'
+    +'<td>'+t.rot+(t.sub?'<div class="fn-ev" style="font-weight:400">'+t.sub+'</div>':'')+'</td>'
+    +J.map(x=>cel(t.k,x.k)).join('')+'</tr>').join('');
+  if(!linhas)return '<div class="tr-vz">Nenhum gesto registrado neste mês.</div>';
+  return '<table class="fz-tbl"><thead><tr><th>O que foi feito</th>'
+    +J.map(x=>'<th>'+x.rot+'</th>').join('')+'</tr></thead>'
+    +'<tbody>'+linhas+'</tbody>'
+    +'<tfoot><tr><td>Total de gestos</td>'+J.map(x=>'<td>'+T[x.k].tot+'</td>').join('')+'</tr></tfoot></table>';
+}
+// a visão do diretor e do head: uma linha por pessoa
+function fezTimeHtml(){
+  const J=fezJanelas();
+  const gente=(USUARIOS||[]).filter(u=>u.ativo&&perfilOk(u)!=='diretor')
+    .map(u=>({nome:u.nome,papel:perfilOk(u),T:fezTotais(u.nome)}))
+    .filter(x=>J.some(j=>x.T[j.k].tot))
+    .sort((a,b)=>b.T.mes.tot-a.T.mes.tot||a.nome.localeCompare(b.nome));
+  if(!gente.length)return '<div class="tr-vz">Ninguém registrou gesto neste mês.</div>';
+  const linhas=gente.map(x=>'<tr'+(norm(x.nome)===norm(USER.nome)?' class="eu"':'')+'>'
+    +'<td><span class="fz-nome">'+x.nome+'<i>'+PERFIL_ROT(x.papel)+'</i></span></td>'
+    +J.map(j=>x.T[j.k].tot
+      ?'<td class="n" onclick="fezAbrir(\''+String(x.nome).replace(/'/g,"\\'")+'\',\'\',\''+j.k+'\')">'+x.T[j.k].tot+'</td>'
+      :'<td class="z">—</td>').join('')+'</tr>').join('');
+  const tot=j=>gente.reduce((s,x)=>s+x.T[j.k].tot,0);
+  return '<table class="fz-tbl"><thead><tr><th>Quem</th>'
+    +J.map(x=>'<th>'+x.rot+'</th>').join('')+'</tr></thead>'
+    +'<tbody>'+linhas+'</tbody>'
+    +'<tfoot><tr><td>O time</td>'+J.map(j=>'<td>'+tot(j)+'</td>').join('')+'</tr></tfoot></table>';
+}
+// todo número abre a lista do que foi feito
+function fezAbrir(nome,k,jk){
+  const J=fezJanelas().find(x=>x.k===jk)||fezJanelas()[0];
+  const f=fezDe(nome,J.de,J.ate);
+  const tipos=k?[FEZ_MAP[k]]:FEZ_TIPOS;
+  const itens=[];
+  tipos.forEach(t=>(f[t.k]||[]).forEach(x=>itens.push(Object.assign({rot:t.rot},x))));
+  if(!itens.length){showToast('Nada registrado nessa janela');return}
+  itens.sort((a,b)=>String(b.quando).localeCompare(String(a.quando))
+    ||String(a.r.cliente||'').localeCompare(String(b.r.cliente||'')));
+  document.getElementById('ba-title').innerHTML=(k?FEZ_MAP[k].rot:'O que '+nome+' fez')
+    +' <span style="font-size:11px;font-weight:600;color:var(--muted)">· '+nome+' · '
+    +J.rot.toLowerCase()+' · '+itens.length+' gesto'+(itens.length===1?'':'s')+'</span>';
+  document.getElementById('ba-body').innerHTML=
+    '<div class="tbl-wrap" style="max-height:58vh;overflow:auto"><table class="tr-tbl">'
+    +'<thead><tr><th>Quando</th><th>Cliente</th>'+(k?'':'<th>O que foi</th>')+'<th>Registrou</th></tr></thead><tbody>'
+    +itens.map(x=>'<tr>'
+      +'<td class="tr-pq">'+brData(x.quando)+'</td>'
+      +'<td class="tr-cli" onclick="closeModal(\'area\');openEdit(\''+x.r.id+'\')">'+(x.r.cliente||'—')
+        +'<small>'+((SUBAREAS[subAreaOf(x.r)]||{}).name||x.r.area||'—')+'</small></td>'
+      +(k?'':'<td class="tr-pq">'+x.rot+'</td>')
+      +'<td class="tr-pq">'+String(x.txt||'—').slice(0,60)+'</td></tr>').join('')
+    +'</tbody></table></div>'
+    +'<div class="gs-acoes" style="margin-top:12px">'
+      +'<button class="btn" onclick="closeModal(\'area\')">Fechar</button></div>';
+  document.getElementById('modal-area').style.display='flex';
+}
+
 // ── a lista, com o gesto que resolve ──
 function tarAbrir(k,todas){
   const T=TAREFAS[k];if(!T)return;
@@ -6097,6 +6379,12 @@ async function dyNovaLinha(ak,tipo){
   await dyOvSet(ak,id,{m:1,t:tipo,h:'',c:'',cl:'',v:0,p:tipo==='pag'?1:0});
   setTimeout(()=>{const el=document.querySelector('[data-ln="'+id+'"] .dy-i-cli');if(el)el.focus()},120);
 }
+// ── OS TRÊS GESTOS DO FECHAMENTO ──────────────────────────────────────────
+// Nenhum deles escreve na oportunidade. São a leitura do diretor sobre o dia,
+// e vivem na linha da Daily. O Kanban segue com o que o time registrou.
+async function dyRes(ak,id,v){await dyOvSet(ak,id,{res:v})}
+async function dyPg(ak,id,on){await dyOvSet(ak,id,{pg:on?1:0,np:0})}
+async function dyNp(ak,id,on){await dyOvSet(ak,id,{np:on?1:0,pg:0})}
 async function dyEdita(ak,id,campo,el){
   const v=(campo==='v')?(parseMoeda(el.value)||0):el.value;
   await dyOvSet(ak,id,{[campo]:v});
@@ -6106,37 +6394,98 @@ async function dyAlterna(ak,id,campo,valAtual){
 }
 
 // ── o dia de uma área: o sistema primeiro, os ajustes por cima ──
-function dyArea(ak,dia){
+// ══ A FOTO DA ABERTURA ═══════════════════════════════════════════════════
+// O fechamento não pode remontar a lista: ele presta contas do que a Daily
+// da manhã prometeu. Se o sistema recalcula, entra reunião marcada ao meio
+// -dia e aparece "fora do previsto" sozinho — e aí o fechamento deixa de ser
+// comparável com a abertura. A foto é tirada na primeira vez que a abertura
+// do dia é montada e fica guardada no banco; o diretor acrescenta ou tira
+// linha na mão, e pode refazer a foto quando quiser.
+function dyFoto(dia,emp,ak){
+  const t=dymT(dia,emp,ak,'foto');
+  if(!t)return null;
+  try{const o=JSON.parse(t);return (o&&Array.isArray(o.l))?o:null}catch(e){return null}
+}
+async function dyTiraFoto(dia,emp,ak,itens,forcar){
+  if(!forcar&&dyFoto(dia,emp,ak))return;
+  // A foto guarda a LINHA INTEIRA, não só o id. Se durante o dia o card for
+  // perdido, arquivado, remarcado ou mudar de área, a linha continua aqui:
+  // o fechamento é a folha da manhã, e folha da manhã não perde linha.
+  // Pagamento que já tinha entrado antes da foto ('ext') não é da daily.
+  const o={h:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),
+    l:itens.filter(x=>x.sist&&x.tipo!=='ext').map(x=>({i:x.id,t:x.tipo,
+      h:x.hora||'',c:x.cliente||'',cl:x.closer||'',v:x.valor||0,p:x.paga?1:0,rd:x.rod||''}))};
+  await dymSet(dia,emp,ak,'foto',o.l.length,JSON.stringify(o));
+}
+async function dyRefazFoto(ak){
+  const dia=dyData(),emp=dyEmp();
+  if(!confirm('Refazer a foto da abertura desta área?\n\n'
+    +'O fechamento passa a prestar contas da lista de AGORA, não da que a Daily da manhã mostrou.\n'
+    +'As linhas que você acrescentou ou tirou na mão continuam valendo.'))return;
+  const d=dyArea(ak,dia,'daily',1);
+  await dyTiraFoto(dia,emp,ak,d.itens,1);
+  renderDaily();
+}
+function dyArea(ak,dia,modo,cru){
+  modo=modo||dyModo();
   const base=dyBase().filter(r=>r.area===ak);
-  const reun=base.filter(r=>isoDia(r.reuniao_data)===dia||(dyResultado(r,dia)==='remarcou'&&dyReuniaoEra(r,dia)));
-  const ids=new Set(reun.map(r=>r.id));
-  const pagam=base.filter(r=>!ids.has(r.id)&&dyFechaHoje(r,dia)&&!dyBoletou(r,dia));
-  const idsP=new Set(pagam.map(r=>r.id));
-  const extras=base.filter(r=>!ids.has(r.id)&&!idsP.has(r.id)&&dyBoletou(r,dia));
+  const foto=(modo==='close'&&!cru)?dyFoto(dia,dyEmp(),ak):null;
+  let reun,pagam,extras;
+  if(foto){
+    // o fechamento segue a foto: cada id volta no papel em que foi fotografado
+    const papelDe={};foto.l.forEach(x=>{papelDe[x.i]=x.t});
+    const naFoto=base.filter(r=>papelDe[r.id]);
+    reun  =naFoto.filter(r=>papelDe[r.id]==='reu');
+    pagam =naFoto.filter(r=>papelDe[r.id]==='pag');
+    extras=naFoto.filter(r=>papelDe[r.id]==='ext');
+  }else{
+    reun=base.filter(r=>isoDia(r.reuniao_data)===dia||(dyResultado(r,dia)==='remarcou'&&dyReuniaoEra(r,dia)));
+    const ids=new Set(reun.map(r=>r.id));
+    pagam=base.filter(r=>!ids.has(r.id)&&dyFechaHoje(r,dia)&&!dyBoletou(r,dia));
+    const idsP=new Set(pagam.map(r=>r.id));
+    extras=base.filter(r=>!ids.has(r.id)&&!idsP.has(r.id)&&dyBoletou(r,dia));
+  }
   const ovs={};dyOvTodos(ak).forEach(o=>{ovs[o.id]=o});
-  const doSistema=(r,tipo)=>{
-    const o=ovs[r.id]||{};
-    return{id:r.id,tipo,r,sist:true,off:!!o.off,
-      hora:o.h!==undefined?o.h:(horaReuniao(r)||''),
-      cliente:o.c!==undefined?o.c:(r.cliente||''),
-      closer:o.cl!==undefined&&o.cl!==''?o.cl:closerDaLinha(r,ak,dyEmp()),
-      valor:o.v!==undefined?(+o.v||0):dyVal(r),
-      paga:o.p!==undefined?!!o.p:dyFechaHoje(r,dia),
-      pago:dyBoletou(r,dia),
-      pagoVal:dyBoletou(r,dia)?(r.atual||0):0,
-      resultado:dyResultado(r,dia),
-      prox:encaminhamento(r).txt,
+  // f = a linha como foi fotografada de manhã. Quando ela existe, manda ela:
+  // o card é consultado só para abrir e para o próximo passo. É isso que faz
+  // o fechamento ser INDEPENDENTE — nada do que acontece depois tira ou muda
+  // uma linha, e o que o diretor clica fica só aqui.
+  const doSistema=(r,tipo,f)=>{
+    const id=r?r.id:(f&&f.i), o=ovs[id]||{};
+    const pg=o.pg!==undefined?!!o.pg:(f?false:(r?dyBoletou(r,dia):false));
+    const val=o.v!==undefined?(+o.v||0):(f&&f.v!==undefined?(+f.v||0):(r?dyVal(r):0));
+    return{id,tipo,r:r||null,sist:true,off:!!o.off,
+      hora:o.h!==undefined?o.h:(f?(f.h||''):(horaReuniao(r)||'')),
+      cliente:o.c!==undefined?o.c:(f?(f.c||''):(r.cliente||'')),
+      closer:o.cl!==undefined&&o.cl!==''?o.cl:(f&&f.cl?f.cl:closerDaLinha(r,ak,dyEmp())),
+      valor:val,
+      paga:o.p!==undefined?!!o.p:(f?!!f.p:dyFechaHoje(r,dia)),
+      rod:(f&&f.rd)?f.rd:(r?dyRodada(r):'R1'),
+      pago:pg,
+      pagoVal:pg?(o.v!==undefined?(+o.v||0):(!f&&r&&dyBoletou(r,dia)?(r.atual||0):val)):0,
+      resultado:o.res!==undefined?o.res:(f?'':dyResultado(r,dia)),
+      naoPagou:!!o.np, motivo:o.mt||'',
+      prox:r?encaminhamento(r).txt:'',
+      sumiu:!!(f&&!r),
       editado:!!(o.h!==undefined||o.c!==undefined||o.cl||o.v!==undefined||o.p!==undefined)};
   };
-  const itens=[].concat(reun.map(r=>doSistema(r,'reu')),pagam.map(r=>doSistema(r,'pag')),
-                        extras.map(r=>doSistema(r,'ext')));
+  let itens;
+  if(foto){
+    const porId={};base.forEach(r=>{porId[r.id]=r});
+    itens=foto.l.filter(f=>f.t!=='ext').map(f=>doSistema(porId[f.i]||null,f.t||'reu',
+      (f.c!==undefined?f:{i:f.i,c:(porId[f.i]||{}).cliente||'',h:'',cl:'',v:0,p:0,rd:''})));
+  }else{
+    itens=[].concat(reun.map(r=>doSistema(r,'reu')),pagam.map(r=>doSistema(r,'pag')),
+                    extras.map(r=>doSistema(r,'ext')));
+  }
   const vistos=new Set(itens.map(x=>x.id));
   Object.keys(ovs).forEach(id=>{
     const o=ovs[id];
     if(!o.m||vistos.has(id))return;
     itens.push({id,tipo:o.t||'reu',r:null,sist:false,off:!!o.off,
       hora:o.h||'',cliente:o.c||'',closer:o.cl||closerDaLinha(null,ak,dyEmp()),valor:+o.v||0,
-      paga:!!o.p,pago:!!o.pg,pagoVal:o.pg?(+o.v||0):0,
+      rod:'',paga:!!o.p,pago:!!o.pg,pagoVal:o.pg?(+o.v||0):0,
+      naoPagou:!!o.np, motivo:o.mt||'',
       resultado:o.res||'',prox:o.nx||'',editado:true,manual:true});
   });
   const vivos=itens.filter(x=>!x.off);
@@ -6153,7 +6502,7 @@ function dyArea(ak,dia){
   closers.forEach(c=>c.reun.sort((x,y)=>(x.hora||'99:99').localeCompare(y.hora||'99:99')));
   const ap=apurar(base,dia,dia);
   const reunV=vivos.filter(x=>x.tipo==='reu'),pagV=vivos.filter(x=>x.tipo==='pag'),extV=vivos.filter(x=>x.tipo==='ext');
-  return{ak,base,itens:vivos,fora,reun:reunV,pagam:pagV,extras:extV,closers,ap};
+  return{ak,base,itens:vivos,todos:itens,fora,reun:reunV,pagam:pagV,extras:extV,closers,ap,foto};
 }
 // a reunião estava marcada para este dia antes de ser remarcada?
 function dyReuniaoEra(r,dia){
@@ -6161,7 +6510,9 @@ function dyReuniaoEra(r,dia){
 }
 const dyVal=r=>(r.atual||r.pipe||0);
 const somaProj=lista=>lista.reduce((s,x)=>s+((x.tipo==='pag'||x.paga)?(x.valor||0):0),0);
-const dyProj=d=>somaProj(d.itens);
+// A projeção é a soma das linhas que estão na folha. Antes somava também o
+// que já tinha sido boletado antes da daily: o total não batia com a lista.
+const dyProj=d=>somaProj(d.reun.concat(d.pagam));
 const dyProjC=c=>somaProj([].concat(c.reun,c.pagam));
 const somaPago=lista=>lista.reduce((s,x)=>s+(x.pagoVal||0),0);
 
@@ -6192,7 +6543,7 @@ function dyRelDaily(){
             +(x.hora?dyHH(x.hora)+' · ':'')+dyEsc(x.cliente||'Sem nome')
             +(x.paga?'<span class="rep-tag">pagar hoje</span>':'')
             +(x.manual?'<span class="rep-tag" style="color:#AFA7A2">fora do sistema</span>':'')+'</span>'
-            +(x.paga&&x.valor?'<b>'+dyK(x.valor)+'</b>':'<span class="rep-r">'+(x.r?dyRodada(x.r):'R1')+'</span>')
+            +(x.paga&&x.valor?'<b>'+dyK(x.valor)+'</b>':'<span class="rep-r">'+(x.rod||'R1')+'</span>')
             +'</div>').join('')
           :'<div class="rep-empty">Sem reuniões</div>')
         +'<div class="rep-tot"><span>Projeção de pagamento hoje'+(d.closers.length>1&&c.closer!=='Sem closer'?' · '+dyEsc(c.closer):'')+'</span><b>'+dyK(pc)+'</b></div>'
@@ -6217,64 +6568,70 @@ function dyRelDaily(){
     +'<div class="rep-tot"><span>Total</span><b>'+dyK(tot)+'</b></div></div></div>';
 }
 // ── Fechamento · fim do dia ──
+// É a MESMA folha da manhã. Mesmas áreas, mesmos closers, mesmas linhas, na
+// mesma ordem. O que muda: ao lado de cada nome entra o que o diretor marcou
+// (aconteceu / não aconteceu, pagou / não pagou) e a observação dele embaixo.
+// Nada entra sozinho e nada sai: pagamento que não estava na daily não aparece
+// aqui, e card que o time perdeu ou remarcou durante o dia continua na linha.
 function dyRelClose(){
   const dia=dyData(),emp=dyEmp();
-  const amanha=localISO(new Date(new Date(dia+'T12:00:00').getTime()+864e5));
-  let tPago=0,tProj=0;const somas=[];
-  const status=x=>({sim:'<span class="t-ok">aconteceu</span>',nao:'<span class="t-no">não aconteceu</span>',
-    remarcou:'<span class="t-mid">remarcou</span>'})[x.resultado]||'';
-  const item=(x,ehReuniao)=>{
-    const tag=x.pago?'<span class="t-ok">pagou</span>'
-      :(ehReuniao&&x.resultado==='sim'&&x.paga?'<span class="t-no">não pagou</span>':'');
-    const amanhaTag=(x.r&&isoDia(x.r.reuniao_data)===amanha)?'<span class="t-tm">amanhã</span>':'';
-    return '<div class="rep-row"><span>'
-      +(ehReuniao&&x.hora?dyHH(x.hora)+' · ':'')+dyEsc(x.cliente||'Sem nome')
-      +(x.manual?'<span class="t-mid">não prevista</span>':'')
-      +(ehReuniao?status(x):'')+tag+amanhaTag+'</span>'
-      +(x.pagoVal?'<b>'+dyK(x.pagoVal)+'</b>':'')+'</div>'
-      +(x.prox?'<div class="rep-sub">→ <i>'+dyEsc(x.prox)+'</i></div>':'');
+  const somas=[];let tot=0,totPg=0;
+  const marca=x=>{
+    const s={sim:'<span class="t-ok">aconteceu</span>',nao:'<span class="t-no">não aconteceu</span>',
+      remarcou:'<span class="t-mid">remarcou</span>'}[x.resultado]||'';
+    return s+(x.pago?'<span class="t-ok">pagou</span>'
+      :(x.naoPagou?'<span class="t-no">não pagou</span>':''));
   };
+  const obs=x=>x.motivo?'<div class="rep-sub mot">'+dyEsc(x.motivo)+'</div>':'';
+  const pagoLn=(rot,v)=>v?'<div class="rep-tot pg"><span>'+rot+'</span><b>'+dyK(v)+'</b></div>':'';
   const secs=dyAreasDaEmpresa().map(([ak,A])=>{
     const d=dyArea(ak,dia);
-    const pago=somaPago(d.itens),proj=dyProj(d);
-    tPago+=pago;tProj+=proj;somas.push([A.name,pago,proj]);
+    const proj=dyProj(d),pago=somaPago(d.reun.concat(d.pagam));
+    tot+=proj;totPg+=pago;somas.push([A.name,proj,pago]);
     const fez=d.reun.filter(x=>x.resultado==='sim').length;
-    const ops=papel(ak,emp,'ops'),obs=dymT(dia,emp,ak,'obs');
+    const ops=papel(ak,emp,'ops'),ob=dymT(dia,emp,ak,'obs');
     const corpo=d.closers.length?d.closers.map(c=>{
-      const pc=somaPago([].concat(c.reun,c.pagam,c.extras)),px=dyProjC(c);
-      const fz=c.reun.filter(x=>x.resultado==='sim').length;
+      const pc=dyProjC(c),pgc=somaPago([].concat(c.reun,c.pagam));
       return '<div class="rep-cl">'
         +'<div class="rep-role">Closer'+(c.closer&&c.closer!=='Sem closer'?'<small>'+dyEsc(c.closer)+'</small>':'')
-          +(d.closers.length>1?'<small>'+fz+'/'+c.reun.length+' aconteceram</small>':'')+'</div>'
-        +(c.pagam.length?'<div class="rep-lbl">Pagamentos previstos:</div>'+c.pagam.map(x=>item(x,false)).join(''):'')
-        +'<div class="rep-lbl">Reuniões:</div>'
-        +(c.reun.length?c.reun.map(x=>item(x,true)).join(''):'<div class="rep-empty">Sem reuniões</div>')
-        +(c.extras.length?'<div class="rep-lbl">Fora do previsto:</div>'
-          +c.extras.map(x=>'<div class="rep-row"><span>'+dyEsc(x.cliente||'Sem nome')+'<span class="t-ok">pagou</span></span><b>'+dyK(x.pagoVal)+'</b></div>').join(''):'')
-        +'<div class="rep-tot"><span>Pago hoje'+(d.closers.length>1&&c.closer!=='Sem closer'?' · '+dyEsc(c.closer):'')
-          +'<small>projetado '+dyK(px)+'</small></span><b>'+dyK(pc)+'</b></div>'
+          +(d.closers.length>1?'<small>'+c.reun.length+(c.reun.length===1?' reunião':' reuniões')+'</small>':'')+'</div>'
+        +(c.pagam.length?'<div class="rep-lbl">Pagamento hoje:</div>'
+          +c.pagam.map(x=>'<div class="rep-row"><span>'+dyEsc(x.cliente||'Sem nome')+marca(x)
+            +'</span><b>'+dyK(x.valor)+'</b></div>'+obs(x)).join(''):'')
+        +'<div class="rep-lbl">Reuniões hoje:</div>'
+        +(c.reun.length?c.reun.map(x=>'<div class="rep-row"><span>'
+            +(x.hora?dyHH(x.hora)+' · ':'')+dyEsc(x.cliente||'Sem nome')
+            +(x.paga?'<span class="rep-tag">pagar hoje</span>':'')
+            +(x.manual?'<span class="rep-tag" style="color:#AFA7A2">fora do sistema</span>':'')
+            +marca(x)+'</span>'
+            +(x.paga&&x.valor?'<b>'+dyK(x.valor)+'</b>':'<span class="rep-r">'+(x.rod||'R1')+'</span>')
+            +'</div>'+obs(x)).join('')
+          :'<div class="rep-empty">Sem reuniões</div>')
+        +'<div class="rep-tot"><span>Projeção de pagamento hoje'+(d.closers.length>1&&c.closer!=='Sem closer'?' · '+dyEsc(c.closer):'')+'</span><b>'+dyK(pc)+'</b></div>'
+        +pagoLn('Pago'+(d.closers.length>1&&c.closer!=='Sem closer'?' · '+dyEsc(c.closer):''),pgc)
         +'</div>';
-    }).join(''):'<div class="rep-cl"><div class="rep-role">Closer</div><div class="rep-empty">Nada previsto para o dia</div></div>';
+    }).join(''):'<div class="rep-cl"><div class="rep-role">Closer</div><div class="rep-empty">Sem reuniões e sem fechamento previsto</div></div>';
     return '<div class="rep-area card" style="--ac:'+A.color+'"><h3>'+A.name
-      +'<small>'+fez+'/'+d.reun.length+' reuniões aconteceram</small></h3>'
+      +'<small>'+d.reun.length+(d.reun.length===1?' reunião':' reuniões')
+      +(fez?' · '+fez+' aconteceram':'')+'</small></h3>'
       +corpo
-      +(d.closers.length>1?'<div class="rep-tot"><span>Pago hoje · total da área<small>projetado '+dyK(proj)+'</small></span><b>'+dyK(pago)+'</b></div>':'')
+      +(d.closers.length>1?'<div class="rep-tot"><span>Projeção total da área</span><b>'+dyK(proj)+'</b></div>'
+        +pagoLn('Pago · total da área',pago):'')
       +'<div class="rep-role">SalesOps'+(ops?'<small>'+dyEsc(ops)+'</small>':'')+'</div>'
       +'<div class="rep-stats"><div><b>'+d.ap.n.lig+'<small>/'+dymN(dia,emp,ak,'calls')+'</small></b><span>ligações feitas</span></div>'
         +'<div><b class="g">'+dyMarcadas(ak,dia,emp,d).n+'<small>/'+dymN(dia,emp,ak,'goal')+'</small></b><span>reuniões marcadas</span></div></div>'
-      +(obs.trim()?'<div class="rep-call"><b>Obs</b> · '+dyEsc(obs.trim())+'</div>':'')
+      +(ob.trim()?'<div class="rep-call"><b>Obs</b> · '+dyEsc(ob.trim())+'</div>':'')
       +dyInvBloco(ak,'close')
       +'</div>';
   }).join('');
-  const pct=tProj?Math.round(tPago/tProj*100):0;
-  return '<div class="rep" style="width:1700px;--cols:2">'
-    +'<h2>Fechamento '+empNome(emp)+'</h2><div class="when">'+dyDataFmt(dia)+'</div>'
-    +'<div class="split"><div class="split-l"><div class="rep-grid">'+secs+'</div>'
-    +'<div class="rep-sum"><div class="rep-lbl">Pago no dia (realizado / projetado)</div>'
-    +somas.map(s=>'<div class="rep-row"><span>'+s[0]+'</span><b>'+dyK(s[1])
-      +' <span style="color:#B0ACA7;font-size:15px;font-weight:500">/ '+dyK(s[2])+'</span></b></div>').join('')
-    +'<div class="rep-tot"><span>Total pago<small>'+pct+'% da projeção</small></span><b>'+dyK(tPago)+'</b></div></div>'
-    +'</div><div class="split-r"><div class="split-h">Resumo do dia</div>'+dyResumo()+'</div></div></div>';
+  return '<div class="rep" style="width:1180px;--cols:2">'
+    +'<h2>Daily '+empNome(emp)+'</h2><div class="when">'+dyDataFmt(dia)+' · fechamento</div>'
+    +'<div class="rep-grid">'+secs+'</div>'
+    +'<div class="rep-sum"><div class="rep-lbl">Projeção de pagamento do dia</div>'
+    +somas.map(s=>'<div class="rep-row"><span>'+s[0]+'</span><b>'+dyK(s[1])+'</b></div>').join('')
+    +'<div class="rep-tot"><span>Total</span><b>'+dyK(tot)+'</b></div>'
+    +pagoLn('Pago no dia'+(tot?' <small>'+dyPct(totPg,tot)+' da projeção</small>':''),totPg)
+    +'</div></div>';
 }
 function dyResumo(){
   const dia=dyData(),emp=dyEmp();
@@ -6383,6 +6740,10 @@ function dySetEmp(k){window._dyEmp=k;renderDaily()}
 function dyPintaForms(){
   const el=document.getElementById('dy-forms');if(!el)return;
   const modo=dyModo(),dia=dyData(),emp=dyEmp();
+  // montar a abertura do dia é o gesto que tira a foto — uma vez só por área
+  if(modo==='daily')dyAreasDaEmpresa().forEach(([ak])=>{
+    if(!dyFoto(dia,emp,ak))dyTiraFoto(dia,emp,ak,dyArea(ak,dia,'daily',1).todos);
+  });
   if(modo==='period'){
     el.innerHTML='<div class="dy-card"><div class="dy-ct">Período</div>'
       +'<div class="dy-nota">Nada para preencher: o período é lido direto das oportunidades. '
@@ -6401,9 +6762,17 @@ function dyPintaForms(){
       +(modo==='close'?'<div class="dy-g3">'+DY_PRODS.map(x=>cmp('rv'+x[0],'Renovou venc. · '+x[1],'n')).join('')+'</div>'
         +'<div class="dy-g3">'+DY_PRODS.map(x=>cmp('rb'+x[0],'Renovou barr. · '+x[1],'n')).join('')+'</div>':'')
       :'';
+    const avisoFoto=modo!=='close'?''
+      :(d.foto
+        ? '<div class="dy-foto">Esta é a <b>foto da abertura</b>, tirada às '+dyEsc(d.foto.h||'—')
+          +' · '+d.foto.l.length+' linha'+(d.foto.l.length===1?'':'s')
+          +'. O fechamento não acrescenta nada sozinho — você inclui ou tira na mão.'
+          +'<span class="dy-foto-bt" onclick="dyRefazFoto(\''+ak+'\')">refazer a foto</span></div>'
+        : '<div class="dy-foto sem">Sem foto da abertura deste dia — estou mostrando o que o sistema vê agora. '
+          +'<span class="dy-foto-bt" onclick="dyRefazFoto(\''+ak+'\')">tirar a foto agora</span></div>');
     return '<details class="dy-card" style="--ac:'+A.color+'" open><summary class="dy-ct">'+A.name
       +'<span>'+d.reun.length+(d.reun.length===1?' reunião':' reuniões')+' · '+d.pagam.length+' p/ fechar</span></summary>'
-      +'<div class="dy-body">'
+      +'<div class="dy-body">'+avisoFoto
       +'<div class="dy-g3">'
         +'<label class="dy-f"><span>Closer da área</span><input value="'+dyEsc(papel(ak,emp,'closer'))+'" '
           +'placeholder="quem fecha" onblur="papelSet(\''+ak+'\',\'closer\',this)" '
@@ -6462,6 +6831,22 @@ function dyItens(d,modo){
     +'value="'+dyEsc(val)+'" placeholder="'+(ph||'')+'" '
     +'onblur="dyEdita(\''+ak+'\',\''+id+'\',\''+campo+'\',this)" '
     +'onkeydown="if(event.key===\'Enter\')this.blur()">';
+  // A linha do fechamento é a MESMA da manhã, sem tirar nem mudar nada.
+  // Só ganha, embaixo, o que rolou e a observação. O que ele clica aqui fica
+  // na daily do dia: não encosta na oportunidade nem no Kanban.
+  const resultado=x=>{
+    const idq="'"+ak+"','"+x.id+"'";
+    const bt=(rot,on,cor,fn,tit)=>'<button class="dy-res'+(on?' on':'')+'" style="--rc:'+cor+'" '
+      +'title="'+tit+'" onclick="'+fn+'">'+rot+'</button>';
+    return '<div class="dy-res-g">'
+      +bt('Aconteceu',x.resultado==='sim','#5E1A27','dyRes('+idq+',\''+(x.resultado==='sim'?'':'sim')+'\')','A reunião aconteceu')
+      +bt('Não aconteceu',x.resultado==='nao','#8A6A6A','dyRes('+idq+',\''+(x.resultado==='nao'?'':'nao')+'\')','Não aconteceu')
+      +'<span class="dy-res-sep"></span>'
+      +bt('Pagou',x.pago,'#7A2233','dyPg('+idq+','+(x.pago?0:1)+')','Entrou o dinheiro — usa o valor da linha')
+      +bt('Não pagou',x.naoPagou&&!x.pago,'#8A6A6A','dyNp('+idq+','+(x.naoPagou?0:1)+')','Estava previsto e não entrou')
+      +'</div>'
+      +inp(x.id,'mt',x.motivo,'dy-i-mt','obs — o que rolou');
+  };
   const linha=x=>{
     const ehReu=x.tipo!=='pag';
     return '<div class="dy-ln'+(x.manual?' nova':'')+'" data-ln="'+x.id+'">'
@@ -6471,23 +6856,11 @@ function dyItens(d,modo){
       +inp(x.id,'v',x.valor?fmtMoedaBR(x.valor):'','dy-i-v','R$')
       +'<button class="dy-pg'+(x.paga?' on':'')+'" title="Marcar que paga hoje" '
         +'onclick="dyAlterna(\''+ak+'\',\''+x.id+'\',\'p\','+(x.paga?1:0)+')">paga hoje</button>'
-      +(modo==='close'?'<div class="dy-res-g">'
-        +(x.sist
-          ?'<button class="dy-res'+(x.resultado==='sim'?' on':'')+'" style="--rc:#5E1A27" onclick="toggleMarca(\''+x.id+'\',\'reu\',event)">Aconteceu</button>'
-           +'<button class="dy-res'+(x.resultado==='nao'?' on':'')+'" style="--rc:#8A6A6A" onclick="registraNoShow(\''+x.id+'\',event)">No show</button>'
-           +'<button class="dy-res'+(x.pago?' on':'')+'" style="--rc:#7A2233" title="Boletado hoje, pelo card" onclick="openEdit(\''+x.id+'\')">'+(x.pago?'Pagou':'Boletar')+'</button>'
-          :'<button class="dy-res'+(x.resultado==='sim'?' on':'')+'" style="--rc:#5E1A27" onclick="dyOvSet(\''+ak+'\',\''+x.id+'\',{res:\''+(x.resultado==='sim'?'':'sim')+'\'})">Aconteceu</button>'
-           +'<button class="dy-res'+(x.resultado==='nao'?' on':'')+'" style="--rc:#8A6A6A" onclick="dyOvSet(\''+ak+'\',\''+x.id+'\',{res:\''+(x.resultado==='nao'?'':'nao')+'\'})">No show</button>'
-           +'<button class="dy-res'+(x.pago?' on':'')+'" style="--rc:#7A2233" onclick="dyAlterna(\''+ak+'\',\''+x.id+'\',\'pg\','+(x.pago?1:0)+')">Pagou</button>')
-        +'</div>'
-        +(x.sist
-          ?'<input class="dy-i-nx" value="'+dyEsc(x.prox)+'" placeholder="→ próximo passo" '
-            +'onblur="dyProx(\''+x.id+'\',this.value)" onkeydown="if(event.key===\'Enter\')this.blur()">'
-          :inp(x.id,'nx',x.prox,'dy-i-nx','→ próximo passo'))
-        :'')
+
       +'<button class="dy-x" title="Tirar da daily de hoje" onclick="dyTira(\''+ak+'\',\''+x.id+'\','+(x.sist?1:0)+')">×</button>'
       +(x.sist?'':'<span class="dy-flag">fora do sistema</span>')
       +(x.sist&&x.editado?'<span class="dy-flag ed">editada</span>':'')
+      +(modo==='close'?resultado(x):'')
       +'</div>';
   };
   const grupos=d.closers.map(c=>{
@@ -6508,13 +6881,6 @@ function dyItens(d,modo){
       +'<button onclick="dyNovaLinha(\''+ak+'\',\'reu\')">+ Reunião</button>'
       +'<button onclick="dyNovaLinha(\''+ak+'\',\'pag\')">+ Fechamento</button>'
     +'</div></div>';
-}
-async function dyProx(id,txt){
-  const r=acharOpp(id);if(!r)return;
-  const novo=String(txt||'').trim();
-  if(encaminhamento(r).txt===novo)return;
-  await gravaFato(r,{campo:CAMPO_DAILY,para:novo},'');
-  if(curView==='d-daily'){dyPintaForms();dyPintaPrev()}
 }
 function dyPintaPrev(){
   const p=document.getElementById('dy-prev');if(!p)return;
@@ -9085,6 +9451,16 @@ const ETAPAS_DO_CLOSER=new Set(['agendar','r1','ar2','r2','conf','topou','bol'])
 // O NOME DELE. Sem essa exceção, os 290 cards sem dono apareceriam para
 // todos os closers de uma vez — que foi exatamente o problema de antes.
 const ETAPAS_SO_DO_DONO=new Set(['agendar']);
+// ── COLUNAS QUE O TIME CRIOU E TAMBÉM SÃO DO CLOSER ──
+// "R3" e "STAND-BY" estão fora da cadeia padrão, então etapaDoStatus devolve
+// vazio e elas sumiam para o closer. São estados DEPOIS da reunião: quem
+// responde por elas é quem conduz o cliente. Comparado por nome, porque é
+// nome que o time digita.
+const COLUNAS_DO_CLOSER=['r3','stand-by','stand by','standby'];
+const colunaEhDoCloser=nome=>{
+  const n=norm(nome||'');
+  return !!n&&COLUNAS_DO_CLOSER.some(x=>n===x||n.indexOf(x+' ')===0);
+};
 // "Ligar Cliente" e "Agendar Reunião" caem na MESMA etapa ('agendar'), então
 // a diferença entre as duas colunas só existe pelo nome. O closer volta a ver
 // "Agendar Reunião"; a fila de ligação continua sendo só do sales ops.
@@ -9093,6 +9469,7 @@ const jaTeveReuniao=r=>(r.historico||[]).some(h=>h.campo===MARCAS.reu.campo&&h.p
 // a etapa certa: da Reunião Agendada em diante
 function etapaDoCloser(r){
   if(ETAPAS_DO_CLOSER.has(etapaFunil(r)))return true;
+  if(colunaEhDoCloser(r.sc))return true;
   // "Já teve reunião um dia" NÃO basta: card que voltou para a prospecção é do
   // sales ops de novo — a bola é de quem está com ela agora, não de quem já a
   // teve. Só a oportunidade que MORREU ou foi arquivada depois de uma reunião
@@ -9415,6 +9792,7 @@ const COCKPIT_DET={
 };
 function abrirCockpit(k){
   const E=COCKPIT_DET[k];if(!E)return;
+  const mb=document.getElementById('modal-area');if(mb)mb.classList.remove('sb');
   const b=cockpitBuckets();
   let lista=[];
   if(k==='acoes')      lista=[...b.atrasados,...b.hojeList];
@@ -9476,6 +9854,7 @@ function colunaDoPerfil(nome){
   if(n==='__BOL__'||n==='__PERD__')return true;   // o fim da linha é dele também
   if(n.indexOf('__')===0)return false;            // "Não se Aplica" não é dele
   if(ehColunaLigar(n))return false;               // a fila de ligação é do sales ops
+  if(colunaEhDoCloser(n))return true;             // R3, Stand-by: estados depois da reunião
   return ETAPAS_DO_CLOSER.has(etapaDoStatus(n));
 }
 // Uma linha dizendo o que esta tela está mostrando e por quê. Sem isso, "por
@@ -9557,17 +9936,17 @@ function kbPerJanela(p){
   return null;
 }
 function kbPeriodo(p){window._kbPer=(window._kbPer===p?'':p);renderAssessorOpps()}
-function kbPeriodoData(v){window._kbPer=v?('data:'+v):'';renderAssessorOpps()}
-function kbBarraReunioes(n){
-  const p=window._kbPer||'',J=kbPerJanela(p);
-  const chip=(k,rot)=>'<button class="kb-per'+(p===k?' on':'')+'" onclick="kbPeriodo(\''+k+'\')">'+rot+'</button>';
-  return '<div class="kb-perbar"><span class="kb-perlb">Reuniões</span>'
-    +chip('hoje','Hoje')+chip('amanha','Amanhã')+chip('semana','Esta semana')+chip('passada','Semana passada')
-    +'<input type="date" class="kb-perdt" value="'+(p.indexOf('data:')===0?p.slice(5):'')+'" onchange="kbPeriodoData(this.value)" title="Um dia específico">'
-    +(J?'<span class="kb-perot">'+J.rot+' · '+n+(n===1?' reunião':' reuniões')+'</span>'
-       +'<button class="kb-per lim" onclick="window._kbPer=\'\';renderAssessorOpps()">limpar</button>':'')
-    +'</div>';
+function kbPeriodoSel(v){
+  if(v==='dia'){const a=window._kbPer||'';window._kbPer=a.indexOf('data:')===0?a:'data:'+today();}
+  else window._kbPer=v||'';
+  renderAssessorOpps();
 }
+// Os filtros do funil, num lugar só: dá para saber se tem filtro ligado e
+// apagar todos de uma vez, sem caçar cada caixinha.
+const KB_FILTROS=['_kbArea','_kbAss','_kbProd','_kbSC','_kbPB','_kbPer','_kbAg','_kbResp','_kbCli'];
+function kbTemFiltro(){return KB_FILTROS.some(k=>!!(window[k]||''))}
+function kbLimpaFiltros(){KB_FILTROS.forEach(k=>{window[k]=''});renderAssessorOpps()}
+function kbPeriodoData(v){window._kbPer=v?('data:'+v):'';renderAssessorOpps()}
 function renderAssessorOpps(c=document.getElementById('main-content')){
   const isDir=mandaNaArea();
   const myOpps=oppsDoUsuario();
@@ -9726,7 +10105,15 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
         +'<div class="kb-col-hdr" style="color:'+cor+'">'
         +'<span style="display:flex;align-items:center;gap:6px">'
         +(rows.length?'<input type="checkbox" '+(colSel?'checked ':'')+'title="Selecionar a coluna inteira" onclick="event.stopPropagation()" onchange="kbSelCol(\''+mk+'\',this.checked)" style="width:13px;height:13px;cursor:pointer;accent-color:'+cor+'">':'')
-        +emoji+' '+(key==='__BOL__'?'Boletado':key==='__PERD__'?'Perdido':key==='__NSA__'?'Não se aplica':key)+'</span>'
+        +emoji+' '+(()=>{
+          const rot=(key==='__BOL__'?'Boletado':key==='__PERD__'?'Perdido':key==='__NSA__'?'Não se aplica':key);
+          // Stand-by da saúde abre o painel de qualificação: lá ele diz o que
+          // cada uma espera e quando entra em vigência.
+          return (sbEhColuna(key)&&rows.some(sbEhDaArea))
+            ?'<span class="kb-abre" title="Abrir o stand-by do Plano de saúde: situação, vigência e quando o dinheiro entra" '
+              +'onclick="event.stopPropagation();abrirStandby()">'+rot+' ◱</span>'
+            :rot;
+        })()+'</span>'
         +'<span style="display:flex;align-items:center;gap:4px">'
         +(rows.length?'<span class="kb-exp" title="Baixar só esta coluna em Excel" onclick="event.stopPropagation();exportarColuna(\''+mk+'\',\''+String(key).replace(/['"\\]/g,'')+'\')">⤓</span>':'')
         +((rows.length&&podeMexerColunas()&&key.indexOf('__')!==0)?'<span class="kb-exp" title="Mover todas as oportunidades desta coluna" onclick="event.stopPropagation();abrirMoverColuna(\''+String(key).replace(/['"\\]/g,'')+'\')">⇥</span>':'')
@@ -9814,54 +10201,75 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'</div>'
 
 
-    // Kanban
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin:24px 0 12px;flex-wrap:wrap;gap:8px">'
-    +'<div class="section-label" style="margin:0;border:none;padding:0">'+(isDir?'Funil do time por segmento':'Seu funil')+' — clique no card para editar, use o botão para avançar</div>'
-    +'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">'
-    +'<div style="display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden">'
-    +'<button style="padding:6px 12px;font-size:11px;font-weight:700;border:none;cursor:pointer;background:'+((window._kbView||'kanban')==='kanban'?'var(--wine)':'var(--card)')+';color:'+((window._kbView||'kanban')==='kanban'?'#fff':'var(--muted)')+'" onclick="window._kbView=\'kanban\';renderAssessorOpps()">Kanban</button>'
-    +'<button style="padding:6px 12px;font-size:11px;font-weight:700;border:none;cursor:pointer;background:'+((window._kbView||'kanban')==='lista'?'var(--wine)':'var(--card)')+';color:'+((window._kbView||'kanban')==='lista'?'#fff':'var(--muted)')+'" onclick="window._kbView=\'lista\';renderAssessorOpps()">Lista</button>'
+    // ── A BARRA DE FILTROS ────────────────────────────────────────────────
+    // Um bloco só, não um punhado de caixinhas soltas. Filtro ligado fica
+    // vinho, e o "limpar" só aparece quando há o que limpar.
+    +'<div class="kb-top">'
+      +'<div class="section-label" style="margin:0;border:none;padding:0">'+(isDir?'Funil do time por segmento':'Seu funil')+'</div>'
+      +'<div class="kb-hint">clique no card para editar, use o botão para avançar</div>'
     +'</div>'
+    +'<div class="kb-bar">'
+    +(()=>{
+      const V=window._kbView||'kanban';
+      const bt=(k,rot)=>'<button class="'+(V===k?'on':'')+'" onclick="window._kbView=\''+k+'\';renderAssessorOpps()">'+rot+'</button>';
+      return '<div class="kb-seg">'+bt('kanban','Kanban')+bt('lista','Lista')+'</div>';
+    })()
+    +'<span class="kb-sep"></span>'
+    +'<div class="kb-fs">'
+    +(()=>{
+      const sel=(valor,onch,opts,titulo)=>'<select class="filter-sel'+(valor?' ativa':'')+'"'
+        +(titulo?' title="'+titulo+'"':'')+' onchange="'+onch+'">'+opts+'</select>';
+      const op=(v,rot,on)=>'<option value="'+String(v).replace(/"/g,'&quot;')+'"'+(on?' selected':'')+'>'+rot+'</option>';
+      let h='';
+      h+=sel(fArea,'window._kbArea=this.value;renderAssessorOpps()',
+        op('','Todas as áreas ('+myOpps.length+')',!fArea)
+        +subareasVis().map(([k,a])=>op(k,a.name+' ('+myOpps.filter(r=>subAreaOf(r)===k).length+')',fArea===k)).join(''),'Área');
+      const ass=window._kbAss||'';
+      h+='<span class="kb-dupla">'
+        +sel(ass,'window._kbAss=this.value;renderAssessorOpps()',
+          op('','Todos assessores',!ass)
+          +todosAssessores().filter(a=>myOpps.some(r=>assDe(r)===a)).map(a=>op(a,a,ass===a)).join(''),'Quem trouxe')
+        +(podeMexerAssessor()?'<button class="kb-mini" title="Renomear ou unificar assessores repetidos" onclick="abrirAssessores()">&#9998;</button>':'')
+        +'</span>';
+      const mp=new Map();myOpps.map(r=>r.produto).filter(Boolean).forEach(x=>{if(!mp.has(norm(x)))mp.set(norm(x),x)});
+      const prods=[...mp.values()].sort((a,b)=>a.localeCompare(b));
+      if(prods.length)h+=sel(window._kbProd||'','window._kbProd=this.value;renderAssessorOpps()',
+        op('','Todos produtos',!(window._kbProd||''))
+        +prods.map(x=>op(x,x,norm(window._kbProd||'')===norm(x))).join(''),'Produto');
+      const ms=new Map();myOpps.map(r=>r.sc).filter(Boolean).forEach(x=>{if(!ms.has(norm(x)))ms.set(norm(x),x)});
+      h+=sel(window._kbSC||'','window._kbSC=this.value;renderAssessorOpps()',
+        op('','Todos status',!(window._kbSC||''))
+        +[...ms.values()].sort().map(x=>op(x,x,norm(window._kbSC||'')===norm(x))).join(''),'Status comercial');
+      h+=sel(window._kbPB||'','window._kbPB=this.value;renderAssessorOpps()',
+        op('','Todas pendências',!(window._kbPB||''))
+        +[...new Set(myOpps.map(r=>r.pb).filter(Boolean))].sort().map(x=>op(x,x,(window._kbPB||'')===x)).join(''),'Pendência de boleta');
+      const per=window._kbPer||'', ehData=per.indexOf('data:')===0;
+      h+='<span class="kb-dupla">'
+        +sel(per,'kbPeriodoSel(this.value)',
+          op('','Reuniões: todas',!per)
+          +op('hoje','Reuniões de hoje',per==='hoje')
+          +op('amanha','Reuniões de amanhã',per==='amanha')
+          +op('semana','Reuniões desta semana',per==='semana')
+          +op('passada','Reuniões da semana passada',per==='passada')
+          +op('dia','Reuniões de um dia…',ehData),'Quando é a reunião')
+        +(ehData?'<input type="date" class="kb-perdt" value="'+per.slice(5)+'" onchange="kbPeriodoData(this.value)" title="O dia da reunião">':'')
+        +'</span>';
+      h+=sel(window._kbAg||'','window._kbAg=this.value;renderAssessorOpps()',
+        op('','Agenda: tudo',!(window._kbAg||''))
+        +[['todo-hoje','TODOs de hoje'],['todo-atrasado','TODOs atrasados'],['parado','Parados +7 dias']]
+          .map(([v,l])=>op(v,l,(window._kbAg||'')===v)).join(''),'O que vence');
+      const resps=[...new Set(myOpps.map(r=>r.responsavel).filter(Boolean))].sort();
+      if(resps.length)h+=sel(window._kbResp||'','window._kbResp=this.value;renderAssessorOpps()',
+        op('','Todos responsáveis',!(window._kbResp||''))
+        +resps.map(x=>op(x,x,(window._kbResp||'')===x)).join(''),'Closer responsável');
+      return h;
+    })()
+    +'</div>'
+    +'<input class="filter-inp" id="kb-cli" type="text" placeholder="Buscar cliente..." value="'+fCliKb.replace(/"/g,'&quot;')+'" oninput="window._kbCli=this.value;kbCliDebounce()">'
+    +(kbTemFiltro()?'<button class="kb-limpa" title="Voltar a ver tudo" onclick="kbLimpaFiltros()">Limpar filtros</button>':'')
+    +'<span class="kb-sep"></span>'
     +'<button class="btn sm" style="font-size:11px" onclick="abrirExport()" title="Baixar planilha: tudo, só uma área ou só uma etapa">Exportar</button>'
-    +'<select class="filter-sel" onchange="window._kbArea=this.value;renderAssessorOpps()">'
-    +'<option value="">Todas as áreas ('+myOpps.length+')</option>'
-    +subareasVis().map(([k,a])=>{
-        const n=myOpps.filter(r=>subAreaOf(r)===k).length;      // contagem antes do filtro de área
-        return '<option value="'+k+'"'+(fArea===k?' selected':'')+'>'+a.name+' ('+n+')</option>';
-      }).join('')
-    +'</select>'
-    +'<span style="display:inline-flex;align-items:center;gap:4px">'
-    +'<select class="filter-sel" onchange="window._kbAss=this.value;renderAssessorOpps()">'
-    +'<option value="">Todos assessores</option>'
-    +todosAssessores().filter(a=>myOpps.some(r=>assDe(r)===a)).map(a=>'<option'+((window._kbAss||'')===a?' selected':'')+'>'+a+'</option>').join('')
-    +'</select>'
-    +(podeMexerAssessor()?'<button class="btn sm" style="font-size:11px;padding:5px 8px" title="Renomear ou unificar assessores repetidos" onclick="abrirAssessores()">✎</button>':'')
-    +'</span>'
-    +(()=>{const m=new Map();myOpps.map(r=>r.produto).filter(Boolean).forEach(p=>{if(!m.has(norm(p)))m.set(norm(p),p)});
-      const prods=[...m.values()].sort((a,b)=>a.localeCompare(b));
-      return prods.length?'<select class="filter-sel" onchange="window._kbProd=this.value;renderAssessorOpps()">'
-        +'<option value="">Todos produtos</option>'
-        +prods.map(p=>'<option value="'+p.replace(/"/g,'&quot;')+'"'+(norm(window._kbProd||'')===norm(p)?' selected':'')+'>'+p+'</option>').join('')
-        +'</select>':'';})()
-    +'<select class="filter-sel" onchange="window._kbSC=this.value;renderAssessorOpps()">'
-    +'<option value="">Todos status</option>'
-    +(()=>{const m=new Map();myOpps.map(r=>r.sc).filter(Boolean).forEach(s=>{if(!m.has(norm(s)))m.set(norm(s),s)});return[...m.values()].sort().map(s=>'<option'+(norm(window._kbSC||'')===norm(s)?' selected':'')+'>'+s+'</option>').join('')})()
-    +'</select>'
-    +'<select class="filter-sel" onchange="window._kbPB=this.value;renderAssessorOpps()">'
-    +'<option value="">Todas pendências</option>'
-    +[...new Set(myOpps.map(r=>r.pb).filter(Boolean))].sort().map(s=>'<option'+((window._kbPB||'')===s?' selected':'')+'>'+s+'</option>').join('')
-    +'</select>'
-    +'<select class="filter-sel" onchange="window._kbAg=this.value;renderAssessorOpps()">'
-    +'<option value="">Agenda: tudo</option>'
-    +[['todo-hoje','TODOs de hoje'],['todo-atrasado','TODOs atrasados'],['parado','Parados +7 dias']].map(([v,l])=>'<option value="'+v+'"'+((window._kbAg||'')===v?' selected':'')+'>'+l+'</option>').join('')
-    +'</select>'
-    +((()=>{const resps=[...new Set(myOpps.map(r=>r.responsavel).filter(Boolean))].sort();
-      return resps.length?'<select class="filter-sel" onchange="window._kbResp=this.value;renderAssessorOpps()">'
-        +'<option value="">Todos responsáveis</option>'
-        +resps.map(s=>'<option'+((window._kbResp||'')===s?' selected':'')+'>'+s+'</option>').join('')
-        +'</select>':'';})())
-    +'<input class="filter-inp" id="kb-cli" type="text" placeholder="Cliente..." value="'+fCliKb.replace(/"/g,'&quot;')+'" oninput="window._kbCli=this.value;kbCliDebounce()" style="min-width:120px">'
-    +'</div></div>'
+    +'</div>'
     +(SELECTED.size>0?(()=>{
       const scOpts=[...SC_CHAIN,...kbCustomCols(),'Cliente Negou','Não se Aplica'].map(x=>'<option>'+x+'</option>').join('');
       const pbMap=new Map();
@@ -9885,7 +10293,6 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
         +'<button class="btn sm" onclick="clearSelectionG()">Limpar seleção</button>'
         +'</div>';
     })():'')
-    +kbBarraReunioes(kbOpps.length)
     +kbHtml
     +(semStatus.length?'<div class="kb-board" style="margin-top:-8px"><div class="kb-col" style="border:1.5px dashed var(--muted-l);background:var(--surf2)">'
       +(()=>{window._kbColIds=window._kbColIds||{};window._kbColIds['|classificar']=semStatus.map(r=>r.id);const csel=semStatus.length>0&&semStatus.every(r=>SELECTED.has(r.id));
@@ -10375,7 +10782,7 @@ async function saveEdit(){
 
 // ── NOVA OPORTUNIDADE MANUAL ──
 // Produtos por área no modal: padrão da casa + o que já existe naquela área
-const PRODUTOS_PADRAO={inv:['IA','Collar','Hawk','Equity','COE','NTN-B 50','CP','Liquidez'],cons:['ALAVANCAGEM FINANCEIRA/PAT'],seg:['SEGURO DE VIDA'],saude:['PLANO DE SAÚDE'],rt:['REVISÃO TRIBUTÁRIA']};
+const PRODUTOS_PADRAO={inv:['IA','Collar','Hawk','Equity','COE','NTN-B 50','CP','Liquidez'],cons:['ALAVANCAGEM FINANCEIRA/PAT'],seg:['SEGURO DE VIDA','DIT'],saude:['PLANO DE SAÚDE'],rt:['REVISÃO TRIBUTÁRIA']};
 function updateNovoProdutos(){
   const area=document.getElementById('n-area').value;
   const m=new Map();
@@ -10798,13 +11205,14 @@ function renderMetas(c=document.getElementById('main-content')){
     const subs=p.metas.map(m=>{
       const g=(SUBAREAS[m.area]||AREAS[m.area]||{});
       const pc=m.meta_valor>0?Math.round(m.boletado/m.meta_valor*100):0;
-      return '<span style="display:inline-flex;align-items:center;gap:4px;background:var(--surf2);border:1px solid var(--border-l);border-radius:4px;padding:2px 8px;font-size:9.5px;white-space:nowrap">'
-        +'<span style="width:6px;height:6px;border-radius:50%;background:'+(g.color||'var(--muted)')+'"></span>'
+      return '<span class="mt-chip'+(ehDiretor?' ed':'')+'"'
+        +(ehDiretor?' onclick="event.stopPropagation();openEditMeta(\''+m.id+'\')" title="Clique para editar esta meta"':'')+'>'
+        +'<span class="mt-pt" style="background:'+(g.color||'var(--muted)')+'"></span>'
         +'<span style="font-weight:700">'+(g.name||m.area||'—')+(m.produto?' · '+m.produto:'')+'</span>'
         +'<span style="color:var(--muted)">'+fmtC(m.boletado)+'/'+fmtC(m.meta_valor)+'</span>'
         +'<strong style="color:'+corPct(pc)+'">'+pc+'%</strong>'
-        +(ehDiretor?'<span onclick="event.stopPropagation();openEditMeta(\''+m.id+'\')" title="Editar meta" style="cursor:pointer;opacity:.5;margin-left:2px"></span>'
-          +'<span onclick="event.stopPropagation();delMeta(\''+m.id+'\')" title="Excluir meta" style="cursor:pointer;opacity:.5">×</span>':'')
+        +(ehDiretor?'<span class="mt-bt" onclick="event.stopPropagation();openEditMeta(\''+m.id+'\')" title="Editar meta">✎</span>'
+          +'<span class="mt-bt x" onclick="event.stopPropagation();delMeta(\''+m.id+'\')" title="Excluir meta">×</span>':'')
         +'</span>';
     }).join(' ');
     return '<div style="display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--border-l)">'
@@ -11030,6 +11438,232 @@ function arquivoRetroativo(r,sc,pb,dataBoleta,ds){
 }
 // procura em TUDO: o Histórico precisa abrir e reabrir oportunidade arquivada
 const acharOpp=id=>(OPPS_ALL.length?OPPS_ALL:OPPS).find(o=>String(o.id)===String(id));
+
+// ══ STAND-BY QUALIFICADO · PLANO DE SAÚDE ═════════════════════════════════
+// Stand-by não é um estado só: é "em cotação", "esperando vigência",
+// "esperando documento". Cada um espera uma coisa diferente e entra em um mês
+// diferente. Sem isso, R$3,09M viram um número que ninguém sabe quando vira
+// dinheiro. Aqui a oportunidade ganha uma SITUAÇÃO e uma DATA DE VIGÊNCIA, e
+// o painel soma por mês: quando o dinheiro começa a entrar de fato.
+// As situações são abertas de propósito — o time define quais são.
+const CAMPO_SB='Stand-by';
+const AREA_SB='sb';
+const SB_AREA='saude';
+const SB_PADRAO=['Em cotação','Aguardando vigência','Aguardando documentação','Aguardando assinatura','Cliente decidindo'];
+const sbEhColuna=nome=>{const n=norm(nome||'').replace(/[- ]/g,'');return n.indexOf('standby')===0};
+const sbEhDaArea=r=>r.area===SB_AREA;
+const sbVolume=r=>r.atual||r.pipe||0;
+
+function sbVarsBanco(){
+  return (METAS_RAW||[]).filter(m=>m.area===AREA_SB)
+    .sort((a,b)=>String(a.created_at||'').localeCompare(String(b.created_at||'')));
+}
+function sbVars(){
+  const b=sbVarsBanco().map(m=>String(m.produto||'').trim()).filter(Boolean);
+  return b.length?b:SB_PADRAO.slice();
+}
+// as situações padrão só viram linha no banco quando ele mexe nelas
+async function sbMaterializa(){
+  if(sbVarsBanco().length)return;
+  const novas=SB_PADRAO.map(nome=>({mes:MES_COLUNA,assessor:(USER&&USER.nome)||'',area:AREA_SB,produto:nome,meta_valor:1}));
+  try{const res=await db('POST','metas',novas);
+    (Array.isArray(res)?res:novas).forEach(x=>(METAS_RAW=METAS_RAW||[]).push(normalizaMeta(x)));
+  }catch(e){showToast('Não consegui salvar as situações: '+e.message)}
+}
+async function sbAddVar(){
+  const el=document.getElementById('sb-nova');
+  const nome=String((el&&el.value)||'').trim();
+  if(!nome)return;
+  await sbMaterializa();
+  if(sbVars().some(x=>norm(x)===norm(nome))){showToast('Essa situação já existe');return}
+  const nova={mes:MES_COLUNA,assessor:(USER&&USER.nome)||'',area:AREA_SB,produto:nome,meta_valor:1};
+  try{
+    const res=await db('POST','metas',nova);
+    (METAS_RAW=METAS_RAW||[]).push(normalizaMeta(Object.assign(nova,(Array.isArray(res)&&res[0])||{id:'tmp'+Date.now()})));
+    if(el)el.value='';
+    sbRender();
+  }catch(e){showToast('Não consegui salvar: '+e.message)}
+}
+async function sbDelVar(nome){
+  const usadas=sbLista().filter(r=>norm(sbDe(r).sit)===norm(nome)).length;
+  if(usadas&&!confirm(usadas+' oportunidade'+(usadas>1?'s estão':' está')+' com "'+nome+'". Tirar a situação da lista? Elas ficam sem situação.'))return;
+  await sbMaterializa();
+  const m=sbVarsBanco().find(x=>norm(x.produto||'')===norm(nome));
+  if(!m)return;
+  try{
+    await db('DELETE','metas',null,'id=eq.'+m.id);
+    METAS_RAW=(METAS_RAW||[]).filter(x=>String(x.id)!==String(m.id));
+    sbRender();
+  }catch(e){showToast('Não consegui apagar: '+e.message)}
+}
+
+// o que cada card está esperando: situação | data de vigência | observação
+function sbDe(r){
+  let v='';
+  (r&&r.historico||[]).forEach(h=>{if(h.campo===CAMPO_SB)v=String(h.para||'')});
+  const p=String(v).split('|');
+  return {sit:(p[0]||'').trim(), vig:(p[1]||'').trim(), obs:p.slice(2).join('|').trim()};
+}
+async function sbGrava(id,campo,valor){
+  const r=acharOpp(id);if(!r)return;
+  const a=sbDe(r), d=Object.assign({},a,{[campo]:String(valor||'').trim()});
+  if(d.sit===a.sit&&d.vig===a.vig&&d.obs===a.obs)return;
+  const now=new Date();
+  const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const hist=[...(r.historico||[]),{campo:CAMPO_SB,de:[a.sit,a.vig,a.obs].join('|'),
+    para:[d.sit,d.vig,d.obs].join('|'),usuario:(USER&&USER.nome)||'',data:ds}];
+  r.historico=hist;
+  try{await db('PATCH','oportunidades',{historico:hist,updated_at:now.toISOString()},'id=eq.'+r.id)}
+  catch(e){showToast('Não consegui salvar: '+e.message);return}
+  sbRender();
+}
+
+function sbLista(){
+  return oppsDoUsuario().filter(r=>sbEhDaArea(r)&&sbEhColuna(r.sc)&&!arquivada(r)&&!isPerdida(r));
+}
+const sbMesDe=v=>/^\d{4}-\d{2}/.test(String(v||''))?String(v).slice(0,7):'';
+function sbMesRot(m){
+  if(!m)return 'Sem data de vigência';
+  const [y,mm]=m.split('-');
+  const nm=new Date(+y,+mm-1,1).toLocaleDateString('pt-BR',{month:'short'}).replace('.','');
+  return nm.charAt(0).toUpperCase()+nm.slice(1)+'/'+y.slice(2);
+}
+
+function sbFiltraMes(m){window._sbMes=(window._sbMes===m?'':m);sbRender()}
+function abrirStandby(){
+  window._sbMes='';
+  const el=document.getElementById('modal-area');if(!el)return;
+  el.classList.add('sb');          // aqui se trabalha: a janela abre larga
+  sbRender();
+  el.style.display='flex';
+}
+function sbRender(){
+  const body=document.getElementById('ba-body');if(!body)return;
+  const lista=sbLista().sort((a,b)=>sbVolume(b)-sbVolume(a));
+  const V=sbVars();
+  const tot=lista.reduce((s,r)=>s+sbVolume(r),0);
+  const comVig=lista.filter(r=>sbMesDe(sbDe(r).vig));
+  const semSit=lista.filter(r=>!sbDe(r).sit);
+  const volVig=comVig.reduce((s,r)=>s+sbVolume(r),0);
+
+  const cx=(rot,v,sub,cor)=>'<div style="flex:1;min-width:148px;background:var(--surf2);border:1px solid var(--border);'
+    +'border-radius:4px;padding:10px 13px">'
+    +'<div style="font-size:9.5px;font-weight:700;color:'+(cor||'var(--muted)')+';text-transform:uppercase;letter-spacing:.04em">'+rot+'</div>'
+    +'<div style="font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;color:'+(cor||'var(--text)')+'">'+v+'</div>'
+    +(sub?'<div style="font-size:10px;color:var(--muted-l);margin-top:1px">'+sub+'</div>':'')+'</div>';
+
+  // ── QUANDO O DINHEIRO ENTRA ──
+  // Uma barra por mês, na ordem do calendário e sem pular mês vazio: mês sem
+  // nada também é informação. Clicar num mês filtra a lista de baixo.
+  const porMes={};
+  lista.forEach(r=>{const m=sbMesDe(sbDe(r).vig);(porMes[m]=porMes[m]||[]).push(r)});
+  const comData=Object.keys(porMes).filter(Boolean).sort();
+  const somaM=m=>(porMes[m]||[]).reduce((a,x)=>a+sbVolume(x),0);
+  let meses=[];
+  if(comData.length){
+    const ini=comData[0].split('-').map(Number), fim=comData[comData.length-1].split('-').map(Number);
+    let y=ini[0],mo=ini[1];
+    for(let g=0;g<60;g++){
+      meses.push(y+'-'+String(mo).padStart(2,'0'));
+      if(y===fim[0]&&mo===fim[1])break;
+      mo++;if(mo>12){mo=1;y++}
+    }
+  }
+  const topo=Math.max(1,...meses.map(somaM));
+  const selM=window._sbMes||'';
+  const coluna=m=>{
+    const v=somaM(m),n=(porMes[m]||[]).length;
+    const h=Math.round(v/topo*100);
+    return '<div class="sb-col'+(selM===m?' on':'')+(v?'':' vz')+'"'
+      +(v?' onclick="sbFiltraMes(\''+m+'\')" title="'+n+(n===1?' oportunidade':' oportunidades')+' · '+fmtR(v)+' — clique para ver quais"':'')
+      +'><div class="sb-v">'+(v?dyK(v):'')+'</div>'
+      +'<div class="sb-tr"><div class="sb-b" style="height:'+(v?Math.max(h,4):0)+'%"></div></div>'
+      +'<div class="sb-m">'+sbMesRot(m)+'</div>'
+      +'<div class="sb-q">'+(n?n+(n===1?' op':' ops'):'')+'</div></div>';
+  };
+  const semData=porMes['']||[];
+  const tabMes=(meses.length||semData.length)
+    ? '<div class="sb-bars">'+meses.map(coluna).join('')
+      +(semData.length?'<div class="sb-col sem'+(selM==='__sem__'?' on':'')+'" '
+        +'onclick="sbFiltraMes(\'__sem__\')" title="Sem data de vigência — clique para ver quais">'
+        +'<div class="sb-v">'+dyK(semData.reduce((a,x)=>a+sbVolume(x),0))+'</div>'
+        +'<div class="sb-tr"><div class="sb-b" style="height:'
+        +Math.max(Math.round(semData.reduce((a,x)=>a+sbVolume(x),0)/topo*100),4)+'%"></div></div>'
+        +'<div class="sb-m">Sem data</div>'
+        +'<div class="sb-q">'+semData.length+(semData.length===1?' op':' ops')+'</div></div>':'')
+      +'</div>'
+    : '';
+
+  // por situação
+  const porSit={};
+  lista.forEach(r=>{const k=sbDe(r).sit||'';(porSit[k]=porSit[k]||[]).push(r)});
+  const sits=V.filter(v=>porSit[v]&&porSit[v].length).concat(Object.keys(porSit).filter(k=>k&&!V.some(v=>v===k)));
+  const tabSit='<table class="ba-tbl"><thead><tr><th>Situação</th><th class="r">Oportunidades</th>'
+    +'<th class="r">Volume</th></tr></thead><tbody>'
+    +sits.map(k=>'<tr><td style="font-weight:700">'+dyEsc(k)+'</td><td class="r">'+porSit[k].length+'</td>'
+      +'<td class="r val">'+fmtR(porSit[k].reduce((s,x)=>s+sbVolume(x),0))+'</td></tr>').join('')
+    +(porSit['']?'<tr style="background:var(--amber-bg)"><td style="font-weight:700;color:var(--amber)">Sem situação</td>'
+      +'<td class="r">'+porSit[''].length+'</td><td class="r val">'
+      +fmtR(porSit[''].reduce((s,x)=>s+sbVolume(x),0))+'</td></tr>':'')
+    +'</tbody></table>';
+
+  // a lista, onde ele qualifica — respeitando o mês clicado na barra
+  const visiveis=!selM?lista
+    :lista.filter(r=>{const m=sbMesDe(sbDe(r).vig);return selM==='__sem__'?!m:m===selM});
+  const linhas=visiveis.map(r=>{
+    const d=sbDe(r);
+    const opts='<option value="">— situação —</option>'
+      +V.map(v=>'<option'+(norm(d.sit)===norm(v)?' selected':'')+'>'+dyEsc(v)+'</option>').join('')
+      +((d.sit&&!V.some(v=>norm(v)===norm(d.sit)))?'<option selected>'+dyEsc(d.sit)+'</option>':'');
+    return '<tr>'
+      +'<td style="font-weight:700;cursor:pointer" title="Abrir a oportunidade" onclick="closeModal(\'area\');openEdit(\''+r.id+'\')">'
+        +dyEsc(r.cliente||'Sem nome')
+        +'<div class="fn-ev" style="font-weight:400">'+dyEsc(r.responsavel||'sem closer')+'</div></td>'
+      +'<td class="r val">'+fmtR(sbVolume(r))+'</td>'
+      +'<td><select class="filter-sel'+(d.sit?' ativa':'')+'" style="font-size:11px;max-width:168px" '
+        +'onchange="sbGrava(\''+r.id+'\',\'sit\',this.value)">'+opts+'</select></td>'
+      +'<td><input type="month" class="sb-dt'+(d.vig?' ok':'')+'" value="'+dyEsc(sbMesDe(d.vig))+'" '
+        +'title="O mês em que a boleta entra — é ele que alimenta o gráfico" '
+        +'onchange="sbGrava(\''+r.id+'\',\'vig\',this.value)"></td>'
+      +'<td><input class="sb-obs" value="'+dyEsc(d.obs)+'" placeholder="o que está esperando" '
+        +'onblur="sbGrava(\''+r.id+'\',\'obs\',this.value)" onkeydown="if(event.key===\'Enter\')this.blur()"></td>'
+      +'</tr>';
+  }).join('');
+
+  const podeMexer=typeof podeMexerColunas==='function'?podeMexerColunas():true;
+  const editor=podeMexer?'<div class="ba-sec"><div class="sb-h">As situações possíveis</div>'
+    +'<div style="font-size:11px;color:var(--muted);margin-bottom:7px">Combine com o time e ajuste aqui. '
+    +'O que você criar passa a valer para todas as oportunidades em stand-by da saúde.</div>'
+    +'<div class="sb-vars">'
+    +V.map(v=>'<span class="sb-var">'+dyEsc(v)
+      +'<button title="Tirar da lista" onclick="sbDelVar(\''+dyEsc(v).replace(/'/g,"&#39;")+'\')">×</button></span>').join('')
+    +'</div>'
+    +'<div style="display:flex;gap:6px;margin-top:8px">'
+    +'<input id="sb-nova" class="filter-inp" placeholder="Nova situação (ex.: aguardando perícia)" '
+      +'style="flex:1;min-width:0" onkeydown="if(event.key===\'Enter\')sbAddVar()">'
+    +'<button class="btn sm wine" onclick="sbAddVar()">Adicionar</button></div></div>':'';
+
+  document.getElementById('ba-title').innerHTML='Stand-by · Plano de saúde'
+    +' <span style="font-size:11px;font-weight:600;color:var(--muted)">· o que está esperando, e quando entra</span>';
+  body.innerHTML=
+    '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">'
+    +cx('Oportunidades',lista.length,'')
+    +cx('Volume em stand-by',fmtR(tot),'')
+    +cx('Já com vigência',fmtR(volVig),comVig.length+' de '+lista.length+' qualificadas')
+    +(semSit.length?cx('Sem situação',semSit.length,'ninguém sabe o que esperam','var(--amber)'):'')
+    +'</div>'
+    +(lista.length?'<div class="ba-sec"><div class="sb-h">Quando o dinheiro entra</div>'+tabMes+'</div>'
+      +'<div class="ba-sec"><div class="sb-h">Por situação</div>'+tabSit+'</div>'
+      +'<div class="ba-sec"><div class="sb-h">Qualificar'
+      +(selM?'<span class="sb-fil">'+(selM==='__sem__'?'sem data de vigência':sbMesRot(selM))
+        +' · '+visiveis.length+' de '+lista.length
+        +'<button onclick="sbFiltraMes(\'\')">ver todas</button></span>':'')+'</div>'
+      +'<div style="overflow-x:auto"><table class="ba-tbl sb-tbl"><thead><tr>'
+      +'<th>Cliente</th><th class="r">Volume</th><th>Situação</th><th>Entra em</th><th>Observação</th>'
+      +'</tr></thead><tbody>'+linhas+'</tbody></table></div></div>'
+      :'<div class="ba-vazio">Nenhuma oportunidade de Plano de saúde em stand-by.</div>')
+    +editor;
+}
 function mesExtenso(ym){
   if(!/^\d{4}-\d{2}$/.test(ym||''))return ym||'—';
   const [y,m]=ym.split('-').map(Number);
@@ -13310,7 +13944,7 @@ function renderAgendaExterna(c=document.getElementById('main-content')){
           +'<div class="cal-cli">'+r.cliente+'</div>'
           +'<div class="cal-sub">'+(horaReuniao(r)?horaReuniao(r)+' · ':'')+((AREAS[r.area]||{}).name||r.area)+(r.produto?' · '+r.produto:'')
           +(r.responsavel||r.assessor?' · '+(r.responsavel||r.assessor):'')+'</div></div>'
-          +'<span class="cal-bt" title="Abrir no Google Agenda já preenchido" onclick="event.stopPropagation();mandarParaAgenda(\''+r.id+'\')"></span>'
+          +'<span class="cal-bt" title="Abrir no Google Agenda já preenchido" onclick="event.stopPropagation();mandarParaAgenda(\''+r.id+'\')">'+icoAgenda()+'</span>'
           +'</div>';
       }).join('')
     : '<div style="font-size:12px;color:var(--muted-l);padding:10px 2px">Nenhuma reunião marcada no sistema nesta semana.</div>';
@@ -13480,7 +14114,7 @@ function htmlConfronto(orfaos,semEvento,nCasados,nEvs,alvo){
       :'<div style="font-size:12px;color:var(--green);padding:6px 2px">Toda reunião da agenda tem oportunidade no sistema.</div>')
     +(semEvento.length?'<div style="margin-top:10px">'+semEvento.map(r=>linha('','var(--amber)',
         r.cliente,'marcada no sistema e não achei na agenda · '+brData(isoDia(r.reuniao_data)).slice(0,5),
-        '<span class="cal-bt" title="Abrir no Google Agenda já preenchido" onclick="mandarParaAgenda(\''+r.id+'\')"></span>')).join('')+'</div>':'')
+        '<span class="cal-bt" title="Abrir no Google Agenda já preenchido" onclick="mandarParaAgenda(\''+r.id+'\')">'+icoAgenda()+'</span>')).join('')+'</div>':'')
     +(()=>{
       const fora=(window._agFora||[]);
       if(!fora.length)return '';
