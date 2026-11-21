@@ -172,6 +172,100 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .kpi.wine .kpi-val{color:var(--wine-d)}
 .kpi-sub{font-size:11px;color:var(--muted);margin-top:4px}
 
+/* ══ DASHBOARD DE VENDAS ══ */
+.ds{display:grid;gap:16px}
+.ds-top{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.ds-seg{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--card)}
+.ds-seg button{border:0;background:transparent;padding:6px 12px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.ds-seg button+button{border-left:1px solid var(--border)}
+.ds-seg button:hover{color:var(--text);background:var(--surf2)}
+.ds-seg button.on{background:var(--wine);color:#fff}
+.ds-lbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-right:6px}
+.ds-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;min-width:0}
+.ds-h{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.ds-h .ds-sub{font-weight:600;text-transform:none;letter-spacing:0;color:var(--muted-l)}
+.ds-hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:22px;align-items:center;background:linear-gradient(120deg,#3B0F1A,#7A2233 60%,#9B3A4C);color:#fff;border:0}
+.ds-hero .ds-frase{font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:1.35}
+.ds-hero .ds-frase b{color:#F7D98B;font-weight:700}
+.ds-hero .ds-mini{font-size:12px;opacity:.85;margin-top:8px}
+.ds-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.ds-kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:transform .15s,border-color .15s;position:relative;overflow:hidden}
+.ds-kpi:hover{transform:translateY(-2px);border-color:var(--wine)}
+.ds-kpi::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--kc,var(--wine))}
+.ds-kpi .l{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.ds-kpi .v{font-size:26px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}
+.ds-kpi .s{font-size:11px;color:var(--muted);margin-top:2px}
+.ds-up{color:#2E8B57;font-weight:700}.ds-down{color:#C0392B;font-weight:700}
+.ds-grid2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px}
+@media(max-width:1000px){.ds-grid2{grid-template-columns:minmax(0,1fr)}.ds-hero{grid-template-columns:minmax(0,1fr)}}
+.ds-reu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+.ds-reu>div{background:var(--surf2);border-radius:8px;padding:10px 12px;cursor:pointer;border:1px solid transparent}
+.ds-reu>div:hover{border-color:var(--wine)}
+.ds-reu .n{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.ds-reu .t{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ds-reu .x{font-size:10.5px;color:var(--muted)}
+.ds-bar{position:relative;height:12px;background:var(--surf3);border-radius:6px;overflow:visible}
+.ds-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.ds-bar em{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--text);border-radius:1px}
+.ds-arow{cursor:pointer;padding:8px 6px;border-radius:6px}
+.ds-arow:hover{background:var(--surf2)}
+.ds-fun{display:grid;gap:8px}
+.ds-fun>div{display:grid;grid-template-columns:110px minmax(0,1fr) 54px;align-items:center;gap:10px;cursor:pointer}
+.ds-fun .fb{height:26px;border-radius:5px;background:var(--wine);display:flex;align-items:center;padding-left:9px;color:#fff;font-size:12px;font-weight:700;transition:width .9s cubic-bezier(.2,.8,.2,1);min-width:34px}
+.ds-fun .fp{font-size:11px;color:var(--muted);text-align:right}
+.ds-gap{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;border:1px solid var(--border-l);margin-bottom:7px}
+.ds-gap:hover{border-color:var(--wine);background:var(--surf2)}
+.ds-gap .gi{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0}
+.ds-gap .gt{flex:1;font-size:12.5px}
+.ds-gap .gt small{display:block;color:var(--muted);font-size:11px}
+.ds-gap .gn{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+.ds-hstat{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:12px}
+.ds-hstat>div{background:var(--surf2);border-radius:8px;padding:9px 12px}
+.ds-hstat .t{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ds-hstat .n{font-size:17px;font-weight:700;margin-top:2px}
+.ds-leg{display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:var(--muted);margin-bottom:8px}
+.ds-leg span{display:inline-flex;align-items:center;gap:5px}
+.ds-leg i{width:10px;height:10px;border-radius:2px;display:inline-block}
+/* cards FIFA dos closers */
+.ds-squad{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px}
+.ds-mini{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border:1px solid var(--border);border-radius:999px;cursor:pointer;background:var(--card);transition:all .15s}
+.ds-mini:hover{border-color:var(--wine);transform:translateY(-1px)}
+.ds-mini.on{border-color:var(--wine);background:var(--wine-l);box-shadow:0 0 0 2px var(--wine-l)}
+.ds-mini .av{width:30px;height:30px;border-radius:50%;background:var(--wine);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background-size:cover;background-position:center}
+.ds-mini b{font-size:12px}.ds-mini small{font-size:11px;font-weight:800;color:var(--wine)}
+.ds-ficha{display:grid;grid-template-columns:250px minmax(0,1fr);gap:22px;align-items:start}
+@media(max-width:900px){.ds-ficha{grid-template-columns:minmax(0,1fr);justify-items:center}}
+.fut{position:relative;width:240px;height:340px;clip-path:polygon(14% 0,86% 0,100% 7%,100% 85%,50% 100%,0 85%,0 7%);padding:20px 22px 0;color:var(--fc);background:var(--fb);animation:futIn .6s cubic-bezier(.2,.9,.3,1.2);perspective:800px}
+.fut::before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.45) 45%,transparent 60%);transform:translateX(-120%);animation:futBrilho 3.2s ease-in-out 0.6s infinite}
+.fut::after{content:'';position:absolute;inset:7px;clip-path:inherit;border:1.5px solid rgba(255,255,255,.35);pointer-events:none}
+@keyframes futIn{from{opacity:0;transform:rotateY(80deg) scale(.85)}to{opacity:1;transform:none}}
+@keyframes futBrilho{0%,60%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
+.fut-gold{--fb:linear-gradient(160deg,#FBF0C0,#E2BE52 42%,#A9831F);--fc:#3A2905}
+.fut-prata{--fb:linear-gradient(160deg,#FAFAFA,#C9C9C9 45%,#8C8C8C);--fc:#202020}
+.fut-bronze{--fb:linear-gradient(160deg,#F2C79E,#B9773A 45%,#7A4A1C);--fc:#2B1606}
+.fut-icone{--fb:linear-gradient(160deg,#2A0A12,#7A2233 50%,#C9A24A);--fc:#F7E3A1}
+.fut-top{display:flex;gap:10px;position:relative;z-index:1}
+.fut-ovr{font-size:46px;font-weight:900;line-height:.9;letter-spacing:-1px}
+.fut-pos{font-size:13px;font-weight:800;letter-spacing:.06em;margin-top:2px}
+.fut-tier{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-top:4px}
+.fut-foto{position:absolute;right:18px;top:24px;width:130px;height:138px;border-radius:8px 8px 40px 40px;background:rgba(255,255,255,.18);background-size:cover;background-position:center top;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:var(--fc);z-index:1;cursor:default}
+.fut-foto.pode{cursor:pointer}
+.fut-foto.pode:hover::after{content:'trocar foto';position:absolute;bottom:10px;font-size:10px;font-weight:800;background:rgba(0,0,0,.55);color:#fff;padding:3px 8px;border-radius:10px}
+.fut-nome{position:relative;z-index:1;margin-top:66px;text-align:center;font-size:19px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;border-bottom:1.5px solid currentColor;padding-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fut-stats{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:3px 18px;margin-top:9px;padding:0 10px}
+.fut-stats div{display:flex;gap:7px;align-items:baseline;font-size:13px}
+.fut-stats b{font-size:17px;font-weight:900;min-width:24px}
+.fut-stats span{font-weight:700;letter-spacing:.05em}
+.ds-badges{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.ds-badge{font-size:10.5px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--wine-l);color:var(--wine-d);border:1px solid var(--accent-b);text-transform:uppercase;letter-spacing:.05em}
+.ds-fstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px}
+.ds-fstats>div{background:var(--surf2);border-radius:8px;padding:9px 11px;cursor:pointer;border:1px solid transparent}
+.ds-fstats>div:hover{border-color:var(--wine)}
+.ds-fstats .t{font-size:9.5px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ds-fstats .n{font-size:18px;font-weight:800;margin-top:2px;font-variant-numeric:tabular-nums}
+.ds-li{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:6px 0;border-bottom:1px dashed var(--border-l);cursor:pointer}
+.ds-li:hover{color:var(--wine)}
+.ds-li:last-child{border-bottom:0}
 .area-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:22px}
 .area-card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:14px 16px;border-left:3px solid var(--wine)}
 .area-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border-l);border:1px solid var(--border-l);border-radius:4px;overflow:hidden;margin-bottom:2px}
@@ -2944,10 +3038,10 @@ async function initAppInterno(){
   startVersaoCheck();
   // o diretor abre no macro: é a pergunta que ele faz primeiro.
   // A aba precisa estar escolhida ANTES do menu, senão o título sai errado.
-  curView=(mandaNaArea())?'d-macro':'a-opps';
+  curView=(mandaNaArea())?'d-dash':'a-opps';
   buildNav();
   const c=document.getElementById('main-content');
-  if(curView==='d-macro')renderMacro(c);else renderAssessorOpps(c);
+  if(curView==='d-dash')renderDashboard(c);else renderAssessorOpps(c);
   // Mark active tab
   const firstTab=document.querySelector('.nav-tab');
   if(firstTab)firstTab.classList.add('active');
@@ -3460,13 +3554,14 @@ let curView='';
 function buildNav(){
   const isDiretor=USER.perfil==='diretor';
   const tabs=isDiretor
-    ?[['d-macro','Funis de venda','funil'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-semana','A semana','semana'],['d-tarefas','Tarefas','tarefas'],['d-guia','Guia do dia','guia'],['d-investor','Investor','carteira'],['d-agenda','Agenda','agenda'],['d-metas','Definições do mês','metas'],['d-historico','Histórico','hist'],['d-upload','Upload','upload'],['d-usuarios','Usuários','usuar']]
+    ?[['d-dash','Dashboard','painel'],['d-daily','Daily','daily'],['d-ativ','Atividade','ativ'],['d-semana','A semana','semana'],['d-tarefas','Tarefas','tarefas'],['d-guia','Guia do dia','guia'],['d-investor','Investor','carteira'],['d-agenda','Agenda','agenda'],['d-historico','Histórico','hist'],['d-upload','Upload','upload'],['d-usuarios','Usuários','usuar']]
     :USER.perfil==='head'
-    ?[['d-macro','Funis de venda','funil'],['d-ativ','Atividade','ativ'],['d-tarefas','Tarefas','tarefas'],['d-guia','Guia do dia','guia'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']]
-    :[['a-opps','Guia do dia','guia'],['d-tarefas','Tarefas','tarefas'],['d-macro','Funis de venda','funil'],['d-ativ','Atividade','ativ'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']];
+    ?[['d-dash','Dashboard','painel'],['d-ativ','Atividade','ativ'],['d-tarefas','Tarefas','tarefas'],['d-guia','Guia do dia','guia'],['d-agenda','Agenda','agenda'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']]
+    :[['a-opps','Guia do dia','guia'],['d-tarefas','Tarefas','tarefas'],['d-ativ','Atividade','ativ'],['d-agenda','Agenda','agenda'],['d-metas','Metas','metas'],['d-historico','Histórico','hist'],['a-upload','Subir planilha','upload'],['a-dash','Meu painel','painel']];
   document.getElementById('main-nav').innerHTML=tabs.map(([v,lb,ic])=>
     `<button class="nav-tab${v===curView?' active':''}" title="${lb}" onclick="setView('${v}',this)">${svgIco(ic)}<span class="tab-lb">${lb}</span></button>`).join('');
-  window._tabLabels=Object.fromEntries(tabs.map(([v,lb])=>[v,lb]));
+  // Metas e Funis saíram do menu, mas continuam abrindo pelo Dashboard
+  window._tabLabels=Object.assign({'d-metas':'Metas do mês','d-macro':'Funis de venda'},Object.fromEntries(tabs.map(([v,lb])=>[v,lb])));
   const tt=document.getElementById('view-title');
   if(tt&&window._tabLabels[curView])tt.textContent=window._tabLabels[curView];
 }
@@ -3486,7 +3581,8 @@ async function setView(v,btn){
 function renderCurView(){
   const c=document.getElementById('main-content');
   const v=curView;
-  if(v==='diretor')renderDiretor(c);
+  if(v==='d-dash')renderDashboard(c);
+  else if(v==='diretor')renderDiretor(c);
   else if(v==='d-pipeline')renderDPipeline(c);
   else if(v==='d-guia')renderAssessorOpps(c);
   else if(v==='d-tarefas')renderTarefas(c);
@@ -3505,6 +3601,382 @@ function renderCurView(){
   else if(v==='a-upload')renderTeamUpload(c);
   else if(v==='a-dash')renderAssessorDash(c);
   else if(v==='a-daily')renderAssessorDaily(c);
+}
+
+// ══════════════════════════════════════════════════════════
+// ── DASHBOARD DE VENDAS ──
+// A pergunta do CEO, respondida sozinha: quanto boletamos, o que vamos
+// boletar, o que está andando e onde está o problema. Todo número abre a
+// lista de clientes; toda linha abre o card.
+// ══════════════════════════════════════════════════════════
+const DS_COR={inv:'#7A2233',cons:'#C08497',seg:'#D4A24C',saude:'#5F7A8A',rt:'#9A8C7E'};
+const dsSt=()=>window._ds||(window._ds={per:'mes',area:'',closer:''});
+const dsEsc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const dsDentro=(d,a,b)=>!!d&&d>=a&&d<=b;
+const dsSoma=(rs,f)=>rs.reduce((s,r)=>s+(f(r)||0),0);
+const dsPct=(a,b)=>b>0?Math.round(a/b*100):0;
+// dia da boleta: a data informada; senão a da linha do tempo; senão a competência
+// em que foi arquivada (a virada de mês mexe no updated_at e jogaria tudo no mês errado)
+function dsDataBol(r){
+  const d=parseDataBoleta(r.data_boleta)||boletadoEmISO(r);if(d)return d;
+  const comp=arquivadaEm(r);if(comp)return comp+'-15';
+  return String(r.updated_at||'').slice(0,10);
+}
+function dsPer(per){
+  const h=new Date(),y=h.getFullYear(),m=h.getMonth();let a,b,pa,pb;
+  if(per==='semana'){a=new Date(h);a.setDate(h.getDate()-((h.getDay()+6)%7));b=new Date(a);b.setDate(a.getDate()+6);
+    pa=new Date(a);pa.setDate(a.getDate()-7);pb=new Date(h);pb.setDate(h.getDate()-7);}
+  else if(per==='tri'){const q=Math.floor(m/3)*3;a=new Date(y,q,1);b=new Date(y,q+3,0);pa=new Date(y,q-3,1);pb=new Date(y,m-3,h.getDate());}
+  else if(per==='ano'){a=new Date(y,0,1);b=new Date(y,11,31);pa=new Date(y-1,0,1);pb=new Date(y-1,m,h.getDate());}
+  else{a=new Date(y,m,1);b=new Date(y,m+1,0);pa=new Date(y,m-1,1);pb=new Date(y,m-1,Math.min(h.getDate(),new Date(y,m,0).getDate()));}
+  const rot={semana:'nesta semana',mes:'em '+h.toLocaleDateString('pt-BR',{month:'long'}),tri:'neste trimestre',ano:'em '+y}[per]||'';
+  const rotAnt={semana:'semana passada',mes:'mês passado',tri:'trimestre passado',ano:'ano passado'}[per]||'';
+  return{ini:localISO(a),fim:localISO(b),hoje:localISO(h),aIni:localISO(pa),aFim:localISO(pb),rot,rotAnt};
+}
+function dsBase(){const s=dsSt();return (OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS||[]).filter(r=>visivelParaMim(r)&&(!s.area||r.area===s.area))}
+const dsAtivo=r=>!arquivada(r)&&!isB(r)&&!isPerdida(r)&&norm(r.sc||'')!=='nao se aplica';
+const dsTopada=r=>dsAtivo(r)&&norm(r.sc||'').includes('topou');
+// ── listas clicáveis: o número guarda as linhas, o clique abre o modal ──
+function dsReg(k,titulo,rows,o){(window._dsL=window._dsL||{})[k]={titulo,rows,o:o||{}};return ' onclick="dsAbrir(\''+k+'\')" ';}
+function dsAbrir(k){
+  const L=(window._dsL||{})[k];if(!L)return;
+  const o=L.o, val=o.valor||(r=>r.atual||r.pipe||0), dt=o.data||(r=>dataBR(String(r.updated_at||'').slice(0,10)));
+  const rows=[...L.rows].sort((a,b)=>(val(b)||0)-(val(a)||0));
+  const tot=dsSoma(rows,val);
+  document.getElementById('ba-title').innerHTML=dsEsc(L.titulo)+' <span style="font-size:11px;font-weight:600;color:var(--muted)">· '+rows.length+' · '+fmtR(tot)+'</span>';
+  document.getElementById('ba-body').innerHTML=rows.length
+    ?'<div style="overflow-x:auto"><table class="ba-tbl"><thead><tr><th>Cliente</th><th>Responsável</th><th>Status</th><th>'+(o.colData||'Última mexida')+'</th><th class="r">Valor</th></tr></thead><tbody>'
+      +rows.map(r=>'<tr onclick="closeModal(\'area\');openEdit(\''+r.id+'\')" title="Abrir oportunidade">'
+        +'<td style="font-weight:700">'+dsEsc(r.cliente||'—')+'<div style="font-size:10.5px;font-weight:400;color:var(--muted)">'+dsEsc(((AREAS[r.area]||{}).name||r.area)+(r.produto?' · '+r.produto:''))+(r.area==='seg'&&seguradoraDe(r)?' · '+dsEsc(seguradoraDe(r)):'')+'</div></td>'
+        +'<td style="color:var(--muted)">'+dsEsc(r.responsavel||r.assessor||'—')+'</td>'
+        +'<td style="color:var(--muted);font-size:11px">'+dsEsc(r.pb&&isB(r)?r.pb:(r.sc||'—'))+'</td>'
+        +'<td style="color:var(--muted);font-size:11px">'+(dt(r)||'—')+'</td>'
+        +'<td class="r val">'+fmtR(val(r))+'</td></tr>').join('')+'</tbody></table></div>'
+    :'<div class="ba-vazio">Nada por aqui — bom sinal.</div>';
+  const m=document.getElementById('modal-area');m.style.display='flex';
+}
+// ── números que sobem até o valor (dá vida à tela sem atrapalhar a leitura) ──
+function dsAnimaNumeros(root){
+  (root||document).querySelectorAll('[data-dsv]').forEach(el=>{
+    const v=+el.dataset.dsv||0, moeda=el.dataset.dsf==='r', pc=el.dataset.dsf==='p', t0=performance.now(), dur=750;
+    const pinta=x=>{el.textContent=moeda?fmtR(x):pc?Math.round(x)+'%':Math.round(x).toLocaleString('pt-BR')};
+    const passo=t=>{const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3);pinta(v*e);if(k<1)requestAnimationFrame(passo);else pinta(v)};
+    requestAnimationFrame(passo);
+  });
+}
+const dsNum=(v,f)=>'<span data-dsv="'+(Math.round((v||0)*100)/100)+'" data-dsf="'+(f||'')+'">'+(f==='r'?fmtR(v):f==='p'?(v||0)+'%':Math.round(v||0))+'</span>';
+function dsDelta(a,b){
+  if(!b&&!a)return '<span style="color:var(--muted-l)">sem base de comparação</span>';
+  if(!b)return '<span class="ds-up">novo</span>';
+  const d=Math.round((a-b)/b*100);
+  return '<span class="'+(d>=0?'ds-up':'ds-down')+'">'+(d>=0?'▲ ':'▼ ')+Math.abs(d)+'%</span>';
+}
+function dsSet(k,v){dsSt()[k]=v;renderCurView();}
+
+// ── CLOSERS: números de verdade viram atributos de carta ──
+function dsClosers(base){
+  return (USUARIOS||[]).filter(u=>u.ativo!==false&&u.perfil==='closer')
+    .map(u=>u.nome).filter(n=>base.some(r=>norm(r.responsavel||'')===norm(n)));
+}
+function dsFicha(nome,base,P){
+  const meu=base.filter(r=>norm(r.responsavel||'')===norm(nome));
+  const ativos=meu.filter(r=>dsAtivo(r));
+  const reu=meu.filter(r=>dsDentro(isoDia(r.reuniao_data),P.ini,P.fim));
+  const reuFeitas=reu.filter(r=>isoDia(r.reuniao_data)<=P.hoje);
+  const bol=meu.filter(r=>isBol(r)&&dsDentro(dsDataBol(r),P.ini,P.hoje));
+  const d90=localISO(new Date(Date.now()-90*864e5));
+  const reu90=meu.filter(r=>dsDentro(isoDia(r.reuniao_data),d90,P.hoje));
+  const bol90=meu.filter(r=>isBol(r)&&dsDataBol(r)>=d90);
+  const ciclos=bol90.map(r=>{const c=String(r.created_at||'').slice(0,10),b=dsDataBol(r);return c&&b?Math.max(0,(new Date(b)-new Date(c))/864e5):null}).filter(x=>x!==null);
+  const porArea={};meu.forEach(r=>porArea[r.area]=(porArea[r.area]||0)+1);
+  const area=Object.entries(porArea).sort((a,b)=>b[1]-a[1])[0];
+  const h=new Date(),meses=[];
+  for(let i=5;i>=0;i--){const d=new Date(h.getFullYear(),h.getMonth()-i,1);const k=localISO(d).slice(0,7);
+    meses.push({k,rot:d.toLocaleDateString('pt-BR',{month:'short'}).replace('.',''),v:dsSoma(meu.filter(r=>isBol(r)&&dsDataBol(r).slice(0,7)===k),r=>r.atual)})}
+  return{nome,meu,ativos,reu,reuFeitas,bol,vol:dsSoma(bol,r=>r.atual),
+    reu90:reu90.length,bol90:bol90.length,vol90:dsSoma(bol90,r=>r.atual),
+    conv90:reu90.length?Math.min(1,bol90.length/reu90.length):0,
+    ciclo:ciclos.length?ciclos.reduce((a,b)=>a+b,0)/ciclos.length:null,
+    emDia:ativos.length?ativos.filter(r=>r.todo_data&&r.todo_data>=P.hoje).length/ativos.length:0,
+    pipe:dsSoma(ativos,r=>r.atual||r.pipe),topadas:ativos.filter(dsTopada),
+    prox:meu.filter(r=>!arquivada(r)&&isoDia(r.reuniao_data)>=P.hoje).sort((a,b)=>String(a.reuniao_data).localeCompare(String(b.reuniao_data))),
+    ult:meu.filter(isBol).sort((a,b)=>dsDataBol(b).localeCompare(dsDataBol(a))),
+    area:area?area[0]:'',meses};
+}
+// nota de 45 a 99 por atributo, relativa ao melhor do time nos últimos 90 dias
+function dsNotas(fichas){
+  const mx=k=>Math.max(...fichas.map(f=>f[k]||0),0);
+  const mR=mx('reu90'),mB=mx('bol90'),mV=mx('vol90'),mC=mx('conv90');
+  const ciclos=fichas.map(f=>f.ciclo).filter(x=>x!==null),cMin=ciclos.length?Math.max(1,Math.min(...ciclos)):1;
+  const n=x=>Math.round(45+54*Math.max(0,Math.min(1,x)));
+  fichas.forEach(f=>{
+    f.at={REU:n(mR?f.reu90/mR:0),FEC:n(mB?f.bol90/mB:0),VOL:n(mV?f.vol90/mV:0),CON:n(mC?f.conv90/mC:0),
+      VEL:n(f.ciclo===null?0.25:cMin/Math.max(1,f.ciclo)),DIS:n(f.emDia)};
+    f.ovr=Math.round(f.at.VOL*.25+f.at.FEC*.2+f.at.CON*.2+f.at.REU*.15+f.at.DIS*.1+f.at.VEL*.1);
+    f.tier=f.ovr>=85?'icone':f.ovr>=75?'gold':f.ovr>=62?'prata':'bronze';
+  });
+  const top=(k,rot)=>{const m=Math.max(...fichas.map(f=>f.at[k]));if(m>45)fichas.filter(f=>f.at[k]===m).forEach(f=>(f.badges=f.badges||[]).push(rot))};
+  top('VOL','Artilheiro');top('REU','Maratonista');top('CON','Sniper');top('DIS','Relógio suíço');top('VEL','Foguete');top('FEC','Fechador');
+  return fichas.sort((a,b)=>b.ovr-a.ovr);
+}
+const dsIniciais=n=>String(n||'?').split(/\s+/).filter(Boolean).slice(0,2).map(p=>p[0]).join('').toUpperCase();
+const dsFoto=n=>confGet('foto:'+norm(n));
+const DS_AREA_SIG={inv:'INV',cons:'CON',seg:'SEG',saude:'SAU',rt:'REV'};
+function dsCarta(f){
+  const foto=dsFoto(f.nome), pode=mandaNaArea();
+  const tierRot={icone:'Ícone',gold:'Ouro',prata:'Prata',bronze:'Bronze'}[f.tier];
+  return '<div class="fut fut-'+f.tier+'">'
+    +'<div class="fut-top"><div><div class="fut-ovr">'+f.ovr+'</div><div class="fut-pos">'+(DS_AREA_SIG[f.area]||'—')+'</div><div class="fut-tier">'+tierRot+'</div></div></div>'
+    +'<div class="fut-foto'+(pode?' pode':'')+'"'+(pode?' onclick="dsTrocarFoto(\''+dsEsc(f.nome).replace(/'/g,"\\'")+'\')" title="Trocar a foto"':'')
+      +(foto?' style="background-image:url('+foto+')">':'>'+dsIniciais(f.nome))+'</div>'
+    +'<div class="fut-nome">'+dsEsc(String(f.nome).split(' ')[0])+'</div>'
+    +'<div class="fut-stats">'+['REU','FEC','CON','VOL','VEL','DIS'].map(k=>'<div><b>'+f.at[k]+'</b><span>'+k+'</span></div>').join('')+'</div>'
+    +'</div>';
+}
+function dsTrocarFoto(nome){
+  let inp=document.getElementById('ds-foto-in');
+  if(!inp){inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.id='ds-foto-in';inp.style.display='none';document.body.appendChild(inp);
+    inp.onchange=()=>{const f=inp.files[0];inp.value='';if(!f)return;const rd=new FileReader();
+      rd.onload=()=>{const img=new Image();img.onload=async()=>{
+        const W=240,H=280,cv=document.createElement('canvas');cv.width=W;cv.height=H;const cx=cv.getContext('2d');
+        const s=Math.max(W/img.width,H/img.height),w=img.width*s,h=img.height*s;
+        cx.drawImage(img,(W-w)/2,(H-h)/2.6,w,h);
+        try{await confSet('foto:'+norm(window._dsFotoNome),cv.toDataURL('image/jpeg',.82));showToast('Foto atualizada',true);renderCurView();}
+        catch(e){showToast('Não deu para salvar a foto: '+e.message)}
+      };img.src=rd.result};rd.readAsDataURL(f)}}
+  window._dsFotoNome=nome;inp.click();
+}
+
+function renderDashboard(c=document.getElementById('main-content')){
+  ['dsHist','dsReu','dsSpark'].forEach(k=>{if(charts[k]){try{charts[k].destroy()}catch(x){}delete charts[k]}});
+  window._dsL={};
+  const s=dsSt(), P=dsPer(s.per), base=dsBase(), ativos=base.filter(r=>!arquivada(r));
+  const ehMes=s.per==='mes', du=diasUteis();
+  // ── o que já fechou, o que vai fechar ──
+  const bol=base.filter(r=>isBol(r)&&dsDentro(dsDataBol(r),P.ini,P.hoje));
+  const bolAnt=base.filter(r=>isBol(r)&&dsDentro(dsDataBol(r),P.aIni,P.aFim));
+  const vBol=dsSoma(bol,r=>r.atual), vBolAnt=dsSoma(bolAnt,r=>r.atual);
+  const aBol=ativos.filter(isABoletar), vABol=dsSoma(aBol,r=>r.atual||r.pipe);
+  const top=ativos.filter(dsTopada), vTop=dsSoma(top,r=>r.atual||r.pipe);
+  const proj=vBol+vABol+vTop;
+  const metas=metasDoMes().filter(m=>!s.area||m.area===s.area);
+  const meta=ehMes?dsSoma(metas,m=>m.meta_valor):0;
+  const ritmo=ehMes&&du.ate?vBol/du.ate*du.tot:0;
+  const pipeAberto=ativos.filter(dsAtivo), vPipe=dsSoma(pipeAberto,r=>r.pipe);
+  // ── reuniões ──
+  const reu=base.filter(r=>dsDentro(isoDia(r.reuniao_data),P.ini,P.fim));
+  const reuAnt=base.filter(r=>dsDentro(isoDia(r.reuniao_data),P.aIni,P.aFim));
+  const reuFeitas=reu.filter(r=>isoDia(r.reuniao_data)<P.hoje||(isoDia(r.reuniao_data)===P.hoje&&teveReuniao(r)));
+  const reuHoje=ativos.filter(r=>isoDia(r.reuniao_data)===P.hoje);
+  const em7=localISO(new Date(Date.now()+7*864e5));
+  const reuProx=ativos.filter(r=>{const d=isoDia(r.reuniao_data);return d>P.hoje&&d<=em7});
+  const reuTop=reuFeitas.filter(r=>norm(r.sc||'').includes('topou')||isB(r));
+  const reuSemPasso=reuFeitas.filter(r=>dsAtivo(r)&&(!r.todo_data||r.todo_data<P.hoje));
+  // ── gaps ──
+  const gTopou=top.filter(r=>daysSince(getLastMoveDate(r))>5);
+  const gABol=aBol.filter(r=>daysSince(getLastMoveDate(r))>3);
+  const gParado=pipeAberto.filter(r=>daysSince(getLastMoveDate(r))>7);
+  const gTarefa=pipeAberto.filter(r=>r.todo_data&&r.todo_data<P.hoje);
+  // ── por área ──
+  const areas=areasVis().filter(([ak])=>!s.area||ak===s.area).map(([ak,a])=>{
+    const rs=base.filter(r=>r.area===ak), at=rs.filter(r=>!arquivada(r));
+    const b=dsSoma(rs.filter(r=>isBol(r)&&dsDentro(dsDataBol(r),P.ini,P.hoje)),r=>r.atual);
+    const fut=dsSoma(at.filter(isABoletar),r=>r.atual||r.pipe)+dsSoma(at.filter(dsTopada),r=>r.atual||r.pipe);
+    const mt=ehMes?dsSoma(metasDoMes().filter(m=>m.area===ak),m=>m.meta_valor):0;
+    return{ak,a,b,fut,mt,esperado:mt*du.ate/Math.max(du.tot,1)};
+  }).filter(x=>x.b||x.fut||x.mt);
+  const gRitmo=ehMes?areas.filter(x=>x.mt&&x.b<x.esperado*.85):[];
+
+  // ── frase do topo: o que o CEO pergunta, em uma linha ──
+  const nomePer=P.rot;
+  let frase;
+  if(ehMes&&meta){
+    const falta=Math.max(meta-vBol,0);
+    frase=falta?'Faltam <b>'+fmtR(falta)+'</b> para a meta de '+fmtR(meta)+'. Com o que já topou e está a boletar, a projeção é <b>'+fmtR(proj)+'</b>'+(proj>=meta?' — dá para bater.':' — ainda '+fmtR(meta-proj)+' abaixo.')
+      :'Meta de '+fmtR(meta)+' <b>batida</b>. Já são '+fmtR(vBol)+' boletados e mais '+fmtR(vABol+vTop)+' a caminho.';
+  }else frase='<b>'+fmtR(vBol)+'</b> boletados '+nomePer+' ('+dsDelta(vBol,vBolAnt).replace(/class="ds-(up|down)"/,'style="color:#F7D98B"')+' vs '+P.rotAnt+'). A caminho: <b>'+fmtR(vABol+vTop)+'</b> entre a boletar e topadas.';
+  const pReal=meta?Math.min(100,vBol/meta*100):0, pProj=meta?Math.min(100,proj/meta*100):0;
+  const C=2*Math.PI*54;
+  const anel='<svg width="150" height="150" viewBox="0 0 130 130" aria-label="Meta do mês">'
+    +'<circle cx="65" cy="65" r="54" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="12"/>'
+    +'<circle cx="65" cy="65" r="54" fill="none" stroke="rgba(247,217,139,.45)" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+(C*pProj/100)+' '+C+'" transform="rotate(-90 65 65)"/>'
+    +'<circle cx="65" cy="65" r="54" fill="none" stroke="#F7D98B" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+(C*pReal/100)+' '+C+'" transform="rotate(-90 65 65)"/>'
+    +'<text x="65" y="62" text-anchor="middle" fill="#fff" font-size="26" font-weight="800">'+(meta?Math.round(vBol/meta*100)+'%':'—')+'</text>'
+    +'<text x="65" y="80" text-anchor="middle" fill="rgba(255,255,255,.75)" font-size="10">'+(meta?'da meta':'sem meta')+'</text></svg>';
+
+  // ── filtros ──
+  const seg=(rot,itens,atual,fn)=>'<div style="display:flex;align-items:center"><span class="ds-lbl">'+rot+'</span><div class="ds-seg">'
+    +itens.map(([v,l])=>'<button class="'+(v===atual?'on':'')+'" onclick="'+fn(v)+'">'+l+'</button>').join('')+'</div></div>';
+  const filtros='<div class="ds-top">'
+    +(temDuasEmpresas()?seg('Empresa',[...empresasDoUsuario().map(e=>[e,empNome(e)]),['','As duas']],empAtual(),v=>"setEmp('"+v+"')"):'')
+    +seg('Período',[['semana','Semana'],['mes','Mês'],['tri','Trimestre'],['ano','Ano']],s.per,v=>"dsSet('per','"+v+"')")
+    +seg('Área',[['','Todas'],...areasVis().map(([k,a])=>[k,a.name.split(' ')[0]])],s.area,v=>"dsSet('area','"+v+"')")
+    +'<span style="flex:1"></span>'
+    +(mandaNaArea()?'<button class="btn" onclick="setView(\'d-metas\')">Metas do mês</button>':'')
+    +'</div>';
+
+  const kpi=(cor,l,v,f,sub,k,tit,rows,o)=>'<div class="ds-kpi" style="--kc:'+cor+'"'+dsReg(k,tit,rows,o)+'><div class="l">'+l+'</div><div class="v">'+dsNum(v,f)+'</div><div class="s">'+sub+'</div></div>';
+  const oBol={valor:r=>r.atual||0,data:r=>dataBR(dsDataBol(r)),colData:'Boletada em'};
+  const kpis='<div class="ds-kpis">'
+    +kpi('#2E8B57','Boletado '+nomePer,vBol,'r',bol.length+' boleta'+(bol.length!==1?'s':'')+' · '+dsDelta(vBol,vBolAnt),'k-bol','Boletado '+nomePer,bol,oBol)
+    +kpi('#D4A24C','A boletar',vABol,'r',aBol.length+' fechou, falta processar','k-abol','A boletar',aBol)
+    +kpi('#C08497','Topadas',vTop,'r',top.length+' cliente'+(top.length!==1?'s':'')+' disseram sim','k-top','Topadas — para fechar',top)
+    +kpi('var(--wine)','Projeção',proj,'r',ehMes&&meta?(proj>=meta?'<span class="ds-up">acima da meta</span>':'<span class="ds-down">gap '+fmtR(meta-proj)+'</span>'):'boletado + a boletar + topadas','k-proj','Projeção — o que fecha se tudo andar',[...bol,...aBol,...top])
+    +kpi('#5F7A8A','Pipe em aberto',vPipe,'r',pipeAberto.length+' oportunidades vivas','k-pipe','Pipe em aberto',pipeAberto,{valor:r=>r.pipe||0})
+    +'</div>';
+
+  const hero='<div class="ds-card ds-hero">'+anel+'<div><div style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:6px">Resumo '+nomePer+'</div>'
+    +'<div class="ds-frase">'+frase+'</div>'
+    +'<div class="ds-mini">'+(ehMes&&du.ate?'Ritmo: '+fmtR(vBol/du.ate)+' por dia útil → fecha o mês em '+fmtR(ritmo)+' · '+du.rest+' dias úteis restantes'+(meta>vBol&&du.rest?' · precisa de '+fmtR((meta-vBol)/du.rest)+'/dia':''):'Comparando com o mesmo ponto do '+P.rotAnt+'.')+'</div></div></div>';
+
+  const r1=(t,lista,x,k,tit,o,cor)=>'<div'+dsReg(k,tit,lista,o)+'><div class="t">'+t+'</div><div class="n" style="'+(cor?'color:'+cor:'')+'">'+dsNum(lista.length)+'</div><div class="x">'+x+'</div></div>';
+  const oReu={data:r=>dataBR(isoDia(r.reuniao_data))+(horaReuniao(r)?' '+horaReuniao(r):''),colData:'Reunião'};
+  const reunioes='<div class="ds-card"><div class="ds-h">Reuniões <span class="ds-sub">'+nomePer+'</span></div>'
+    +'<div class="ds-reu">'
+    +r1('Marcadas',reu,dsDelta(reu.length,reuAnt.length)+' vs '+P.rotAnt,'r-marc','Reuniões marcadas '+nomePer,oReu)
+    +r1('Aconteceram',reuFeitas,dsPct(reuFeitas.length,reu.length)+'% das marcadas','r-feit','Reuniões que aconteceram',oReu)
+    +r1('Viraram negócio',reuTop,dsPct(reuTop.length,reuFeitas.length)+'% das feitas topou','r-top','Reuniões que viraram topada ou boleta',oReu)
+    +r1('Sem próximo passo',reuSemPasso,'reunião feita, card sem tarefa','r-sem','Reunião feita sem próximo passo',oReu,reuSemPasso.length?'#C0392B':'')
+    +r1('Hoje',reuHoje,'na agenda de hoje','r-hoje','Reuniões de hoje',oReu)
+    +r1('Próximos 7 dias',reuProx,'já agendadas','r-prox','Reuniões dos próximos 7 dias',oReu)
+    +'</div>'
+    +'<div class="ds-leg"><span><i style="background:#7A2233"></i>Aconteceram</span><span><i style="background:#D9B8C0"></i>Agendadas</span><span><i style="background:#D4A24C;height:3px"></i>Viraram negócio</span></div>'
+    +'<div style="position:relative;height:170px"><canvas id="ds-reu" role="img" aria-label="Reuniões por semana nas últimas 8 semanas"></canvas></div></div>';
+
+  const mxA=Math.max(1,...areas.map(x=>Math.max(x.b+x.fut,x.mt)));
+  const blocoArea='<div class="ds-card"><div class="ds-h">'+(ehMes?'Meta × realizado × projeção':'Boletado e a caminho')+' por área</div>'
+    +(areas.length?areas.map(x=>'<div class="ds-arow" onclick="abrirBoletasArea(\''+x.ak+'\')" title="Ver as boletas de '+x.a.name+'">'
+      +'<div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><b>'+x.a.name+'</b>'
+      +'<span style="color:var(--muted)">'+fmtR(x.b)+(x.fut?' <span style="color:var(--muted-l)">+ '+fmtR(x.fut)+'</span>':'')+(x.mt?' / meta '+fmtR(x.mt):'')+'</span></div>'
+      +'<div class="ds-bar"><i style="width:'+((x.b+x.fut)/mxA*100)+'%;background:'+DS_COR[x.ak]+';opacity:.35"></i><i style="width:'+(x.b/mxA*100)+'%;background:'+DS_COR[x.ak]+'"></i>'
+      +(x.mt?'<em style="left:'+(x.mt/mxA*100)+'%" title="meta"></em>':'')+'</div>'
+      +(x.mt?'<div style="font-size:10.5px;color:var(--muted);margin-top:4px">'+dsPct(x.b,x.mt)+'% realizado · projeção '+dsPct(x.b+x.fut,x.mt)+'%'+(x.b<x.esperado?' · <span class="ds-down">abaixo do ritmo</span>':' · <span class="ds-up">no ritmo</span>')+'</div>':'')
+      +'</div>').join('')
+      +'<div class="ds-leg" style="margin:8px 0 0"><span><i style="background:var(--wine)"></i>Boletado</span><span><i style="background:var(--wine);opacity:.35"></i>A boletar + topadas</span>'+(ehMes?'<span><i style="background:var(--text);width:2px"></i>Meta</span>':'')+'</div>'
+      :'<div class="ba-vazio">Sem movimento nesse recorte.</div>')+'</div>';
+
+  // funil do período: o que entrou no período e até onde chegou
+  const coorte=base.filter(r=>dsDentro(String(r.created_at||'').slice(0,10),P.ini,P.hoje));
+  const F=calcFunil(coorte);
+  window._funilRows=coorte;window._funilPer={semana:'mes',mes:'mes',tri:'tri',ano:'ano'}[s.per];window._funilRec=[];
+  const etapas=[['geradas','Entraram',F.geradas],['ligacao','Ligação feita',F.comLig],['reuniao','Fez reunião',F.comReu],['conv','Boletou',F.convN]];
+  const funil='<div class="ds-card"><div class="ds-h">Funil <span class="ds-sub">o que entrou '+nomePer+' e até onde chegou</span></div><div class="ds-fun">'
+    +etapas.map(([k,l,v],i)=>'<div onclick="abrirFunilEtapa(\''+k+'\')"><span style="font-size:12px;color:var(--muted)">'+l+'</span>'
+      +'<div><div class="fb" style="width:'+Math.max(6,dsPct(v,F.geradas||1))+'%;opacity:'+(1-i*.15)+'">'+v+'</div></div>'
+      +'<span class="fp">'+(i?dsPct(v,etapas[i-1][2])+'%':'')+'</span></div>').join('')
+    +'</div><div style="font-size:11px;color:var(--muted);margin-top:10px">De ponta a ponta: <b>'+F.pontaAPonta+'%</b> do que entrou já virou boleta'+(F.volume?' · '+fmtR(F.volume):'')+'.</div></div>';
+
+  const gap=(cor,ico,t,sub,lista,k,tit,num)=>'<div class="ds-gap"'+dsReg(k,tit,lista)+'><div class="gi" style="background:'+cor+'22;color:'+cor+'">'+ico+'</div>'
+    +'<div class="gt">'+t+'<small>'+sub+'</small></div><div class="gn" style="color:'+cor+'">'+(num!==undefined?num:lista.length)+'</div></div>';
+  const gaps='<div class="ds-card"><div class="ds-h">Gaps para agir hoje</div>'
+    +gap('#C0392B','!','Topou e não boletou','parado há mais de 5 dias · '+fmtR(dsSoma(gTopou,r=>r.atual||r.pipe)),gTopou,'g-top','Topou e não boletou há +5 dias')
+    +gap('#D4A24C','$','A boletar travado','há mais de 3 dias sem processar · '+fmtR(dsSoma(gABol,r=>r.atual||r.pipe)),gABol,'g-abol','A boletar há +3 dias')
+    +gap('#C0392B','?','Reunião sem próximo passo','reunião feita e card sem tarefa',reuSemPasso,'g-sem','Reunião feita sem próximo passo')
+    +gap('#8E6E5A','⏸','Parados há +7 dias','sem nenhuma mexida · '+fmtR(dsSoma(gParado,r=>r.pipe)),gParado,'g-par','Parados há mais de 7 dias',undefined)
+    +gap('#5F7A8A','⌛','Tarefas vencidas','próximo passo com data passada',gTarefa,'g-tar','Tarefas vencidas')
+    +(gRitmo.length?gRitmo.map(x=>'<div class="ds-gap" onclick="abrirBoletasArea(\''+x.ak+'\')"><div class="gi" style="background:#C0392B22;color:#C0392B">↘</div><div class="gt">'+x.a.name+' abaixo do ritmo<small>esperado até hoje '+fmtR(x.esperado)+' · realizado '+fmtR(x.b)+'</small></div><div class="gn" style="color:#C0392B">'+(dsPct(x.b,x.esperado)-100)+'%</div></div>').join(''):'')
+    +'</div>';
+
+  // ── histórico das boletas: 12 meses, empilhado por área ──
+  const h=new Date();let M=[];
+  for(let i=11;i>=0;i--){const d=new Date(h.getFullYear(),h.getMonth()-i,1);M.push({k:localISO(d).slice(0,7),rot:d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}).replace('.','').replace(' de ','/')})}
+  const bolTodas=base.filter(isBol);
+  // começa no primeiro mês com boleta: meses vazios antes do sistema existir só achatam o gráfico
+  const iPrim=M.findIndex(m=>bolTodas.some(r=>dsDataBol(r).slice(0,7)===m.k));
+  if(iPrim>0)M=M.slice(Math.max(0,iPrim-1));
+  const hQtd=s.hm==='n';
+  const porMes=M.map(m=>bolTodas.filter(r=>dsDataBol(r).slice(0,7)===m.k));
+  porMes.forEach((rs,i)=>dsReg('h-'+i,'Boletas de '+M[i].rot,rs,oBol));
+  const totM=porMes.map(rs=>dsSoma(rs,r=>r.atual));
+  const comValor=totM.filter(v=>v>0), media=comValor.length?comValor.reduce((a,b)=>a+b,0)/comValor.length:0;
+  const iMelhor=totM.indexOf(Math.max(...totM));
+  const ticket=bolTodas.length?dsSoma(bolTodas,r=>r.atual)/bolTodas.length:0;
+  const areasHist=areasVis().filter(([ak])=>!s.area||ak===s.area).filter(([ak])=>bolTodas.some(r=>r.area===ak));
+  const hist='<div class="ds-card"><div class="ds-h">Histórico das boletas <span class="ds-sub">até 12 meses · clique numa barra para ver as boletas do mês</span>'
+    +'<span style="flex:1"></span><div class="ds-seg"><button class="'+(hQtd?'':'on')+'" onclick="dsSet(\'hm\',\'v\')">Valor</button><button class="'+(hQtd?'on':'')+'" onclick="dsSet(\'hm\',\'n\')">Nº de boletas</button></div></div>'
+    +'<div class="ds-leg">'+areasHist.map(([ak,a])=>'<span><i style="background:'+DS_COR[ak]+'"></i>'+a.name+'</span>').join('')+'</div>'
+    +'<div style="position:relative;height:230px"><canvas id="ds-hist" role="img" aria-label="Valor boletado por mês nos últimos 12 meses, por área"></canvas></div>'
+    +'<div class="ds-hstat">'
+    +'<div><div class="t">Total 12 meses</div><div class="n">'+fmtR(totM.reduce((a,b)=>a+b,0))+'</div></div>'
+    +'<div><div class="t">Média por mês</div><div class="n">'+fmtR(media)+'</div></div>'
+    +'<div'+(totM[iMelhor]?dsReg('h-best','Melhor mês: '+M[iMelhor].rot,porMes[iMelhor],oBol):'')+' style="cursor:pointer"><div class="t">Melhor mês</div><div class="n">'+(totM[iMelhor]?M[iMelhor].rot+' · '+fmtR(totM[iMelhor]):'—')+'</div></div>'
+    +'<div><div class="t">Mês atual vs média</div><div class="n">'+(media?dsDelta(totM[totM.length-1],media):'—')+'</div></div>'
+    +'<div><div class="t">Ticket médio</div><div class="n">'+fmtR(ticket)+'</div></div>'
+    +'</div></div>';
+
+  // ── o elenco: cartas dos closers ──
+  const fichas=dsNotas(dsClosers(base).map(n=>dsFicha(n,base,P)));
+  let elenco='';
+  if(fichas.length){
+    if(!fichas.some(f=>f.nome===s.closer))s.closer=fichas[0].nome;
+    const f=fichas.find(x=>x.nome===s.closer);
+    const fs=(t,v,f2,lista,k,tit,o)=>'<div'+(lista?dsReg(k,tit,lista,o):'')+'><div class="t">'+t+'</div><div class="n">'+(f2==='txt'?v:dsNum(v,f2))+'</div></div>';
+    const conv=Math.min(100,dsPct(f.bol.length,f.reuFeitas.length));
+    elenco='<div class="ds-card"><div class="ds-h">Elenco <span class="ds-sub">nota de 45 a 99 tirada dos últimos 90 dias · selecione um closer</span></div>'
+      +'<div class="ds-squad">'+fichas.map(x=>{const ft=dsFoto(x.nome);return '<div class="ds-mini'+(x.nome===f.nome?' on':'')+'" onclick="dsSet(\'closer\',\''+dsEsc(x.nome).replace(/'/g,"\\'")+'\')">'
+        +'<div class="av"'+(ft?' style="background-image:url('+ft+')">':'>'+dsIniciais(x.nome))+'</div><div><b>'+dsEsc(x.nome)+'</b><br><small>'+x.ovr+' · '+(DS_AREA_SIG[x.area]||'')+'</small></div></div>'}).join('')+'</div>'
+      +'<div class="ds-ficha">'+dsCarta(f)
+      +'<div style="min-width:0">'
+        +'<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><div style="font-size:22px;font-weight:800">'+dsEsc(f.nome)+'</div><div style="color:var(--muted);font-size:12px">'+((AREAS[f.area]||{}).name||'')+' · '+f.ativos.length+' oportunidades em mãos</div></div>'
+        +'<div class="ds-badges">'+(f.badges||[]).map(b=>'<span class="ds-badge">'+b+'</span>').join('')+(f.badges&&f.badges.length?'':'<span style="font-size:11px;color:var(--muted)">Ainda sem destaque no time — o próximo fechamento muda isso.</span>')+'</div>'
+        +'<div class="ds-fstats">'
+          +fs('Reuniões marcadas',f.reu.length,'',f.reu,'c-reu','Reuniões de '+f.nome+' '+nomePer,oReu)
+          +fs('Reuniões feitas',f.reuFeitas.length,'',f.reuFeitas,'c-feit','Reuniões feitas por '+f.nome,oReu)
+          +fs('Negócios fechados',f.bol.length,'',f.bol,'c-bol','Boletas de '+f.nome+' '+nomePer,oBol)
+          +fs('Volume fechado',f.vol,'r',f.bol,'c-vol','Boletas de '+f.nome+' '+nomePer,oBol)
+          +fs('Conversão',conv,'p',null)
+          +fs('Ticket médio',f.bol.length?f.vol/f.bol.length:0,'r',null)
+          +fs('Topadas em mãos',f.topadas.length,'',f.topadas,'c-top','Topadas de '+f.nome)
+          +fs('Pipe em mãos',f.pipe,'r',f.ativos,'c-pipe','Oportunidades de '+f.nome)
+          +fs('Ciclo médio',f.ciclo===null?'—':Math.round(f.ciclo)+' dias','txt',null)
+          +fs('Tarefas em dia',Math.round(f.emDia*100),'p',null)
+        +'</div>'
+        +'<div class="ds-grid2" style="margin-top:14px;gap:14px">'
+          +'<div><div class="ds-h" style="margin-bottom:6px">Boletado nos últimos 6 meses</div><div style="position:relative;height:120px"><canvas id="ds-spark" role="img" aria-label="Boletado por mês de '+dsEsc(f.nome)+'"></canvas></div></div>'
+          +'<div><div class="ds-h" style="margin-bottom:6px">Últimas boletas</div>'
+            +(f.ult.length?f.ult.slice(0,5).map(r=>'<div class="ds-li" onclick="openEdit(\''+r.id+'\')"><span><b>'+dsEsc(r.cliente)+'</b> <span style="color:var(--muted)">'+dataBR(dsDataBol(r))+'</span></span><span style="font-weight:700">'+fmtR(r.atual)+'</span></div>').join(''):'<div style="font-size:12px;color:var(--muted)">Nenhuma boleta ainda.</div>')
+            +(f.prox.length?'<div class="ds-h" style="margin:12px 0 6px">Próximas reuniões</div>'+f.prox.slice(0,3).map(r=>'<div class="ds-li" onclick="openEdit(\''+r.id+'\')"><span><b>'+dsEsc(r.cliente)+'</b></span><span style="color:var(--muted)">'+dataBR(isoDia(r.reuniao_data))+(horaReuniao(r)?' '+horaReuniao(r):'')+'</span></div>').join(''):'')
+          +'</div>'
+        +'</div>'
+      +'</div></div></div>';
+    window._dsSpark=f.meses;
+  }
+
+  c.innerHTML='<div class="ds">'+filtros+hero+kpis
+    +'<div class="ds-grid2">'+reunioes+gaps+'</div>'
+    +'<div class="ds-grid2">'+blocoArea+funil+'</div>'
+    +hist+elenco+'</div>';
+  dsAnimaNumeros(c);
+
+  // ── gráficos ──
+  if(typeof Chart==='undefined')return;
+  const escuro=document.documentElement.getAttribute('data-theme')==='dark';
+  const tick=escuro?'#A49B98':'#85817C', grade=escuro?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)';
+  const eixoR=v=>v>=1e6?'R$'+(v/1e6).toFixed(1).replace('.',',')+'M':v>=1e3?'R$'+Math.round(v/1e3)+'k':'R$'+v;
+  const cv=document.getElementById('ds-hist');
+  if(cv)charts.dsHist=new Chart(cv,{type:'bar',
+    data:{labels:M.map(m=>m.rot),datasets:areasHist.map(([ak,a])=>({label:a.name,data:M.map(m=>{const rs=bolTodas.filter(r=>r.area===ak&&dsDataBol(r).slice(0,7)===m.k);return hQtd?rs.length:dsSoma(rs,r=>r.atual)}),backgroundColor:DS_COR[ak],borderRadius:4,maxBarThickness:34,stack:'s'}))},
+    options:{responsive:true,maintainAspectRatio:false,animation:{duration:900,easing:'easeOutQuart'},
+      onClick:(e,els)=>{if(els.length)dsAbrir('h-'+els[0].index)},
+      onHover:(e,els)=>{e.native.target.style.cursor=els.length?'pointer':'default'},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>x.dataset.label+': '+(hQtd?x.raw+' boleta'+(x.raw!==1?'s':''):fmtR(x.raw)),footer:xs=>'Total: '+(hQtd?porMes[xs[0].dataIndex].length+' boletas · ':'')+fmtR(totM[xs[0].dataIndex])}}},
+      scales:{x:{stacked:true,grid:{display:false},ticks:{color:tick}},y:{stacked:true,grid:{color:grade},ticks:{color:tick,precision:0,callback:hQtd?(v=>v):eixoR}}}}});
+  // reuniões por semana (8 semanas): aconteceram, agendadas e quantas viraram negócio
+  const sem=[];const seg0=new Date();seg0.setDate(seg0.getDate()-((seg0.getDay()+6)%7));
+  for(let i=7;i>=0;i--){const a=new Date(seg0);a.setDate(seg0.getDate()-7*i);const b=new Date(a);b.setDate(a.getDate()+6);sem.push({a:localISO(a),b:localISO(b),rot:dataBR(localISO(a)).slice(0,5)})}
+  const naSem=w=>base.filter(r=>dsDentro(isoDia(r.reuniao_data),w.a,w.b));
+  sem.forEach((w,i)=>dsReg('w-'+i,'Reuniões da semana de '+w.rot,naSem(w),oReu));
+  const cr=document.getElementById('ds-reu');
+  if(cr)charts.dsReu=new Chart(cr,{data:{labels:sem.map(w=>w.rot),datasets:[
+      {type:'line',label:'Viraram negócio',data:sem.map(w=>naSem(w).filter(r=>isoDia(r.reuniao_data)<=P.hoje&&(norm(r.sc||'').includes('topou')||isB(r))).length),borderColor:'#D4A24C',backgroundColor:'#D4A24C',borderWidth:2,pointRadius:3,tension:.3},
+      {type:'bar',label:'Aconteceram',data:sem.map(w=>naSem(w).filter(r=>isoDia(r.reuniao_data)<=P.hoje).length),backgroundColor:'#7A2233',borderRadius:4,maxBarThickness:22,stack:'r'},
+      {type:'bar',label:'Agendadas',data:sem.map(w=>naSem(w).filter(r=>isoDia(r.reuniao_data)>P.hoje).length),backgroundColor:'#D9B8C0',borderRadius:4,maxBarThickness:22,stack:'r'}]},
+    options:{responsive:true,maintainAspectRatio:false,onClick:(e,els)=>{if(els.length)dsAbrir('w-'+els[0].index)},
+      onHover:(e,els)=>{e.native.target.style.cursor=els.length?'pointer':'default'},
+      plugins:{legend:{display:false}},scales:{x:{stacked:true,grid:{display:false},ticks:{color:tick}},y:{stacked:true,beginAtZero:true,grid:{color:grade},ticks:{color:tick,precision:0}}}}});
+  const cs=document.getElementById('ds-spark');
+  if(cs&&window._dsSpark)charts.dsSpark=new Chart(cs,{type:'bar',data:{labels:window._dsSpark.map(m=>m.rot),datasets:[{data:window._dsSpark.map(m=>m.v),backgroundColor:window._dsSpark.map((m,i)=>i===5?'#7A2233':'#D9B8C0'),borderRadius:4,maxBarThickness:26}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:x=>fmtR(x.raw)}}},scales:{x:{grid:{display:false},ticks:{color:tick}},y:{display:false,beginAtZero:true}}}});
 }
 
 // ══ SINCRONIA ENTRE AS TELAS ══
@@ -10224,7 +10696,8 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
   });
 
   c.innerHTML=''
-    +blocoAreasHtml()+(isDir?'':linhaDoRecorte())
+    // quem tem o Dashboard vê o desempenho por área lá; aqui fica só o trabalho do dia
+    +(mandaNaArea()?'':blocoAreasHtml())+(isDir?'':linhaDoRecorte())
 
     // Nova oportunidade · virada de mês
     +'<div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">'
