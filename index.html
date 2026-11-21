@@ -1862,6 +1862,9 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
       <div class="fg"><label>Corretor parceiro <span style="font-weight:400;text-transform:none;font-size:9px">(THE INVESTOR — aparece no hub dele)</span></label>
         <select id="e-parc"><option value="">Nenhum</option></select>
       </div>
+      <div class="fg" id="e-segur-wrap" style="display:none"><label>Seguradora <span style="font-weight:400;text-transform:none;font-size:9px">(com quem vai fechar)</span></label>
+        <select id="e-segur"><option value="">A definir</option></select>
+      </div>
     </div>
     <div class="fg"><label>Confirmar o que aconteceu <span style="font-weight:400;text-transform:none;font-size:9px">(salva na hora)</span></label>
       <div id="e-marcas" style="display:flex;gap:8px;flex-wrap:wrap"></div>
@@ -2021,6 +2024,9 @@ html[data-theme="dark"] .rf-pill.on{background:var(--wine);color:#fff;box-shadow
     </div>
     <div class="fg"><label>Corretor parceiro <span style="font-weight:400;text-transform:none;font-size:9px">(THE INVESTOR — aparece no hub dele)</span></label>
       <select id="n-parc"><option value="">Nenhum</option></select>
+    </div>
+    <div class="fg" id="n-segur-wrap" style="display:none"><label>Seguradora <span style="font-weight:400;text-transform:none;font-size:9px">(com quem vai fechar)</span></label>
+      <select id="n-segur"><option value="">A definir</option></select>
     </div>
     <div class="fg"><label>Observação</label>
       <textarea id="n-obs" placeholder="Observações..."></textarea>
@@ -2285,6 +2291,23 @@ function veioDoInvestor(r){
   const H=Array.isArray(r.historico)?r.historico:[];
   return H.some(h=>h&&(norm(h.usuario||'')==='esteira de indicacoes'
     ||(h.campo==='Criação'&&/varredura +investor/i.test(String(h.para||'')))));
+}
+// Faixa vermelha THE INVESTOR: só o que nasceu do painel de indicações (Admin ou hub do corretor).
+// A varredura Investor e as boletas de seguro do hub continuam contando como Investor nos relatórios,
+// mas não ganham a faixa.
+function doPainelIndicacoes(r){
+  const H=r&&Array.isArray(r.historico)?r.historico:[];
+  return H.some(h=>h&&h.campo==='Criação'&&/^Oportunidade criada pela Esteira de Indicações/.test(String(h.para||'')));
+}
+// ── SEGURADORA (Seguro de vida e DIT) ── com quem a oportunidade vai fechar.
+// Fica no histórico, como a empresa: o último carimbo vale.
+const CAMPO_SEGURADORA='Seguradora';
+const SEGURADORAS=['Omint','MAG','Prudential','Allianz'];
+function seguradoraDe(r){let s='';(r.historico||[]).forEach(h=>{if(h&&h.campo===CAMPO_SEGURADORA)s=String(h.para||'')});return s;}
+function opcoesSeguradora(atual){
+  const lista=[...SEGURADORAS];
+  if(atual&&!lista.includes(atual))lista.push(atual);
+  return '<option value="">A definir</option>'+lista.map(n=>'<option'+(n===atual?' selected':'')+'>'+n.replace(/</g,'&lt;')+'</option>').join('');
 }
 function selosOutrasAreas(r){
   const res=outrasAreasResumo(r);
@@ -10022,7 +10045,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     const dias=daysSince(getLastMoveDate(r));
     const risk=isB(r)?null:riskColor(dias);
     const isTopou=norm(r.sc||'')==='cliente topou';
-    const investor=veioDoInvestor(r);
+    const investor=doPainelIndicacoes(r);
     return '<div class="kb-card'+(investor?' kb-investor':'')+'" draggable="true" ondragstart="kbDragStart(event,\''+r.id+'\')" onclick="openEdit(\''+r.id+'\')">'
       +(investor?'<div class="kb-investor-tag">THE INVESTOR</div>':'')
       +'<div class="kb-cli" style="display:flex;align-items:center;gap:6px">'
@@ -10036,6 +10059,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
           +'<span style="font-size:9px;font-weight:700;color:'+cr+';text-transform:uppercase;letter-spacing:.03em">'+((SUBAREAS[sub]||{}).name||'')+'</span>'
           +(r.produto?'<span style="border:1px solid '+cr+';color:'+cr+';border-radius:4px;padding:0 6px;font-size:9px;font-weight:700;text-transform:uppercase">'+r.produto+'</span>':'')
           +chipEmpresa(empresaDe(r),1)
+          +(r.area==='seg'&&seguradoraDe(r)?'<span style="border:1px solid var(--muted);color:var(--muted);border-radius:4px;padding:0 6px;font-size:9px;font-weight:700;text-transform:uppercase" title="Seguradora">'+seguradoraDe(r).replace(/</g,'&lt;')+'</span>':'')
           +'</div>';})()
       +(r.assessor?'<div class="kb-meta" style="font-weight:600">'+r.assessor+(r.responsavel?' ·'+r.responsavel:'')+'</div>':(r.responsavel?'<div class="kb-meta">'+r.responsavel+'</div>':''))
       +(r.reuniao_data?'<div class="kb-meta" style="color:var(--blue);font-weight:700">Reunião '+fmtReuniao(r.reuniao_data)+(horaReuniao(r)?' às '+horaReuniao(r):'')+'</div>':'')
@@ -10698,6 +10722,8 @@ function openEdit(id){
   respSel.innerHTML='<option value="">Sem responsável</option>'+timeUsers.map(n=>'<option'+(norm(n)===norm(r.responsavel||'')?' selected':'')+'>'+n+'</option>').join('');
   if(r.responsavel&&!timeUsers.some(n=>norm(n)===norm(r.responsavel)))respSel.innerHTML+='<option selected>'+r.responsavel+'</option>';
   (function(){const s=document.getElementById('e-parc');if(s)s.innerHTML=opcoesParceiro(parceiroDe(r));})();
+  (function(){const w=document.getElementById('e-segur-wrap'),s=document.getElementById('e-segur');if(!w||!s)return;
+    w.style.display=r.area==='seg'?'block':'none';s.innerHTML=opcoesSeguradora(seguradoraDe(r));})();
   document.getElementById('e-obs').value='';
   const obsBox=document.getElementById('e-obs-atual');
   if(r.obs&&limpaTraco(r.obs)){obsBox.style.display='block';document.getElementById('e-obs-atual-txt').textContent=r.obs;}
@@ -10763,6 +10789,8 @@ async function saveEdit(){
   })();
   (function(){const s=document.getElementById('e-parc');if(!s)return;const de=parceiroDe(r),para=s.value||'';
     if(para!==de)hist.push({campo:CAMPO_PARCEIRO,de:de,para:para,usuario:USER.nome,data:ds});})();
+  (function(){const s=document.getElementById('e-segur');if(!s||r.area!=='seg')return;const de=seguradoraDe(r),para=s.value||'';
+    if(para!==de)hist.push({campo:CAMPO_SEGURADORA,de:de,para:para,usuario:USER.nome,data:ds});})();
   const newObs=document.getElementById('e-obs').value.trim();
   if(newObs)hist.push({campo:'Observação',de:'',para:newObs,usuario:USER.nome,data:ds});
   const retro=arquivoRetroativo(r,newSc,newPb,document.getElementById('e-data').value,ds);
@@ -10806,6 +10834,7 @@ function updateNovoProdutos(){
   if(area==='cons')np.value='ALAVANCAGEM FINANCEIRA/PAT';
   else if(area==='seg'&&!np.value)np.value='SEGURO DE VIDA';
   else if(area==='saude'&&!np.value)np.value='PLANO DE SAÚDE';
+  const sw=document.getElementById('n-segur-wrap');if(sw)sw.style.display=area==='seg'?'block':'none';
 }
 function openNewOpp(){
   // Fill datalists
@@ -10828,6 +10857,7 @@ function openNewOpp(){
     wrapE.style.display='flex';
   }else{selE.innerHTML='<option value="'+padrao+'" selected>'+EMPRESAS[padrao].nome+'</option>';wrapE.style.display='none';}
   (function(){const s=document.getElementById('n-parc');if(s)s.innerHTML=opcoesParceiro('');})();
+  (function(){const s=document.getElementById('n-segur');if(s)s.innerHTML=opcoesSeguradora('');})();
   document.getElementById('modal-newopp').style.display='flex';
 }
 
@@ -10856,14 +10886,15 @@ async function saveNewOpp(){
     historico:[{campo:'Criação',de:'',para:'Oportunidade criada manualmente',usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})},
       ...((document.getElementById('n-reuniao-hora')||{}).value?[{campo:CAMPO_HORA,de:'',para:document.getElementById('n-reuniao-hora').value,usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}]:[]),
       marcaEmpresa(lerSel('n-empresa')||empParaGravar(),now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})),
-      ...(((document.getElementById('n-parc')||{}).value)?[{campo:CAMPO_PARCEIRO,de:'',para:document.getElementById('n-parc').value,usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}]:[])]
+      ...(((document.getElementById('n-parc')||{}).value)?[{campo:CAMPO_PARCEIRO,de:'',para:document.getElementById('n-parc').value,usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}]:[]),
+      ...((area==='seg'&&(document.getElementById('n-segur')||{}).value)?[{campo:CAMPO_SEGURADORA,de:'',para:document.getElementById('n-segur').value,usuario:USER.nome,data:now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}]:[])]
   };
   try{
     const criada=await db('POST','oportunidades',[opp]);
     const idNovo=(criada&&criada[0]&&criada[0].id)||'';
     showToast('Oportunidade criada!',true);
     closeModal('newopp');
-    ['n-assessor','n-cliente','n-produto','n-pipe','n-atual','n-sc','n-pb','n-todo','n-todo-data','n-reuniao','n-reuniao-hora','n-resp','n-obs','n-parc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    ['n-assessor','n-cliente','n-produto','n-pipe','n-atual','n-sc','n-pb','n-todo','n-todo-data','n-reuniao','n-reuniao-hora','n-resp','n-obs','n-parc','n-segur'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     if(idNovo)setTimeout(()=>sincronizarAgenda(idNovo),600);
     await loadData();
     renderCurView();
