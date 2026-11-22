@@ -188,6 +188,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ds-hero .ds-frase{font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:1.35}
 .ds-hero .ds-frase b{color:#F7D98B;font-weight:700}
 .ds-hero .ds-mini{font-size:12px;opacity:.85;margin-top:8px}
+.ds-areas .area-cards{margin-bottom:0}
 .ds-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
 .ds-kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;cursor:pointer;transition:transform .15s,border-color .15s;position:relative;overflow:hidden}
 .ds-kpi:hover{transform:translateY(-2px);border-color:var(--wine)}
@@ -3982,7 +3983,8 @@ function renderDashboard(c=document.getElementById('main-content')){
       +'</div>';
   }
 
-  c.innerHTML='<div class="ds">'+filtros+hero+kpis
+  // com "Todas" as áreas, os quadros de desempenho por área (os mesmos do Guia do dia)
+  c.innerHTML='<div class="ds">'+filtros+hero+(s.area?'':'<div class="ds-areas">'+blocoAreasHtml()+'</div>')+kpis
     +'<div class="ds-grid2">'+reunioes+gaps+'</div>'
     +'<div class="ds-grid2">'+blocoArea+funil+'</div>'
     +hist+elenco+blocoMetas+'</div>';
