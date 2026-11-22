@@ -2966,7 +2966,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261122-1400';
+const APP_VERSION='20261122-1430';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3949,7 +3949,7 @@ function renderDashboard(c=document.getElementById('main-content')){
       +'<div class="ds-ficha">'+dsCarta(f)
       +'<div style="min-width:0">'
         +'<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><div style="font-size:22px;font-weight:800">'+dsEsc(f.nome)+'</div><div style="color:var(--muted);font-size:12px">'+((AREAS[f.area]||{}).name||'')+' · '+f.ativos.length+' oportunidades em mãos</div></div>'
-        +'<div class="ds-badges">'+(f.badges||[]).map(b=>'<span class="ds-badge">'+b+'</span>').join('')+(f.badges&&f.badges.length?'':'<span style="font-size:11px;color:var(--muted)">Ainda sem destaque no time — o próximo fechamento muda isso.</span>')+'</div>'
+        +'<div style="height:12px"></div>'
         +'<div class="ds-fstats">'
           +fs('Reuniões marcadas',f.reu.length,'',f.reu,'c-reu','Reuniões de '+f.nome+' '+nomePer,oReu)
           +fs('Reuniões feitas',f.reuFeitas.length,'',f.reuFeitas,'c-feit','Reuniões feitas por '+f.nome,oReu)
