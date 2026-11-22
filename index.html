@@ -383,13 +383,28 @@ tr.bol td{background:var(--green-bg)}
 /* filtro de reuniões por período, em cima do quadro */
 .kb-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:24px 0 9px}
 .kb-hint{font-size:11px;color:var(--muted-l)}
-.kb-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:var(--surf2);
-  border:1px solid var(--border);border-radius:7px;padding:8px 10px;margin-bottom:12px}
-.kb-sep{width:1px;align-self:stretch;background:var(--border);margin:1px 1px}
-.kb-fs{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1 1 420px;min-width:0}
+.kb-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);
+  border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(40,10,15,.05)}
+.kb-sep{display:none}
+/* os filtros descem para uma linha só deles; em cima ficam visão, busca e ações */
+.kb-fs{order:9;display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1 1 100%;min-width:0;
+  padding-top:11px;border-top:1px dashed var(--border)}
 .kb-dupla{display:inline-flex;align-items:center;gap:4px}
-.kb-seg{display:flex;border:1px solid var(--border);border-radius:5px;overflow:hidden;background:var(--card);flex-shrink:0}
-.kb-seg button{padding:6px 13px;font-size:11px;font-weight:700;border:none;cursor:pointer;
+.kb-f{display:inline-flex;flex-direction:column;justify-content:center;gap:0;border:1px solid var(--border);border-radius:10px;
+  background:var(--surf2);padding:4px 4px 3px 11px;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s;min-width:0}
+.kb-f:hover{border-color:var(--accent-b);background:var(--card)}
+.kb-f:focus-within{border-color:var(--wine);box-shadow:0 0 0 3px var(--wine-l)}
+.kb-fl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted-l);line-height:1.2}
+.kb-f select.filter-sel{border:0;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2385817C' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center;
+  -webkit-appearance:none;appearance:none;padding:1px 26px 2px 0;font-size:12.5px;font-weight:600;max-width:200px;border-radius:0;box-shadow:none;cursor:pointer}
+.kb-f.on{background:var(--wine-l);border-color:var(--wine)}
+.kb-f.on .kb-fl{color:var(--wine)}
+.kb-f.on select.filter-sel{color:var(--wine-d)}
+.kb-bar .kb-mini{border-radius:8px;padding:9px 9px}
+.kb-bar>input.filter-inp{flex:1 1 260px;max-width:none;border-radius:999px;padding:9px 14px 9px 36px;font-size:13px;background:var(--surf2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15'%3E%3Ccircle cx='6.5' cy='6.5' r='5' fill='none' stroke='%2385817C' stroke-width='1.6'/%3E%3Cpath d='M10.5 10.5l3.2 3.2' stroke='%2385817C' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat 13px center}
+.kb-bar>input.filter-inp:focus{background-color:var(--card);border-color:var(--wine);box-shadow:0 0 0 3px var(--wine-l)}
+.kb-seg{display:flex;border:1px solid var(--border);border-radius:999px;overflow:hidden;background:var(--surf2);flex-shrink:0;padding:3px;gap:2px}
+.kb-seg button{padding:6px 15px;font-size:11.5px;font-weight:700;border:none;cursor:pointer;border-radius:999px;
   background:transparent;color:var(--muted);font-family:inherit}
 .kb-seg button:hover{color:var(--wine)}
 .kb-seg button.on{background:var(--wine);color:#fff}
@@ -2946,7 +2961,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261121-1930';
+const APP_VERSION='20261122-1200';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -10765,8 +10780,11 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'<span class="kb-sep"></span>'
     +'<div class="kb-fs">'
     +(()=>{
-      const sel=(valor,onch,opts,titulo)=>'<select class="filter-sel'+(valor?' ativa':'')+'"'
-        +(titulo?' title="'+titulo+'"':'')+' onchange="'+onch+'">'+opts+'</select>';
+      // cada filtro é uma pílula com o nome em cima do valor; ligado, fica vinho
+      const ROT={'Área':'Área','Quem trouxe':'Assessor','Produto':'Produto','Status comercial':'Status','Pendência de boleta':'Pendência','Quando é a reunião':'Reunião','O que vence':'Agenda','Closer responsável':'Responsável'};
+      const sel=(valor,onch,opts,titulo)=>'<label class="kb-f'+(valor?' on':'')+'"><span class="kb-fl">'+(ROT[titulo]||titulo||'')+'</span>'
+        +'<select class="filter-sel'+(valor?' ativa':'')+'"'
+        +(titulo?' title="'+titulo+'"':'')+' onchange="'+onch+'">'+opts+'</select></label>';
       const op=(v,rot,on)=>'<option value="'+String(v).replace(/"/g,'&quot;')+'"'+(on?' selected':'')+'>'+rot+'</option>';
       let h='';
       h+=sel(fArea,'window._kbArea=this.value;renderAssessorOpps()',
