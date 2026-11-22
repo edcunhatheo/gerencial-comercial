@@ -750,6 +750,63 @@ tr.bol td{background:var(--green-bg)}
 @media(max-width:700px){.at-q{font-size:15px;line-height:2}.at-q select{font-size:14px}.at-big{font-size:40px}}
 
 /* ══ DAILY CEO ══ */
+/* plano do dia: pipeline à esquerda (arrasta), áreas à direita (solta) */
+.dz-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.dz-sum>div{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 14px}
+.dz-sum span{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.dz-sum b{display:block;font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.dz-sum em{font-style:normal;font-size:11px;color:var(--muted)}
+.dz-grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:1000px){.dz-grid{grid-template-columns:minmax(0,1fr)}}
+.dz-pipe{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:12px;position:sticky;top:70px;max-height:calc(100vh - 90px);display:flex;flex-direction:column;gap:8px}
+.dz-pipe h4{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:0}
+.dz-pipe input{border:1px solid var(--border);border-radius:999px;padding:7px 12px;font-size:12px;background:var(--card);color:var(--text)}
+.dz-chips{display:flex;flex-wrap:wrap;gap:4px}
+.dz-chips button{border:1px solid var(--border);background:var(--card);color:var(--muted);border-radius:999px;font-size:10.5px;font-weight:700;padding:3px 9px;cursor:pointer}
+.dz-chips button.on{background:var(--wine);border-color:var(--wine);color:#fff}
+.dz-list{overflow-y:auto;display:grid;gap:6px;align-content:start;padding-right:2px}
+.dz-pc{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:8px 10px;cursor:grab;transition:border-color .15s,transform .15s}
+.dz-pc:hover{border-color:var(--wine);transform:translateY(-1px)}
+.dz-pc.arrasta{opacity:.45}
+.dz-pc b{font-size:12.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dz-pc small{display:block;font-size:10.5px;color:var(--muted);margin-top:1px}
+.dz-pc .dz-tag{display:inline-block;font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;border-radius:4px;padding:1px 6px;margin-top:4px;background:var(--wine-l);color:var(--wine-d)}
+.dz-pc .dz-add{display:flex;gap:4px;margin-top:6px}
+.dz-pc .dz-add button{flex:1;border:1px dashed var(--accent-b);background:transparent;color:var(--wine);border-radius:6px;font-size:10.5px;font-weight:700;padding:3px 0;cursor:pointer}
+.dz-pc .dz-add button:hover{background:var(--wine-l)}
+.dz-areas{display:grid;gap:14px}
+.dz-area{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.dz-ah{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.dz-ah b{font-size:15px}
+.dz-ah span{font-size:11.5px;color:var(--muted)}
+.dz-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media(max-width:760px){.dz-cols{grid-template-columns:minmax(0,1fr)}}
+.dz-lbl{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:flex;justify-content:space-between}
+.dz-zone{min-height:70px;border:1.5px dashed var(--border);border-radius:10px;padding:6px;display:grid;gap:6px;align-content:start;transition:background .15s,border-color .15s}
+.dz-zone.sobre{border-color:var(--wine);background:var(--wine-ll)}
+.dz-vazio{font-size:11px;color:var(--muted-l);text-align:center;padding:14px 4px}
+.dz-it{background:var(--surf2);border:1px solid var(--border-l);border-radius:8px;padding:7px 9px}
+.dz-it-l{display:flex;align-items:center;gap:8px}
+.dz-it-l .nm{flex:1;min-width:0;font-size:12.5px}
+.dz-it-l .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.dz-it-l .nm small{display:block;font-size:10.5px;color:var(--muted)}
+.dz-it-l .vl{font-size:12px;font-weight:800;white-space:nowrap}
+.dz-x{border:0;background:transparent;color:var(--muted-l);font-size:15px;cursor:pointer;padding:0 2px;line-height:1}
+.dz-x:hover{color:var(--wine)}
+.dz-res{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.dz-res button{flex:1;border:1px solid var(--border);background:var(--card);color:var(--muted);border-radius:6px;font-size:10.5px;font-weight:700;padding:4px 6px;cursor:pointer;white-space:nowrap}
+.dz-res button.ok.on{background:#2E8B57;border-color:#2E8B57;color:#fff}
+.dz-res button.mid.on{background:#C9A24A;border-color:#C9A24A;color:#2A1F05}
+.dz-res button.no.on{background:#A94442;border-color:#A94442;color:#fff}
+.dz-it input.dz-ob{width:100%;margin-top:5px;border:1px solid var(--border-l);border-radius:6px;padding:4px 8px;font-size:11px;background:var(--card);color:var(--text)}
+.dz-it.ok{border-left:3px solid #2E8B57}.dz-it.no{border-left:3px solid #A94442}.dz-it.mid{border-left:3px solid #C9A24A}
+.dz-mais{display:flex;gap:6px;margin-top:6px}
+.dz-mais button{font-size:10.5px;font-weight:700;color:var(--muted);background:transparent;border:0;cursor:pointer;text-decoration:underline}
+.dz-fotoc{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:12px}
+.dz-fotoc>summary{cursor:pointer;list-style:none;padding:12px 16px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--wine);display:flex;align-items:center;gap:10px}
+.dz-fotoc>summary::-webkit-details-marker{display:none}
+.dz-fotoc>summary span{font-weight:600;text-transform:none;letter-spacing:0;color:var(--muted)}
+.dz-fotoc .dy-prev-shell{margin:0 16px 16px}
 /* a tela de preenchimento */
 .dy-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
 .dy-ctrls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -2966,7 +3023,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261122-1430';
+const APP_VERSION='20261122-1600';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -7052,14 +7109,18 @@ function dyArea(ak,dia,modo,cru){
                     extras.map(r=>doSistema(r,'ext')));
   }
   const vistos=new Set(itens.map(x=>x.id));
+  // linhas acrescentadas: na mão (fora do sistema) ou arrastadas do pipeline (op=1,
+  // o id é o da oportunidade — o card fica ligado para abrir e mostrar o próximo passo)
+  const porIdBase={};base.forEach(r=>{porIdBase[r.id]=r});
   Object.keys(ovs).forEach(id=>{
     const o=ovs[id];
     if(!o.m||vistos.has(id))return;
-    itens.push({id,tipo:o.t||'reu',r:null,sist:false,off:!!o.off,
-      hora:o.h||'',cliente:o.c||'',closer:o.cl||closerDaLinha(null,ak,dyEmp()),valor:+o.v||0,
-      rod:'',paga:!!o.p,pago:!!o.pg,pagoVal:o.pg?(+o.v||0):0,
+    const r=o.op?(porIdBase[id]||null):null;
+    itens.push({id,tipo:o.t||'reu',r,sist:false,off:!!o.off,
+      hora:o.h||'',cliente:o.c||'',closer:o.cl||closerDaLinha(r,ak,dyEmp()),valor:+o.v||0,
+      rod:r?dyRodada(r):'',paga:!!o.p,pago:!!o.pg,pagoVal:o.pg?(+o.v||0):0,
       naoPagou:!!o.np, motivo:o.mt||'',
-      resultado:o.res||'',prox:o.nx||'',editado:true,manual:true});
+      resultado:o.res||'',prox:r?encaminhamento(r).txt:(o.nx||''),editado:true,manual:!o.op,pipe:!!o.op});
   });
   const vivos=itens.filter(x=>!x.off);
   const fora=itens.filter(x=>x.off);
@@ -7126,9 +7187,10 @@ function dyRelDaily(){
       +'<small>'+d.reun.length+(d.reun.length===1?' reunião':' reuniões')+'</small></h3>'
       +corpo
       +(d.closers.length>1?'<div class="rep-tot"><span>Projeção total da área</span><b>'+dyK(proj)+'</b></div>':'')
-      +'<div class="rep-role">SalesOps'+(ops?'<small>'+dyEsc(ops)+'</small>':'')+'</div>'
+      // o bloco do SalesOps só entra na foto quando alguém preencheu a meta do dia
+      +((dymN(dia,emp,ak,'calls')||dymN(dia,emp,ak,'goal'))?'<div class="rep-role">SalesOps'+(ops?'<small>'+dyEsc(ops)+'</small>':'')+'</div>'
       +'<div class="rep-stats"><div><b>'+dymN(dia,emp,ak,'calls')+'</b><span>ligações</span></div>'
-        +'<div><b class="g">'+dymN(dia,emp,ak,'goal')+'</b><span>reuniões a marcar</span></div></div>'
+        +'<div><b class="g">'+dymN(dia,emp,ak,'goal')+'</b><span>reuniões a marcar</span></div></div>':'')
       +(gap.trim()?'<div class="rep-call">'+(ops?'<b>'+dyEsc(ops)+'</b> · ':'<b>Gap</b> · ')+dyEsc(gap.trim())+'</div>':'')
       +dyInvBloco(ak,'daily')
       +'</div>';
@@ -7190,9 +7252,9 @@ function dyRelClose(){
       +corpo
       +(d.closers.length>1?'<div class="rep-tot"><span>Projeção total da área</span><b>'+dyK(proj)+'</b></div>'
         +pagoLn('Pago · total da área',pago):'')
-      +'<div class="rep-role">SalesOps'+(ops?'<small>'+dyEsc(ops)+'</small>':'')+'</div>'
+      +((dymN(dia,emp,ak,'calls')||dymN(dia,emp,ak,'goal'))?'<div class="rep-role">SalesOps'+(ops?'<small>'+dyEsc(ops)+'</small>':'')+'</div>'
       +'<div class="rep-stats"><div><b>'+d.ap.n.lig+'<small>/'+dymN(dia,emp,ak,'calls')+'</small></b><span>ligações feitas</span></div>'
-        +'<div><b class="g">'+dyMarcadas(ak,dia,emp,d).n+'<small>/'+dymN(dia,emp,ak,'goal')+'</small></b><span>reuniões marcadas</span></div></div>'
+        +'<div><b class="g">'+dyMarcadas(ak,dia,emp,d).n+'<small>/'+dymN(dia,emp,ak,'goal')+'</small></b><span>reuniões marcadas</span></div></div>':'')
       +(ob.trim()?'<div class="rep-call"><b>Obs</b> · '+dyEsc(ob.trim())+'</div>':'')
       +dyInvBloco(ak,'close')
       +'</div>';
@@ -7286,8 +7348,11 @@ function renderDaily(c=document.getElementById('main-content')){
   const bt=(v,l)=>'<button class="dy-seg-b'+(modo===v?' on':'')+'" onclick="dySetModo(\''+v+'\')">'+l+'</button>';
   const be=k=>'<button class="dy-seg-b'+(dyEmp()===k?' on':'')+'" onclick="dySetEmp(\''+k+'\')">'+empNome(k)+'</button>';
   c.innerHTML='<div class="dy-head">'
-    +'<div><div class="section-label" style="margin:0;border:none;padding:0">Daily CEO</div>'
-    +'<div style="font-size:11px;color:var(--muted)">As reuniões e o fechamento do dia vêm das oportunidades. Só a meta do SalesOps e os blocos de Investimentos são digitados.</div></div>'
+    +'<div><div class="kb-titulo"><i></i>Daily CEO</div>'
+    +'<div style="font-size:11.5px;color:var(--muted);margin-top:4px">'+(modo==='close'
+      ?'Fim do dia: marque o que rolou em cada linha. A foto mostra o plano da manhã × o que aconteceu.'
+      :modo==='period'?'O período é lido direto das oportunidades.'
+      :'O dia já vem do Kanban. Arraste do pipeline o que mais entra hoje, ou tire o que não vai rolar.')+'</div></div>'
     +'<div class="dy-ctrls">'
       +'<div class="dy-seg">'+Object.keys(EMPRESAS).map(be).join('')+'</div>'
       +'<div class="dy-seg">'+DY_MODOS.map(m=>bt(m[0],m[1])).join('')+'</div>'
@@ -7296,15 +7361,16 @@ function renderDaily(c=document.getElementById('main-content')){
          +'<input type="date" class="dy-dt" value="'+dyAte()+'" onchange="window._dyAte=this.value;renderDaily()">'
         :'<input type="date" class="dy-dt" value="'+dyData()+'" onchange="window._dyData=this.value;renderDaily()">')
     +'</div></div>'
-    +'<div class="dy-grid">'
-      +'<div id="dy-forms" class="dy-forms"></div>'
-      +'<aside class="dy-side">'
-        +'<div class="dy-acts">'
-          +'<button class="dy-btn primaria" onclick="dyBaixar()">Baixar PNG</button>'
-          +'<button class="dy-btn" onclick="dyCopiar()">Copiar imagem</button>'
-        +'</div>'
-        +'<div class="dy-prev-shell"><div id="dy-prev"></div></div>'
-      +'</aside></div>';
+    // o plano do dia ocupa a tela; a foto para o CEO fica embaixo, recolhida
+    +(modo==='period'?'':'<div id="dz-sum" class="dz-sum"></div>'
+      +'<div class="dz-grid"><aside id="dz-pipe" class="dz-pipe"></aside><div id="dy-forms" class="dz-areas"></div></div>')
+    +'<details class="dz-fotoc"'+(modo==='period'||window._dzFotoAberta?' open':'')+' ontoggle="window._dzFotoAberta=this.open;dyPintaPrev()">'
+      +'<summary>Foto do dia para o CEO <span>'+(modo==='close'?'plano × o que aconteceu':modo==='period'?'resumo do período':'o plano da manhã')+'</span>'
+        +'<span style="flex:1"></span>'
+        +'<button class="dy-btn primaria" onclick="event.preventDefault();dyBaixar()">Baixar PNG</button>'
+        +'<button class="dy-btn" onclick="event.preventDefault();dyCopiar()">Copiar imagem</button></summary>'
+      +'<div class="dy-prev-shell"><div id="dy-prev"></div></div>'
+    +'</details>';
   dyPintaForms();dyPintaPrev();
 }
 function dySetModo(v){window._dyModo=v;renderDaily()}
@@ -7317,12 +7383,12 @@ function dyPintaForms(){
   if(modo==='daily')dyAreasDaEmpresa().forEach(([ak])=>{
     if(!dyFoto(dia,emp,ak))dyTiraFoto(dia,emp,ak,dyArea(ak,dia,'daily',1).todos);
   });
-  if(modo==='period'){
-    el.innerHTML='<div class="dy-card"><div class="dy-ct">Período</div>'
-      +'<div class="dy-nota">Nada para preencher: o período é lido direto das oportunidades. '
-      +'Escolha as datas acima e exporte a imagem.</div></div>';
-    return;
-  }
+  if(modo==='period')return;
+  // ══ A DAILY NOVA: plano por área, com arrastar do pipeline ══
+  el.innerHTML=dyAreasDaEmpresa().map(([ak,A])=>dzArea(ak,A,dyArea(ak,dia),modo)).join('');
+  dzPintaPipe();dzPintaResumo();dzLiga();
+  return;
+  // (o formulário antigo fica abaixo, desligado)
   el.innerHTML=dyAreasDaEmpresa().map(([ak,A])=>{
     const d=dyArea(ak,dia);
     const cmp=(f,rot,tipo,larg)=>'<label class="dy-f" style="'+(larg||'')+'"><span>'+rot+'</span>'
@@ -7454,6 +7520,144 @@ function dyItens(d,modo){
       +'<button onclick="dyNovaLinha(\''+ak+'\',\'reu\')">+ Reunião</button>'
       +'<button onclick="dyNovaLinha(\''+ak+'\',\'pag\')">+ Fechamento</button>'
     +'</div></div>';
+}
+// ══ A DAILY COMO PLANO DO DIA ═══════════════════════════════════════════
+// De manhã: o sistema preenche com o que o Kanban tem para hoje e o diretor
+// arrasta do pipeline o que mais entra (ou tira o que não vai rolar).
+// No fim do dia: cada linha ganha Rolou / Remarcou / Não rolou (reunião) ou
+// Pagou / Não pagou (fechamento). Tudo fica na daily do dia — o card no
+// Kanban não é tocado, como sempre foi.
+function dzArea(ak,A,d,modo){
+  const q=s=>"'"+String(s).replace(/'/g,"\\'")+"'";
+  const it=x=>{
+    const reu=x.tipo!=='pag';
+    const cls=reu?({sim:'ok',nao:'no',remarcou:'mid'}[x.resultado]||''):(x.pago?'ok':x.naoPagou?'no':'');
+    const abre=x.r?' onclick="openEdit(\''+x.r.id+'\')" title="Abrir a oportunidade"':'';
+    const sub=reu
+      ?[(x.hora?dyHH(x.hora):''),(x.closer&&x.closer!=='Sem closer'?x.closer:''),x.rod||''].filter(Boolean).join(' · ')
+      :[(x.closer&&x.closer!=='Sem closer'?x.closer:''),(x.r&&x.r.produto?x.r.produto:'')].filter(Boolean).join(' · ');
+    const nome=x.manual
+      ?'<input class="dy-i-cli dz-ob" style="margin:0;font-weight:700" value="'+dyEsc(x.cliente)+'" placeholder="Nome do cliente" onblur="dyEdita('+q(ak)+','+q(x.id)+',\'c\',this)" onkeydown="if(event.key===\'Enter\')this.blur()">'
+      :'<b'+abre+'>'+dyEsc(x.cliente||'Sem nome')+'</b>';
+    const extra=x.manual
+      ?(reu?'<input type="time" class="dz-ob" style="width:96px;margin:4px 0 0" value="'+dyEsc(x.hora)+'" onblur="dyEdita('+q(ak)+','+q(x.id)+',\'h\',this)">'
+           :'<input class="dz-ob" style="width:120px;margin:4px 0 0" placeholder="Valor R$" value="'+(x.valor?fmtMoedaBR(x.valor):'')+'" onblur="dyEdita('+q(ak)+','+q(x.id)+',\'v\',this)" onkeydown="if(event.key===\'Enter\')this.blur()">')
+      :'';
+    const bt=(rot,on,c,fn)=>'<button class="'+c+(on?' on':'')+'" onclick="'+fn+'">'+rot+'</button>';
+    const res=modo!=='close'?''
+      :'<div class="dz-res">'+(reu
+        ?bt('✓ Rolou',x.resultado==='sim','ok','dyRes('+q(ak)+','+q(x.id)+',\''+(x.resultado==='sim'?'':'sim')+'\')')
+          +bt('↻ Remarcou',x.resultado==='remarcou','mid','dyRes('+q(ak)+','+q(x.id)+',\''+(x.resultado==='remarcou'?'':'remarcou')+'\')')
+          +bt('✕ Não rolou',x.resultado==='nao','no','dyRes('+q(ak)+','+q(x.id)+',\''+(x.resultado==='nao'?'':'nao')+'\')')
+        :bt('✓ Pagou',x.pago,'ok','dyPg('+q(ak)+','+q(x.id)+','+(x.pago?0:1)+')')
+          +bt('✕ Não pagou',x.naoPagou&&!x.pago,'no','dyNp('+q(ak)+','+q(x.id)+','+(x.naoPagou?0:1)+')'))
+      +'</div><input class="dz-ob" placeholder="o que rolou (vai na foto)" value="'+dyEsc(x.motivo)+'" onblur="dyEdita('+q(ak)+','+q(x.id)+',\'mt\',this)" onkeydown="if(event.key===\'Enter\')this.blur()">';
+    return '<div class="dz-it '+cls+'" data-ln="'+x.id+'"><div class="dz-it-l"><div class="nm">'+nome
+      +'<small>'+dyEsc(sub)+(x.pipe?' · do pipeline':'')+(x.manual?' · fora do sistema':'')+'</small>'+extra+'</div>'
+      +((!reu||x.paga)&&x.valor?'<span class="vl">'+dyK(x.valor)+'</span>':'')
+      +'<button class="dz-x" title="Tirar da daily de hoje" onclick="dyTira('+q(ak)+','+q(x.id)+','+(x.sist?1:0)+')">×</button></div>'
+      +res+'</div>';
+  };
+  const zona=(t,rot,lista)=>'<div><div class="dz-lbl"><span>'+rot+'</span><span>'+lista.length+'</span></div>'
+    +'<div class="dz-zone" data-ak="'+ak+'" data-t="'+t+'">'
+    +(lista.length?lista.map(it).join(''):'<div class="dz-vazio">'+(modo==='close'?'nada planejado':'arraste do pipeline para cá')+'</div>')
+    +'</div><div class="dz-mais"><button onclick="dyNovaLinha('+q(ak)+',\''+t+'\')">+ '+(t==='reu'?'reunião':'fechamento')+' fora do sistema</button></div></div>';
+  const reun=[].concat(d.reun).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99'));
+  const proj=dyProj(d);
+  const fez=d.reun.filter(x=>x.resultado==='sim').length, pago=somaPago(d.reun.concat(d.pagam));
+  const dia=dyData(),emp=dyEmp();
+  const inv=dyEhInv(ak)?(()=>{
+    const cmp=(f,rot)=>'<label class="dy-f"><span>'+rot+'</span><input value="'+(dymN(dia,emp,ak,f)||'')+'" onblur="dyCampo(\''+ak+'\',\''+f+'\',this,\'n\')" onkeydown="if(event.key===\'Enter\')this.blur()"></label>';
+    return '<details style="margin-top:12px"><summary style="cursor:pointer;font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Investimentos · vencimentos e barreiras do dia</summary>'
+      +'<div class="dy-g3" style="margin-top:8px">'+DY_PRODS.map(x=>cmp('v'+x[0],'Vence · '+x[1])).join('')+'</div>'
+      +'<div class="dy-g3" style="margin-top:8px">'+DY_PRODS.map(x=>cmp('b'+x[0],'Barreira · '+x[1])).join('')+'</div>'
+      +(modo==='close'?'<div class="dy-g3" style="margin-top:8px">'+DY_PRODS.map(x=>cmp('rv'+x[0],'Renovou venc. · '+x[1])).join('')+'</div>'
+        +'<div class="dy-g3" style="margin-top:8px">'+DY_PRODS.map(x=>cmp('rb'+x[0],'Renovou barr. · '+x[1])).join('')+'</div>':'')
+      +'</details>';
+  })():'';
+  return '<div class="dz-area"><div class="dz-ah"><b>'+A.name+'</b><span>'
+    +(modo==='close'
+      ?fez+' de '+d.reun.length+' reuniões rolaram · pago '+dyK(pago)+' de '+dyK(proj)
+      :d.reun.length+(d.reun.length===1?' reunião':' reuniões')+' · '+d.pagam.length+' p/ fechar · projeção '+dyK(proj))
+    +'</span></div>'
+    +'<div class="dz-cols">'+zona('reu','Reuniões do dia',reun)+zona('pag','Fechamentos do dia',d.pagam)+'</div>'
+    +(d.fora.length?'<div class="dy-fora" style="margin-top:8px">Tirados hoje: '+d.fora.map(x=>'<button class="dy-volta" title="Trazer de volta" onclick="dyVolta('+q(ak)+','+q(x.id)+')">'+dyEsc(x.cliente||'sem nome')+' ↺</button>').join('')+'</div>':'')
+    +(modo==='close'?'<label class="dy-f" style="margin-top:10px"><span>Observação do dia (vai na foto)</span><input value="'+dyEsc(dymT(dia,emp,ak,'obs'))+'" onblur="dyCampo(\''+ak+'\',\'obs\',this,\'t\')" onkeydown="if(event.key===\'Enter\')this.blur()"></label>':'')
+    +dyRetomar(ak,dia)
+    +inv+'</div>';
+}
+// o pipeline à esquerda: o que ainda não está na daily de hoje
+function dzPintaPipe(){
+  const el=document.getElementById('dz-pipe');if(!el)return;
+  if(!el.dataset.ok){
+    el.innerHTML='<h4>Pipeline · arraste para o dia</h4>'
+      +'<input id="dz-q" placeholder="Buscar cliente ou closer…" value="'+dyEsc(window._dzQ||'')+'" oninput="window._dzQ=this.value;dzPintaPipe()">'
+      +'<div id="dz-chips" class="dz-chips"></div><div id="dz-list" class="dz-list"></div>';
+    el.dataset.ok='1';
+  }
+  const dia=dyData(),q=norm(window._dzQ||''),fa=window._dzArea||'';
+  const areas=dyAreasDaEmpresa();
+  const naDaily=new Set();areas.forEach(([ak])=>dyArea(ak,dia).itens.forEach(x=>naDaily.add(x.id)));
+  const hoje=today(),em7=localISO(new Date(Date.now()+7*864e5));
+  const peso=r=>{const d=isoDia(r.reuniao_data);
+    if(isABoletar(r))return 0;if(norm(r.sc||'').includes('topou'))return 1;
+    if(d&&d>=hoje&&d<=em7)return 2;if(d&&d>em7)return 3;return 4};
+  const cand=dyBase().filter(r=>!isBol(r)&&areas.some(([k])=>k===r.area)&&(!fa||r.area===fa)&&!naDaily.has(r.id)
+      &&norm(r.sc||'')!=='nao se aplica'
+      &&(!q||norm(r.cliente||'').includes(q)||norm(r.responsavel||'').includes(q)||norm(r.assessor||'').includes(q)))
+    .sort((a,b)=>peso(a)-peso(b)||String(a.reuniao_data||'9').localeCompare(String(b.reuniao_data||'9'))||String(b.updated_at||'').localeCompare(String(a.updated_at||'')));
+  document.getElementById('dz-chips').innerHTML=[['','Todas'],...areas.map(([k,a])=>[k,a.name.split(' ')[0]])]
+    .map(([k,l])=>'<button class="'+(fa===k?'on':'')+'" onclick="window._dzArea=\''+k+'\';dzPintaPipe()">'+l+'</button>').join('');
+  const tag=r=>{const d=isoDia(r.reuniao_data);
+    if(isABoletar(r))return 'A boletar · '+dyK(dyVal(r));
+    if(norm(r.sc||'').includes('topou'))return 'Topou · '+dyK(dyVal(r));
+    if(d)return 'Reunião '+dataBR(d).slice(0,5)+(horaReuniao(r)?' '+horaReuniao(r):'');
+    return r.sc||'Sem status'};
+  const lista=cand.slice(0,80);
+  document.getElementById('dz-list').innerHTML=(lista.length?lista.map(r=>'<div class="dz-pc" draggable="true" data-id="'+r.id+'">'
+      +'<b>'+dyEsc(r.cliente||'Sem nome')+'</b><small>'+dyEsc(((AREAS[r.area]||{}).name||r.area)+' · '+(r.responsavel||r.assessor||'sem responsável'))+'</small>'
+      +'<span class="dz-tag">'+dyEsc(tag(r))+'</span>'
+      +'<div class="dz-add"><button onclick="dzAdd(\''+r.id+'\',\'reu\')">+ Reunião</button><button onclick="dzAdd(\''+r.id+'\',\'pag\')">+ Fechamento</button></div></div>').join('')
+    :'<div class="dz-vazio">Nada no pipeline com esse filtro.</div>')
+    +(cand.length>80?'<div class="dz-vazio">mostrando 80 de '+cand.length+' — use a busca</div>':'');
+  dzLiga();
+}
+function dzPintaResumo(){
+  const el=document.getElementById('dz-sum');if(!el)return;
+  const dia=dyData(),modo=dyModo();let R=0,P=0,proj=0,fez=0,pg=0,pago=0,ok=0,tot=0;
+  dyAreasDaEmpresa().forEach(([ak])=>{const d=dyArea(ak,dia);
+    R+=d.reun.length;P+=d.pagam.length;proj+=dyProj(d);
+    fez+=d.reun.filter(x=>x.resultado==='sim').length;
+    pg+=d.pagam.filter(x=>x.pago).length;pago+=somaPago(d.reun.concat(d.pagam));
+    tot+=d.reun.length+d.pagam.length;ok+=d.reun.filter(x=>x.resultado==='sim').length+d.pagam.filter(x=>x.pago).length});
+  const c=(l,v,e)=>'<div><span>'+l+'</span><b>'+v+'</b>'+(e?'<em>'+e+'</em>':'')+'</div>';
+  el.innerHTML=modo==='close'
+    ?c('Reuniões que rolaram',fez+' de '+R,dyPct(fez,R))+c('Fechamentos pagos',pg+' de '+P,dyPct(pg,P))
+      +c('Valor pago',dyK(pago),'de '+dyK(proj)+' projetados')+c('Aderência ao plano',dyPct(ok,tot),ok+' de '+tot+' linhas aconteceram')
+    :c('Reuniões no plano',R,'')+c('Fechamentos no plano',P,'')+c('Projeção de pagamento',dyK(proj),'')
+      +c('Dia',dyDataFmt(dia),empNome(dyEmp()));
+}
+// arrastar e soltar
+function dzLiga(){
+  document.querySelectorAll('.dz-pc').forEach(c=>{
+    c.ondragstart=e=>{e.dataTransfer.setData('text/plain',c.dataset.id);e.dataTransfer.effectAllowed='copy';c.classList.add('arrasta')};
+    c.ondragend=()=>c.classList.remove('arrasta');
+  });
+  document.querySelectorAll('.dz-zone').forEach(z=>{
+    z.ondragover=e=>{e.preventDefault();z.classList.add('sobre')};
+    z.ondragleave=()=>z.classList.remove('sobre');
+    z.ondrop=e=>{e.preventDefault();z.classList.remove('sobre');const id=e.dataTransfer.getData('text/plain');if(id)dzAdd(id,z.dataset.t,z.dataset.ak)};
+  });
+}
+async function dzAdd(id,tipo,akSolto){
+  const r=dyBase().find(x=>String(x.id)===String(id));
+  if(!r){showToast('Não achei essa oportunidade');return}
+  const ak=r.area;
+  if(akSolto&&akSolto!==ak)showToast((r.cliente||'O card')+' é de '+((AREAS[ak]||{}).name||ak)+' — entrou na área dele',true);
+  const o=dyOv(ak,id);
+  if(o&&o.off){await dyOvSet(ak,id,{off:0});return}
+  await dyOvSet(ak,id,{m:1,op:1,t:tipo,c:r.cliente||'',h:tipo==='reu'?(horaReuniao(r)||''):'',cl:'',v:dyVal(r),p:tipo==='pag'?1:0});
+  showToast((r.cliente||'Oportunidade')+' entrou na daily como '+(tipo==='reu'?'reunião':'fechamento'),true);
 }
 function dyPintaPrev(){
   const p=document.getElementById('dy-prev');if(!p)return;
