@@ -3984,7 +3984,8 @@ function renderDashboard(c=document.getElementById('main-content')){
   }
 
   // com "Todas" as áreas, os quadros de desempenho por área (os mesmos do Guia do dia)
-  c.innerHTML='<div class="ds">'+filtros+hero+(s.area?'':'<div class="ds-areas">'+blocoAreasHtml()+'</div>')+kpis
+  // "Todas": os quadros por área. Uma área escolhida: a faixa com o resumo e a meta dela.
+  c.innerHTML='<div class="ds">'+filtros+(s.area?hero:'<div class="ds-areas">'+blocoAreasHtml()+'</div>')+kpis
     +'<div class="ds-grid2">'+reunioes+gaps+'</div>'
     +'<div class="ds-grid2">'+blocoArea+funil+'</div>'
     +hist+elenco+blocoMetas+'</div>';
