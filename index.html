@@ -2966,7 +2966,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261122-1330';
+const APP_VERSION='20261122-1400';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3978,23 +3978,30 @@ function renderDashboard(c=document.getElementById('main-content')){
   if(mandaNaArea()){
     const mesK=P.hoje.slice(0,7);
     const ms=metasDoMes().filter(m=>!s.area||m.area===s.area);
+    // A META É DA ÁREA: conta tudo o que a área boletou no mês, de todos os closers.
+    // O nome gravado na meta é só quem a cadastrou/responde por ela, não filtra nada.
     const real=m=>dsSoma(base.filter(r=>(m.area==='rv'||m.area==='rf'?subAreaOf(r)===m.area:r.area===m.area)
       &&(!m.produto||norm(r.produto||'')===norm(m.produto))
-      &&(norm(r.responsavel||'')===norm(m.assessor)||norm(r.assessor||'')===norm(m.assessor))
       &&isBol(r)&&dsDataBol(r).slice(0,7)===mesK),r=>r.atual);
+    const realArea=ak=>real({area:ak,produto:''});
     const grupos={};ms.forEach(m=>(grupos[m.area]=grupos[m.area]||[]).push(m));
     const nomeArea=k=>(AREAS[k]||SUBAREAS[k]||{}).name||k;
     blocoMetas='<div class="ds-card" id="ds-metas"><div class="ds-h">Metas do mês <span class="ds-sub">'+P.hoje.slice(0,7).split('-').reverse().join('/')+' · total '+fmtR(dsSoma(ms,m=>m.meta_valor))
       +' · mude o valor e aperte Enter para salvar</span><span style="flex:1"></span>'
       +'<button class="btn wine" onclick="openNewMeta()">+ Nova meta</button></div>'
       +(ms.length?Object.entries(grupos).map(([ak,lista])=>{
-        const tot=dsSoma(lista,m=>m.meta_valor), feito=dsSoma(lista,real);
-        return '<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">'
-          +'<b style="font-size:13px">'+dsEsc(nomeArea(ak))+'</b><span style="font-size:12px;color:var(--muted)">'+fmtR(feito)+' de '+fmtR(tot)+' · '+dsPct(feito,tot)+'%</span></div>'
+        const tot=dsSoma(lista,m=>m.meta_valor), feito=realArea(ak), pA=dsPct(feito,tot);
+        const gerais=lista.filter(m=>!m.produto);
+        return '<div style="margin-bottom:18px;padding:12px 14px;border:1px solid var(--border-l);border-radius:10px;background:var(--surf2)">'
+          +'<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px">'
+          +'<b style="font-size:14px">'+dsEsc(nomeArea(ak))+'</b>'
+          +'<span style="font-size:12.5px"><b>'+fmtR(feito)+'</b> <span style="color:var(--muted)">de '+fmtR(tot)+' · '+pA+'% · todos os closers da área</span></span></div>'
+          +'<div class="ds-bar" style="height:10px;margin-bottom:10px"><i style="width:'+Math.min(100,pA)+'%;background:'+(pA>=100?'#2E8B57':DS_COR[ak]||'var(--wine)')+'"></i></div>'
+          +(gerais.length>1?'<div style="font-size:11px;color:#C0392B;margin-bottom:8px">Esta área tem '+gerais.length+' metas que somam '+fmtR(dsSoma(gerais,m=>m.meta_valor))+'. Se a meta da área é uma só, apague as repetidas.</div>':'')
           +lista.map(m=>{const f=real(m),p=dsPct(f,m.meta_valor);
-            return '<div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 150px 34px 34px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--border-l)">'
-              +'<div style="font-size:12.5px"><b>'+dsEsc(m.assessor||'—')+'</b><div style="font-size:11px;color:var(--muted)">'+dsEsc(m.produto||'Todos os produtos')+'</div></div>'
-              +'<div><div class="ds-bar" style="height:8px"><i style="width:'+Math.min(100,p)+'%;background:'+(p>=100?'#2E8B57':DS_COR[ak]||'var(--wine)')+'"></i></div><div style="font-size:10.5px;color:var(--muted);margin-top:3px">'+fmtR(f)+' · '+p+'%</div></div>'
+            return '<div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 150px 34px 34px;gap:10px;align-items:center;padding:6px 0;border-top:1px dashed var(--border)">'
+              +'<div style="font-size:12.5px"><b>'+(m.assessor?dsEsc(m.assessor):'Meta da área')+'</b><div style="font-size:11px;color:var(--muted)">'+dsEsc(m.produto||'todos os produtos')+'</div></div>'
+              +'<div style="font-size:11px;color:var(--muted)">'+(lista.length>1?'parte da meta da área · '+dsPct(m.meta_valor,tot)+'% do total':'meta da área inteira')+'</div>'
               +'<input type="text" inputmode="decimal" value="'+(m.meta_valor||0).toLocaleString('pt-BR')+'" title="Valor da meta — aperte Enter para salvar" onkeydown="if(event.key===\'Enter\')this.blur()" onchange="dsSalvarMeta(\''+m.id+'\',this)" style="text-align:right;font-weight:700;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surf2);color:var(--text)">'
               +'<button class="btn sm" title="Editar responsável, área e produto" onclick="openEditMeta(\''+m.id+'\')">✎</button>'
               +'<button class="btn sm" title="Apagar meta" style="color:#C0392B" onclick="delMeta(\''+m.id+'\')">×</button></div>'}).join('')+'</div>';
