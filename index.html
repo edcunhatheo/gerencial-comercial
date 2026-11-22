@@ -381,7 +381,8 @@ tr.bol td{background:var(--green-bg)}
 .kb-board{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;align-items:flex-start}
 .kb-col{min-width:262px;max-width:262px;background:var(--surf3);border-radius:3px;padding:10px;flex-shrink:0}
 /* filtro de reuniões por período, em cima do quadro */
-.kb-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:24px 0 9px}
+.kb-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px}
+.kb-acoes{margin-left:auto;display:flex;gap:8px}
 .kb-hint{font-size:11px;color:var(--muted-l)}
 .kb-titulo{display:flex;align-items:center;gap:10px;font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.01em}
 .kb-titulo i{width:4px;height:22px;border-radius:2px;background:var(--wine);display:inline-block}
@@ -2965,7 +2966,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261122-1300';
+const APP_VERSION='20261122-1330';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -10761,11 +10762,6 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     // quem tem o Dashboard vê o desempenho por área lá; aqui fica só o trabalho do dia
     +(mandaNaArea()?'':blocoAreasHtml())+(isDir?'':linhaDoRecorte())
 
-    // Nova oportunidade · virada de mês
-    +'<div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px">'
-    +(isDir?'<button class="btn" onclick="viradaDeMes()" title="Arquiva as boletadas e as perdidas: elas saem daqui e da Daily e vão para o Histórico">Virada de mês</button>':'')
-    +'<button class="btn wine" onclick="openNewOpp()">+ Nova oportunidade</button>'
-    +'</div>'
 
 
     // ── A BARRA DE FILTROS ────────────────────────────────────────────────
@@ -10775,6 +10771,11 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       +'<div class="kb-titulo"><i></i>'+(isDir?'Pipeline do time':'Meu pipeline')
         +'<span>'+myOpps.length+' oportunidade'+(myOpps.length!==1?'s':'')+'</span></div>'
       +'<div class="kb-hint">clique no card para editar · use o botão para avançar</div>'
+      // Nova oportunidade · virada de mês, na mesma linha do título
+      +'<div class="kb-acoes">'
+      +(isDir?'<button class="btn" onclick="viradaDeMes()" title="Arquiva as boletadas e as perdidas: elas saem daqui e da Daily e vão para o Histórico">Virada de mês</button>':'')
+      +'<button class="btn wine" onclick="openNewOpp()">+ Nova oportunidade</button>'
+      +'</div>'
     +'</div>'
     +'<div class="kb-bar">'
     +(()=>{
