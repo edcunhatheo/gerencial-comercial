@@ -228,34 +228,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ds-leg i{width:10px;height:10px;border-radius:2px;display:inline-block}
 /* cards FIFA dos closers */
 .ds-squad{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px}
-.ds-mini{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border:1px solid var(--border);border-radius:999px;cursor:pointer;background:var(--card);transition:all .15s}
-.ds-mini:hover{border-color:var(--wine);transform:translateY(-1px)}
-.ds-mini.on{border-color:var(--wine);background:var(--wine-l);box-shadow:0 0 0 2px var(--wine-l)}
-.ds-mini .av{width:30px;height:30px;border-radius:50%;background:var(--wine);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background-size:cover;background-position:center}
-.ds-mini b{font-size:12px}.ds-mini small{font-size:11px;font-weight:800;color:var(--wine)}
+.ds-pick{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border:1px solid var(--border);border-radius:999px;cursor:pointer;background:var(--card);transition:all .15s}
+.ds-pick:hover{border-color:var(--wine);transform:translateY(-1px)}
+.ds-pick.on{border-color:var(--wine);background:var(--wine-l);box-shadow:0 0 0 2px var(--wine-l)}
+.ds-pick .av{width:30px;height:30px;border-radius:50%;background:var(--wine);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;background-size:cover;background-position:center}
+.ds-pick b{font-size:12px}.ds-pick small{font-size:11px;font-weight:800;color:var(--wine)}
 .ds-ficha{display:grid;grid-template-columns:250px minmax(0,1fr);gap:22px;align-items:start}
 @media(max-width:900px){.ds-ficha{grid-template-columns:minmax(0,1fr);justify-items:center}}
-.fut{position:relative;width:240px;height:340px;clip-path:polygon(14% 0,86% 0,100% 7%,100% 85%,50% 100%,0 85%,0 7%);padding:20px 22px 0;color:var(--fc);background:var(--fb);animation:futIn .6s cubic-bezier(.2,.9,.3,1.2);perspective:800px}
-.fut::before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.45) 45%,transparent 60%);transform:translateX(-120%);animation:futBrilho 3.2s ease-in-out 0.6s infinite}
-.fut::after{content:'';position:absolute;inset:7px;clip-path:inherit;border:1.5px solid rgba(255,255,255,.35);pointer-events:none}
+.dsfut{position:relative;width:240px;height:340px;clip-path:polygon(14% 0,86% 0,100% 7%,100% 85%,50% 100%,0 85%,0 7%);padding:20px 22px 0;color:var(--fc);background:var(--fb);animation:futIn .6s cubic-bezier(.2,.9,.3,1.2);perspective:800px}
+.dsfut::before{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.45) 45%,transparent 60%);transform:translateX(-120%);animation:futBrilho 3.2s ease-in-out 0.6s infinite}
+.dsfut::after{content:'';position:absolute;inset:7px;clip-path:inherit;border:1.5px solid rgba(255,255,255,.35);pointer-events:none}
 @keyframes futIn{from{opacity:0;transform:rotateY(80deg) scale(.85)}to{opacity:1;transform:none}}
 @keyframes futBrilho{0%,60%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
-.fut-gold{--fb:linear-gradient(160deg,#FBF0C0,#E2BE52 42%,#A9831F);--fc:#3A2905}
-.fut-prata{--fb:linear-gradient(160deg,#FAFAFA,#C9C9C9 45%,#8C8C8C);--fc:#202020}
-.fut-bronze{--fb:linear-gradient(160deg,#F2C79E,#B9773A 45%,#7A4A1C);--fc:#2B1606}
-.fut-icone{--fb:linear-gradient(160deg,#2A0A12,#7A2233 50%,#C9A24A);--fc:#F7E3A1}
-.fut-top{display:flex;gap:10px;position:relative;z-index:1}
-.fut-ovr{font-size:46px;font-weight:900;line-height:.9;letter-spacing:-1px}
-.fut-pos{font-size:13px;font-weight:800;letter-spacing:.06em;margin-top:2px}
-.fut-tier{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-top:4px}
-.fut-foto{position:absolute;right:18px;top:24px;width:130px;height:138px;border-radius:8px 8px 40px 40px;background:rgba(255,255,255,.18);background-size:cover;background-position:center top;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:var(--fc);z-index:1;cursor:default}
-.fut-foto.pode{cursor:pointer}
-.fut-foto.pode:hover::after{content:'trocar foto';position:absolute;bottom:10px;font-size:10px;font-weight:800;background:rgba(0,0,0,.55);color:#fff;padding:3px 8px;border-radius:10px}
-.fut-nome{position:relative;z-index:1;margin-top:66px;text-align:center;font-size:19px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;border-bottom:1.5px solid currentColor;padding-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fut-stats{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:3px 18px;margin-top:9px;padding:0 10px}
-.fut-stats div{display:flex;gap:7px;align-items:baseline;font-size:13px}
-.fut-stats b{font-size:17px;font-weight:900;min-width:24px}
-.fut-stats span{font-weight:700;letter-spacing:.05em}
+.dsfut-gold{--fb:linear-gradient(160deg,#FBF0C0,#E2BE52 42%,#A9831F);--fc:#3A2905}
+.dsfut-prata{--fb:linear-gradient(160deg,#FAFAFA,#C9C9C9 45%,#8C8C8C);--fc:#202020}
+.dsfut-bronze{--fb:linear-gradient(160deg,#F2C79E,#B9773A 45%,#7A4A1C);--fc:#2B1606}
+.dsfut-icone{--fb:linear-gradient(160deg,#2A0A12,#7A2233 50%,#C9A24A);--fc:#F7E3A1}
+.dsfut-top{display:flex;gap:10px;position:relative;z-index:1}
+.dsfut-ovr{font-size:46px;font-weight:900;line-height:.9;letter-spacing:-1px}
+.dsfut-pos{font-size:13px;font-weight:800;letter-spacing:.06em;margin-top:2px}
+.dsfut-tier{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-top:4px}
+.dsfut-foto{position:absolute;right:18px;top:24px;width:130px;height:138px;border-radius:8px 8px 40px 40px;background:rgba(255,255,255,.18);background-size:cover;background-position:center top;display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:var(--fc);z-index:1;cursor:default}
+.dsfut-foto.pode{cursor:pointer}
+.dsfut-foto.pode:hover::after{content:'trocar foto';position:absolute;bottom:10px;font-size:10px;font-weight:800;background:rgba(0,0,0,.55);color:#fff;padding:3px 8px;border-radius:10px}
+.dsfut-nome{position:relative;z-index:1;margin-top:66px;text-align:center;font-size:19px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;border-bottom:1.5px solid currentColor;padding-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dsfut-stats{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:3px 18px;margin-top:9px;padding:0 10px}
+.dsfut-stats div{display:flex;gap:7px;align-items:baseline;font-size:13px}
+.dsfut-stats b{font-size:17px;font-weight:900;min-width:24px}
+.dsfut-stats span{font-weight:700;letter-spacing:.05em}
 .ds-badges{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
 .ds-badge{font-size:10.5px;font-weight:800;padding:4px 10px;border-radius:999px;background:var(--wine-l);color:var(--wine-d);border:1px solid var(--accent-b);text-transform:uppercase;letter-spacing:.05em}
 .ds-fstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px}
@@ -3672,6 +3672,16 @@ function dsDelta(a,b){
   return '<span class="'+(d>=0?'ds-up':'ds-down')+'">'+(d>=0?'▲ ':'▼ ')+Math.abs(d)+'%</span>';
 }
 function dsSet(k,v){dsSt()[k]=v;renderCurView();}
+// troca rápida do valor de uma meta, direto no Dashboard
+async function dsSalvarMeta(id,inp){
+  const m=METAS.find(x=>x.id===id);if(!m)return;
+  const v=parseMoeda(inp.value);
+  if(!(v>0)){showToast('Digite um valor maior que zero');inp.value=(m.meta_valor||0).toLocaleString('pt-BR');return}
+  if(v===+m.meta_valor)return;
+  inp.disabled=true;
+  try{await db('PATCH','metas',{meta_valor:v},'id=eq.'+id);showToast('Meta de '+(m.assessor||'')+' agora é '+fmtR(v),true);await loadData();renderCurView();}
+  catch(e){showToast('Erro ao salvar: '+e.message);inp.disabled=false}
+}
 
 // ── CLOSERS: números de verdade viram atributos de carta ──
 function dsClosers(base){
@@ -3725,12 +3735,12 @@ const DS_AREA_SIG={inv:'INV',cons:'CON',seg:'SEG',saude:'SAU',rt:'REV'};
 function dsCarta(f){
   const foto=dsFoto(f.nome), pode=mandaNaArea();
   const tierRot={icone:'Ícone',gold:'Ouro',prata:'Prata',bronze:'Bronze'}[f.tier];
-  return '<div class="fut fut-'+f.tier+'">'
-    +'<div class="fut-top"><div><div class="fut-ovr">'+f.ovr+'</div><div class="fut-pos">'+(DS_AREA_SIG[f.area]||'—')+'</div><div class="fut-tier">'+tierRot+'</div></div></div>'
-    +'<div class="fut-foto'+(pode?' pode':'')+'"'+(pode?' onclick="dsTrocarFoto(\''+dsEsc(f.nome).replace(/'/g,"\\'")+'\')" title="Trocar a foto"':'')
+  return '<div class="dsfut dsfut-'+f.tier+'">'
+    +'<div class="dsfut-top"><div><div class="dsfut-ovr">'+f.ovr+'</div><div class="dsfut-pos">'+(DS_AREA_SIG[f.area]||'—')+'</div><div class="dsfut-tier">'+tierRot+'</div></div></div>'
+    +'<div class="dsfut-foto'+(pode?' pode':'')+'"'+(pode?' onclick="dsTrocarFoto(\''+dsEsc(f.nome).replace(/'/g,"\\'")+'\')" title="Trocar a foto"':'')
       +(foto?' style="background-image:url('+foto+')">':'>'+dsIniciais(f.nome))+'</div>'
-    +'<div class="fut-nome">'+dsEsc(String(f.nome).split(' ')[0])+'</div>'
-    +'<div class="fut-stats">'+['REU','FEC','CON','VOL','VEL','DIS'].map(k=>'<div><b>'+f.at[k]+'</b><span>'+k+'</span></div>').join('')+'</div>'
+    +'<div class="dsfut-nome">'+dsEsc(String(f.nome).split(' ')[0])+'</div>'
+    +'<div class="dsfut-stats">'+['REU','FEC','CON','VOL','VEL','DIS'].map(k=>'<div><b>'+f.at[k]+'</b><span>'+k+'</span></div>').join('')+'</div>'
     +'</div>';
 }
 function dsTrocarFoto(nome){
@@ -3812,7 +3822,7 @@ function renderDashboard(c=document.getElementById('main-content')){
     +seg('Período',[['semana','Semana'],['mes','Mês'],['tri','Trimestre'],['ano','Ano']],s.per,v=>"dsSet('per','"+v+"')")
     +seg('Área',[['','Todas'],...areasVis().map(([k,a])=>[k,a.name.split(' ')[0]])],s.area,v=>"dsSet('area','"+v+"')")
     +'<span style="flex:1"></span>'
-    +(mandaNaArea()?'<button class="btn" onclick="setView(\'d-metas\')">Metas do mês</button>':'')
+    +(mandaNaArea()?'<button class="btn wine" onclick="document.getElementById(\'ds-metas\').scrollIntoView({behavior:\'smooth\',block:\'start\'})">Editar metas</button>':'')
     +'</div>';
 
   const kpi=(cor,l,v,f,sub,k,tit,rows,o)=>'<div class="ds-kpi" style="--kc:'+cor+'"'+dsReg(k,tit,rows,o)+'><div class="l">'+l+'</div><div class="v">'+dsNum(v,f)+'</div><div class="s">'+sub+'</div></div>';
@@ -3913,7 +3923,7 @@ function renderDashboard(c=document.getElementById('main-content')){
     const fs=(t,v,f2,lista,k,tit,o)=>'<div'+(lista?dsReg(k,tit,lista,o):'')+'><div class="t">'+t+'</div><div class="n">'+(f2==='txt'?v:dsNum(v,f2))+'</div></div>';
     const conv=Math.min(100,dsPct(f.bol.length,f.reuFeitas.length));
     elenco='<div class="ds-card"><div class="ds-h">Elenco <span class="ds-sub">nota de 45 a 99 tirada dos últimos 90 dias · selecione um closer</span></div>'
-      +'<div class="ds-squad">'+fichas.map(x=>{const ft=dsFoto(x.nome);return '<div class="ds-mini'+(x.nome===f.nome?' on':'')+'" onclick="dsSet(\'closer\',\''+dsEsc(x.nome).replace(/'/g,"\\'")+'\')">'
+      +'<div class="ds-squad">'+fichas.map(x=>{const ft=dsFoto(x.nome);return '<div class="ds-pick'+(x.nome===f.nome?' on':'')+'" onclick="dsSet(\'closer\',\''+dsEsc(x.nome).replace(/'/g,"\\'")+'\')">'
         +'<div class="av"'+(ft?' style="background-image:url('+ft+')">':'>'+dsIniciais(x.nome))+'</div><div><b>'+dsEsc(x.nome)+'</b><br><small>'+x.ovr+' · '+(DS_AREA_SIG[x.area]||'')+'</small></div></div>'}).join('')+'</div>'
       +'<div class="ds-ficha">'+dsCarta(f)
       +'<div style="min-width:0">'
@@ -3942,10 +3952,40 @@ function renderDashboard(c=document.getElementById('main-content')){
     window._dsSpark=f.meses;
   }
 
+  // ── metas do mês, editáveis aqui mesmo ──
+  let blocoMetas='';
+  if(mandaNaArea()){
+    const mesK=P.hoje.slice(0,7);
+    const ms=metasDoMes().filter(m=>!s.area||m.area===s.area);
+    const real=m=>dsSoma(base.filter(r=>(m.area==='rv'||m.area==='rf'?subAreaOf(r)===m.area:r.area===m.area)
+      &&(!m.produto||norm(r.produto||'')===norm(m.produto))
+      &&(norm(r.responsavel||'')===norm(m.assessor)||norm(r.assessor||'')===norm(m.assessor))
+      &&isBol(r)&&dsDataBol(r).slice(0,7)===mesK),r=>r.atual);
+    const grupos={};ms.forEach(m=>(grupos[m.area]=grupos[m.area]||[]).push(m));
+    const nomeArea=k=>(AREAS[k]||SUBAREAS[k]||{}).name||k;
+    blocoMetas='<div class="ds-card" id="ds-metas"><div class="ds-h">Metas do mês <span class="ds-sub">'+P.hoje.slice(0,7).split('-').reverse().join('/')+' · total '+fmtR(dsSoma(ms,m=>m.meta_valor))
+      +' · mude o valor e aperte Enter para salvar</span><span style="flex:1"></span>'
+      +'<button class="btn wine" onclick="openNewMeta()">+ Nova meta</button></div>'
+      +(ms.length?Object.entries(grupos).map(([ak,lista])=>{
+        const tot=dsSoma(lista,m=>m.meta_valor), feito=dsSoma(lista,real);
+        return '<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">'
+          +'<b style="font-size:13px">'+dsEsc(nomeArea(ak))+'</b><span style="font-size:12px;color:var(--muted)">'+fmtR(feito)+' de '+fmtR(tot)+' · '+dsPct(feito,tot)+'%</span></div>'
+          +lista.map(m=>{const f=real(m),p=dsPct(f,m.meta_valor);
+            return '<div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) 150px 34px 34px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dashed var(--border-l)">'
+              +'<div style="font-size:12.5px"><b>'+dsEsc(m.assessor||'—')+'</b><div style="font-size:11px;color:var(--muted)">'+dsEsc(m.produto||'Todos os produtos')+'</div></div>'
+              +'<div><div class="ds-bar" style="height:8px"><i style="width:'+Math.min(100,p)+'%;background:'+(p>=100?'#2E8B57':DS_COR[ak]||'var(--wine)')+'"></i></div><div style="font-size:10.5px;color:var(--muted);margin-top:3px">'+fmtR(f)+' · '+p+'%</div></div>'
+              +'<input type="text" inputmode="decimal" value="'+(m.meta_valor||0).toLocaleString('pt-BR')+'" title="Valor da meta — aperte Enter para salvar" onkeydown="if(event.key===\'Enter\')this.blur()" onchange="dsSalvarMeta(\''+m.id+'\',this)" style="text-align:right;font-weight:700;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surf2);color:var(--text)">'
+              +'<button class="btn sm" title="Editar responsável, área e produto" onclick="openEditMeta(\''+m.id+'\')">✎</button>'
+              +'<button class="btn sm" title="Apagar meta" style="color:#C0392B" onclick="delMeta(\''+m.id+'\')">×</button></div>'}).join('')+'</div>';
+      }).join('')
+      :'<div class="ba-vazio">Nenhuma meta para este mês'+(s.area?' nessa área':'')+'. Clique em <b>+ Nova meta</b> para começar — sem meta, o Dashboard não mostra os gaps de ritmo.</div>')
+      +'</div>';
+  }
+
   c.innerHTML='<div class="ds">'+filtros+hero+kpis
     +'<div class="ds-grid2">'+reunioes+gaps+'</div>'
     +'<div class="ds-grid2">'+blocoArea+funil+'</div>'
-    +hist+elenco+'</div>';
+    +hist+elenco+blocoMetas+'</div>';
   dsAnimaNumeros(c);
 
   // ── gráficos ──
@@ -13182,7 +13222,7 @@ async function saveMeta(){
     closeModal('meta');
     document.getElementById('m-valor').value='';
     await loadData();
-    renderMetas();
+    if(curView==='d-dash')renderCurView();else renderMetas();
   }catch(e){showToast('Erro: '+e.message)}
 }
 
@@ -13192,7 +13232,7 @@ async function delMeta(id){
     await db('DELETE','metas','','id=eq.'+id);
     showToast('Meta removida',true);
     await loadData();
-    renderMetas();
+    if(curView==='d-dash')renderCurView();else renderMetas();
   }catch(e){showToast('Erro: '+e.message)}
 }
 
