@@ -3030,7 +3030,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261123-1000';
+const APP_VERSION='20261123-1100';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -6862,7 +6862,8 @@ async function dymSet(d,e,a,f,valor,texto){
 // as reuniões que o Sales Ops marcou no dia: o que o sistema registrou + o que o
 // diretor arrastou para a lista (linhas 'mar' da daily)
 function dyMarcLista(d){
-  const sis=((d&&d.ap&&d.ap.mar)||[]).map(x=>({id:x.r.id,r:x.r,cliente:x.r.cliente||'',quem:x.e.quem||'',sist:true}));
+  const sis=((d&&d.ap&&d.ap.mar)||[]).map(x=>({id:x.r.id,r:x.r,cliente:x.r.cliente||'',quem:x.e.quem||'',sist:true,
+    depois:isPerdida(x.r)?'depois virou Cliente Negou':contouNoShow(x.r)?'depois deu no show':''}));
   const ids=new Set(sis.map(x=>x.id));
   const man=((d&&d.todos)||[]).filter(x=>x.tipo==='mar'&&!x.off&&!ids.has(x.id))
     .map(x=>({id:x.id,r:x.r,cliente:x.cliente,quem:x.closer&&x.closer!=='Sem closer'?x.closer:'',sist:false}));
@@ -7161,7 +7162,11 @@ function dyArea(ak,dia,modo,cru){
   const closers=Object.keys(porCloser).map(k=>porCloser[k])
     .sort((a,b)=>b.reun.length-a.reun.length||a.closer.localeCompare(b.closer));
   closers.forEach(c=>c.reun.sort((x,y)=>(x.hora||'99:99').localeCompare(y.hora||'99:99')));
-  const ap=apurar(base,dia,dia);
+  // O que o time FEZ no dia (ligou, marcou) conta mesmo que depois o card tenha
+  // virado "Cliente Negou" ou sido arquivado — igual à aba Atividade. Por isso a
+  // apuração usa todos os cards da área e da empresa, não só os vivos.
+  const baseAtiv=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS).filter(r=>r.area===ak&&empresaDe(r)===dyEmp());
+  const ap=apurar(baseAtiv,dia,dia);
   const reunV=vivos.filter(x=>x.tipo==='reu'),pagV=vivos.filter(x=>x.tipo==='pag'),extV=vivos.filter(x=>x.tipo==='ext');
   return{ak,base,itens:vivos,todos:itens,fora,reun:reunV,pagam:pagV,extras:extV,closers,ap,foto};
 }
@@ -7619,7 +7624,8 @@ function dzArea(ak,A,d,modo){
       +'<div class="dz-lbl" style="margin-top:10px"><span>Reuniões marcadas hoje</span><span>'+ml.length+'</span></div>'
       +'<div class="dz-zone" data-ak="'+ak+'" data-t="mar">'
       +(ml.length?ml.map(x=>'<div class="dz-it"><div class="dz-it-l"><div class="nm"><b'+(x.r?' onclick="openEdit(\''+x.r.id+'\')"':'')+'>'+dyEsc(x.cliente||'Sem nome')+'</b>'
-          +'<small>'+(x.quem?'marcou: '+dyEsc(x.quem)+' · ':'')+(x.sist?'registrado no Kanban':'incluída por você')+'</small></div>'
+          +'<small>'+(x.quem?'marcou: '+dyEsc(x.quem)+' · ':'')+(x.sist?'registrado no Kanban':'incluída por você')
+          +(x.depois?' · <span style="color:#A94442;font-weight:700">'+x.depois+'</span>':'')+'</small></div>'
           +(x.sist?'':'<button class="dz-x" title="Tirar da lista" onclick="dyTira('+q(ak)+','+q(x.id)+',0)">×</button>')+'</div></div>').join('')
         :'<div class="dz-vazio">arraste do pipeline as reuniões que o Sales Ops marcou hoje</div>')
       +'</div></div>';
