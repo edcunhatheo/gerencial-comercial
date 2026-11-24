@@ -3104,7 +3104,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261124-1600';
+const APP_VERSION='20261124-1700';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -7513,12 +7513,15 @@ function dyRelQuadro(){
     const kp=fech
       ?k('Reuniões',fez+'/'+R,'rolaram')+k('Fechamentos',pg+'/'+P,'pagos')+k('Pago',dyK(pago),'de '+dyK(proj))
       :k('Reuniões',R,'no plano')+k('Fechamentos',P,'no plano')+k('Projeção',dyK(proj),'');
-    const so=k('Marcadas',M.n+(mM?'/'+mM:''),'reuniões')+k('Ligações',L.n+(mL?'/'+mL:''),'Sales Ops');
+    // de manhã é o objetivo do Sales Ops; no fechamento, o que fez contra o objetivo
+    const so=fech
+      ?k('Marcadas',M.n+(mM?'/'+mM:''),'reuniões')+k('Ligações',L.n+(mL?'/'+mL:''),'Sales Ops')
+      :k('Meta de marcação',mM||'—','reuniões a marcar')+k('Meta de ligações',mL||'—','Sales Ops');
     return '<div class="qd-col"><div class="qd-h">'+A.name+'</div>'
       +'<div class="qd-k">'+kp+so+'</div>'
       +'<div class="qd-s">Reuniões do dia</div>'+(R?linhas('reu',reun):'<div class="qd-v">sem reuniões</div>')
       +'<div class="qd-s">Fechamentos do dia</div>'+(P?linhas('pag',d.pagam):'<div class="qd-v">sem fechamentos</div>')
-      +((ml.length||ops)?'<div class="qd-s">Sales Ops'+(ops?' · '+E(ops):'')+' · marcadas</div>'
+      +((ml.length||(fech&&ops))?'<div class="qd-s">Sales Ops'+(ops?' · '+E(ops):'')+' · marcadas</div>'
         +(ml.length?'<div class="qd-mk">'+ml.map(x=>'<span'+(x.depois?' class="perd"':'')+'>'+E(x.cliente||'')+'</span>').join('')+'</div>':'<div class="qd-v">nenhuma marcada</div>'):'')
       +(fech&&ob.trim()?'<div class="qd-nota">'+E(ob.trim())+'</div>':'')
       +'</div>';
@@ -7919,7 +7922,8 @@ function dzResumoArea(ak,d,modo,cls){
   return '<div class="'+cls+'">'+(modo==='close'
     ?c('Reuniões que rolaram',fez+' de '+R,dyPct(fez,R))+c('Fechamentos pagos',pg+' de '+P,dyPct(pg,P))
       +c('Valor pago',dyK(pago),'de '+dyK(proj)+' projetados')+marc+lig
-    :c('Reuniões no plano',R,'')+c('Fechamentos no plano',P,'')+c('Projeção de pagamento',dyK(proj),'')+marc+lig)+'</div>';
+    :c('Reuniões no plano',R,'')+c('Fechamentos no plano',P,'')+c('Projeção de pagamento',dyK(proj),'')
+      +c('Meta de marcação',mM||'—','reuniões que o Sales Ops vai marcar')+c('Meta de ligações',mL||'—','ligações do Sales Ops'))+'</div>';
 }
 function dzPintaResumo(){
   const el=document.getElementById('dz-sum');if(!el)return;
