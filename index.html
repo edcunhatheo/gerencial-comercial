@@ -824,6 +824,33 @@ tr.bol td{background:var(--green-bg)}
 .rpz-ah b{font-size:20px;font-weight:800;color:#1C1B1A}
 .rpz-ah b.m{font-size:16px}
 .rpz-ah span{font-size:13px;color:#85817C}
+/* foto em quadro: áreas em colunas */
+.qd{padding:22px 24px 24px}
+.qd-top{display:flex;align-items:baseline;gap:16px;margin-bottom:14px}
+.qd-top .rpz-d{margin:0}
+.qd-grid{display:grid;gap:12px;align-items:start}
+.qd-col{background:#FFFFFF;border:1px solid #E2DCD7;border-radius:14px;overflow:hidden;padding-bottom:10px}
+.qd-h{background:#7A2233;color:#FFFFFF;font-size:19px;font-weight:800;padding:10px 14px;letter-spacing:.01em}
+.qd-k{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:10px 10px 4px}
+.qd-k div{background:#FAF8F6;border:1px solid #EEE9E5;border-radius:8px;padding:6px 8px}
+.qd-k span{display:block;font-size:10px;font-weight:800;color:#85817C;text-transform:uppercase;letter-spacing:.05em}
+.qd-k b{display:block;font-size:19px;font-weight:800;color:#1C1B1A;line-height:1.2}
+.qd-k em{font-style:normal;font-size:10.5px;color:#85817C}
+.qd-s{font-size:11px;font-weight:800;color:#7A2233;text-transform:uppercase;letter-spacing:.07em;margin:10px 12px 4px;padding-bottom:3px;border-bottom:2px solid #F0E6E8}
+.qd-cl{display:flex;justify-content:space-between;align-items:baseline;margin:6px 12px 2px}
+.qd-cl b{font-size:12.5px;font-weight:800;color:#1C1B1A}
+.qd-cl span{font-size:11.5px;color:#85817C;font-weight:700}
+.qd-ln{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 12px;padding:4px 0;border-bottom:1px solid #F3EFEC}
+.qd-n{font-size:13.5px;font-weight:600;color:#1C1B1A;min-width:0}
+.qd-n small{font-size:11.5px;color:#85817C;font-weight:600;margin-left:6px}
+.qd-ch{font-style:normal;font-size:10.5px;font-weight:800;border-radius:5px;padding:2px 7px;background:#EEE9E5;color:#85817C;white-space:nowrap}
+.qd-ch.ok{background:#2E8B57;color:#fff}.qd-ch.no{background:#A94442;color:#fff}.qd-ch.mid{background:#C9A24A;color:#2A1F05}
+.qd-ob{margin:0 12px 2px;font-size:11.5px;color:#6E6A64;font-style:italic;padding:1px 0 4px}
+.qd-v{margin:2px 12px;font-size:12px;color:#B0ACA7}
+.qd-mk{display:flex;flex-wrap:wrap;gap:4px;margin:4px 12px}
+.qd-mk span{font-size:11.5px;font-weight:600;background:#F6F0F1;color:#5E1A27;border-radius:5px;padding:2px 7px}
+.qd-mk span.perd{background:#F6E3E2;color:#A94442;text-decoration:line-through}
+.qd-nota{margin:10px 12px 0;background:#FAF8F6;border-left:3px solid #7A2233;border-radius:5px;padding:6px 9px;font-size:12px;color:#3A3634}
 .rpz-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
 .rpz-sum>div{background:#FAF8F6;border:1px solid #EEE9E5;border-radius:10px;padding:10px 13px}
 .rpz-sum span{display:block;font-size:10.5px;font-weight:800;color:#85817C;text-transform:uppercase;letter-spacing:.06em}
@@ -3075,7 +3102,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261124-1200';
+const APP_VERSION='20261124-1300';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -7445,7 +7472,59 @@ function dyInvBloco(ak,modo){
 
 // ══ A TELA ══
 function dyRelatorio(){
-  return dyModo()==='period'?dyRelPeriodo():dyRelTela();
+  return dyModo()==='period'?dyRelPeriodo():dyRelQuadro();
+}
+// ══ A FOTO EM QUADRO ══
+// Uma coluna por área, lado a lado: a imagem fica larga e baixa, e dá para ler
+// no celular. Cada coluna: resumo da área, reuniões e fechamentos por closer
+// (uma linha por cliente, com o resultado), Sales Ops e a observação do dia.
+function dyRelQuadro(){
+  const dia=dyData(),emp=dyEmp(),fech=dyModo()==='close',E=dyEsc;
+  const porCloser=l=>{const g={};l.forEach(x=>{const c=(x.closer&&x.closer!=='Sem closer')?x.closer:'Sem closer';(g[c]=g[c]||[]).push(x)});
+    return Object.entries(g).sort((a,b)=>b[1].length-a[1].length||a[0].localeCompare(b[0]))};
+  const chip=x=>{
+    if(!fech)return '';
+    const reu=x.tipo!=='pag';
+    const st=reu?({sim:['ok','Rolou'],remarcou:['mid','Remarcou'],nao:['no','Não rolou']}[x.resultado]||['', '—'])
+      :(x.pago?['ok','Pagou']:x.naoPagou?['no','Não pagou']:['','—']);
+    return '<i class="qd-ch '+st[0]+'">'+st[1]+'</i>';
+  };
+  const linhas=(t,l)=>porCloser(l).map(([c,ll])=>{
+    const pl=t==='reu'?(fech?ll.filter(x=>x.resultado==='sim').length+'/'+ll.length:ll.length)
+      :(fech?ll.filter(x=>x.pago).length+'/'+ll.length+' · '+dyK(somaPago(ll)):ll.length+' · '+dyK(ll.reduce((s,x)=>s+(x.valor||0),0)));
+    return '<div class="qd-cl"><b>'+E(c)+'</b><span>'+pl+'</span></div>'
+      +ll.map(x=>{const reu=x.tipo!=='pag';
+        const info=reu?(x.hora?dyHH(x.hora):''):(x.valor?dyK(x.valor):'');
+        return '<div class="qd-ln"><span class="qd-n">'+E(x.cliente||'Sem nome')+(info?'<small>'+info+'</small>':'')+'</span>'+chip(x)+'</div>'
+          +(fech&&x.motivo?'<div class="qd-ob">'+E(x.motivo)+'</div>':'');
+      }).join('');
+  }).join('');
+  const cols=dyAreasDaEmpresa().map(([ak,A])=>{
+    const d=dyArea(ak,dia);
+    const L=dyLigacoes(ak,dia,emp,d),M=dyMarcadas(ak,dia,emp,d),ml=dyMarcLista(d),ops=papel(ak,emp,'ops');
+    const mL=dymN(dia,emp,ak,'calls'),mM=dymN(dia,emp,ak,'goal'),ob=dymT(dia,emp,ak,'obs');
+    if(!d.reun.length&&!d.pagam.length&&!L.n&&!M.n&&!mL&&!mM)return '';
+    const reun=[].concat(d.reun).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99'));
+    const R=d.reun.length,P=d.pagam.length,fez=d.reun.filter(x=>x.resultado==='sim').length,pg=d.pagam.filter(x=>x.pago).length;
+    const proj=dyProj(d),pago=somaPago(d.reun.concat(d.pagam));
+    const k=(l,v,s)=>'<div><span>'+l+'</span><b>'+v+'</b>'+(s?'<em>'+s+'</em>':'')+'</div>';
+    const kp=fech
+      ?k('Reuniões',fez+'/'+R,'rolaram')+k('Fechamentos',pg+'/'+P,'pagos')+k('Pago',dyK(pago),'de '+dyK(proj))
+      :k('Reuniões',R,'no plano')+k('Fechamentos',P,'no plano')+k('Projeção',dyK(proj),'');
+    const so=k('Marcadas',M.n+(mM?'/'+mM:''),'reuniões')+k('Ligações',L.n+(mL?'/'+mL:''),'Sales Ops');
+    return '<div class="qd-col"><div class="qd-h">'+A.name+'</div>'
+      +'<div class="qd-k">'+kp+so+'</div>'
+      +'<div class="qd-s">Reuniões do dia</div>'+(R?linhas('reu',reun):'<div class="qd-v">sem reuniões</div>')
+      +'<div class="qd-s">Fechamentos do dia</div>'+(P?linhas('pag',d.pagam):'<div class="qd-v">sem fechamentos</div>')
+      +((ml.length||ops)?'<div class="qd-s">Sales Ops'+(ops?' · '+E(ops):'')+' · marcadas</div>'
+        +(ml.length?'<div class="qd-mk">'+ml.map(x=>'<span'+(x.depois?' class="perd"':'')+'>'+E(x.cliente||'')+'</span>').join('')+'</div>':'<div class="qd-v">nenhuma marcada</div>'):'')
+      +(fech&&ob.trim()?'<div class="qd-nota">'+E(ob.trim())+'</div>':'')
+      +'</div>';
+  }).filter(Boolean);
+  const n=Math.max(cols.length,1), larg=Math.max(1100,Math.min(n,5)*400+60);
+  return '<div class="rpz qd" style="width:'+larg+'px"><div class="qd-top"><div class="rpz-t"><i></i>'+(fech?'Fechamento ':'Daily ')+empNome(emp)+'</div>'
+    +'<div class="rpz-d">'+dyDataFmt(dia)+'</div></div>'
+    +'<div class="qd-grid" style="grid-template-columns:repeat('+Math.min(n,5)+',minmax(0,1fr))">'+(cols.join('')||'<div class="qd-col"><div class="qd-v">Nada planejado para este dia.</div></div>')+'</div></div>';
 }
 // ══ A FOTO NO FORMATO DA TELA ══
 // O CEO recebe exatamente o que o diretor preencheu: área por área, reuniões e
