@@ -3030,7 +3030,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261123-1200';
+const APP_VERSION='20261124-0900';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -5582,7 +5582,12 @@ function analiseMarcacoes(r){
     const chave=dia+'|'+norm(x.quem||'');
     if(vistos.has(chave))return;
     vistos.add(chave);
-    const reu=reuNoDia(x.para||dia);
+    let reu=reuNoDia(x.para||dia);
+    // Data de reunião anterior ao próprio registro é erro de digitação (ex.: o
+    // ano saiu 2023 em vez de 2026) — reunião recém-marcada não fica no passado.
+    // Se o card hoje tem uma reunião válida, vale ela.
+    const atualCard=isoDia(r.reuniao_data)||dataR2(r)||'';
+    if(reu&&reu<dia&&atualCard&&atualCard>=dia)reu=atualCard;
     const motivo=!reu?'a ligação de '+brData(dia)+' não tem data de reunião no card'
       :reu<dia?'a reunião no card é de '+brData(reu)+', anterior ao registro de '+brData(dia)
       :'';
