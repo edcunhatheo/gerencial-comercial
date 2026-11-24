@@ -756,6 +756,9 @@ tr.bol td{background:var(--green-bg)}
 .dz-sum span{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .dz-sum b{display:block;font-size:22px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
 .dz-sum em{font-style:normal;font-size:11px;color:var(--muted)}
+.dz-sum-a{margin:0 0 14px}
+.dz-sum-a>div{background:var(--surf2);padding:9px 12px}
+.dz-sum-a b{font-size:19px}
 .dz-grid{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
 @media(max-width:1000px){.dz-grid{grid-template-columns:minmax(0,1fr)}}
 .dz-pipe{background:var(--surf2);border:1px solid var(--border);border-radius:12px;padding:12px;position:sticky;top:70px;max-height:calc(100vh - 90px);display:flex;flex-direction:column;gap:8px}
@@ -821,6 +824,11 @@ tr.bol td{background:var(--green-bg)}
 .rpz-ah b{font-size:20px;font-weight:800;color:#1C1B1A}
 .rpz-ah b.m{font-size:16px}
 .rpz-ah span{font-size:13px;color:#85817C}
+.rpz-sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.rpz-sum>div{background:#FAF8F6;border:1px solid #EEE9E5;border-radius:10px;padding:10px 13px}
+.rpz-sum span{display:block;font-size:10.5px;font-weight:800;color:#85817C;text-transform:uppercase;letter-spacing:.06em}
+.rpz-sum b{display:block;font-size:22px;font-weight:800;color:#1C1B1A;margin-top:2px}
+.rpz-sum em{font-style:normal;font-size:12px;color:#85817C}
 .rpz-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .rpz-lbl{display:flex;justify-content:space-between;font-size:11px;font-weight:800;color:#85817C;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
 .rpz-zone{border:1.5px dashed #E2DCD7;border-radius:12px;padding:8px;display:grid;gap:7px}
@@ -3067,7 +3075,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261124-1000';
+const APP_VERSION='20261124-1100';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -7484,6 +7492,7 @@ function dyRelTela(){
     return '<div class="rpz-area"><div class="rpz-ah"><b>'+A.name+'</b><span>'
       +(fech?fez+' de '+d.reun.length+' reuniões rolaram · pago '+dyK(pago)+' de '+dyK(proj)
         :d.reun.length+(d.reun.length===1?' reunião':' reuniões')+' · '+d.pagam.length+' p/ fechar · projeção '+dyK(proj))+'</span></div>'
+      +dzResumoArea(ak,d,modo,'rpz-sum')
       +'<div class="rpz-cols">'+coluna('reu','Reuniões do dia',reun)+coluna('pag','Fechamentos do dia',d.pagam)+'</div>'
       +so
       +(fech&&ob.trim()?'<div class="rpz-nota"><b>Observação do dia</b> · '+E(ob.trim())+'</div>':'')
@@ -7512,8 +7521,7 @@ function renderDaily(c=document.getElementById('main-content')){
         :'<input type="date" class="dy-dt" value="'+dyData()+'" onchange="window._dyData=this.value;renderDaily()">')
     +'</div></div>'
     // o plano do dia ocupa a tela; a foto para o CEO fica embaixo, recolhida
-    +(modo==='period'?'':'<div id="dz-sum" class="dz-sum"></div>'
-      +'<div class="dz-grid"><aside id="dz-pipe" class="dz-pipe"></aside><div id="dy-forms" class="dz-areas"></div></div>')
+    +(modo==='period'?'':'<div class="dz-grid"><aside id="dz-pipe" class="dz-pipe"></aside><div id="dy-forms" class="dz-areas"></div></div>')
     +'<details class="dz-fotoc"'+(modo==='period'||window._dzFotoAberta?' open':'')+' ontoggle="window._dzFotoAberta=this.open;dyPintaPrev()">'
       +'<summary>Foto do dia para o CEO <span>'+(modo==='close'?'plano × o que aconteceu':modo==='period'?'resumo do período':'o plano da manhã')+'</span>'
         +'<span style="flex:1"></span>'
@@ -7760,6 +7768,7 @@ function dzArea(ak,A,d,modo){
       ?fez+' de '+d.reun.length+' reuniões rolaram · pago '+dyK(pago)+' de '+dyK(proj)
       :d.reun.length+(d.reun.length===1?' reunião':' reuniões')+' · '+d.pagam.length+' p/ fechar · projeção '+dyK(proj))
     +'</span></div>'
+    +dzResumoArea(ak,d,modo,'dz-sum dz-sum-a')
     +'<div class="dz-cols">'+zona('reu','Reuniões do dia',reun)+zona('pag','Fechamentos do dia',d.pagam)+'</div>'
     +salesOps
     +(d.fora.length?'<div class="dy-fora" style="margin-top:8px">Tirados hoje: '+d.fora.map(x=>'<button class="dy-volta" title="Trazer de volta" onclick="dyVolta('+q(ak)+','+q(x.id)+')">'+dyEsc(x.cliente||'sem nome')+' ↺</button>').join('')+'</div>':'')
@@ -7802,6 +7811,20 @@ function dzPintaPipe(){
     :'<div class="dz-vazio">Nada no pipeline com esse filtro.</div>')
     +(cand.length>80?'<div class="dz-vazio">mostrando 80 de '+cand.length+' — use a busca</div>':'');
   dzLiga();
+}
+// o resumo de UMA área (o mesmo quadro na tela e na foto do CEO)
+function dzResumoArea(ak,d,modo,cls){
+  const dia=dyData(),emp=dyEmp();
+  const R=d.reun.length,P=d.pagam.length,proj=dyProj(d);
+  const fez=d.reun.filter(x=>x.resultado==='sim').length,pg=d.pagam.filter(x=>x.pago).length,pago=somaPago(d.reun.concat(d.pagam));
+  const L=dyLigacoes(ak,dia,emp,d),M=dyMarcadas(ak,dia,emp,d);
+  const c=(l,v,e)=>'<div><span>'+l+'</span><b>'+v+'</b>'+(e?'<em>'+e+'</em>':'')+'</div>';
+  return '<div class="'+cls+'">'+(modo==='close'
+    ?c('Reuniões que rolaram',fez+' de '+R,dyPct(fez,R))+c('Fechamentos pagos',pg+' de '+P,dyPct(pg,P))
+      +c('Valor pago',dyK(pago),'de '+dyK(proj)+' projetados')+c('Aderência ao plano',dyPct(fez+pg,R+P),(fez+pg)+' de '+(R+P)+' linhas aconteceram')
+      +c('Sales Ops',L.n+' ligações',M.n+' reuniões marcadas')
+    :c('Reuniões no plano',R,'')+c('Fechamentos no plano',P,'')+c('Projeção de pagamento',dyK(proj),'')
+      +c('Sales Ops',L.n+' ligações',M.n+' reuniões marcadas'))+'</div>';
 }
 function dzPintaResumo(){
   const el=document.getElementById('dz-sum');if(!el)return;
