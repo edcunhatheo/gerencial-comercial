@@ -794,6 +794,8 @@ tr.bol td{background:var(--green-bg)}
 .dz-it-l .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .dz-it-l .nm small{display:block;font-size:10.5px;color:var(--muted)}
 .dz-it-l .vl{font-size:12px;font-weight:800;white-space:nowrap}
+.dz-clsel{font-size:10.5px;font-weight:700;color:var(--wine);background:var(--card);border:1px solid var(--border-l);border-radius:5px;padding:1px 4px;margin:2px 6px 0 0;cursor:pointer;max-width:120px}
+.dz-clsel.vazio{color:#A94442;border-color:#A94442;border-style:dashed}
 .dz-x{border:0;background:transparent;color:var(--muted-l);font-size:15px;cursor:pointer;padding:0 2px;line-height:1}
 .dz-x:hover{color:var(--wine)}
 .dz-res{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
@@ -3102,7 +3104,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261124-1300';
+const APP_VERSION='20261124-1600';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -7771,8 +7773,13 @@ function dzArea(ak,A,d,modo){
     const cls=reu?({sim:'ok',nao:'no',remarcou:'mid'}[x.resultado]||''):(x.pago?'ok':x.naoPagou?'no':'');
     const abre=x.r?' onclick="openEdit(\''+x.r.id+'\')" title="Abrir a oportunidade"':'';
     const sub=reu
-      ?[(x.hora?dyHH(x.hora):''),(x.closer&&x.closer!=='Sem closer'?x.closer:''),x.rod||''].filter(Boolean).join(' · ')
-      :[(x.closer&&x.closer!=='Sem closer'?x.closer:''),(x.r&&x.r.produto?x.r.produto:'')].filter(Boolean).join(' · ');
+      ?[(x.hora?dyHH(x.hora):''),x.rod||''].filter(Boolean).join(' · ')
+      :[(x.r&&x.r.produto?x.r.produto:'')].filter(Boolean).join(' · ');
+    // o closer da linha: escolhe aqui, vale só para a daily (o card não muda)
+    const clAt=(x.closer&&x.closer!=='Sem closer')?x.closer:'';
+    const clOpts=dzClosers();if(clAt&&!clOpts.some(n=>norm(n)===norm(clAt)))clOpts.unshift(clAt);
+    const clSel='<select class="dz-clsel'+(clAt?'':' vazio')+'" title="Closer desta linha" onclick="event.stopPropagation()" onchange="dyEdita('+q(ak)+','+q(x.id)+',\'cl\',this)">'
+      +'<option value="Sem closer">Closer…</option>'+clOpts.map(n=>'<option'+(norm(n)===norm(clAt)?' selected':'')+'>'+dyEsc(n)+'</option>').join('')+'</select>';
     const nome=x.manual
       ?'<input class="dy-i-cli dz-ob" style="margin:0;font-weight:700" value="'+dyEsc(x.cliente)+'" placeholder="Nome do cliente" onblur="dyEdita('+q(ak)+','+q(x.id)+',\'c\',this)" onkeydown="if(event.key===\'Enter\')this.blur()">'
       :'<b'+abre+'>'+dyEsc(x.cliente||'Sem nome')+'</b>';
@@ -7790,7 +7797,7 @@ function dzArea(ak,A,d,modo){
           +bt('✕ Não pagou',x.naoPagou&&!x.pago,'no','dyNp('+q(ak)+','+q(x.id)+','+(x.naoPagou?0:1)+')'))
       +'</div><input class="dz-ob" placeholder="o que rolou (vai na foto)" value="'+dyEsc(x.motivo)+'" onblur="dyEdita('+q(ak)+','+q(x.id)+',\'mt\',this)" onkeydown="if(event.key===\'Enter\')this.blur()">';
     return '<div class="dz-it '+cls+'" data-ln="'+x.id+'"><div class="dz-it-l"><div class="nm">'+nome
-      +'<small>'+dyEsc(sub)+(x.pipe?' · do pipeline':'')+(x.manual?' · fora do sistema':'')+'</small>'+extra+'</div>'
+      +'<small>'+clSel+dyEsc(sub)+(x.pipe?' · do pipeline':'')+(x.manual?' · fora do sistema':'')+'</small>'+extra+'</div>'
       +((!reu||x.paga)&&x.valor?'<span class="vl">'+dyK(x.valor)+'</span>':'')
       +'<button class="dz-x" title="Tirar da daily de hoje" onclick="dyTira('+q(ak)+','+q(x.id)+','+(x.sist?1:0)+')">×</button></div>'
       +res+'</div>';
@@ -7854,6 +7861,11 @@ function dzArea(ak,A,d,modo){
     +(modo==='close'?'<label class="dy-f" style="margin-top:10px"><span>Observação do dia (vai na foto)</span><input value="'+dyEsc(dymT(dia,emp,ak,'obs'))+'" onblur="dyCampo(\''+ak+'\',\'obs\',this,\'t\')" onkeydown="if(event.key===\'Enter\')this.blur()"></label>':'')
     +dyRetomar(ak,dia)
     +inv+'</div>';
+}
+// quem pode ser closer de uma linha da daily: closers e heads ativos
+function dzClosers(){
+  return (USUARIOS||[]).filter(u=>u.ativo!==false&&(u.perfil==='closer'||u.perfil==='head')).map(u=>u.nome)
+    .sort((a,b)=>a.localeCompare(b,'pt-BR'));
 }
 // o pipeline à esquerda: o que ainda não está na daily de hoje
 function dzPintaPipe(){
