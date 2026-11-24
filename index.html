@@ -3030,7 +3030,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261123-1100';
+const APP_VERSION='20261123-1200';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -5636,6 +5636,22 @@ function marcacaoDeReuniao(r,add){
       +(alvo?' — reunião em '+brData(alvo):' — a reunião teve desfecho registrado depois'),
       h.usuario,true,{i});
   });
+  // ── MARCADA NA CRIAÇÃO ──
+  // Quem cria a oportunidade já em "Reunião agendada" (ou R2 agendada), com a
+  // data da reunião, marcou uma reunião naquele dia — não precisa de clique
+  // depois. Carga por planilha e o que nasce pela esteira não entram: isso é
+  // importação, não trabalho comercial do dia.
+  const cri=H.find(x=>x.campo==='Criação');
+  if(cri&&!/planilha|esteira|the investor|varredura/i.test(String(cri.usuario||'')+' '+String(cri.para||''))){
+    const dia=isoHist(cri.data)||isoDia(r.created_at);
+    const prim=H.find(x=>x.campo==='Status comercial');
+    const scIni=prim?prim.de:r.sc;                       // a etapa em que o card nasceu
+    const mud=H.find(x=>x.campo==='Reunião marcada');
+    const reuIni=isoDia(mud?mud.de:r.reuniao_data);      // a reunião que nasceu com o card
+    const horaNaCriacao=H.some(x=>x.campo===CAMPO_HORA&&isoHist(x.data)===dia&&norm(x.usuario||'')===norm(cri.usuario||''));
+    if(dia&&ETAPA_IDX(scIni)===2&&(reuIni||horaNaCriacao)&&!jaTem(dia,cri.usuario))
+      add('mar',cri.data,'criou a oportunidade já com reunião marcada'+(reuIni?' para '+brData(reuIni):''),cri.usuario,false);
+  }
 }
 function marcacoesRecusadas(rows,de,ate){
   const out=[];
