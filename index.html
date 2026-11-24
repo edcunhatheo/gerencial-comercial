@@ -3075,7 +3075,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261124-1100';
+const APP_VERSION='20261124-1200';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -7817,14 +7817,18 @@ function dzResumoArea(ak,d,modo,cls){
   const dia=dyData(),emp=dyEmp();
   const R=d.reun.length,P=d.pagam.length,proj=dyProj(d);
   const fez=d.reun.filter(x=>x.resultado==='sim').length,pg=d.pagam.filter(x=>x.pago).length,pago=somaPago(d.reun.concat(d.pagam));
-  const L=dyLigacoes(ak,dia,emp,d),M=dyMarcadas(ak,dia,emp,d);
+  const L=dyLigacoes(ak,dia,emp,d),M=dyMarcadas(ak,dia,emp,d),ml=dyMarcLista(d);
+  const mL=dymN(dia,emp,ak,'calls'),mM=dymN(dia,emp,ak,'goal');
   const c=(l,v,e)=>'<div><span>'+l+'</span><b>'+v+'</b>'+(e?'<em>'+e+'</em>':'')+'</div>';
+  // as reuniões que o Sales Ops marcou no dia: o número contra a meta e quem são
+  const nomes=ml.map(x=>dyEsc(String(x.cliente||'').trim())).filter(Boolean);
+  const marc=c('Reuniões marcadas',M.n+(mM?'<small style="font-size:.6em;opacity:.6"> / '+mM+'</small>':''),
+    nomes.length?nomes.slice(0,6).join(' · ')+(nomes.length>6?' · +'+(nomes.length-6):''):'nenhuma marcada');
+  const lig=c('Ligações do Sales Ops',L.n+(mL?'<small style="font-size:.6em;opacity:.6"> / '+mL+'</small>':''),mL?dyPct(L.n,mL)+' da meta':'');
   return '<div class="'+cls+'">'+(modo==='close'
     ?c('Reuniões que rolaram',fez+' de '+R,dyPct(fez,R))+c('Fechamentos pagos',pg+' de '+P,dyPct(pg,P))
-      +c('Valor pago',dyK(pago),'de '+dyK(proj)+' projetados')+c('Aderência ao plano',dyPct(fez+pg,R+P),(fez+pg)+' de '+(R+P)+' linhas aconteceram')
-      +c('Sales Ops',L.n+' ligações',M.n+' reuniões marcadas')
-    :c('Reuniões no plano',R,'')+c('Fechamentos no plano',P,'')+c('Projeção de pagamento',dyK(proj),'')
-      +c('Sales Ops',L.n+' ligações',M.n+' reuniões marcadas'))+'</div>';
+      +c('Valor pago',dyK(pago),'de '+dyK(proj)+' projetados')+marc+lig
+    :c('Reuniões no plano',R,'')+c('Fechamentos no plano',P,'')+c('Projeção de pagamento',dyK(proj),'')+marc+lig)+'</div>';
 }
 function dzPintaResumo(){
   const el=document.getElementById('dz-sum');if(!el)return;
