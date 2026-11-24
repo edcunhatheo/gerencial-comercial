@@ -809,6 +809,43 @@ tr.bol td{background:var(--green-bg)}
 .dz-ops-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 @media(max-width:760px){.dz-ops-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .dz-ops .dy-f input{width:100%;padding:6px 9px;border:1px solid var(--border);border-radius:7px;background:var(--surf2);color:var(--text);font-size:13px;font-weight:700}
+/* a foto do CEO no formato da tela (cores fixas: sai igual em qualquer tema) */
+.rpz{width:1180px;background:#F4F1EE;color:#1C1B1A;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:26px 28px 28px}
+.rpz *{box-sizing:border-box}
+.rpz-hd{margin-bottom:16px}
+.rpz-t{display:flex;align-items:center;gap:12px;font-family:Georgia,'Times New Roman',serif;font-size:34px;font-weight:700;color:#1C1B1A}
+.rpz-t i{width:6px;height:32px;border-radius:3px;background:#7A2233;display:inline-block}
+.rpz-d{font-size:15px;color:#85817C;margin:4px 0 0 18px}
+.rpz-area{background:#FFFFFF;border:1px solid #E2DCD7;border-radius:14px;padding:16px 18px;margin-bottom:14px}
+.rpz-ah{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
+.rpz-ah b{font-size:20px;font-weight:800;color:#1C1B1A}
+.rpz-ah b.m{font-size:16px}
+.rpz-ah span{font-size:13px;color:#85817C}
+.rpz-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rpz-lbl{display:flex;justify-content:space-between;font-size:11px;font-weight:800;color:#85817C;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+.rpz-zone{border:1.5px dashed #E2DCD7;border-radius:12px;padding:8px;display:grid;gap:7px}
+.rpz-cl{display:flex;justify-content:space-between;align-items:baseline;padding:4px 4px 0}
+.rpz-cl b{font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#7A2233}
+.rpz-cl span{font-size:12px;color:#85817C}
+.rpz-it{background:#FAF8F6;border:1px solid #EEE9E5;border-radius:10px;padding:9px 11px;border-left:4px solid #E2DCD7}
+.rpz-it.ok{border-left-color:#2E8B57}.rpz-it.no{border-left-color:#A94442}.rpz-it.mid{border-left-color:#C9A24A}
+.rpz-l{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.rpz-l b{display:block;font-size:14.5px;font-weight:700;color:#1C1B1A}
+.rpz-l small{display:block;font-size:12px;color:#85817C;margin-top:1px}
+.rpz-l small em{font-style:normal;color:#A94442;font-weight:700}
+.rpz-r{display:flex;align-items:center;gap:8px;white-space:nowrap}
+.rpz-r b{font-size:15px;font-weight:800}
+.rpz-ch{font-size:11.5px;font-weight:800;border-radius:6px;padding:4px 10px;background:#EEE9E5;color:#85817C}
+.rpz-ch.ok{background:#2E8B57;color:#fff}.rpz-ch.no{background:#A94442;color:#fff}.rpz-ch.mid{background:#C9A24A;color:#2A1F05}
+.rpz-ob{margin-top:7px;background:#FFFFFF;border:1px solid #EEE9E5;border-radius:7px;padding:6px 9px;font-size:12.5px;color:#3A3634}
+.rpz-vazio{font-size:13px;color:#B0ACA7;text-align:center;padding:14px}
+.rpz-ops{margin-top:16px;padding-top:14px;border-top:1px dashed #E2DCD7}
+.rpz-g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.rpz-g4 div{background:#FAF8F6;border:1px solid #EEE9E5;border-radius:9px;padding:8px 11px}
+.rpz-g4 span{display:block;font-size:10.5px;font-weight:800;color:#85817C;text-transform:uppercase;letter-spacing:.06em}
+.rpz-g4 b{font-size:20px;font-weight:800;color:#1C1B1A}
+.rpz-nota{margin-top:12px;background:#FAF8F6;border-left:4px solid #7A2233;border-radius:6px;padding:9px 12px;font-size:13.5px;color:#3A3634}
+.rpz-nota b{color:#7A2233}
 .dz-fotoc{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:12px}
 .dz-fotoc>summary{cursor:pointer;list-style:none;padding:12px 16px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--wine);display:flex;align-items:center;gap:10px}
 .dz-fotoc>summary::-webkit-details-marker{display:none}
@@ -3030,7 +3067,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261124-0900';
+const APP_VERSION='20261124-1000';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -7400,7 +7437,61 @@ function dyInvBloco(ak,modo){
 
 // ══ A TELA ══
 function dyRelatorio(){
-  return dyModo()==='close'?dyRelClose():dyModo()==='period'?dyRelPeriodo():dyRelDaily();
+  return dyModo()==='period'?dyRelPeriodo():dyRelTela();
+}
+// ══ A FOTO NO FORMATO DA TELA ══
+// O CEO recebe exatamente o que o diretor preencheu: área por área, reuniões e
+// fechamentos separados por closer, o resultado de cada linha e o Sales Ops.
+// Sem compilado geral — cada área tem os seus números. Cores fixas (a imagem
+// sai igual no tema claro ou escuro).
+function dyRelTela(){
+  const dia=dyData(),emp=dyEmp(),modo=dyModo(),fech=modo==='close';
+  const E=dyEsc;
+  const linha=x=>{
+    const reu=x.tipo!=='pag';
+    const st=reu?({sim:['ok','Rolou'],remarcou:['mid','Remarcou'],nao:['no','Não rolou']}[x.resultado]||null)
+      :(x.pago?['ok','Pagou']:x.naoPagou?['no','Não pagou']:null);
+    const sub=reu?[(x.hora?dyHH(x.hora):''),(x.closer&&x.closer!=='Sem closer'?x.closer:''),x.rod||''].filter(Boolean).join(' · ')
+      :[(x.closer&&x.closer!=='Sem closer'?x.closer:''),(x.r&&x.r.produto?x.r.produto:'')].filter(Boolean).join(' · ');
+    const val=(!reu||x.paga)&&x.valor?dyK(x.valor):'';
+    return '<div class="rpz-it'+(fech&&st?' '+st[0]:'')+'"><div class="rpz-l"><div><b>'+E(x.cliente||'Sem nome')+'</b><small>'+E(sub)+'</small></div>'
+      +'<div class="rpz-r">'+(val?'<b>'+val+'</b>':'')+(fech?(st?'<span class="rpz-ch '+st[0]+'">'+st[1]+'</span>':'<span class="rpz-ch">sem resposta</span>'):'')+'</div></div>'
+      +(fech&&x.motivo?'<div class="rpz-ob">'+E(x.motivo)+'</div>':'')+'</div>';
+  };
+  const porCloser=l=>{const g={};l.forEach(x=>{const c=(x.closer&&x.closer!=='Sem closer')?x.closer:'Sem closer';(g[c]=g[c]||[]).push(x)});
+    return Object.entries(g).sort((a,b)=>b[1].length-a[1].length||a[0].localeCompare(b[0]))};
+  const placar=(t,l)=>t==='reu'
+    ?(fech?l.filter(x=>x.resultado==='sim').length+' de '+l.length+' rolaram':l.length+(l.length===1?' reunião':' reuniões'))
+    :(fech?l.filter(x=>x.pago).length+' de '+l.length+' pagaram · '+dyK(somaPago(l)):l.length+' · '+dyK(l.reduce((s,x)=>s+(x.valor||0),0)));
+  const coluna=(t,rot,l)=>'<div><div class="rpz-lbl"><span>'+rot+'</span><span>'+l.length+'</span></div><div class="rpz-zone">'
+    +(l.length?porCloser(l).map(([c,ll])=>'<div class="rpz-cl"><b>'+E(c)+'</b><span>'+placar(t,ll)+'</span></div>'+ll.map(linha).join('')).join('')
+      :'<div class="rpz-vazio">'+(t==='reu'?'sem reuniões':'sem fechamentos')+'</div>')+'</div></div>';
+  const areas=dyAreasDaEmpresa().map(([ak,A])=>{
+    const d=dyArea(ak,dia);
+    const L=dyLigacoes(ak,dia,emp,d),M=dyMarcadas(ak,dia,emp,d),ml=dyMarcLista(d),ops=papel(ak,emp,'ops');
+    const mL=dymN(dia,emp,ak,'calls'),mM=dymN(dia,emp,ak,'goal'),ob=dymT(dia,emp,ak,'obs');
+    if(!d.reun.length&&!d.pagam.length&&!L.n&&!M.n&&!mL&&!mM)return '';   // área parada não ocupa a foto
+    const reun=[].concat(d.reun).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99'));
+    const proj=dyProj(d),pago=somaPago(d.reun.concat(d.pagam)),fez=d.reun.filter(x=>x.resultado==='sim').length;
+    const so=(L.n||M.n||mL||mM||ml.length)?'<div class="rpz-ops"><div class="rpz-ah"><b class="m">Sales Ops'+(ops?' · '+E(ops):'')+'</b>'
+        +'<span>'+L.n+(mL?'/'+mL:'')+' ligações · '+M.n+(mM?'/'+mM:'')+' reuniões marcadas</span></div>'
+        +'<div class="rpz-g4"><div><span>Ligações feitas</span><b>'+L.n+'</b></div><div><span>Meta de ligações</span><b>'+(mL||'—')+'</b></div>'
+        +'<div><span>Reuniões marcadas</span><b>'+M.n+'</b></div><div><span>Meta de reuniões</span><b>'+(mM||'—')+'</b></div></div>'
+        +(ml.length?'<div class="rpz-lbl" style="margin-top:12px"><span>Reuniões marcadas hoje</span><span>'+ml.length+'</span></div><div class="rpz-zone">'
+          +ml.map(x=>'<div class="rpz-it"><div class="rpz-l"><div><b>'+E(x.cliente||'Sem nome')+'</b><small>'+(x.quem?'marcou: '+E(x.quem):'')
+            +(x.depois?' · <em>'+E(x.depois)+'</em>':'')+'</small></div></div></div>').join('')+'</div>':'')
+        +'</div>':'';
+    return '<div class="rpz-area"><div class="rpz-ah"><b>'+A.name+'</b><span>'
+      +(fech?fez+' de '+d.reun.length+' reuniões rolaram · pago '+dyK(pago)+' de '+dyK(proj)
+        :d.reun.length+(d.reun.length===1?' reunião':' reuniões')+' · '+d.pagam.length+' p/ fechar · projeção '+dyK(proj))+'</span></div>'
+      +'<div class="rpz-cols">'+coluna('reu','Reuniões do dia',reun)+coluna('pag','Fechamentos do dia',d.pagam)+'</div>'
+      +so
+      +(fech&&ob.trim()?'<div class="rpz-nota"><b>Observação do dia</b> · '+E(ob.trim())+'</div>':'')
+      +'</div>';
+  }).join('');
+  return '<div class="rpz"><div class="rpz-hd"><div class="rpz-t"><i></i>'+(fech?'Fechamento ':'Daily ')+empNome(emp)+'</div>'
+    +'<div class="rpz-d">'+dyDataFmt(dia)+(fech?' · o plano da manhã e o que aconteceu':' · o plano do dia')+'</div></div>'
+    +(areas||'<div class="rpz-area"><div class="rpz-vazio">Nada planejado para este dia.</div></div>')+'</div>';
 }
 function renderDaily(c=document.getElementById('main-content')){
   const modo=dyModo();
@@ -7755,7 +7846,7 @@ function dyPintaPrev(){
   const p=document.getElementById('dy-prev');if(!p)return;
   p.innerHTML=dyRelatorio();
   // encolhe o cartão para caber na coluna, sem mexer no tamanho real da imagem
-  const shell=p.parentElement, rep=p.querySelector('.rep');
+  const shell=p.parentElement, rep=p.querySelector('.rep, .rpz');
   if(shell&&rep){
     const esc=Math.min(1,(shell.clientWidth-2)/rep.offsetWidth);
     p.style.transform='scale('+esc+')';
@@ -7771,7 +7862,7 @@ async function dyCanvas(){
   document.body.appendChild(palco);
   try{
     if(document.fonts&&document.fonts.ready)await document.fonts.ready;
-    return await html2canvas(palco.firstChild,{scale:2,backgroundColor:'#2A2425',useCORS:true});
+    return await html2canvas(palco.firstChild,{scale:2,backgroundColor:palco.firstChild.classList.contains('rpz')?'#F4F1EE':'#2A2425',useCORS:true});
   }catch(e){showToast('Erro ao gerar imagem: '+e.message);return null}
   finally{palco.remove()}
 }
