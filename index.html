@@ -794,6 +794,8 @@ tr.bol td{background:var(--green-bg)}
 .dz-it-l .nm b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
 .dz-it-l .nm small{display:block;font-size:10.5px;color:var(--muted)}
 .dz-it-l .vl{font-size:12px;font-weight:800;white-space:nowrap}
+.dz-vol{display:inline-flex;align-items:center;gap:3px;margin-top:4px;font-size:10.5px;font-weight:700;color:var(--muted)}
+.dz-vol input{width:96px;border:1px solid var(--border-l);border-radius:5px;padding:2px 6px;font-size:11.5px;font-weight:800;background:var(--card);color:var(--text)}
 .dz-clsel{font-size:10.5px;font-weight:700;color:var(--wine);background:var(--card);border:1px solid var(--border-l);border-radius:5px;padding:1px 4px;margin:2px 6px 0 0;cursor:pointer;max-width:120px}
 .dz-clsel.vazio{color:#A94442;border-color:#A94442;border-style:dashed}
 .dz-x{border:0;background:transparent;color:var(--muted-l);font-size:15px;cursor:pointer;padding:0 2px;line-height:1}
@@ -3104,7 +3106,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261125-0900';
+const APP_VERSION='20261125-1000';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -7802,7 +7804,10 @@ function dzArea(ak,A,d,modo){
     const extra=x.manual
       ?(reu?'<input type="time" class="dz-ob" style="width:96px;margin:4px 0 0" value="'+dyEsc(x.hora)+'" onblur="dyEdita('+q(ak)+','+q(x.id)+',\'h\',this)">'
            :'<input class="dz-ob" style="width:120px;margin:4px 0 0" placeholder="Valor R$" value="'+(x.valor?fmtMoedaBR(x.valor):'')+'" onblur="dyEdita('+q(ak)+','+q(x.id)+',\'v\',this)" onkeydown="if(event.key===\'Enter\')this.blur()">')
-      :'';
+      :(!reu
+        // o volume da boleta: vem do card, mas o diretor ajusta aqui (vale só para a daily)
+        ?'<label class="dz-vol">R$ <input inputmode="decimal" value="'+(x.valor?fmtMoedaBR(x.valor):'')+'" placeholder="volume" title="Volume da boleta (vale só para a daily)" onclick="event.stopPropagation()" onblur="dyEdita('+q(ak)+','+q(x.id)+',\'v\',this)" onkeydown="if(event.key===\'Enter\')this.blur()"></label>'
+        :'');
     const bt=(rot,on,c,fn)=>'<button class="'+c+(on?' on':'')+'" onclick="'+fn+'">'+rot+'</button>';
     const res=modo!=='close'?''
       :'<div class="dz-res">'+(reu
@@ -7814,7 +7819,7 @@ function dzArea(ak,A,d,modo){
       +'</div><input class="dz-ob" placeholder="o que rolou (vai na foto)" value="'+dyEsc(x.motivo)+'" onblur="dyEdita('+q(ak)+','+q(x.id)+',\'mt\',this)" onkeydown="if(event.key===\'Enter\')this.blur()">';
     return '<div class="dz-it '+cls+'" data-ln="'+x.id+'"><div class="dz-it-l"><div class="nm">'+nome
       +'<small>'+clSel+dyEsc(sub)+(x.pipe?' · do pipeline':'')+(x.manual?' · fora do sistema':'')+'</small>'+extra+'</div>'
-      +((!reu||x.paga)&&x.valor?'<span class="vl">'+dyK(x.valor)+'</span>':'')
+      +(reu&&x.paga&&x.valor?'<span class="vl">'+dyK(x.valor)+'</span>':'')
       +'<button class="dz-x" title="Tirar da daily de hoje" onclick="dyTira('+q(ak)+','+q(x.id)+','+(x.sist?1:0)+')">×</button></div>'
       +res+'</div>';
   };
