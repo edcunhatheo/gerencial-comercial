@@ -3104,7 +3104,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261124-1800';
+const APP_VERSION='20261125-0900';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -7111,7 +7111,17 @@ function dyOvTodos(ak){
 async function dyOvSet(ak,id,dados,repinta){
   const at=Object.assign({},dyOv(ak,id)||{},dados);
   await dymSet(dyData(),dyEmp(),ak,dyOvKey(id),1,JSON.stringify(at));
+  await dyFotoDaTela(ak);
   if(repinta!==false){dyPintaForms();dyPintaPrev()}
+}
+// mexeu na Daily: a foto passa a ser a folha como está na tela agora
+async function dyFotoDaTela(ak){
+  if(dyModo()!=='daily')return;
+  const dia=dyData(),emp=dyEmp();
+  for(const [k] of dyAreasDaEmpresa()){
+    if(ak&&k!==ak)continue;
+    await dyTiraFoto(dia,emp,k,dyArea(k,dia,'daily',1).todos,1);
+  }
 }
 async function dyOvApaga(ak,id){
   const m=dymRow(dyData(),dyEmp(),ak,dyOvKey(id));
@@ -7182,10 +7192,10 @@ async function dyRefazFoto(ak){
 function dyArea(ak,dia,modo,cru){
   modo=modo||dyModo();
   const base=dyBase().filter(r=>r.area===ak);
-  // O fechamento é a MESMA folha da Daily (o que o diretor montou na tela),
-  // agora com o resultado de cada linha. A foto automática das 9h fazia o
-  // fechamento mostrar outra lista — ela não é mais usada aqui.
-  const foto=null;
+  // O fechamento é a foto da Daily: a folha como o diretor a deixou (a foto é
+  // refeita a cada ajuste na Daily e quando a imagem vai para o CEO). O que os
+  // closers mexem depois não entra sozinho; o diretor acrescenta na mão.
+  const foto=(modo==='close'&&!cru)?dyFoto(dia,dyEmp(),ak):null;
   let reun,pagam,extras;
   if(foto){
     // o fechamento segue a foto: cada id volta no papel em que foi fotografado
@@ -7208,7 +7218,7 @@ function dyArea(ak,dia,modo,cru){
   // uma linha, e o que o diretor clica fica só aqui.
   const doSistema=(r,tipo,f)=>{
     const id=r?r.id:(f&&f.i), o=ovs[id]||{};
-    const pg=o.pg!==undefined?!!o.pg:(f?false:(r?dyBoletou(r,dia):false));
+    const pg=o.pg!==undefined?!!o.pg:(r?dyBoletou(r,dia):false);
     const val=o.v!==undefined?(+o.v||0):(f&&f.v!==undefined?(+f.v||0):(r?dyVal(r):0));
     return{id,tipo,r:r||null,sist:true,off:!!o.off,
       hora:o.h!==undefined?o.h:(f?(f.h||''):(horaReuniao(r)||'')),
@@ -7231,10 +7241,8 @@ function dyArea(ak,dia,modo,cru){
     itens=foto.l.filter(f=>f.t!=='ext').map(f=>doSistema(porId[f.i]||null,f.t||'reu',
       (f.c!==undefined?f:{i:f.i,c:(porId[f.i]||{}).cliente||'',h:'',cl:'',v:0,p:0,rd:''})));
   }else{
-    // o que boletou hoje continua na folha como fechamento (já marcado como pago),
-    // em vez de sumir da Daily quando a boleta entra
     itens=[].concat(reun.map(r=>doSistema(r,'reu')),pagam.map(r=>doSistema(r,'pag')),
-                    extras.map(r=>doSistema(r,'pag')));
+                    extras.map(r=>doSistema(r,'ext')));
   }
   const vistos=new Set(itens.map(x=>x.id));
   // linhas acrescentadas: na mão (fora do sistema) ou arrastadas do pipeline (op=1,
@@ -7996,11 +8004,13 @@ async function dyCanvas(){
 const dyNomeArq=()=>(dyModo()==='close'?'fechamento':dyModo()==='period'?'periodo':'daily')
   +'-'+empNome(dyEmp()).toLowerCase().replace(/\W+/g,'')+'-'+(dyModo()==='period'?dyDe()+'_'+dyAte():dyData())+'.png';
 async function dyBaixar(){
+  await dyFotoDaTela();
   const cv=await dyCanvas();if(!cv)return;
   const a=document.createElement('a');a.download=dyNomeArq();a.href=cv.toDataURL('image/png');a.click();
   showToast('Imagem salva nos seus downloads!',true);
 }
 async function dyCopiar(){
+  await dyFotoDaTela();
   const cv=await dyCanvas();if(!cv)return;
   try{
     const blob=await new Promise(res=>cv.toBlob(res,'image/png'));
