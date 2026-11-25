@@ -3104,7 +3104,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261124-1700';
+const APP_VERSION='20261124-1800';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -7182,7 +7182,10 @@ async function dyRefazFoto(ak){
 function dyArea(ak,dia,modo,cru){
   modo=modo||dyModo();
   const base=dyBase().filter(r=>r.area===ak);
-  const foto=(modo==='close'&&!cru)?dyFoto(dia,dyEmp(),ak):null;
+  // O fechamento é a MESMA folha da Daily (o que o diretor montou na tela),
+  // agora com o resultado de cada linha. A foto automática das 9h fazia o
+  // fechamento mostrar outra lista — ela não é mais usada aqui.
+  const foto=null;
   let reun,pagam,extras;
   if(foto){
     // o fechamento segue a foto: cada id volta no papel em que foi fotografado
@@ -7228,8 +7231,10 @@ function dyArea(ak,dia,modo,cru){
     itens=foto.l.filter(f=>f.t!=='ext').map(f=>doSistema(porId[f.i]||null,f.t||'reu',
       (f.c!==undefined?f:{i:f.i,c:(porId[f.i]||{}).cliente||'',h:'',cl:'',v:0,p:0,rd:''})));
   }else{
+    // o que boletou hoje continua na folha como fechamento (já marcado como pago),
+    // em vez de sumir da Daily quando a boleta entra
     itens=[].concat(reun.map(r=>doSistema(r,'reu')),pagam.map(r=>doSistema(r,'pag')),
-                    extras.map(r=>doSistema(r,'ext')));
+                    extras.map(r=>doSistema(r,'pag')));
   }
   const vistos=new Set(itens.map(x=>x.id));
   // linhas acrescentadas: na mão (fora do sistema) ou arrastadas do pipeline (op=1,
