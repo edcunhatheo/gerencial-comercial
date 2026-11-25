@@ -3106,7 +3106,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261125-1000';
+const APP_VERSION='20261125-1030';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -6958,9 +6958,12 @@ async function dymSet(d,e,a,f,valor,texto){
 // na contagem automática quando fica vazio. Vazio ≠ zero: por isso o 'on'.
 // as reuniões que o Sales Ops marcou no dia: o que o sistema registrou + o que o
 // diretor arrastou para a lista (linhas 'mar' da daily)
-function dyMarcLista(d){
+function dyMarcLista(d,comTiradas){
+  const tirada=id=>{const o=d&&d.ak?dyOv(d.ak,'mk:'+id):null;return !!(o&&o.off)};
   const sis=((d&&d.ap&&d.ap.mar)||[]).map(x=>({id:x.r.id,r:x.r,cliente:x.r.cliente||'',quem:x.e.quem||'',sist:true,
-    depois:isPerdida(x.r)?'depois virou Cliente Negou':contouNoShow(x.r)?'depois deu no show':''}));
+    depois:isPerdida(x.r)?'depois virou Cliente Negou':contouNoShow(x.r)?'depois deu no show':''}))
+    .filter(x=>comTiradas?tirada(x.id):!tirada(x.id));
+  if(comTiradas)return sis;
   const ids=new Set(sis.map(x=>x.id));
   const man=((d&&d.todos)||[]).filter(x=>x.tipo==='mar'&&!x.off&&!ids.has(x.id))
     .map(x=>({id:x.id,r:x.r,cliente:x.cliente,quem:x.closer&&x.closer!=='Sem closer'?x.closer:'',sist:false}));
@@ -7853,9 +7856,14 @@ function dzArea(ak,A,d,modo){
       +(ml.length?ml.map(x=>'<div class="dz-it"><div class="dz-it-l"><div class="nm"><b'+(x.r?' onclick="openEdit(\''+x.r.id+'\')"':'')+'>'+dyEsc(x.cliente||'Sem nome')+'</b>'
           +'<small>'+(x.quem?'marcou: '+dyEsc(x.quem)+' · ':'')+(x.sist?'registrado no Kanban':'incluída por você')
           +(x.depois?' · <span style="color:#A94442;font-weight:700">'+x.depois+'</span>':'')+'</small></div>'
-          +(x.sist?'':'<button class="dz-x" title="Tirar da lista" onclick="dyTira('+q(ak)+','+q(x.id)+',0)">×</button>')+'</div></div>').join('')
+          +(x.sist
+            ?'<button class="dz-x" title="Tirar da lista de marcadas" onclick="dyOvSet('+q(ak)+',\'mk:'+String(x.id).replace(/'/g,'')+'\',{off:1})">×</button>'
+            :'<button class="dz-x" title="Tirar da lista" onclick="dyTira('+q(ak)+','+q(x.id)+',0)">×</button>')+'</div></div>').join('')
         :'<div class="dz-vazio">arraste do pipeline as reuniões que o Sales Ops marcou hoje</div>')
-      +'</div></div>';
+      +'</div>'
+      +(()=>{const t=dyMarcLista(d,1);return t.length?'<div class="dy-fora" style="margin-top:6px">Marcadas tiradas: '
+        +t.map(x=>'<button class="dy-volta" title="Trazer de volta" onclick="dyOvSet('+q(ak)+',\'mk:'+String(x.id).replace(/'/g,'')+'\',{off:0})">'+dyEsc(x.cliente||'sem nome')+' ↺</button>').join('')+'</div>':''})()
+      +'</div>';
   })();
   const reun=[].concat(d.reun).sort((a,b)=>(a.hora||'99').localeCompare(b.hora||'99'));
   const proj=dyProj(d);
