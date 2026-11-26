@@ -1381,6 +1381,9 @@ html[data-theme="dark"] .area-card.clicavel:hover{box-shadow:0 6px 20px rgba(0,0
 .ba-hdr .n{font-size:10px;font-weight:700;background:var(--bbg);color:var(--bc);border-radius:4px;padding:1px 8px}
 .ba-hdr .v{margin-left:auto;font-size:13px;font-weight:700;color:var(--bc);font-variant-numeric:tabular-nums}
 .ba-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.dsp-bts{display:flex;gap:6px;justify-content:flex-end;margin:0 0 10px}
+.dsp-bt{font:inherit;font-size:11px;font-weight:700;padding:5px 11px;border-radius:4px;cursor:pointer;border:1px solid var(--wine);background:transparent;color:var(--wine)}
+.dsp-bt.cheio{background:var(--wine);color:#fff}
 .ba-tbl th{background:var(--surf2);color:var(--muted);font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:6px 9px;white-space:nowrap}
 .ba-tbl th.r,.ba-tbl td.r{text-align:right}
 .ba-tbl td{padding:7px 9px;border-bottom:1px solid var(--border-l);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px}
@@ -3106,7 +3109,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261125-1030';
+const APP_VERSION='20261126-1200';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3806,7 +3809,7 @@ function dsAbrir(k){
   const tot=dsSoma(rows,val);
   document.getElementById('ba-title').innerHTML=dsEsc(L.titulo)+' <span style="font-size:11px;font-weight:600;color:var(--muted)">· '+rows.length+' · '+fmtR(tot)+'</span>';
   document.getElementById('ba-body').innerHTML=rows.length
-    ?'<div style="overflow-x:auto"><table class="ba-tbl"><thead><tr><th>Cliente</th><th>Responsável</th><th>Status</th><th>'+(o.colData||'Última mexida')+'</th><th class="r">Valor</th></tr></thead><tbody>'
+    ?dsBtPrint(k)+'<div style="overflow-x:auto"><table class="ba-tbl"><thead><tr><th>Cliente</th><th>Responsável</th><th>Status</th><th>'+(o.colData||'Última mexida')+'</th><th class="r">Valor</th></tr></thead><tbody>'
       +rows.map(r=>'<tr onclick="closeModal(\'area\');openEdit(\''+r.id+'\')" title="Abrir oportunidade">'
         +'<td style="font-weight:700">'+dsEsc(r.cliente||'—')+'<div style="font-size:10.5px;font-weight:400;color:var(--muted)">'+dsEsc(((AREAS[r.area]||{}).name||r.area)+(r.produto?' · '+r.produto:''))+(r.area==='seg'&&seguradoraDe(r)?' · '+dsEsc(seguradoraDe(r)):'')+'</div></td>'
         +'<td style="color:var(--muted)">'+dsEsc(r.responsavel||r.assessor||'—')+'</td>'
@@ -3815,6 +3818,52 @@ function dsAbrir(k){
         +'<td class="r val">'+fmtR(val(r))+'</td></tr>').join('')+'</tbody></table></div>'
     :'<div class="ba-vazio">Nada por aqui — bom sinal.</div>';
   const m=document.getElementById('modal-area');m.style.display='flex';
+}
+// ── print da lista (ex.: o que foi boletado) para mandar no WhatsApp ──
+function dsBtPrint(k){
+  return '<div class="dsp-bts"><button class="dsp-bt cheio" onclick="dsPrintLista(\''+k+'\',1)">Copiar print</button>'
+    +'<button class="dsp-bt" onclick="dsPrintLista(\''+k+'\',0)">Salvar imagem</button></div>';
+}
+async function dsPrintLista(k,copiar){
+  const L=(window._dsL||{})[k];if(!L)return;
+  if(typeof html2canvas==='undefined'){showToast('Recurso de imagem ainda carregando — tente novamente');return}
+  const o=L.o, val=o.valor||(r=>r.atual||r.pipe||0), dt=o.data||(r=>dataBR(String(r.updated_at||'').slice(0,10)));
+  const rows=[...L.rows].sort((a,b)=>(val(b)||0)-(val(a)||0));
+  const tot=dsSoma(rows,val);
+  const porArea={};rows.forEach(r=>{const n=(AREAS[r.area]||{}).name||r.area||'—';porArea[n]=(porArea[n]||0)+(val(r)||0)});
+  // cores fixas (claras) para o print sair igual no tema claro e no escuro
+  const esc=dsEsc, td='padding:9px 10px;border:0;border-bottom:1px solid #EEE6E2;vertical-align:top;background:#fff;color:#2A2425;text-transform:none;letter-spacing:0';
+  const card='<div style="width:760px;background:#FAF8F6;padding:22px;font-family:Arial,Helvetica,sans-serif;color:#2A2425">'
+    +'<div style="background:#7A2436;color:#fff;border-radius:6px;padding:18px 22px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px">'
+      +'<div><div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.85">'+esc(L.titulo)+'</div>'
+      +'<div style="font-size:34px;font-weight:700;line-height:1.1;margin-top:4px">'+fmtR(tot)+'</div>'
+      +'<div style="font-size:13px;opacity:.85;margin-top:2px">'+rows.length+(k==='k-bol'?' boleta':' oportunidade')+(rows.length!==1?'s':'')+'</div></div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">'
+      +Object.entries(porArea).sort((a,b)=>b[1]-a[1]).map(([n,v])=>'<div style="border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:7px 11px;text-align:center"><div style="font-size:9.5px;font-weight:700;text-transform:uppercase;opacity:.85">'+esc(n)+'</div><div style="font-size:14px;font-weight:700;margin-top:2px">'+fmtR(v)+'</div></div>').join('')
+      +'</div></div>'
+    +'<table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:12.5px;background:#fff;border-radius:6px">'
+    +'<thead><tr>'+[['Cliente',''],['Responsável',''],[o.colData||'Data',''],['Valor','text-align:right']].map(([t,x])=>'<th style="'+td+';background:#F4EFEC;color:#8A7F7C;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-align:left;'+x+'">'+esc(t)+'</th>').join('')+'</tr></thead><tbody>'
+    +rows.map(r=>'<tr><td style="'+td+'"><b>'+esc(r.cliente||'—')+'</b><div style="font-size:10.5px;color:#8A7F7C;margin-top:1px">'+esc(((AREAS[r.area]||{}).name||r.area||'')+(r.produto?' · '+r.produto:''))+'</div></td>'
+      +'<td style="'+td+';color:#5C5250">'+esc(r.responsavel||r.assessor||'—')+'</td>'
+      +'<td style="'+td+';color:#5C5250">'+(dt(r)||'—')+'</td>'
+      +'<td style="'+td+';text-align:right;font-weight:700;white-space:nowrap">'+fmtR(val(r))+'</td></tr>').join('')
+    +'<tr><td colspan="3" style="'+td+';font-weight:700;border-bottom:0">Total</td><td style="'+td+';text-align:right;font-weight:700;color:#7A2436;white-space:nowrap;border-bottom:0">'+fmtR(tot)+'</td></tr>'
+    +'</tbody></table>'
+    +'<div style="font-size:10px;color:#8A7F7C;margin-top:10px;text-align:right">Gerado em '+new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})+'</div>'
+    +'</div>';
+  const tmp=document.createElement('div');
+  tmp.style.cssText='position:absolute;left:-99999px;top:0';
+  tmp.innerHTML=card;document.body.appendChild(tmp);
+  let cv;
+  try{cv=await html2canvas(tmp.firstChild,{scale:2,backgroundColor:'#FAF8F6',useCORS:true})}
+  catch(e){showToast('Erro ao gerar imagem: '+e.message);return}
+  finally{tmp.remove()}
+  const salvar=()=>{const a=document.createElement('a');a.download=norm(L.titulo).replace(/[^a-z0-9]+/g,'-')+'-'+new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')+'.png';a.href=cv.toDataURL('image/png');a.click()};
+  if(copiar){
+    try{const blob=await new Promise(res=>cv.toBlob(res,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);showToast('Print copiado! Abra o WhatsApp e cole com Ctrl+V',true);return}
+    catch(e){salvar();showToast('Seu navegador não copia imagem direto — salvei o arquivo pra anexar');return}
+  }
+  salvar();showToast('Imagem salva nos seus downloads!',true);
 }
 // ── números que sobem até o valor (dá vida à tela sem atrapalhar a leitura) ──
 function dsAnimaNumeros(root){
