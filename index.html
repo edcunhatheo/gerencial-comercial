@@ -1381,6 +1381,7 @@ html[data-theme="dark"] .area-card.clicavel:hover{box-shadow:0 6px 20px rgba(0,0
 .ba-hdr .n{font-size:10px;font-weight:700;background:var(--bbg);color:var(--bc);border-radius:4px;padding:1px 8px}
 .ba-hdr .v{margin-left:auto;font-size:13px;font-weight:700;color:var(--bc);font-variant-numeric:tabular-nums}
 .ba-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.at-div{margin:8px 0 0;padding:8px 11px;border-radius:4px;background:var(--amber-bg,#FFF6E5);color:var(--text);font-size:11.5px;border-left:3px solid var(--amber,#D4A24C)}
 .dsp-bts{display:flex;gap:6px;justify-content:flex-end;margin:0 0 10px}
 .dsp-bt{font:inherit;font-size:11px;font-weight:700;padding:5px 11px;border-radius:4px;cursor:pointer;border:1px solid var(--wine);background:transparent;color:var(--wine)}
 .dsp-bt.cheio{background:var(--wine);color:#fff}
@@ -3109,7 +3110,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261126-1200';
+const APP_VERSION='20261126-1500';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3617,12 +3618,16 @@ function mapaCaixa(caixa,titulo,nota){
   const grade=gente.map(nm=>({nm,dias:J.cols.map(d=>{
     const ap=atApura(nm,d.de,d.ate);
     return{v:atVal(ap,k),itens:fuItens(ap[k]||[]),iso:d.de,rot:d.de===d.ate?brData(d.de):brData(d.de)+' a '+brData(d.ate)};
-  })}));
+  }),
+    // o total sai da MESMA apuração da pergunta lá em cima (o período inteiro),
+    // nunca da soma das colunas: assim os dois números são sempre o mesmo
+    per:atVal(atApura(nm,J.de,J.ate),k)}));
+  const divergem=J.totRot?grade.filter(g=>g.dias.reduce((s,d)=>s+d.v,0)!==g.per):[];
   const max=Math.max(...grade.map(g=>Math.max(...g.dias.map(d=>d.v),0)),1);
   const tinta=v=>v<=0?TINTA[0]:TINTA[Math.min(TINTA.length-1,1+Math.floor(v/max*(TINTA.length-1.001)))];
   const corTexto=v=>v/max>=.6?'#fff':'var(--text)';
   const linhas=grade.map(g=>{
-    const tot=g.dias.reduce((s,d)=>s+d.v,0);
+    const tot=g.per;
     return '<tr><td class="nm">'+g.nm+'</td>'
       +g.dias.map(d=>'<td>'+(d.itens.length
         ?'<div class="at-cel" style="background:'+tinta(d.v)+';color:'+corTexto(d.v)+'" '
@@ -3634,13 +3639,18 @@ function mapaCaixa(caixa,titulo,nota){
   const totDia=J.cols.map((d,i)=>grade.reduce((s,g)=>s+g.dias[i].v,0));
   const rodape='<tr class="rod"><td class="nm">Total</td>'
     +totDia.map(v=>'<td>'+(k==='bol'?fmtR(v):v)+'</td>').join('')
-    +(J.totRot?'<td class="tot">'+(k==='bol'?fmtR(totDia.reduce((a,b)=>a+b,0)):totDia.reduce((a,b)=>a+b,0))+'</td>':'')+'</tr>';
+    +(J.totRot?'<td class="tot">'+(k==='bol'?fmtR(grade.reduce((s,g)=>s+g.per,0)):grade.reduce((s,g)=>s+g.per,0))+'</td>':'')+'</tr>';
+  // conferência: se a soma das colunas não fecha com o total, a tela diz por quê
+  const aviso=divergem.length?'<div class="at-div">Conferência: '+divergem.map(g=>g.nm+' soma '+(k==='bol'?fmtR(g.dias.reduce((s,d)=>s+d.v,0)):g.dias.reduce((s,d)=>s+d.v,0))
+      +' nas colunas e '+(k==='bol'?fmtR(g.per):g.per)+' no total').join(' · ')
+    +(k==='mar'?' — reunião marcada deveria fechar sempre. Avise o suporte.'
+      :' — o mesmo cliente aparece em mais de uma coluna e no total conta uma vez só.')+'</div>':'';
   return '<div class="at-card">'
     +'<div class="at-ch"><div class="at-ct">'+titulo+'<span>'+nota+'</span></div><div class="at-mbs">'+abas+'</div></div>'
     +'<div class="at-wrap"><table class="at-mapa"><thead><tr><th>Pessoa</th>'
       +J.cols.map(d=>'<th>'+d.rot+'</th>').join('')
       +(J.totRot?'<th class="tot">'+J.totRot+'</th>':'')+'</tr></thead>'
-      +'<tbody>'+linhas+rodape+'</tbody></table></div>'
+      +'<tbody>'+linhas+rodape+'</tbody></table></div>'+aviso
     +'<div class="at-leg"><span>menos</span>'+TINTA.map(c=>'<i style="background:'+c+'"></i>').join('')
       +'<span>mais</span><span class="dica">clique numa célula para ver as oportunidades'
       +(J.g==='mes'?' daquela semana':J.g==='dia'?' do dia':' daquele dia')+'</span></div>'
@@ -5722,7 +5732,29 @@ function analiseMarcacoes(r){
   try{Object.defineProperty(r,'__mk',{value:res,enumerable:false,configurable:true})}catch(e){r.__mk=res}
   return res;
 }
-function marcacaoDeReuniao(r,add){
+// Card que saiu do jogo: perdido, cliente negou ou não se aplica.
+const scForaDoJogo=sc=>{const k=norm(sc||'');return !!k&&(etapaDoStatus(sc)==='perd'||/nao se aplica/.test(k))};
+// ══ UMA REUNIÃO, UMA MARCAÇÃO ══
+// Regra do diretor (26/11): cada reunião conta UMA vez, no dia em que foi
+// marcada pela primeira vez. Remarcar (outra data, no show, mexer na data da
+// ligação) não conta de novo. A única coisa que abre uma marcação nova é o card
+// ter saído do jogo (perdido / negou / não se aplica) e ter sido retomado.
+function marcacaoDeReuniao(r,addReal){
+  const cand=[];
+  const add=(t,data,txt,quem,inf,extra)=>cand.push({t,data,txt,quem,inf,extra:extra||{}});
+  marcacaoDeReuniaoBruta(r,add);
+  const H=r.historico||[];
+  const resets=[];H.forEach((h,i)=>{if(h.campo==='Status comercial'&&scForaDoJogo(h.para))resets.push(i)});
+  const pos=c=>typeof c.extra.i==='number'?c.extra.i:Math.max(0,H.findIndex(x=>x.campo==='Criação'));
+  cand.sort((a,b)=>pos(a)-pos(b));
+  let ult=null;
+  cand.forEach(c=>{
+    const p=pos(c);
+    if(ult!==null&&!resets.some(x=>x>ult&&x<p))return;     // mesma reunião: já contou
+    ult=p;addReal(c.t,c.data,c.txt,c.quem,c.inf,c.extra);
+  });
+}
+function marcacaoDeReuniaoBruta(r,add){
   const reg=analiseMarcacoes(r).ok;
   reg.forEach(m=>
     add('mar',m.dia,'ligação marcada para '+brData(m.dia)+' com reunião em '+brData(m.alvo),
@@ -5750,7 +5782,9 @@ function marcacaoDeReuniao(r,add){
   H.forEach((h,i)=>{
     if(h.campo!=='Status comercial')return;
     const pi=ETAPA_IDX(h.para),di=ETAPA_IDX(h.de);
-    if(pi!==2||!(di>=0&&di<pi))return;         // 2 = Reunião Agendada (e R2 Agendada)
+    // 2 = Reunião Agendada (e R2 Agendada). Vindo de coluna anterior, ou de um
+    // card que estava fora do jogo (perdido / não se aplica) e foi retomado.
+    if(pi!==2||!((di>=0&&di<pi)||(di<0&&scForaDoJogo(h.de))))return;
     const dia=isoHist(h.data);
     if(!dia||doGesto(i,h.usuario)||jaTem(dia,h.usuario))return;
     // SEM REUNIÃO, NÃO HÁ MARCAÇÃO. Mover um card para a coluna e tirar dois
@@ -5762,6 +5796,10 @@ function marcacaoDeReuniao(r,add){
     const teveDesfecho=H.slice(i+1).some(x=>
       (x.campo===MARCAS.reu.campo&&x.para===MARCAS.reu.on)||ehNoShow(x));
     if(!alvo&&!teveDesfecho)return;
+    // Reunião com data anterior ao movimento não é reunião nova: é arrumar o
+    // quadro com um card antigo. Card retomado só conta com reunião de verdade.
+    if(alvo&&alvo<dia)return;
+    if(di<0&&!alvo)return;
     add('mar',h.data,'⚠ moveu o card para “'+(h.para||'—')+'”'
       +(alvo?' — reunião em '+brData(alvo):' — a reunião teve desfecho registrado depois'),
       h.usuario,true,{i});
@@ -5780,7 +5818,7 @@ function marcacaoDeReuniao(r,add){
     const reuIni=isoDia(mud?mud.de:r.reuniao_data);      // a reunião que nasceu com o card
     const horaNaCriacao=H.some(x=>x.campo===CAMPO_HORA&&isoHist(x.data)===dia&&norm(x.usuario||'')===norm(cri.usuario||''));
     if(dia&&ETAPA_IDX(scIni)===2&&(reuIni||horaNaCriacao)&&!jaTem(dia,cri.usuario))
-      add('mar',cri.data,'criou a oportunidade já com reunião marcada'+(reuIni?' para '+brData(reuIni):''),cri.usuario,false);
+      add('mar',cri.data,'criou a oportunidade já com reunião marcada'+(reuIni?' para '+brData(reuIni):''),cri.usuario,false,{i:H.indexOf(cri)});
   }
 }
 function marcacoesRecusadas(rows,de,ate){
@@ -6630,8 +6668,11 @@ function apurar(rows,de,ate){
       const autor=e.quem?normUsuario(e.quem):'';
       if(autor?autor!==quem:!eDono(r,_apQuem))return;
     }
-    if(vis[e.t].has(r.id))return;
-    vis[e.t].add(r.id);S[e.t].push({r,e});
+    // reunião marcada já sai uma por reunião (marcacaoDeReuniao): card retomado
+    // depois de perdido tem uma segunda, e ela também conta
+    const chave=e.t==='mar'?r.id+'|'+(e.i!=null?e.i:e.iso):r.id;
+    if(vis[e.t].has(chave))return;
+    vis[e.t].add(chave);S[e.t].push({r,e});
   }));
   // o que o diretor pôs à mão entra junto, marcado como tal
   ajustesAtiv().forEach(a=>{
