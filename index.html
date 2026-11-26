@@ -3110,7 +3110,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261126-1700';
+const APP_VERSION='20261126-1730';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -5747,7 +5747,7 @@ const scForaDoJogo=sc=>{const k=norm(sc||'');return !!k&&(etapaDoStatus(sc)==='p
 // não se aplica) e voltou conta de novo quando alguém clica em Marcou.
 // O que é anterior a esta data segue a regra antiga, para não apagar o passado
 // de quem ainda não tinha o botão.
-const MARCOU_DESDE='2026-11-27';
+const MARCOU_DESDE='2026-11-01';     // diretor pediu novembro inteiro na regra nova
 const COL_REMARQUE='Remarque de reunião';
 const LIG_REMARCOU='Remarcou reunião';
 const CAMPO_REMARQUE='Remarque';          // R1 ou R2: de que reunião é o remarque
