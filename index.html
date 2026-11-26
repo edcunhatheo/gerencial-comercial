@@ -3110,7 +3110,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261126-1500';
+const APP_VERSION='20261126-1700';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -4837,7 +4837,7 @@ function estudoDoDia(nome){
     if(dt===hj)b.fazer.push({r,m:r.todo||'TODO marcado para hoje'});
     else if(dt&&dt<hj)b.atrasado.push({r,m:(r.todo||'TODO')+' · vencido '+brData(dt)});
     const sck=norm(r.sc||'');
-    const conhecidos=[...SC_CHAIN,...kbCustomCols(),'Cliente Negou','Não se Aplica'];
+    const conhecidos=[...new Set([...SC_CHAIN,COL_REMARQUE,...kbCustomCols(),'Cliente Negou','Não se Aplica'])];
     if(!sck)b.semData.push({r,m:'Subiu sem status — organize e classifique'});
     else if(sck==='nao se aplica'){/* fora do jogo, sem cobrança */}
     else if(/r2/.test(sck)&&!dr)b.semData.push({r,m:'R2 sem data de reunião — marque no sistema'});
@@ -5739,7 +5739,46 @@ const scForaDoJogo=sc=>{const k=norm(sc||'');return !!k&&(etapaDoStatus(sc)==='p
 // marcada pela primeira vez. Remarcar (outra data, no show, mexer na data da
 // ligação) não conta de novo. A única coisa que abre uma marcação nova é o card
 // ter saído do jogo (perdido / negou / não se aplica) e ter sido retomado.
+// ══ REGRA DO MARCOU (diretor, 26/11) ══
+// Daqui em diante reunião marcada é SÓ o clique em "Marcou" (nas colunas
+// Agendar Reunião / R2 Agendar). Arrastar card, mexer em data, salvar no
+// formulário: nada disso conta. Remarcar depois de no show é "Remarcou", na
+// coluna Remarque de reunião, e NÃO conta. Card que saiu do jogo (perdido /
+// não se aplica) e voltou conta de novo quando alguém clica em Marcou.
+// O que é anterior a esta data segue a regra antiga, para não apagar o passado
+// de quem ainda não tinha o botão.
+const MARCOU_DESDE='2026-11-27';
+const COL_REMARQUE='Remarque de reunião';
+const LIG_REMARCOU='Remarcou reunião';
+const CAMPO_REMARQUE='Remarque';          // R1 ou R2: de que reunião é o remarque
+const ehColRemarque=sc=>/remarq|remarc/.test(norm(sc||''));
+function remarqueTipo(r){let v='';(r.historico||[]).forEach(h=>{if(h.campo===CAMPO_REMARQUE)v=h.para||''});return v==='R2'?'R2':'R1'}
 function marcacaoDeReuniao(r,addReal){
+  const add=(t,data,txt,quem,inf,extra)=>{
+    const iso=isoDia(data)||isoHist(data);
+    if(iso&&iso<MARCOU_DESDE)addReal(t,data,txt,quem,inf,extra);
+  };
+  marcacaoPelaRegraAntiga(r,add);
+  // o clique: um por pessoa por dia no mesmo card (clique duplo não vira dois)
+  const H=r.historico||[],vistos=new Set();
+  let remarque=false;
+  H.forEach((h,i)=>{
+    if(ehNoShow(h)){remarque=true;return}
+    if(h.campo==='Status comercial'&&scForaDoJogo(h.para)){remarque=false;return}
+    if(h.campo!==MARCAS.lig.campo)return;
+    if(h.para===LIG_REMARCOU){remarque=false;return}
+    if(h.para!==LIG_MARCOU)return;
+    const iso=isoHist(h.data);
+    if(!iso||iso<MARCOU_DESDE){remarque=false;return}
+    // clique em Marcou logo depois de um no show é remarque (antes do botão Remarcou)
+    if(remarque){remarque=false;return}
+    const ch=iso+'|'+norm(h.usuario||'');
+    if(vistos.has(ch))return;vistos.add(ch);
+    const s=H.slice(i+1,i+5).find(x=>x.campo==='Status comercial');
+    addReal('mar',h.data,'clicou em Marcou'+(s&&s.de?' em “'+s.de+'”':''),h.usuario,false,{i});
+  });
+}
+function marcacaoPelaRegraAntiga(r,addReal){
   const cand=[];
   const add=(t,data,txt,quem,inf,extra)=>cand.push({t,data,txt,quem,inf,extra:extra||{}});
   marcacaoDeReuniaoBruta(r,add);
@@ -5825,6 +5864,8 @@ function marcacoesRecusadas(rows,de,ate){
   const out=[];
   rows.forEach(r=>analiseMarcacoes(r).nao.forEach(m=>{
     if(m.dia<de||m.dia>ate)return;
+    if(m.dia>=MARCOU_DESDE)return;           // na regra do Marcou, ligação sem clique não é marcação
+
     if(!m.alvo)return;                       // sem data de reunião é só ligação, não é gap
     if(_apQuem&&(m.quem?normUsuario(m.quem)!==norm(_apQuem):!eDono(r,_apQuem)))return;
     out.push({r,quando:m.dia,txt:m.motivo});
@@ -11052,6 +11093,7 @@ function colunaDoPerfil(nome){
   if(!USER||USER.perfil!=='closer')return true;
   const n=String(nome||'');
   if(n==='__BOL__'||n==='__PERD__')return true;   // o fim da linha é dele também
+  if(ehColRemarque(n))return true;                 // remarque: todo mundo enxerga
   if(n.indexOf('__')===0)return false;            // "Não se Aplica" não é dele
   if(ehColunaLigar(n))return false;               // a fila de ligação é do sales ops
   if(colunaEhDoCloser(n))return true;             // R3, Stand-by: estados depois da reunião
@@ -11194,12 +11236,13 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
 
   // Kanban columns
   const _cust=colunasDaArea(window._kbArea||'');
-  const _custReuniao=_cust.filter(c=>/r2|reuni/.test(norm(c)));
-  const _custOutras=_cust.filter(c=>!/r2|reuni/.test(norm(c)));
+  const _custReuniao=_cust.filter(c=>/r2|reuni/.test(norm(c))&&!ehColRemarque(c));
+  const _custOutras=_cust.filter(c=>!/r2|reuni/.test(norm(c))&&!ehColRemarque(c));
   const KB_COLS=[
     ['Ligar Cliente','',''],
     ['Agendar Reunião','',''],
     ['Reunião Agendada','',''],
+    [COL_REMARQUE,'',''],              // fixa para todo mundo: é para onde vai o no show
     ..._custReuniao.map(c=>[c,'','',true]),
     ['Cliente Confirmar','',''],
     ['Cliente Topou','',''],
@@ -11237,6 +11280,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       +acoesDoCard(r)
       +((contouNoShow(r)||dataR2(r))?'<div class="kb-meta" style="display:flex;gap:4px;flex-wrap:wrap">'
         +(contouNoShow(r)?'<span class="mk fixo" style="border-color:var(--red);color:var(--red)" title="Cliente não compareceu em uma reunião">No show</span>':'')
+        +(ehColRemarque(r.sc)?'<span class="mk fixo" style="border-color:var(--amber);color:var(--amber)" title="Remarque da '+remarqueTipo(r)+'">Remarque '+remarqueTipo(r)+'</span>':'')
         +(dataR2(r)?'<span class="mk fixo">R2 '+brData(dataR2(r)).slice(0,5)+'</span>':'')
         +'</div>':'')
       +'<div style="display:flex;align-items:center;justify-content:space-between">'
@@ -11477,7 +11521,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
     +'<button class="btn sm" style="font-size:11px" onclick="abrirExport()" title="Baixar planilha: tudo, só uma área ou só uma etapa">Exportar</button>'
     +'</div>'
     +(SELECTED.size>0?(()=>{
-      const scOpts=[...SC_CHAIN,...kbCustomCols(),'Cliente Negou','Não se Aplica'].map(x=>'<option>'+x+'</option>').join('');
+      const scOpts=[...new Set([...SC_CHAIN,COL_REMARQUE,...kbCustomCols(),'Cliente Negou','Não se Aplica'])].map(x=>'<option>'+x+'</option>').join('');
       const pbMap=new Map();
       ['Boletado','A Boletar','TO DO COMERCIAL','TO DO OPERACIONAL','Aguardando Comercial','EMAIL','Não se Aplica'].concat(OPPS.map(r=>r.pb).filter(Boolean)).forEach(p=>{if(!pbMap.has(norm(p)))pbMap.set(norm(p),p)});
       const pbOpts=[...pbMap.values()].map(x=>'<option>'+x+'</option>').join('');
@@ -11506,7 +11550,7 @@ function renderAssessorOpps(c=document.getElementById('main-content')){
       +'<div style="font-size:10px;color:var(--muted);padding:0 8px 8px">Status fora do funil — escolha um existente ou crie uma coluna</div>'
       +semStatus.slice(0,(window._kbMore||{})['|classificar']?semStatus.length:15).map(r=>{
         const scBruto=(r.sc||'').replace(/"/g,'&quot;');
-        const opts=[...SC_CHAIN,...kbCustomCols(),'Cliente Negou','Não se Aplica'].map(s=>'<option value="'+s.replace(/"/g,'&quot;')+'">'+s+'</option>').join('');
+        const opts=[...new Set([...SC_CHAIN,COL_REMARQUE,...kbCustomCols(),'Cliente Negou','Não se Aplica'])].map(s=>'<option value="'+s.replace(/"/g,'&quot;')+'">'+s+'</option>').join('');
         return kbCard(r)
           +'<div style="background:#fff;border:1px dashed var(--border);border-radius:3px;padding:8px;margin:-6px 0 10px">'
           +'<div style="font-size:10px;color:var(--muted);margin-bottom:5px">Status atual: <b>'+(r.sc||'(vazio)')+'</b></div>'
@@ -11788,7 +11832,7 @@ function exportDailyPDF(){
 // ══════════════════════════════════════════════════════════
 // ── EDIT MODAL ──
 // ══════════════════════════════════════════════════════════
-const SC_PADRAO=['Ligar Cliente','Ligar Cliente c AI','Agendar Reunião','Reunião Agendada','Cliente Confirmar','Cliente Topou','Cliente Negou','Não se Aplica'];
+const SC_PADRAO=['Ligar Cliente','Ligar Cliente c AI','Agendar Reunião','Reunião Agendada','Remarque de reunião','Cliente Confirmar','Cliente Topou','Cliente Negou','Não se Aplica'];
 const PB_PADRAO=['To Do Comercial','To Do Operacional','Email/Push + Saldo','Email + Suit + Saldo','Email + Suita','Email/Push','Email','A Boletar','Aguardando Comercial','Boletado','Não se Aplica'];
 function fillSelect(selId,lista,atual){
   const sel=document.getElementById(selId);if(!sel)return;
@@ -12551,14 +12595,14 @@ const ehColunaR2=k=>/r2/.test(k);
 // para onde o card vai quando a reunião é marcada
 function destinoDaMarcacao(r){
   const k=norm(r.sc||'');
-  const alvo=ehColunaR2(k)?'R2 Agendada':'Reunião Agendada';
+  const r2=ehColRemarque(r.sc)?remarqueTipo(r)==='R2':ehColunaR2(k);
+  const alvo=r2?'R2 Agendada':'Reunião Agendada';
   return colunaQueExiste(alvo,r.area)||alvo;
 }
 // para onde o card volta no no show
+// (regra de 26/11: no show vai sempre para Remarque de reunião; o card guarda se é R1 ou R2)
 function destinoDoNoShow(r){
-  const k=norm(r.sc||'');
-  const alvo=ehColunaR2(k)?'Agendar R2':'Agendar Reunião';
-  return colunaQueExiste(alvo,r.area)||alvo;
+  return colunaQueExiste(COL_REMARQUE,r.area)||COL_REMARQUE;
 }
 // usa a coluna que o time já criou, com a grafia dele
 function colunaQueExiste(nome,area){
@@ -12986,22 +13030,26 @@ async function registraLigacao(id,res,ev){
 }
 const ligacaoMarcada=r=>{let v='';(r.historico||[]).forEach(h=>{if(h.campo===CAMPO_LIG_DATA)v=h.para});return v};
 // ── MARCOU: a data da reunião, e o card anda sozinho ──
-function abrirCaixaMarcar(id){
+function abrirCaixaMarcar(id,remarque){
+  if(typeof event!=='undefined'&&event&&event.stopPropagation){try{event.stopPropagation()}catch(e){}}
   const r=acharOpp(id);if(!r)return;
   const destino=destinoDaMarcacao(r);
-  document.getElementById('gs-title').textContent='Marcou reunião — '+(r.cliente||'cliente');
+  const rem=!!remarque;
+  document.getElementById('gs-title').textContent=(rem?'Remarcou reunião ('+remarqueTipo(r)+') — ':'Marcou reunião — ')+(r.cliente||'cliente');
   document.getElementById('gs-body').innerHTML=
     '<div class="gs-f"><label><span>Data da reunião</span>'
       +'<input type="date" id="gs-data" value="'+(isoDia(r.reuniao_data)||'')+'"></label>'
     +'<label><span>Hora</span><input type="time" id="gs-hora" value="'+(horaReuniao(r)||'')+'"></label></div>'
-    +'<div class="gs-nota">Ao salvar, o card vai para <b>'+destino+'</b> e a reunião conta como marcada hoje.</div>'
+    +'<div class="gs-nota">Ao salvar, o card vai para <b>'+destino+'</b>'
+      +(rem?'. É um remarque: <b>não conta</b> como reunião marcada.':' e a reunião conta como marcada hoje.')+'</div>'
     +'<div class="gs-acoes"><button class="btn" onclick="closeModal(\'gesto\')">Cancelar</button>'
-      +'<button class="btn wine" onclick="salvarMarcacao(\''+id+'\')">Salvar e mover</button></div>';
+      +'<button class="btn wine" onclick="salvarMarcacao(\''+id+'\','+(rem?1:0)+')">Salvar e mover</button></div>';
   document.getElementById('modal-gesto').style.display='flex';
   setTimeout(()=>{const el=document.getElementById('gs-data');if(el)el.focus()},80);
 }
-async function salvarMarcacao(id){
+async function salvarMarcacao(id,remarque){
   const r=acharOpp(id);if(!r)return;
+  const rem=!!remarque;
   const data=(document.getElementById('gs-data')||{}).value||'';
   const hora=(document.getElementById('gs-hora')||{}).value||'';
   if(!data){showToast('Ponha a data da reunião');return}
@@ -13010,7 +13058,7 @@ async function salvarMarcacao(id){
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const hoje=localISO(now);
   const hist=[...(r.historico||[]),
-    {campo:MARCAS.lig.campo,de:'',para:LIG_MARCOU,usuario:USER.nome,data:ds},
+    {campo:MARCAS.lig.campo,de:'',para:rem?LIG_REMARCOU:LIG_MARCOU,usuario:USER.nome,data:ds},
     {campo:CAMPO_LIG_DATA,de:'',para:hoje,usuario:USER.nome,data:ds},
     {campo:'Reunião marcada',de:isoDia(r.reuniao_data)||'',para:data,usuario:USER.nome,data:ds},
     {campo:'Status comercial',de:r.sc||'',para:destino,usuario:USER.nome,data:ds}];
@@ -13021,7 +13069,7 @@ async function salvarMarcacao(id){
   catch(e){showToast('Não consegui salvar: '+e.message);return}
   closeModal('gesto');
   await loadData();renderCurView();
-  showToast('Reunião de '+(r.cliente||'')+' marcada para '+brData(data)+(hora?' às '+hora:'')+' — card em '+destino,true);
+  showToast('Reunião de '+(r.cliente||'')+(rem?' remarcada':' marcada')+' para '+brData(data)+(hora?' às '+hora:'')+' — card em '+destino,true);
   // com agenda ligada, o evento vai junto
   try{if(typeof sincronizarAgenda==='function')sincronizarAgenda(id);}catch(e){}
 }
@@ -13128,17 +13176,19 @@ async function registraNoShow(id,ev){
   const r=acharOpp(id);if(!r)return;
   const destino=destinoDoNoShow(r);
   if(!confirm('O cliente NÃO compareceu na reunião de '+(r.cliente||'')+'?\n\n'
-    +'A reunião sai das realizadas, entra no no show e o card volta para "'+destino+'".'))return;
+    +'Conta como no show e o card vai para "'+destino+'" (remarque de '+(ehColunaR2(norm(r.sc||''))?'R2':'R1')+'). Quando remarcar, use o botão Remarcou.'))return;
   const now=new Date();
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const tipo=ehColunaR2(norm(r.sc||''))?'R2':'R1';
   const hist=[...(r.historico||[]),{campo:CAMPO_NOSHOW,de:'',para:NOSHOW_PARA,usuario:USER.nome,data:ds},
+    {campo:CAMPO_REMARQUE,de:'',para:tipo,usuario:USER.nome,data:ds},
     {campo:'Status comercial',de:r.sc||'',para:destino,usuario:USER.nome,data:ds}];
   r.historico=hist;
   try{await db('PATCH','oportunidades',{historico:hist,sc:destino,reuniao_data:null,
     updated_at:now.toISOString()},'id=eq.'+r.id)}
   catch(e){showToast('Não consegui salvar: '+e.message);return}
   await loadData();renderCurView();
-  showToast('No show registrado — '+(r.cliente||'')+' voltou para '+destino);
+  showToast('No show registrado — '+(r.cliente||'')+' foi para '+destino+' ('+tipo+')');
 }
 // ══ O QUE O CARD PERGUNTA ══
 // A coluna diz de quem é a vez. Nas colunas do sales ops, as três saídas da
@@ -13164,15 +13214,22 @@ function acoesDoCard(r){
           fut?'A reunião é em '+brData(d)+' — o no show se registra no dia':'O cliente não compareceu')
       +'</div>';
   }
-  if(COL_OPS(k))
+  if(COL_OPS(k)){
+    // Remarque: o botão é Remarcou (não conta como reunião marcada).
+    // Ligar Cliente: sem Marcou — reunião marcada só se marca em Agendar
+    // Reunião / R2 Agendar, para o número ter um lugar só.
+    const remq=ehColRemarque(r.sc), ligar=ehColunaLigar(r.sc||'');
+    const res=Object.keys(LIG_RESULTADOS).filter(x=>!(x==='marcou'&&(remq||ligar)));
     return '<div class="gestos">'
-      +Object.keys(LIG_RESULTADOS).map(x=>{const R=LIG_RESULTADOS[x];
+      +(remq?bt('Remarcou','abrirCaixaMarcar(\''+r.id+'\',1)','#7A2233','Remarcou a reunião ('+remarqueTipo(r)+') — põe a nova data; não conta como reunião marcada'):'')
+      +res.map(x=>{const R=LIG_RESULTADOS[x];
         return bt(R.rot,'registraLigacao(\''+r.id+'\',\''+x+'\',event)',R.cor,
           x==='marcou'?'Marcou a reunião — põe a data e move o card'
           :x==='retorno'?'Pediu retorno — volta na fila do próximo dia útil'
           :'Não atendeu — volta na fila do próximo dia útil')}).join('')
       +bt('Perdido','registraPerdido(\''+r.id+'\',event)','#8A6A6A','O cliente não quer — sai do funil')
       +'</div>';
+  }
   return '';
 }
 // O que já ficou registrado nesta oportunidade. Só leitura: quem registra é
@@ -13186,6 +13243,7 @@ function marcasDoCard(r){
   if(marcado(r,'reu'))sel.push('<span class="mk fixo on">Reunião aconteceu</span>');
   if(contouNoShow(r))sel.push('<span class="mk fixo" style="border-color:var(--red);color:var(--red)">No show</span>');
   if(dataR2(r))sel.push('<span class="mk fixo">R2 em '+brData(dataR2(r))+'</span>');
+  if(ehColRemarque(r.sc))sel.push('<span class="mk fixo" style="border-color:var(--amber);color:var(--amber)">Remarque '+remarqueTipo(r)+'</span>');
   return sel.length?sel.join(''):'<span style="font-size:11px;color:var(--muted-l)">Nenhum registro ainda — use os botões do card</span>';
 }
 function mkChip(r,k,grande){
