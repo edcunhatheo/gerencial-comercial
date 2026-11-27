@@ -3110,7 +3110,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261126-1800';
+const APP_VERSION='20261126-1900';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3545,7 +3545,7 @@ async function salvarIncluirAtiv(){
   const rot=String(v('aj-rot')).trim().replace(/[|]/g,' ');
   if(!met||!quem||!dia){showToast('Preencha métrica, pessoa e dia');return}
   closeModal('gesto');
-  try{await ajusteAtivGrava(['add',met,dia,norm(quem),ak,rot||('('+quem+')')].join('|'))}
+  try{await ajusteAtivGrava(['add',met,dia,norm(quem),ak,rot||('('+quem+')'),empAtual()||''].join('|'))}
   catch(e){showToast('Não consegui salvar: '+e.message);return}
   showToast('Incluído à mão — '+MET[met].rot+' de '+quem+' em '+brData(dia),true);
   renderAtividade();
@@ -5794,10 +5794,11 @@ function marcacaoDeReuniao(r,addReal){
     const ch=iso+'|'+norm(h.usuario||'');
     if(vistos.has(ch))return;
     const s=H.slice(i+1,i+5).find(x=>x.campo==='Status comercial');
-    // só vale o Marcou dado em Agendar Reunião / R2 Agendar
-    if(!s||!/agendar/.test(norm(s.de||''))||ehColRemarque(s.de))return;
+    // só vale o Marcou dado em Agendar Reunião / R2 Agendar — ou confirmado no arrasto
+    const viaArrasto=h.de==='arrasto';
+    if(!viaArrasto&&(!s||!/agendar/.test(norm(s.de||''))||ehColRemarque(s.de)))return;
     vistos.add(ch);
-    addReal('mar',h.data,'clicou em Marcou'+(s&&s.de?' em “'+s.de+'”':''),h.usuario,false,{i});
+    addReal('mar',h.data,(viaArrasto?'confirmou “marquei” ao arrastar':'clicou em Marcou')+(s&&s.de?' em “'+s.de+'”':''),h.usuario,false,{i});
   });
 }
 function marcacaoPelaRegraAntiga(r,addReal){
@@ -6740,8 +6741,9 @@ function apurar(rows,de,ate){
   // o que o diretor pôs à mão entra junto, marcado como tal
   ajustesAtiv().forEach(a=>{
     if(a.acao!=='add')return;
-    const [t,iso,quemN,ak,rot]=a.campos;
+    const [t,iso,quemN,ak,rot,emp]=a.campos;
     if(!S[t]||iso<de||iso>ate)return;
+    if(emp&&empAtual()&&emp!==empAtual())return;   // incluído numa empresa não aparece na outra
     if(quem&&norm(quemN||'')!==quem)return;
     if(_apArea&&ak&&ak!==_apArea)return;
     S[t].push({r:{id:'aj:'+a.id,cliente:rot||'(incluído à mão)',area:ak||'',sc:'',atual:0,pipe:0,historico:[]},
@@ -10667,6 +10669,11 @@ document.addEventListener('dragover',ev=>{
   else if(window.innerHeight-ev.clientY<80)window.scrollBy(0,S);
 },{passive:true});
 function kbDragLeave(ev){ev.currentTarget.style.background='';ev.currentTarget.style.transform='';}
+// ══ ARRASTOU PARA REUNIÃO AGENDADA ══
+// Arrastar não conta como reunião marcada (regra do Marcou). Para ninguém
+// marcar reunião "de graça" sem saber, o quadro pergunta: você marcou essa
+// reunião agora? Sim → pede a data e conta. Não → só move, sem contar.
+const ehColAgendada=s=>/agendad/.test(norm(s||''));
 async function kbDrop(ev,statusKey){
   window._arrastando=false;
   if(statusKey==='__PERD__')statusKey='Cliente Negou';
@@ -10675,6 +10682,29 @@ async function kbDrop(ev,statusKey){
   ev.currentTarget.style.background='';ev.currentTarget.style.transform='';
   const id=_dragId;_dragId=null;
   if(!id)return;
+  const r=acharOpp(id);if(!r)return;
+  if(statusKey!=='__BOL__'&&!isB(r)&&ehColAgendada(statusKey)&&!ehColAgendada(r.sc))
+    return perguntaSeMarcou(id,statusKey);
+  return kbMover(id,statusKey);
+}
+function perguntaSeMarcou(id,destino){
+  const r=acharOpp(id);if(!r)return;
+  const rem=ehColRemarque(r.sc);
+  window._mkCtx={id,destino};
+  document.getElementById('gs-title').textContent='Você está levando '+(r.cliente||'o card')+' para “'+destino+'”';
+  document.getElementById('gs-body').innerHTML=
+    '<div class="gs-nota">'+(rem
+      ?'Este card está em Remarque. Você <b>remarcou</b> a reunião com o cliente? Remarque não conta como reunião marcada.'
+      :'Você <b>marcou essa reunião</b> com o cliente agora? Só conta como reunião marcada se você confirmar aqui (ou clicar em Marcou).')+'</div>'
+    +'<div class="gs-acoes" style="flex-wrap:wrap">'
+      +'<button class="btn" onclick="closeModal(\'gesto\')">Cancelar</button>'
+      +'<button class="btn" onclick="closeModal(\'gesto\');kbMover(window._mkCtx.id,window._mkCtx.destino)">Não, só estou arrumando o quadro</button>'
+      +'<button class="btn wine" onclick="abrirCaixaMarcar(window._mkCtx.id,'+(rem?1:0)+',window._mkCtx.destino)">'
+        +(rem?'Sim, remarquei':'Sim, marquei a reunião')+'</button>'
+    +'</div>';
+  document.getElementById('modal-gesto').style.display='flex';
+}
+async function kbMover(id,statusKey){
   const r=acharOpp(id);if(!r)return;
   const now=new Date();
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -13052,10 +13082,11 @@ async function registraLigacao(id,res,ev){
 }
 const ligacaoMarcada=r=>{let v='';(r.historico||[]).forEach(h=>{if(h.campo===CAMPO_LIG_DATA)v=h.para});return v};
 // ── MARCOU: a data da reunião, e o card anda sozinho ──
-function abrirCaixaMarcar(id,remarque){
+function abrirCaixaMarcar(id,remarque,destinoArrasto){
   if(typeof event!=='undefined'&&event&&event.stopPropagation){try{event.stopPropagation()}catch(e){}}
   const r=acharOpp(id);if(!r)return;
-  const destino=destinoDaMarcacao(r);
+  window._mkArrasto=destinoArrasto||'';
+  const destino=destinoArrasto||destinoDaMarcacao(r);
   const rem=!!remarque;
   document.getElementById('gs-title').textContent=(rem?'Remarcou reunião ('+remarqueTipo(r)+') — ':'Marcou reunião — ')+(r.cliente||'cliente');
   document.getElementById('gs-body').innerHTML=
@@ -13075,12 +13106,14 @@ async function salvarMarcacao(id,remarque){
   const data=(document.getElementById('gs-data')||{}).value||'';
   const hora=(document.getElementById('gs-hora')||{}).value||'';
   if(!data){showToast('Ponha a data da reunião');return}
-  const destino=destinoDaMarcacao(r);
+  const arrasto=window._mkArrasto||'';window._mkArrasto='';
+  const destino=arrasto||destinoDaMarcacao(r);
   const now=new Date();
   const ds=now.toLocaleDateString('pt-BR')+' '+now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   const hoje=localISO(now);
   const hist=[...(r.historico||[]),
-    {campo:MARCAS.lig.campo,de:'',para:rem?LIG_REMARCOU:LIG_MARCOU,usuario:USER.nome,data:ds},
+    // de:'arrasto' = confirmou "marquei" ao arrastar o card (vale de qualquer coluna)
+    {campo:MARCAS.lig.campo,de:arrasto?'arrasto':'',para:rem?LIG_REMARCOU:LIG_MARCOU,usuario:USER.nome,data:ds},
     {campo:CAMPO_LIG_DATA,de:'',para:hoje,usuario:USER.nome,data:ds},
     {campo:'Reunião marcada',de:isoDia(r.reuniao_data)||'',para:data,usuario:USER.nome,data:ds},
     {campo:'Status comercial',de:r.sc||'',para:destino,usuario:USER.nome,data:ds}];
