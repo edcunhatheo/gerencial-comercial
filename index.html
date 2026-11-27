@@ -3110,7 +3110,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261126-2130';
+const APP_VERSION='20261126-2200';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -6792,16 +6792,23 @@ function apurar(rows,de,ate){
     if(vis[e.t].has(chave))return;
     vis[e.t].add(chave);S[e.t].push({r,e});
   }));
-  // o que o diretor pôs à mão entra junto, marcado como tal
+  // o que o diretor pôs à mão entra junto, marcado como tal — mas só se for da
+  // área e da empresa dos cards que estão sendo apurados (a Daily apura área por
+  // área; sem isso o incluído no Seguro aparecia no Consórcio também)
+  const areasRows=new Set(rows.map(r=>r.area)), empsRows=new Set(rows.map(r=>empresaDe(r)));
   ajustesAtiv().forEach(a=>{
+    if(rows.length&&a.campos[3]&&!areasRows.has(a.campos[3]))return;
+    if(rows.length&&a.campos[5]&&!empsRows.has(a.campos[5]))return;
     if(a.acao!=='add')return;
     const [t,iso,quemN,ak,rot,emp]=a.campos;
     if(!S[t]||iso<de||iso>ate)return;
-    if(emp&&empAtual()&&emp!==empAtual())return;   // incluído numa empresa não aparece na outra
+    const empF=window._apEmp!==undefined?window._apEmp:empAtual();
+    if(emp&&empF&&emp!==empF)return;   // incluído numa empresa não aparece na outra
     if(quem&&norm(quemN||'')!==quem)return;
     if(_apArea&&ak&&ak!==_apArea)return;
     S[t].push({r:{id:'aj:'+a.id,cliente:rot||'(incluído à mão)',area:ak||'',sc:'',atual:0,pipe:0,historico:[]},
-      e:{t,iso,txt:'✎ incluído à mão por '+(a.quemFez||'—'),quem:quemN||'',inf:true,aj:a.id}});
+      e:{t,iso,txt:'✎ incluído à mão por '+(a.quemFez||'—'),
+        quem:((USUARIOS||[]).find(u=>norm(u.nome)===norm(quemN||''))||{}).nome||quemN||'',inf:true,aj:a.id}});
   });
   const vol=S.bol.reduce((s,x)=>s+(x.r.atual||0),0);
   const n={};TIPOS_EV.forEach(t=>n[t]=S[t].length);
@@ -7169,7 +7176,8 @@ async function dymSet(d,e,a,f,valor,texto){
 // diretor arrastou para a lista (linhas 'mar' da daily)
 function dyMarcLista(d,comTiradas){
   const tirada=id=>{const o=d&&d.ak?dyOv(d.ak,'mk:'+id):null;return !!(o&&o.off)};
-  const sis=((d&&d.ap&&d.ap.mar)||[]).map(x=>({id:x.r.id,r:x.r,cliente:x.r.cliente||'',quem:x.e.quem||'',sist:true,
+  const sis=((d&&d.ap&&d.ap.mar)||[]).map(x=>({id:x.r.id,r:x.r,
+    cliente:x.e.aj?String(x.r.cliente||'').replace(/\s*\(.*$/,''):(x.r.cliente||''),quem:x.e.quem||'',sist:true,
     depois:isPerdida(x.r)?'depois virou Cliente Negou':contouNoShow(x.r)?'depois deu no show':''}))
     .filter(x=>comTiradas?tirada(x.id):!tirada(x.id));
   if(comTiradas)return sis;
@@ -7488,7 +7496,13 @@ function dyArea(ak,dia,modo,cru){
   // virado "Cliente Negou" ou sido arquivado — igual à aba Atividade. Por isso a
   // apuração usa todos os cards da área e da empresa, não só os vivos.
   const baseAtiv=(OPPS_ALL&&OPPS_ALL.length?OPPS_ALL:OPPS).filter(r=>r.area===ak&&empresaDe(r)===dyEmp());
-  const ap=apurar(baseAtiv,dia,dia);
+  // Mesma conta da Atividade: o incluído à mão só entra na área e na empresa
+  // dele, e só conta o que um SALES OPS registrou (clique da conta Diretor ou
+  // de closer fica fora, igual à Atividade — senão aparecia em dobro).
+  const antA=_apArea,antE=window._apEmp;_apArea=ak;window._apEmp=dyEmp();
+  let ap;try{ap=apurar(baseAtiv,dia,dia)}finally{_apArea=antA;window._apEmp=antE}
+  const doOps=x=>{const a=x.e&&x.e.quem?normUsuario(x.e.quem):'';return !a||caixaDe(x.e.quem)==='ops'};
+  ['mar','lig'].forEach(t=>{if(Array.isArray(ap[t])){ap[t]=ap[t].filter(doOps);ap.n[t]=ap[t].length}});
   const reunV=vivos.filter(x=>x.tipo==='reu'),pagV=vivos.filter(x=>x.tipo==='pag'),extV=vivos.filter(x=>x.tipo==='ext');
   return{ak,base,itens:vivos,todos:itens,fora,reun:reunV,pagam:pagV,extras:extV,closers,ap,foto};
 }
