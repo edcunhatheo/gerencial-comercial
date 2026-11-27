@@ -3110,7 +3110,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261126-1730';
+const APP_VERSION='20261126-1800';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3398,7 +3398,10 @@ let _apArea='';
 function atApura(nome,de,ate){
   let rows=fuBase().filter(r=>!arquivada(r));
   if(atArea())rows=rows.filter(r=>r.area===atArea());
-  rows=nome?rowsDoComercial(nome,rows):rows;
+  // Atividade é de quem REGISTRA: o clique do Luan num card de Saúde é dele,
+  // mesmo sem Saúde no cadastro. Filtrar pelo cadastro aqui fazia a linha da
+  // pessoa no mapa sumir com registros que o "time todo" lá em cima contava.
+  rows=nome?rows.filter(r=>eDono(r,nome)||tocouAlgumDia(r,nome)):rows;
   const ant=_apArea;_apArea=atArea()||'';
   try{return comQuem(nome||'',()=>apurar(rows,de,ate))}finally{_apArea=ant}
 }
@@ -3551,7 +3554,21 @@ function blocoPergunta(){
   const q=atQ(),[de,ate,quando]=atRangeQ(q.per);
   const caixa=MET[q.met].caixa;
   const gente=atPessoas(caixa);
-  const ap=atApura(q.quem,de,ate);
+  let ap=atApura(q.quem,de,ate);
+  // "O time todo" é o time DESTA caixinha — as mesmas pessoas do mapa lá
+  // embaixo. O que outra pessoa registrou (diretor, closer) não entra no
+  // número, mas aparece dito, para nada sumir em silêncio.
+  let fora=[];
+  if(!q.quem){
+    const dentro=new Set(gente.map(norm));
+    const ehDentro=x=>{const a=x.e&&x.e.quem?normUsuario(x.e.quem):'';return a?dentro.has(a):true};
+    const foraMap={};(ap[q.met]||[]).forEach(x=>{if(!ehDentro(x)){const nm=x.e.quem||'—';foraMap[nm]=(foraMap[nm]||0)+1}});
+    fora=Object.entries(foraMap);
+    const f={...ap,n:{...ap.n}};
+    TIPOS_EV.forEach(t=>{if(Array.isArray(ap[t])){f[t]=ap[t].filter(ehDentro);f.n[t]=f[t].length}});
+    f.vol=(f.bol||[]).reduce((s,x)=>s+(x.r.atual||0),0);
+    ap=f;
+  }
   const sel=(campo,ops,val)=>'<select onchange="setQ(\''+campo+'\',this.value)">'
     +ops.map(o=>'<option value="'+o[0]+'"'+(String(o[0])===String(val)?' selected':'')+'>'+o[1]+'</option>').join('')
     +'</select>';
@@ -3589,7 +3606,9 @@ function blocoPergunta(){
       +'<div class="at-big" style="color:'+MET[q.met].cor+'">'+atTexto(ap,q.met)+'</div>'
       +'<div class="at-ao"><b>'+metLow(q.met)+' '+nome
         +(q.area?' em '+((AREAS[q.area]||{}).name||q.area):'')+', '+quando+'</b>'
-        +(det?'<div>'+det+'</div>':'')+(det2?'<div>'+det2+'</div>':'')+'</div>'
+        +(det?'<div>'+det+'</div>':'')+(det2?'<div>'+det2+'</div>':'')
+        +(fora.length?'<div>Fora da conta (não está como '+(caixa==='ops'?'sales ops':'closer')+(q.area?' desta área':'')+' no cadastro — Usuários → Acesso): '
+          +fora.map(([n,c])=>n+' '+c).join(' · ')+'</div>':'')+'</div>'
     +'</div>'
     +'<table class="at-mini"><thead><tr><th>Cliente</th><th>O que ficou registrado</th><th>Quando</th>'
       +(pode?'<th></th>':'')+'</tr></thead>'
@@ -5773,8 +5792,11 @@ function marcacaoDeReuniao(r,addReal){
     // clique em Marcou logo depois de um no show é remarque (antes do botão Remarcou)
     if(remarque){remarque=false;return}
     const ch=iso+'|'+norm(h.usuario||'');
-    if(vistos.has(ch))return;vistos.add(ch);
+    if(vistos.has(ch))return;
     const s=H.slice(i+1,i+5).find(x=>x.campo==='Status comercial');
+    // só vale o Marcou dado em Agendar Reunião / R2 Agendar
+    if(!s||!/agendar/.test(norm(s.de||''))||ehColRemarque(s.de))return;
+    vistos.add(ch);
     addReal('mar',h.data,'clicou em Marcou'+(s&&s.de?' em “'+s.de+'”':''),h.usuario,false,{i});
   });
 }
