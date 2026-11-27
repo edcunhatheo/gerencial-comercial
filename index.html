@@ -3110,7 +3110,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261126-2200';
+const APP_VERSION='20261126-2300';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3251,7 +3251,7 @@ async function loadData(){
 const MET={
   lig:{rot:'Ligações',low:'ligações',verbo:'fez',cor:'var(--wine)',caixa:'ops'},
   mar:{rot:'Reuniões marcadas',low:'reuniões marcadas',verbo:'marcou',cor:'var(--wine)',caixa:'ops'},
-  mac:{rot:'Aconteceram',low:'reuniões marcadas que aconteceram',verbo:'marcou e aconteceram',cor:'var(--wine)',caixa:'ops'},
+  mac:{rot:'Aconteceram',low:'reuniões que aconteceram',verbo:'teve',cor:'var(--wine)',caixa:'ops'},
   perd:{rot:'Perdidas',low:'oportunidades perdidas',verbo:'perdeu',cor:'var(--red)',caixa:'ops'},
   reu:{rot:'Reuniões feitas',low:'reuniões feitas',verbo:'fez',cor:'var(--wine)',caixa:'closer'},
   r1f:{rot:'R1 feitas',low:'R1 feitas',verbo:'fez',cor:'var(--wine)',caixa:'closer'},
@@ -3399,6 +3399,7 @@ let _apArea='';
 function atApura(nome,de,ate){
   let rows=fuBase().filter(r=>!arquivada(r));
   if(atArea())rows=rows.filter(r=>r.area===atArea());
+  const todasDaArea=rows;
   // Atividade é de quem REGISTRA: o clique do Luan num card de Saúde é dele,
   // mesmo sem Saúde no cadastro. Filtrar pelo cadastro aqui fazia a linha da
   // pessoa no mapa sumir com registros que o "time todo" lá em cima contava.
@@ -3406,9 +3407,47 @@ function atApura(nome,de,ate){
   const ant=_apArea;_apArea=atArea()||'';
   try{
     const ap=comQuem(nome||'',()=>apurar(rows,de,ate));
-    ap.mac=marcadasQueAconteceram(ap.mar||[]);ap.n.mac=ap.mac.length;
+    ap.mac=reunioesQueAconteceram(todasDaArea,de,ate,nome);ap.n.mac=ap.mac.length;
     return ap;
   }finally{_apArea=ant}
+}
+// ══ REUNIÕES QUE ACONTECERAM ══
+// Só o que alguém REGISTROU ("Aconteceu" no card), dentro do período — nada de
+// presumir porque a data passou (era assim que Douglas e Filipi, que não
+// aconteceram, entravam como feitas). Cada card conta uma vez no período.
+// A reunião é do sales ops que a marcou: o último registro de marcação feito
+// por um sales ops antes do "Aconteceu" (Marcou, data, arrasto, incluído à mão).
+// Sem isso, fica com o sales ops da área quando ele é um só.
+function aconteceuNoPeriodo(r,de,ate){
+  const H=r.historico||[];
+  for(let i=0;i<H.length;i++){const h=H[i];
+    if(h.campo===MARCAS.reu.campo&&h.para===MARCAS.reu.on){const d=isoHist(h.data);if(d&&d>=de&&d<=ate)return{iso:d,i}}}
+  return null;
+}
+function opsDaReuniao(r,i){
+  const H=r.historico||[];
+  for(let j=i-1;j>=0;j--){const h=H[j];
+    const marca=h.campo==='Reunião marcada'||h.campo===CAMPO_LIG_DATA||h.campo===CAMPO_R2
+      ||(h.campo===MARCAS.lig.campo&&/reunião/.test(h.para||''))
+      ||(h.campo==='Status comercial'&&/agendad/i.test(h.para||'')||h.campo==='Criação');
+    if(marca&&h.usuario&&caixaDe(h.usuario)==='ops')return nomeDoCadastro?nomeDoCadastro(h.usuario):h.usuario;
+  }
+  const nm=norm(r.cliente||'');
+  const aj=ajustesAtiv().filter(a=>a.acao==='add'&&a.campos[0]==='mar'&&a.campos[3]===r.area
+    &&(!a.campos[5]||a.campos[5]===empresaDe(r))&&norm(String(a.campos[4]||'').replace(/\s*\(.*$/,''))===nm);
+  if(aj.length){const q=aj[aj.length-1].campos[2];return((USUARIOS||[]).find(u=>norm(u.nome)===norm(q))||{}).nome||q}
+  const ops=(USUARIOS||[]).filter(u=>u.ativo!==false&&caixaDe(u.nome)==='ops'&&trabalhaArea(u.nome,r.area)&&trabalhaEmpresa(u.nome,empresaDe(r)));
+  return ops.length===1?ops[0].nome:'';
+}
+function reunioesQueAconteceram(rows,de,ate,nome){
+  const out=[];
+  rows.forEach(r=>{
+    const a=aconteceuNoPeriodo(r,de,ate);if(!a)return;
+    const quem=opsDaReuniao(r,a.i);
+    if(nome?norm(quem)!==norm(nome):!quem)return;
+    out.push({r,e:{t:'mac',iso:a.iso,quem,txt:'reunião aconteceu (registrado)',i:a.i}});
+  });
+  return out;
 }
 // ══ DAS MARCADAS, QUAIS ACONTECERAM ══
 // Uma marcada "aconteceu" quando o card tem "Reunião aconteceu" registrado
@@ -3972,7 +4011,8 @@ function dsFicha(nome,base,P){
   const meu=base.filter(r=>norm(r.responsavel||'')===norm(nome));
   const ativos=meu.filter(r=>dsAtivo(r));
   const reu=meu.filter(r=>dsDentro(isoDia(r.reuniao_data),P.ini,P.fim));
-  const reuFeitas=reu.filter(r=>isoDia(r.reuniao_data)<=P.hoje);
+  // feitas = "Aconteceu" registrado no período (não "a data passou")
+  const reuFeitas=meu.filter(r=>!!aconteceuNoPeriodo(r,P.ini,P.fim));
   const bol=meu.filter(r=>isBol(r)&&dsDentro(dsDataBol(r),P.ini,P.hoje));
   const d90=localISO(new Date(Date.now()-90*864e5));
   const reu90=meu.filter(r=>dsDentro(isoDia(r.reuniao_data),d90,P.hoje));
@@ -4045,7 +4085,10 @@ function dsMarcadas(area,de,ate){
     atPessoas('ops').forEach(p=>{const ap=atApura(p,de,ate);mar.push(...ap.mar);mac.push(...ap.mac)});
   }finally{window._atArea=ant}
   const card=x=>cardDaMarcada(x)||Object.assign({},x.r,{reuniao_data:x.e.iso});
-  return{mar:mar.map(card),mac:mac.map(x=>x.r)};
+  // aconteceram: TODA reunião registrada da área no período, seja quem for que marcou
+  const rowsA=fuBase().filter(r=>!arquivada(r)&&(!area||r.area===area));
+  const acont=rowsA.filter(r=>!!aconteceuNoPeriodo(r,de,ate));
+  return{mar:mar.map(card),mac:acont};
 }
 function renderDashboard(c=document.getElementById('main-content')){
   ['dsHist','dsReu','dsSpark'].forEach(k=>{if(charts[k]){try{charts[k].destroy()}catch(x){}delete charts[k]}});
@@ -4137,7 +4180,7 @@ function renderDashboard(c=document.getElementById('main-content')){
   const reunioes='<div class="ds-card"><div class="ds-h">Reuniões <span class="ds-sub">'+nomePer+'</span></div>'
     +'<div class="ds-reu">'
     +r1('Marcadas',reu,dsDelta(reu.length,reuAnt.length)+' vs '+P.rotAnt,'r-marc','Reuniões marcadas '+nomePer,oReu)
-    +r1('Aconteceram',reuFeitas,dsPct(reuFeitas.length,reu.length)+'% das marcadas','r-feit','Reuniões que aconteceram',oReu)
+    +r1('Aconteceram',reuFeitas,'com “Aconteceu” registrado','r-feit','Reuniões que aconteceram (registradas) '+nomePer,oReu)
     +r1('Viraram negócio',reuTop,dsPct(reuTop.length,reuFeitas.length)+'% das feitas topou','r-top','Reuniões que viraram topada ou boleta',oReu)
     +r1('Sem próximo passo',reuSemPasso,'reunião feita, card sem tarefa','r-sem','Reunião feita sem próximo passo',oReu,reuSemPasso.length?'#C0392B':'')
     +r1('Hoje',reuHoje,'na agenda de hoje','r-hoje','Reuniões de hoje',oReu)
@@ -4223,7 +4266,7 @@ function renderDashboard(c=document.getElementById('main-content')){
         +'<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap"><div style="font-size:22px;font-weight:800">'+dsEsc(f.nome)+'</div><div style="color:var(--muted);font-size:12px">'+((AREAS[f.area]||{}).name||'')+' · '+f.ativos.length+' oportunidades em mãos</div></div>'
         +'<div style="height:12px"></div>'
         +'<div class="ds-fstats">'
-          +fs('Reuniões marcadas',f.reu.length,'',f.reu,'c-reu','Reuniões de '+f.nome+' '+nomePer,oReu)
+          +fs('Reuniões na agenda',f.reu.length,'',f.reu,'c-reu','Reuniões na agenda de '+f.nome+' '+nomePer,oReu)
           +fs('Reuniões feitas',f.reuFeitas.length,'',f.reuFeitas,'c-feit','Reuniões feitas por '+f.nome,oReu)
           +fs('Negócios fechados',f.bol.length,'',f.bol,'c-bol','Boletas de '+f.nome+' '+nomePer,oBol)
           +fs('Volume fechado',f.vol,'r',f.bol,'c-vol','Boletas de '+f.nome+' '+nomePer,oBol)
@@ -13405,10 +13448,13 @@ function teveReuniao(r){
   return (r.historico||[]).some(h=>h.campo==='Status comercial'&&ETAPA_IDX(h.de)>=2);
 }
 
+// Reunião feita no funil e no Dashboard: só a REGISTRADA ("Aconteceu") — ou
+// card que boletou. Data passada não prova que a reunião existiu.
+const reuniaoRegistrada=r=>isB(r)||(r.historico||[]).some(h=>h.campo===MARCAS.reu.campo&&h.para===MARCAS.reu.on);
 function calcFunil(rows){
   const geradas=rows.length;
   const comLig=rows.filter(teveLigacao).length;
-  const comReu=rows.filter(teveReuniao).length;
+  const comReu=rows.filter(reuniaoRegistrada).length;
   const conv=rows.filter(isBoletadoFirmado);
   const convN=conv.length;
   const pct=(a,b)=>b>0?Math.round(a/b*100):0;
@@ -13541,7 +13587,7 @@ function provaEtapa(k,r){
 const ETAPA_DET={
   geradas:{ico:'',t:'Oportunidades geradas',sub:'tudo que entrou no período',cor:'var(--wine)',bg:'var(--wine-l)',fn:()=>true,col:'Criada em'},
   ligacao:{ico:'',t:'Ligações que aconteceram',sub:'oportunidades com atividade registrada pelo time',cor:'#8E4152',bg:'var(--wine-ll)',fn:r=>teveLigacao(r),col:'Primeiro toque'},
-  reuniao:{ico:'',t:'Fez reunião',sub:'encontros já realizados — agendadas para frente não entram',cor:'#A66070',bg:'var(--wine-ll)',fn:r=>teveReuniao(r),col:'Reunião'},
+  reuniao:{ico:'',t:'Fez reunião',sub:'reunião com “Aconteceu” registrado no card (ou que já boletou)',cor:'#A66070',bg:'var(--wine-ll)',fn:r=>reuniaoRegistrada(r),col:'Reunião'},
   conv:{ico:'',t:'Converteram em boleta',sub:'pendência de boleta = Boletado',cor:'var(--green)',bg:'var(--green-bg)',fn:r=>isBoletadoFirmado(r),col:'Fechada em'},
 };
 function abrirFunilEtapa(k){
