@@ -1381,6 +1381,13 @@ html[data-theme="dark"] .area-card.clicavel:hover{box-shadow:0 6px 20px rgba(0,0
 .ba-hdr .n{font-size:10px;font-weight:700;background:var(--bbg);color:var(--bc);border-radius:4px;padding:1px 8px}
 .ba-hdr .v{margin-left:auto;font-size:13px;font-weight:700;color:var(--bc);font-variant-numeric:tabular-nums}
 .ba-tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.acc-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:14px 16px;margin-bottom:16px;font-size:12.5px}
+.acc-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.acc-top select{font:inherit;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;background:var(--card);color:var(--text)}
+.acc-n{flex:1;color:var(--muted)}
+.acc-alerta{color:var(--red)}
+.acc-fora td{background:var(--red-bg)}
+.acc-mut{color:var(--muted);font-size:11.5px}
 .at-div{margin:8px 0 0;padding:8px 11px;border-radius:4px;background:var(--amber-bg,#FFF6E5);color:var(--text);font-size:11.5px;border-left:3px solid var(--amber,#D4A24C)}
 .dsp-bts{display:flex;gap:6px;justify-content:flex-end;margin:0 0 10px}
 .dsp-bt{font:inherit;font-size:11px;font-weight:700;padding:5px 11px;border-radius:4px;cursor:pointer;border:1px solid var(--wine);background:transparent;color:var(--wine)}
@@ -3110,7 +3117,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261126-2300';
+const APP_VERSION='20261127-1000';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3169,8 +3176,31 @@ async function pingPresenca(){
   if(!USER||!USER.id)return;
   try{await db('PATCH','usuarios',{ultimo_acesso:new Date().toISOString()},'id=eq.'+USER.id);}catch(e){/* coluna pode não existir ainda */}
 }
+// ══ REGISTRO DE ACESSOS ══
+// Um registro por entrada no sistema (por aba do navegador): quem, quando, de
+// onde (país/estado/cidade que a Vercel identifica — sem serviço de fora e sem
+// guardar IP), aparelho e navegador. Mora na tabela metas com um mês que o
+// loadData nunca carrega, então não pesa no uso do dia a dia.
+const AREA_ACESSO='acesso', MES_ACESSO='0001-01';
+async function registraAcesso(){
+  if(!USER||!USER.nome)return;
+  try{const k='acc:'+(USER.id||USER.nome);if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,'1')}catch(e){}
+  let g={};
+  if(/vercel\.app$/.test(location.hostname)){
+    try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),3000);
+      g=await fetch('/api/geo',{cache:'no-store',signal:ctl.signal}).then(r=>r.ok?r.json():{})}catch(e){g={}}
+  }
+  const ua=navigator.userAgent||'';
+  const disp=/iPad|Tablet/i.test(ua)?'tablet':/Mobi|Android|iPhone/i.test(ua)?'celular':'computador';
+  const nav=/Edg\//.test(ua)?'Edge':/OPR\//.test(ua)?'Opera':/Chrome\//.test(ua)?'Chrome':/Firefox\//.test(ua)?'Firefox':/Safari\//.test(ua)?'Safari':'outro';
+  const so=/Windows/.test(ua)?'Windows':/iPhone|iPad/.test(ua)?'iOS':/Android/.test(ua)?'Android':/Mac OS/.test(ua)?'Mac':/Linux/.test(ua)?'Linux':'outro';
+  let fuso='';try{fuso=Intl.DateTimeFormat().resolvedOptions().timeZone||''}catch(e){}
+  const info={pais:g.pais||'',uf:g.uf||'',cidade:g.cidade||'',disp,nav,so,fuso,site:location.hostname,perfil:USER.perfil||''};
+  try{await db('POST','metas',{mes:MES_ACESSO,assessor:USER.nome,area:AREA_ACESSO,produto:JSON.stringify(info),meta_valor:1})}catch(e){}
+}
 function startHeartbeat(){
   clearInterval(_hbTimer);
+  registraAcesso();
   pingPresenca();
   _hbTimer=setInterval(pingPresenca,60000);
 }
@@ -15960,8 +15990,10 @@ function parsePipe(raw,area){
 function renderUsuarios(c=document.getElementById('main-content')){
   c.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
     <div style="font-size:14px;font-weight:700">${USUARIOS.length} usuários cadastrados</div>
-    <button class="btn wine" onclick="document.getElementById('modal-user').style.display='flex'">+ Novo usuário</button>
+    <div style="display:flex;gap:8px"><button class="btn" onclick="abrirAcessos()">Acessos ao sistema</button>
+    <button class="btn wine" onclick="document.getElementById('modal-user').style.display='flex'">+ Novo usuário</button></div>
   </div>
+  <div id="acc-box"></div>
   <div class="tbl-wrap"><table><thead><tr><th>Nome</th><th>Perfil</th><th>Empresa</th><th>Áreas</th><th>Agenda</th><th>PIN</th><th>Status</th><th>Último acesso</th><th></th></tr></thead>
   <tbody>${USUARIOS.map(u=>`<tr>
     <td style="font-weight:700">${u.nome}</td>
@@ -15985,6 +16017,45 @@ function renderUsuarios(c=document.getElementById('main-content')){
   </tr>`).join('')}</tbody></table></div>`;
 }
 
+// ── lista de acessos (quem entrou, quando e de onde) ──
+const accPais=c=>{if(!c)return '';try{return new Intl.DisplayNames(['pt-BR'],{type:'region'}).of(c)||c}catch(e){return c}};
+async function abrirAcessos(){
+  const box=document.getElementById('acc-box');if(!box)return;
+  box.innerHTML='<div class="acc-card">Carregando acessos…</div>';
+  let rows=[];
+  try{rows=await db('GET','metas','','area=eq.'+AREA_ACESSO+'&order=created_at.desc&limit=2000')||[]}
+  catch(e){box.innerHTML='<div class="acc-card">Não consegui ler os acessos: '+dsEsc(e.message)+'</div>';return}
+  window._accRows=rows.map(r=>{let i={};try{i=JSON.parse(r.produto||'{}')}catch(e){}return Object.assign({quem:r.assessor||'',em:r.created_at||''},i)});
+  window._accF=window._accF||{quem:'',dias:'30'};
+  pintaAcessos();
+}
+function pintaAcessos(){
+  const box=document.getElementById('acc-box');if(!box)return;
+  const F=window._accF,all=window._accRows||[];
+  const lim=F.dias?Date.now()-(+F.dias)*864e5:0;
+  const rows=all.filter(r=>(!F.quem||r.quem===F.quem)&&(!lim||new Date(r.em).getTime()>=lim));
+  const pessoas=[...new Set(all.map(r=>r.quem))].sort();
+  const fora=rows.filter(r=>r.pais&&r.pais!=='BR');
+  const quando=s=>{const d=new Date(s);return isNaN(d)?'—':d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
+  box.innerHTML='<div class="acc-card">'
+    +'<div class="acc-top"><b>Acessos ao sistema</b>'
+      +'<select onchange="window._accF.quem=this.value;pintaAcessos()"><option value="">Todas as pessoas</option>'
+        +pessoas.map(p=>'<option'+(p===F.quem?' selected':'')+'>'+dsEsc(p)+'</option>').join('')+'</select>'
+      +'<select onchange="window._accF.dias=this.value;pintaAcessos()">'
+        +[['1','Hoje'],['7','7 dias'],['30','30 dias'],['90','90 dias'],['','Tudo']].map(([v,l])=>'<option value="'+v+'"'+(v===F.dias?' selected':'')+'>'+l+'</option>').join('')+'</select>'
+      +'<span class="acc-n">'+rows.length+' acesso'+(rows.length===1?'':'s')+(fora.length?' · <b class="acc-alerta">'+fora.length+' fora do Brasil</b>':'')+'</span>'
+      +'<button class="btn sm" onclick="document.getElementById(\'acc-box\').innerHTML=\'\'">Fechar</button></div>'
+    +(rows.length?'<div class="tbl-wrap"><table><thead><tr><th>Quando</th><th>Quem</th><th>País</th><th>Cidade / estado</th><th>Aparelho</th><th>Navegador</th><th>Link</th></tr></thead><tbody>'
+      +rows.slice(0,500).map(r=>'<tr'+(r.pais&&r.pais!=='BR'?' class="acc-fora"':'')+'><td>'+quando(r.em)+'</td><td style="font-weight:700">'+dsEsc(r.quem)+'</td>'
+        +'<td>'+(r.pais?dsEsc(accPais(r.pais)):'<span class="acc-mut" title="Só o link da Vercel mostra o país">não informado</span>')+'</td>'
+        +'<td>'+dsEsc([r.cidade,r.uf].filter(Boolean).join(' / ')||'—')+'</td>'
+        +'<td>'+dsEsc(r.disp||'—')+(r.so?' · '+dsEsc(r.so):'')+'</td><td>'+dsEsc(r.nav||'—')+'</td>'
+        +'<td class="acc-mut">'+dsEsc((r.site||'').replace('gerencial-comercial.','').replace('edcunhatheo.',''))+'</td></tr>').join('')
+      +'</tbody></table></div>'
+      :'<div class="acc-mut" style="padding:10px 0">Nenhum acesso registrado neste recorte. O registro começou a valer nesta versão.</div>')
+    +'<div class="acc-mut" style="margin-top:8px">País e cidade vêm da Vercel (link gerencial-comercial.vercel.app). Pelo link do GitHub o país não aparece. Quem usa VPN aparece no país da VPN.</div>'
+    +'</div>';
+}
 async function editAreas(id){
   const u=USUARIOS.find(x=>String(x.id)===String(id));if(!u)return;
   document.getElementById('modal-areas')?.remove();
