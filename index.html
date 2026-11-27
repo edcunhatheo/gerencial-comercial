@@ -3117,7 +3117,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261127-1000';
+const APP_VERSION='20261127-1500';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3657,6 +3657,11 @@ function blocoPergunta(){
   const q=atQ(),[de,ate,quando]=atRangeQ(q.per);
   const caixa=MET[q.met].caixa;
   const gente=atPessoas(caixa);
+  // A pessoa escolhida antes pode não existir nesta empresa/área (ex.: Luan
+  // escolhido na Quark e a tela trocada para a QRK). O seletor mostrava "o time
+  // todo" mas a conta seguia sendo do Luan — dava 0. Agora a pergunta volta de
+  // verdade para o time todo.
+  if(q.quem&&!gente.some(n=>norm(n)===norm(q.quem))){q.quem='';window._atQ=Object.assign({},window._atQ||{},{quem:''})}
   let ap=atApura(q.quem,de,ate);
   // "O time todo" é o time DESTA caixinha — as mesmas pessoas do mapa lá
   // embaixo. O que outra pessoa registrou (diretor, closer) não entra no
