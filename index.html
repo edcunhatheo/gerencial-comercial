@@ -3110,7 +3110,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261126-2030';
+const APP_VERSION='20261126-2130';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3445,6 +3445,9 @@ function setQ(campo,v){
   const q=atQ();q[campo]=v;
   // trocar a métrica pode deixar a pessoa fora da caixinha certa
   if(campo==='met'&&q.quem&&caixaDe(q.quem)!==MET[q.met].caixa)q.quem='';
+  // o mapa lá embaixo acompanha a pergunta: os dois mostram a MESMA métrica,
+  // senão "1 reunião marcada" em cima e "5" embaixo (ligações) parece erro
+  if(campo==='met'){const cx=MET[v]&&MET[v].caixa;if(cx)window._atMapa=Object.assign({},window._atMapa,{[cx==='ops'?'ops':'closer']:v})}
   window._atQ=q;window._atArea=q.area;renderAtividade();
 }
 const AT_PERS=[['ontem','ontem'],['hoje','hoje'],['semana','nesta semana'],
@@ -3652,9 +3655,16 @@ function blocoPergunta(){
 const atMetMapa=caixa=>{
   const lista=caixa==='ops'?MET_OPS:MET_CLO;
   const esc=(window._atMapa||{})[caixa];
-  return lista.includes(esc)?esc:lista[0];
+  if(lista.includes(esc))return esc;
+  const q=atQ().met;            // sem escolha feita: o mapa abre na métrica da pergunta
+  return lista.includes(q)?q:lista[0];
 };
-function setMapa(caixa,k){window._atMapa=Object.assign({},window._atMapa,{[caixa]:k});renderAtividade()}
+// trocar a aba do mapa também troca a pergunta (mesma caixinha): um número só na tela
+function setMapa(caixa,k){
+  window._atMapa=Object.assign({},window._atMapa,{[caixa]:k});
+  const q=atQ();if(MET[q.met]&&MET[q.met].caixa===caixa&&q.met!==k){q.met=k;window._atQ=q}
+  renderAtividade();
+}
 const TINTA=['#F7F1F2','#F4EEEF','#D8AEB7','#C98E99','#A85A68','#7A2233'];
 function mapaCaixa(caixa,titulo,nota){
   const k=atMetMapa(caixa),J=atJanela();
