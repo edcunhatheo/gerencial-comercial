@@ -3110,7 +3110,7 @@ function tempoAtras(iso){
 // mudar) e o TAMANHO do arquivo publicado, que muda em qualquer edição. Sem
 // isso, cada um fica rodando a versão que o navegador guardou — foi assim que
 // duas telas passaram a mostrar números diferentes.
-const APP_VERSION='20261126-1900';
+const APP_VERSION='20261126-2030';
 let _verTimer=null,_verTam=0,_verUlt=0;
 const urlApp=()=>location.href.split('?')[0].split('#')[0];
 // Baixa o arquivo publicado e compara pelo TEXTO. Não dá para usar o
@@ -3251,6 +3251,7 @@ async function loadData(){
 const MET={
   lig:{rot:'Ligações',low:'ligações',verbo:'fez',cor:'var(--wine)',caixa:'ops'},
   mar:{rot:'Reuniões marcadas',low:'reuniões marcadas',verbo:'marcou',cor:'var(--wine)',caixa:'ops'},
+  mac:{rot:'Aconteceram',low:'reuniões marcadas que aconteceram',verbo:'marcou e aconteceram',cor:'var(--wine)',caixa:'ops'},
   perd:{rot:'Perdidas',low:'oportunidades perdidas',verbo:'perdeu',cor:'var(--red)',caixa:'ops'},
   reu:{rot:'Reuniões feitas',low:'reuniões feitas',verbo:'fez',cor:'var(--wine)',caixa:'closer'},
   r1f:{rot:'R1 feitas',low:'R1 feitas',verbo:'fez',cor:'var(--wine)',caixa:'closer'},
@@ -3259,7 +3260,7 @@ const MET={
   bol:{rot:'Boletado',low:'boletado',verbo:'boletou',cor:'var(--wine)',caixa:'closer',dinheiro:1},
 };
 const metLow=k=>(MET[k]||{}).low||String((MET[k]||{}).rot||'').toLowerCase();
-const MET_OPS=['lig','mar','perd'], MET_CLO=['r1f','r2f','nos','bol'];
+const MET_OPS=['lig','mar','mac','perd'], MET_CLO=['r1f','r2f','nos','bol'];
 // ── quem é de que caixinha ──
 // Sales ops é quem está cadastrado como sales ops de alguma área (no painel da
 // Daily, ou pela dupla fixa). Todo o resto do time é closer.
@@ -3403,7 +3404,37 @@ function atApura(nome,de,ate){
   // pessoa no mapa sumir com registros que o "time todo" lá em cima contava.
   rows=nome?rows.filter(r=>eDono(r,nome)||tocouAlgumDia(r,nome)):rows;
   const ant=_apArea;_apArea=atArea()||'';
-  try{return comQuem(nome||'',()=>apurar(rows,de,ate))}finally{_apArea=ant}
+  try{
+    const ap=comQuem(nome||'',()=>apurar(rows,de,ate));
+    ap.mac=marcadasQueAconteceram(ap.mar||[]);ap.n.mac=ap.mac.length;
+    return ap;
+  }finally{_apArea=ant}
+}
+// ══ DAS MARCADAS, QUAIS ACONTECERAM ══
+// Uma marcada "aconteceu" quando o card tem "Reunião aconteceu" registrado
+// depois da marcação. Cada "aconteceu" vale para UMA marcação só — a última
+// antes dele —, então remarcar a mesma reunião não vira duas realizadas.
+// O que foi incluído à mão acha o card pelo nome (mesma área e empresa).
+function cardDaMarcada(x){
+  if(!x.e||!x.e.aj)return x.r;
+  const nome=norm(String(x.r.cliente||'').replace(/\s*\(.*$/,''));
+  const emp=empAtual();
+  return (OPPS_RAW||[]).find(o=>norm(o.cliente||'')===nome&&(!x.r.area||o.area===x.r.area)&&(!emp||empresaDe(o)===emp))||null;
+}
+function marcadasQueAconteceram(itens){
+  const porCard=new Map();
+  itens.forEach(x=>{const c=cardDaMarcada(x);if(!c)return;if(!porCard.has(c.id))porCard.set(c.id,{c,its:[]});porCard.get(c.id).its.push(x)});
+  const out=[];
+  porCard.forEach(({c,its})=>{
+    const ac=(c.historico||[]).filter(h=>h.campo===MARCAS.reu.campo&&h.para===MARCAS.reu.on).map(h=>isoHist(h.data)).filter(Boolean).sort();
+    const ord=its.slice().sort((a,b)=>a.e.iso.localeCompare(b.e.iso));
+    const usada=new Set();
+    ac.forEach(d=>{
+      for(let i=ord.length-1;i>=0;i--){if(usada.has(i)||ord[i].e.iso>d)continue;usada.add(i);break}
+    });
+    usada.forEach(i=>out.push(Object.assign({},ord[i],{r:c.id===ord[i].r.id?ord[i].r:Object.assign({},c,{cliente:c.cliente})})));
+  });
+  return out;
 }
 const atVal=(ap,k)=>k==='bol'?(ap.vol||0):(ap.n[k]||0);
 const atTexto=(ap,k)=>k==='bol'?fmtR(ap.vol):String(ap.n[k]||0);
@@ -3565,7 +3596,7 @@ function blocoPergunta(){
     const foraMap={};(ap[q.met]||[]).forEach(x=>{if(!ehDentro(x)){const nm=x.e.quem||'—';foraMap[nm]=(foraMap[nm]||0)+1}});
     fora=Object.entries(foraMap);
     const f={...ap,n:{...ap.n}};
-    TIPOS_EV.forEach(t=>{if(Array.isArray(ap[t])){f[t]=ap[t].filter(ehDentro);f.n[t]=f[t].length}});
+    TIPOS_EV.concat(['mac']).forEach(t=>{if(Array.isArray(ap[t])){f[t]=ap[t].filter(ehDentro);f.n[t]=f[t].length}});
     f.vol=(f.bol||[]).reduce((s,x)=>s+(x.r.atual||0),0);
     ap=f;
   }
@@ -3996,6 +4027,16 @@ function dsTrocarFoto(nome){
   window._dsFotoNome=nome;inp.click();
 }
 
+// reuniões marcadas (e as que aconteceram) dos sales ops, pela conta da Atividade
+function dsMarcadas(area,de,ate){
+  const ant=window._atArea;window._atArea=area||'';
+  const mar=[],mac=[];
+  try{
+    atPessoas('ops').forEach(p=>{const ap=atApura(p,de,ate);mar.push(...ap.mar);mac.push(...ap.mac)});
+  }finally{window._atArea=ant}
+  const card=x=>cardDaMarcada(x)||Object.assign({},x.r,{reuniao_data:x.e.iso});
+  return{mar:mar.map(card),mac:mac.map(x=>x.r)};
+}
 function renderDashboard(c=document.getElementById('main-content')){
   ['dsHist','dsReu','dsSpark'].forEach(k=>{if(charts[k]){try{charts[k].destroy()}catch(x){}delete charts[k]}});
   window._dsL={};
@@ -4013,9 +4054,12 @@ function renderDashboard(c=document.getElementById('main-content')){
   const ritmo=ehMes&&du.ate?vBol/du.ate*du.tot:0;
   const pipeAberto=ativos.filter(dsAtivo), vPipe=dsSoma(pipeAberto,r=>r.pipe);
   // ── reuniões ──
-  const reu=base.filter(r=>dsDentro(isoDia(r.reuniao_data),P.ini,P.fim));
-  const reuAnt=base.filter(r=>dsDentro(isoDia(r.reuniao_data),P.aIni,P.aFim));
-  const reuFeitas=reu.filter(r=>isoDia(r.reuniao_data)<P.hoje||(isoDia(r.reuniao_data)===P.hoje&&teveReuniao(r)));
+  // Marcadas e aconteceram saem da MESMA conta da Atividade e da Daily (o
+  // clique em Marcou dos sales ops + o incluído à mão), para o número ser um
+  // só em todo lugar. Antes o Dashboard contava "card com reunião no período",
+  // que é outra pergunta e dava outro número.
+  const mk=dsMarcadas(s.area,P.ini,P.fim), mkAnt=dsMarcadas(s.area,P.aIni,P.aFim);
+  const reu=mk.mar, reuAnt=mkAnt.mar, reuFeitas=mk.mac;
   const reuHoje=ativos.filter(r=>isoDia(r.reuniao_data)===P.hoje);
   const em7=localISO(new Date(Date.now()+7*864e5));
   const reuProx=ativos.filter(r=>{const d=isoDia(r.reuniao_data);return d>P.hoje&&d<=em7});
